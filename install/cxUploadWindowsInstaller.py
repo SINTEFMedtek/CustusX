@@ -11,14 +11,16 @@
 # Usage (execute):
 #   python install/cxUploadWindowsInstaller.py --version v26.08-rc5 --app fraxinus --installer C:/path/to/Fraxinus-win64.exe --execute
 #
-# Requires a GitLab personal access token with the 'api' scope stored in the
-# GITLAB_TOKEN environment variable.  Create one at:
+# Requires a GitLab personal access token with the 'api' scope.  Create one at:
 #   https://gitlab.sintef.no/-/user_settings/personal_access_tokens
 #
-# Store it in your shell:
-#   Linux/Mac:  export GITLAB_TOKEN=your_token   (add to ~/.bashrc)
-#   Windows PS: $env:GITLAB_TOKEN = "your_token"
-#   Windows cmd (permanent): setx GITLAB_TOKEN your_token
+# Pass the token via --token, or store it so you don't have to type it each time:
+#   Linux/Mac:  export GITLAB_TOKEN=your_token   (add to ~/.bashrc to persist)
+#   Windows PS: $env:GITLAB_TOKEN = "your_token"              (current session)
+#               [System.Environment]::SetEnvironmentVariable("GITLAB_TOKEN","your_token","User")
+#                                                             (permanent, all sessions)
+#   Windows cmd: set GITLAB_TOKEN=your_token                  (current session)
+#                setx GITLAB_TOKEN your_token                 (permanent, all sessions)
 #
 # Prerequisites:
 #   - The GitLab CI pipeline for the tag must have already run and created
@@ -102,6 +104,9 @@ def main():
                         help='Application: %s' % ' | '.join(sorted(APP_CONFIG)))
     parser.add_argument('--installer', required=True,
                         help='Path to the .exe installer file')
+    parser.add_argument('--token',
+                        help='GitLab personal access token (api scope). '
+                             'Alternatively set the GITLAB_TOKEN environment variable.')
     parser.add_argument('--execute', action='store_true',
                         help='Actually run. Default is dry-run (print commands only).')
     args = parser.parse_args()
@@ -115,9 +120,9 @@ def main():
         print('ERROR: installer not found: %s' % args.installer)
         sys.exit(1)
 
-    token = os.environ.get('GITLAB_TOKEN', '')
+    token = args.token or os.environ.get('GITLAB_TOKEN', '')
     if not token and not dry_run:
-        print('ERROR: GITLAB_TOKEN environment variable not set.')
+        print('ERROR: no GitLab token found. Pass --token <token> or set the GITLAB_TOKEN environment variable.')
         sys.exit(1)
     display_token = token if token else '<GITLAB_TOKEN>'
 
