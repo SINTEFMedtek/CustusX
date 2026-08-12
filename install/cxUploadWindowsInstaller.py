@@ -71,20 +71,13 @@ def _api_url(project_path, endpoint):
     return '%s/api/v4/projects/%s/%s' % (GITLAB_BASE, encoded_project, endpoint)
 
 
-def _run(description, cmd, dry_run):
+def _run(description, cmd, dry_run, secret=None):
     print('\n--- %s ---' % description)
-    # Mask the token value in displayed output
-    display_cmd = []
-    skip_next = False
-    for part in cmd:
-        if skip_next:
-            display_cmd.append('***')
-            skip_next = False
-        elif part == 'PRIVATE-TOKEN:':
-            display_cmd.append(part)
-            skip_next = True
-        else:
-            display_cmd.append(part)
+    # Mask the token value in displayed output, wherever it appears in an arg
+    # (e.g. embedded in "PRIVATE-TOKEN: <token>") rather than assuming argv shape.
+    display_cmd = cmd
+    if secret:
+        display_cmd = [part.replace(secret, '***') for part in cmd]
     print('  $ ' + ' '.join(display_cmd))
     if not dry_run:
         result = subprocess.run(cmd, check=False)
@@ -124,7 +117,7 @@ def main():
     if not token and not dry_run:
         print('ERROR: no GitLab token found. Pass --token <token> or set the GITLAB_TOKEN environment variable.')
         sys.exit(1)
-    display_token = token if token else '<GITLAB_TOKEN>'
+    header_token = token if token else '<GITLAB_TOKEN>'
 
     cfg = APP_CONFIG[args.app]
     project_path = cfg['project_path']
@@ -138,11 +131,12 @@ def main():
         'Upload installer to GitLab Generic Packages',
         [
             'curl', '--fail', '--progress-bar',
-            '--header', 'PRIVATE-TOKEN: %s' % display_token,
+            '--header', 'PRIVATE-TOKEN: %s' % header_token,
             '--upload-file', args.installer,
             package_url,
         ],
         dry_run,
+        secret=token,
     )
 
     link_data = json.dumps({
@@ -156,12 +150,13 @@ def main():
         'Add link to GitLab release page',
         [
             'curl', '--fail', '--request', 'POST',
-            '--header', 'PRIVATE-TOKEN: %s' % display_token,
+            '--header', 'PRIVATE-TOKEN: %s' % header_token,
             '--header', 'Content-Type: application/json',
             '--data', link_data,
             releases_links_url,
         ],
         dry_run,
+        secret=token,
     )
 
     print('\nDone. Check the release page at:')
