@@ -10,6 +10,7 @@ _Changes since v22.09_
 | [CustusX#33](https://gitlab.sintef.no/custusx/custusx/-/issues/33) | New registration and mesh filters | Added a Coherent Point Drift (CPD) registration filter and a ClipMeshByVolume mesh-clipping filter. |
 | [Fraxinus#22](https://gitlab.sintef.no/custusx/fraxinus/-/issues/22) | Optional gray application style | Added an optional gray application style for all applications, activated with `-style gray` on the command line. |
 | [CustusX#22](https://gitlab.sintef.no/custusx/custusx/-/issues/22) | Ubuntu 22.04 support | CustusX now builds and runs on Ubuntu 22.04. |
+| [CustusX#42](https://gitlab.sintef.no/custusx/custusx/-/issues/42) | Windows installer | A pre-built Windows installer is now published on the releases page. The open-source Windows build uses IGSTK for tracking. |
 
 ## Bugfixes
 
@@ -28,6 +29,7 @@ _Changes since v22.09_
 | Key | Summary | Release Note |
 |---|---|---|
 | [CustusX#30](https://gitlab.sintef.no/custusx/custusx/-/issues/30) | Tracking on Ubuntu 24.04 | Tracking hardware support is not available in the open-source CustusX build on Ubuntu 24.04. |
+| [CustusX#42](https://gitlab.sintef.no/custusx/custusx/-/issues/42) | Windows testing coverage | The Windows build is new and has not been as thoroughly tested and verified as the Ubuntu builds. Ubuntu remains the primary, best-tested platform. |
 
 <details>
 <summary>Internal changes not included above (CI/build/tooling)</summary>
