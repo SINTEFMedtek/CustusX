@@ -556,7 +556,13 @@ class CustusX(CppComponent):
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', True)
             add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', False)
             add('CMAKE_CXX_STANDARD:STRING', 14)
-            append('CX_CMAKE_CXX_FLAGS:STRING', '-fpermissive') # old ITK throw() specs are forbidden in C++17
+            if platform.system() != 'Windows':
+                # old ITK throw() specs are forbidden in C++17. GCC/Clang-only flag: CX_CMAKE_CXX_FLAGS
+                # feeds CMake's add_definitions(), which is not language-scoped, so on Windows this also
+                # leaked into rc.exe (resource compiler) invocations, where it's a fatal unknown option
+                # (RC1103) rather than the harmless cl.exe D9002 warning it is for C++ compiles there.
+                # MSVC doesn't need or support this flag, so just skip it on Windows.
+                append('CX_CMAKE_CXX_FLAGS:STRING', '-fpermissive')
         else:
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False)
             add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', False)
