@@ -69,8 +69,13 @@ def copyOutput(filenameInput):
     venv_path = os.path.dirname(sys.executable)
     data_path = venv_path + '/../../segmentations/'
     filenameInputNoExt = os.path.splitext(filenameInput)[0]
-    if os.path.isfile(data_path + 'lung_vessels.nii.gz'):
-        sitk.WriteImage(sitk.ReadImage(data_path + 'lung_vessels.nii.gz'), filenameInputNoExt + '_lungVessels.mhd')
+    # The lung_vessels task now outputs 4 classes (lung_airways, lung_airways_wall,
+    # lung_arteries, lung_veins) instead of one combined lung_vessels class.
+    # Airways are already segmented separately, so only copy the vessel classes.
+    if os.path.isfile(data_path + 'lung_arteries.nii.gz'):
+        sitk.WriteImage(sitk.ReadImage(data_path + 'lung_arteries.nii.gz'), filenameInputNoExt + '_lungVessels_PulmonaryArteries.mhd')
+    if os.path.isfile(data_path + 'lung_veins.nii.gz'):
+        sitk.WriteImage(sitk.ReadImage(data_path + 'lung_veins.nii.gz'), filenameInputNoExt + '_lungVessels_PulmonaryVeins.mhd')
 
 def deleteAllFilesInSegmentationFolder():
     venv_path = os.path.dirname(sys.executable)

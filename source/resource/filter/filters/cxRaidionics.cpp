@@ -196,7 +196,7 @@ QStringList Raidionics::createTargetList(QString target)
 	else if(model == lmMEDIUM_ORGANS_MEDIASTINUM)
 		targets << getTarget(otVENA_CAVA) << getTarget(otAORTIC_ARCH) << getTarget(otASCENDING_AORTA) << getTarget(otDESCENDING_AORTA) << getTarget(otSPINE);
 	else if(model == lmPULMSYST_HEART)
-		targets << getTarget(otHEART) << getTarget(otPULMONARY_VEINS) << getTarget(otPULMONARY_TRUNK);
+		targets << getTarget(otHEART);
 	else if(model == lmSMALL_ORGANS_MEDIASTINUM)
 		targets << getTarget(otBRACHIO_CEPHALIC_VEINS) << getTarget(otSUBCLAVIAN_ARTERY) << getTarget(otAZYGOS) <<	getTarget(otESOPHAGUS);
 
@@ -281,10 +281,6 @@ QString Raidionics::colorForLungClass(QString outputClass)
 		color = "255,255,255,255";break;
 	case otHEART:
 		color = "254,128,204,128";break;
-	case otPULMONARY_VEINS:
-		color = "131,105,79,255";break;
-	case otPULMONARY_TRUNK:
-		color = "229,179,255,255";break;
 	case otBRACHIO_CEPHALIC_VEINS:
 		color = "153,153,255,255";break;
 	case otSUBCLAVIAN_ARTERY:
@@ -293,8 +289,10 @@ QString Raidionics::colorForLungClass(QString outputClass)
 		color = "153,153,255,255";break;
 	case otESOPHAGUS:
 		color = "170,85,0,255";break;
-	case otLUNG_VESSELS:
-		color = "0,0,255,255";break;
+	case otPULMONARY_ARTERIES: // Same color as other arteries (e.g. Subclavian Artery)
+		color = "255,127,127,255";break;
+	case otPULMONARY_VEINS: // Same color as other veins (e.g. Vena Cava)
+		color = "153,153,255,255";break;
 	case otLOBE_LUL:
 	case otLOBE_RUL:
 		color = "255,117,117,100";break;
@@ -320,7 +318,8 @@ int Raidionics::contourFilterSettingForLungClass(QString outputClass)
 	ORGAN_TYPE target = Raidionics::getOrganType(outputClass);
 	switch (target)
 	{
-	case otLUNG_VESSELS:
+	case otPULMONARY_ARTERIES:
+	case otPULMONARY_VEINS:
 		filtering = 1;break;
 
 	case otLYMPH_NODES:
@@ -329,8 +328,6 @@ int Raidionics::contourFilterSettingForLungClass(QString outputClass)
 	case otASCENDING_AORTA:
 	case otDESCENDING_AORTA:
 	case otSPINE:
-	case otPULMONARY_VEINS:
-	case otPULMONARY_TRUNK:
 	case otBRACHIO_CEPHALIC_VEINS:
 	case otSUBCLAVIAN_ARTERY:
 	case otAZYGOS:
