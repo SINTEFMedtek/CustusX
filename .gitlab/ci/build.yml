@@ -3,7 +3,7 @@
 # CI_PROJECT_DIR is deleted from the Docker image before the build,
 # so a quick build requires out of source build files
 .build-variables:
-  stage: build
+  # stage is set per-platform job below, to serialize platform builds.
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
     OS: OS
@@ -100,6 +100,7 @@
 
 build-ubuntu20:
   extends: .reuse-build
+  stage: build-20
   image: $IMAGE_UBUNTU2004
   variables:
     OS: Ubuntu2004
@@ -111,6 +112,7 @@ build-ubuntu20:
 
 build-ubuntu22:
   extends: .reuse-build
+  stage: build-22
   image: $IMAGE_UBUNTU2204
   variables:
     OS: Ubuntu2204
@@ -122,6 +124,7 @@ build-ubuntu22:
 
 build-ubuntu24:
   extends: .reuse-build
+  stage: build-24
   image: $IMAGE_UBUNTU2404
   variables:
     OS: Ubuntu2404
