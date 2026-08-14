@@ -62,6 +62,8 @@ cx_install_add_library_dirs(
     ${DCMTK_DIR}/bin
     ${ITK_DIR}/lib
     ${ITK_DIR}/bin
+    ${IGSTK_DIR}/lib
+    ${IGSTK_DIR}/bin
     ${FAST_LIBRARY_DIRS}
     ${FAST_DIR}/lib
     ${FAST_DIR}/bin
