@@ -184,9 +184,10 @@ class ITK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        # Using ITK v4.12.0 with a fix for gcc 9
-        # Newer ITK versions makes IGSTK compilation fail
-        self._getBuilder().gitCheckoutSha('d16ba4abedea55622c38275e2edfdd6ddec12dad')
+        # Using ITK v4.12.0 with a fix for gcc 9, plus a fix for MSVC's stricter
+        # STL headers (missing <functional> include for std::unary_function/
+        # binary_function). Newer ITK versions makes IGSTK compilation fail.
+        self._getBuilder().gitCheckoutSha('3a90ed3efaef717eb09a72e62bc39d05d4641ac8')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
