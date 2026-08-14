@@ -571,8 +571,9 @@ TEST_CASE("GenericScriptFilter: Read python_LungVessels.ini file", "[unit]")
 	REQUIRE(outputVariables.mCreateOutputVolumeList[0] == "false");
 	REQUIRE(outputVariables.mCreateOutputMeshList[0] == "true");
 
-	REQUIRE(outputVariables.mOutputClasses.size() > 0);
-	REQUIRE(outputVariables.mOutputClasses[0] == "LungVessels");
+	REQUIRE(outputVariables.mOutputClasses.size() == 2);
+	REQUIRE(outputVariables.mOutputClasses[0] == "PulmonaryArteries");
+	REQUIRE(outputVariables.mOutputClasses[1] == "PulmonaryVeins");
 
 
 	//CX_LOG_DEBUG() << "testStandardCommandString: " << filter->testStandardCommandString(variables);

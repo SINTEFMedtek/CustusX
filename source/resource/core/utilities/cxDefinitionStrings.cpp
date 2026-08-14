@@ -153,10 +153,9 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Vena Cava",
 	"Aorta",
 	"Subclavian Artery",
-	"Lung Vessels",
-	"Heart",
+	"Pulmonary Arteries",
 	"Pulmonary Veins",
-	"Pulmonary Trunk",
+	"Heart",
 	"Esophagus",
 	"Spine",
 	"Nodules",
@@ -164,7 +163,8 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Centerlines",
 	"Medium Organs",
 	"Small Organs",
-	"PET"
+	"PET",
+	"Pulmonary Arteries And Veins"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_STRUCTURES, lsCOUNT)
 
@@ -190,8 +190,6 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
 	"DescendingAorta",
 	"Spine",
 	"Heart",
-	"PulmonaryVeins",
-	"PulmonaryTrunk",
 	"BrachiocephalicVeins",
 	"SubclavianArtery", //"SubCarArt" in Raidionics
 	"Azygos",
@@ -202,7 +200,8 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
 	"LobeRUL",
 	"LobeRML",
 	"LobeRLL",
-	"LungVessels",
+	"PulmonaryArteries",
+	"PulmonaryVeins",
 	"AirwaysEnhanced",
 	"AirwaysEnhancedCopy",
 	"Centerlines",
