@@ -29,7 +29,8 @@ def runTotalSegmentator(filenameInput):
 
     process = subprocess.Popen(
         [venv_path + '/TotalSegmentator', '-i', filenameInput,
-         '-o', venv_path + '/../../segmentations', '--task', 'lung_vessels'],
+         '-o', venv_path + '/../../segmentations', '--task', 'lung_vessels',
+         '--nr_thr_saving', '1'],
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
         text=True, bufsize=1
     )
