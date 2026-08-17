@@ -131,7 +131,7 @@ class RepoHandler(object):
         - if main_branch is set, use that, else:
         -   try the default and fallback branches
         '''
-        runShell('git fetch', self.repo_path)
+        runShell('git fetch --prune --prune-tags', self.repo_path)
 
         tag = self.args.git_tag
         if tag:
