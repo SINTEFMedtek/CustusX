@@ -90,7 +90,12 @@ ctkMacroSetupPlugins(
 # just the leaf directory name (the plugin's symbolic name) before checking for the target.
 set(_cx_built_plugins "")
 foreach(_cx_plugin_entry IN LISTS CX_PLUGINS)
-    string(REGEX REPLACE ":.*$" "" _cx_plugin_path "${_cx_plugin_entry}")
+    # Match only the trailing :ON/:OFF, not the first colon in the string - on
+    # Windows, plugins registered via an absolute path (e.g. external plugins
+    # living outside this repo, reached only via ".." in cx_append_plugins_
+    # external_to_core) start with a drive letter like "D:", and ":.*$" would
+    # match that colon instead, truncating the path down to a single letter.
+    string(REGEX REPLACE ":(ON|OFF)$" "" _cx_plugin_path "${_cx_plugin_entry}")
     get_filename_component(_cx_plugin_name "${_cx_plugin_path}" NAME)
     string(REPLACE "." "_" _cx_target_name "${_cx_plugin_name}")
     if(TARGET ${_cx_target_name})
