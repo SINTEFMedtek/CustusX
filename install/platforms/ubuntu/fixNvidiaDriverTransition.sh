@@ -106,11 +106,11 @@ echo "--- Determining which driver package should be installed ---"
 # driver, per the note above).
 RECOMMENDED_PKG=""
 if command -v ubuntu-drivers >/dev/null 2>&1; then
-    RECOMMENDED_PKG=$(ubuntu-drivers devices 2>/dev/null | awk '/^driver.*recommended/{print $3}' | head -n1)
+    RECOMMENDED_PKG=$(ubuntu-drivers devices 2>/dev/null | awk '/^driver.*recommended/{print $3}' | head -n1) || true
 fi
 
 if [ -z "$RECOMMENDED_PKG" ]; then
-    GEN=$(dpkg -l 2>/dev/null | awk '/^ii  libnvidia-compute-[0-9]/{print $2}' | grep -oE '[0-9]+$' | sort -n | tail -1)
+    GEN=$(dpkg -l 2>/dev/null | awk '/^ii  libnvidia-compute-[0-9]/{print $2}' | grep -oE '[0-9]+$' | sort -n | tail -1) || true
     if [ -n "$GEN" ]; then
         RECOMMENDED_PKG="nvidia-driver-${GEN}"
     fi
