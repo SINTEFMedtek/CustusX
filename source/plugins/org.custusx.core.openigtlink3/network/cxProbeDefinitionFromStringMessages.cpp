@@ -25,7 +25,7 @@ namespace cx
 bool validSpacing(Vector3D spacing)
 {
 	//Assuming (1, 1, 1) is an invalid spacing
-	if((similar(spacing[0], 1.0) && similar(spacing[0], 1.0) && similar(spacing[0], 1.0)) ||
+	if((similar(spacing[0], 1.0) && similar(spacing[1], 1.0) && similar(spacing[2], 1.0)) ||
 			similar(spacing[0], 0.0) || similar(spacing[1], 0.0) || similar(spacing[2], 0.0) )
 		return false;
 	return true;
