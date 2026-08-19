@@ -47,6 +47,7 @@ else(APPLE)
             OUTPUT ${CX_RES_FILE}
             COMMAND ${CMAKE_RC_COMPILER} /fo ${CX_RES_FILE} ${CX_RC_FILE}
             DEPENDS ${CX_RC_FILE} "${CMAKE_CURRENT_SOURCE_DIR}/../../gui/icons/CustusX/CustusX.ico"
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             COMMENT "Compiling CustusX.rc"
             VERBATIM
         )
