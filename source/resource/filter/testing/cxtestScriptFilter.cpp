@@ -665,8 +665,6 @@ TEST_CASE("Raidionics: target generation", "[unit]")
 
 		QStringList outputClasses = raidionicsUtilities->expandOutputClasses(classes);
 
-        // CX_LOG_DEBUG() << "Input classes: " << classes.join(" ");
-        // CX_LOG_DEBUG() << "Output Classes: " << outputClasses.join(" ");
 		if(i == cx::lmCOUNT || i == cx::lmPULMSYST_HEART)
 			CHECK(outputClasses.size() == 1);
 		else

@@ -210,13 +210,21 @@ function(cx_build_user_documentation_qt_help)
       if(TARGET Qt5::qhelpgenerator)
         get_target_property(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE Qt5::qhelpgenerator LOCATION)
       else()
-        find_program(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qhelpgenerator REQUIRED)
+        # NOTE: find_program's REQUIRED keyword needs CMake >= 3.18; this project's
+        # minimum is 3.16.3 (matches Ubuntu 20.04's stock cmake), so check manually.
+        find_program(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qhelpgenerator)
+        if(NOT CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+          message(FATAL_ERROR "qhelpgenerator not found")
+        endif()
       endif()
     elseif(TARGET Qt5::qcollectiongenerator)
       # works on mac
       get_target_property(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE Qt5::qcollectiongenerator LOCATION)
     else()
-      find_program(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qcollectiongenerator REQUIRED)
+      find_program(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qcollectiongenerator)
+      if(NOT CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+        message(FATAL_ERROR "qcollectiongenerator not found")
+      endif()
     endif()
 
     add_custom_command(TARGET UserDoc

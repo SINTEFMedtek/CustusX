@@ -88,11 +88,13 @@ class RepoHandler(object):
         pathfound = os.path.exists(self.repo_path)
         if pathfound:
             print("Not a git repo, removing folder and contents of %s." % self.repo_path)
-            shutil.rmtree(self.repo_path)
 
         print('*** %s will be cloned in [%s]' % (self.getName(), self.root_path))
         doprompt = not (self.silent or args.silent_mode)
         self._promptToContinue(doprompt)
+
+        if pathfound:
+            shutil.rmtree(self.repo_path)
 
         self._cloneWithRetry()
 
