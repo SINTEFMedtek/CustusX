@@ -135,16 +135,14 @@ cleanup-old-external-libs:
 
       api   = os.environ['CI_API_V4_URL']
       proj  = os.environ['CI_PROJECT_ID']
-      # GITLAB_TOKEN (api scope) is required for DELETE; fall back to JOB-TOKEN for listing only.
-      token = os.environ.get('GITLAB_TOKEN') or os.environ['CI_JOB_TOKEN']
-      token_header = 'PRIVATE-TOKEN' if os.environ.get('GITLAB_TOKEN') else 'JOB-TOKEN'
+      token = os.environ['CI_JOB_TOKEN']
       keep  = int(os.environ.get('KEEP_VERSIONS', '1'))
       pkg_name = 'custusx-external-libs'
 
       def api_request(path, method='GET'):
           req = urllib.request.Request(
               f'{api}/projects/{proj}/{path}',
-              headers={token_header: token},
+              headers={'JOB-TOKEN': token},
               method=method)
           with urllib.request.urlopen(req) as r:
               body = r.read()
