@@ -117,6 +117,24 @@ CI external lib caching:
 
 The private plugin (`org.custusx.fraxinus.private`) follows the standard CTK plugin structure and requires `manifest_headers.cmake` like all other plugins. A missing `manifest_headers.cmake` or a stale `.so` from a renamed plugin causes a "Skipping N plugins not in build manifest" warning at startup; fix by adding the file and doing a clean rebuild.
 
+**Git remotes get rewritten by the open-source build/install scripts**
+
+`cx.build.cxInstallData.Common` defaults `git_use_https = True`, and every component's `update()` calls `gitSetRemoteURL()` (`git remote set-url origin ...` + `git fetch`) using that setting. This means running *either* open-source build/install script resets that repo's own `origin` remote to https, even if it was previously an SSH URL:
+- CustusX's own installer (`root_dir/CX/CX/install/cxInstaller.py`) resets `CX/CX`'s `origin` to `https://gitlab.sintef.no/custusx/CustusX.git`
+- Fraxinus's public installer (`root_dir/FX/FX/script/cxFraxinusInstaller.py`, via `cxPublicComponentAssembly.py`) resets `FX/FX`'s `origin` to `https://gitlab.sintef.no/custusx/fraxinus.git`
+
+This is intentional — both are open source and https doesn't require an SSH key to clone — but it means `git push` from either repo will fail with an HTTP Basic auth error (read/fetch still works over https) any time after that repo's own build script has run. Switch to SSH, push, then switch back so the next build-script run doesn't fight with your remote:
+
+```bash
+git -C CX/CX remote set-url origin git@gitlab.sintef.no:custusx/CustusX.git
+git -C CX/CX push origin <branch>
+git -C CX/CX remote set-url origin https://gitlab.sintef.no/custusx/CustusX.git
+
+git -C FX/FX remote set-url origin git@gitlab.sintef.no:custusx/Fraxinus.git
+git -C FX/FX push origin <branch>
+git -C FX/FX remote set-url origin https://gitlab.sintef.no/custusx/fraxinus.git
+```
+
 **Open/Closed code**
 
 While CustusX is open source, most other repositories are closed source, and Claude should avoid looking into this code unless ordered:
