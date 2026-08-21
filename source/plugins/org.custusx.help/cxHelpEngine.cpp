@@ -34,6 +34,20 @@ HelpEngine::HelpEngine()
 	QString helpFile = profile()->getPath() + "/cx_user_doc.qhc";
 	helpEngine = new QHelpEngine(helpFile, NULL);
 
+	if (!helpEngine->setupData())
+	{
+		// A collection file left over from a previously installed version can
+		// reference a cx_user_doc.qch that no longer exists (each Windows
+		// install lives in its own version-named folder), leaving the
+		// collection file unusable ("Cannot register index tables...").
+		// Recreate it from scratch instead of leaving help broken all session.
+		reportWarning(QString("HelpEngine: could not open %1 (%2), recreating it")
+					  .arg(helpFile).arg(helpEngine->error()));
+		delete helpEngine;
+		QFile::remove(helpFile);
+		helpEngine = new QHelpEngine(helpFile, NULL);
+	}
+
 	this->setupDataWithWarning();
 	this->setupDocFile();
 	this->setupDataWithWarning();
