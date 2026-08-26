@@ -51,6 +51,12 @@ else(APPLE)
             COMMENT "Compiling CustusX.rc"
             VERBATIM
         )
+        # Without EXTERNAL_OBJECT, the Ninja/Makefiles generators don't recognize
+        # the precompiled .res as something to feed to the linker (unlike the
+        # Visual Studio generator, which understands .res natively) and silently
+        # drop it from the link line -- the exe still links fine, just with no
+        # icon resource embedded.
+        set_source_files_properties(${CX_RES_FILE} PROPERTIES EXTERNAL_OBJECT TRUE)
         add_executable(CustusX ${SOURCES} ${CX_RES_FILE}) #WINDOWS
         set_target_properties(CustusX PROPERTIES LINK_FLAGS    "/MANIFESTUAC:\"level='asInvoker' uiAccess='false'\"")
     else()
