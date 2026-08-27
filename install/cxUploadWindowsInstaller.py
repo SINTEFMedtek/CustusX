@@ -59,9 +59,9 @@ APP_CONFIG = {
     },
     'fraxinus-private': {
         'project_path': 'custusx/org.custusx.fraxinus.private',
-        'package_name': 'Fraxinus',
-        'link_name': 'Fraxinus Private Windows installer',
-        'upload_filename': 'FraxinusPrivateWindows.exe',
+        'package_name': 'FraxinusExcelsior',
+        'link_name': 'FraxinusExcelsior Windows installer',
+        'upload_filename': 'FraxinusExcelsiorWindows.exe',
     },
 }
 
