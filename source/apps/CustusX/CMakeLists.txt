@@ -32,7 +32,32 @@ if(APPLE)
     add_executable(CustusX MACOSX_BUNDLE ${SOURCES} ) #APPLE
 else(APPLE)
     if(CX_WINDOWS)
-        add_executable(CustusX ${SOURCES} CustusX.rc) #WINDOWS
+        # CustusX.rc only references a local .ico file, but adding it as a normal
+        # source of the CustusX target (CMake's native RC-language handling) makes
+        # it inherit the target's entire aggregated include-directory list (every
+        # linked VTK/ITK/CTK/... module), same as any .cpp file. Unlike cl.exe,
+        # rc.exe has no response-file fallback for long command lines, so enough
+        # dependencies (e.g. IGSTK, or downstream apps linking in more plugins)
+        # can trip Windows' ~32767-char command-line limit ("CreateProcess
+        # failed... command line too long"). Compile it via a plain custom
+        # command instead, so it only ever sees the two paths it actually needs.
+        set(CX_RC_FILE "${CMAKE_CURRENT_SOURCE_DIR}/CustusX.rc")
+        set(CX_RES_FILE "${CMAKE_CURRENT_BINARY_DIR}/CustusX.res")
+        add_custom_command(
+            OUTPUT ${CX_RES_FILE}
+            COMMAND ${CMAKE_RC_COMPILER} /fo ${CX_RES_FILE} ${CX_RC_FILE}
+            DEPENDS ${CX_RC_FILE} "${CMAKE_CURRENT_SOURCE_DIR}/../../gui/icons/CustusX/CustusX.ico"
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMENT "Compiling CustusX.rc"
+            VERBATIM
+        )
+        # Without EXTERNAL_OBJECT, the Ninja/Makefiles generators don't recognize
+        # the precompiled .res as something to feed to the linker (unlike the
+        # Visual Studio generator, which understands .res natively) and silently
+        # drop it from the link line -- the exe still links fine, just with no
+        # icon resource embedded.
+        set_source_files_properties(${CX_RES_FILE} PROPERTIES EXTERNAL_OBJECT TRUE)
+        add_executable(CustusX ${SOURCES} ${CX_RES_FILE}) #WINDOWS
         set_target_properties(CustusX PROPERTIES LINK_FLAGS    "/MANIFESTUAC:\"level='asInvoker' uiAccess='false'\"")
     else()
         add_executable(CustusX ${SOURCES} ) #LINUX

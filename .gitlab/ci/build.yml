@@ -3,7 +3,7 @@
 # CI_PROJECT_DIR is deleted from the Docker image before the build,
 # so a quick build requires out of source build files
 .build-variables:
-  stage: build
+  # stage is set per-platform job below, to serialize platform builds.
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
     OS: OS
@@ -100,18 +100,31 @@
 
 build-ubuntu20:
   extends: .reuse-build
+  stage: build-20
   image: $IMAGE_UBUNTU2004
   variables:
     OS: Ubuntu2004
+    BUILD_IGSTK: "true"
+    # BASE_DIR must match build-external-libs-ubuntu20-igstk's BASE_DIR: VTK/ITK's
+    # generated CMake config files embed absolute paths and are not relocatable.
+    BASE_DIR: $BASE_DIR_UBUNTU2004_IGSTK
+    GIT_CLONE_PATH: $BASE_DIR_UBUNTU2004_IGSTK/CX/CX
 
 build-ubuntu22:
   extends: .reuse-build
+  stage: build-22
   image: $IMAGE_UBUNTU2204
   variables:
     OS: Ubuntu2204
+    BUILD_IGSTK: "true"
+    # BASE_DIR must match build-external-libs-ubuntu22-igstk's BASE_DIR: VTK/ITK's
+    # generated CMake config files embed absolute paths and are not relocatable.
+    BASE_DIR: $BASE_DIR_UBUNTU2204_IGSTK
+    GIT_CLONE_PATH: $BASE_DIR_UBUNTU2204_IGSTK/CX/CX
 
 build-ubuntu24:
   extends: .reuse-build
+  stage: build-24
   image: $IMAGE_UBUNTU2404
   variables:
     OS: Ubuntu2404

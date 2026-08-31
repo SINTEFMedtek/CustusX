@@ -140,10 +140,13 @@ bool ElastixExecuter::runTransformix(ImagePtr deformImage)
 void ElastixExecuter::setProcessEnvironment(QProcess* process)
 {
 #ifdef Q_OS_LINUX
-	// hack that inserts . into library path for linux. Solveds issue with elastix lib not being fixed up on linux.
-	QString path = QFileInfo(mElastiXApplication).absolutePath();
+	// hack that inserts elastix's own bin and lib folders into the library path for linux.
+	// Needed because the elastix binary's own RUNPATH points to a build-time path that
+	// does not exist on the installed system, so it cannot find e.g. libelxANNlib.so on its own.
+	QDir binDir(QFileInfo(mElastiXApplication).absolutePath());
+	QString libPath = QDir::cleanPath(binDir.absoluteFilePath("../lib"));
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-	env.insert("LD_LIBRARY_PATH", path);
+	env.insert("LD_LIBRARY_PATH", binDir.absolutePath() + ":" + libPath);
 	process->setProcessEnvironment(env);
 #endif
 }

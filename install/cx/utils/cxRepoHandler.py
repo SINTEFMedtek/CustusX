@@ -12,6 +12,7 @@ import sys
 import subprocess
 import pprint
 import argparse
+import shutil
 
 def returnCode():
     return 0
@@ -71,6 +72,9 @@ class RepoHandler(object):
         self.root_path = root_path
         self.repo_path = repo_path
 
+    def is_git_directory(self, path = '.'):
+        return subprocess.call(['git', '-C', path, 'status'], stderr=subprocess.STDOUT, stdout = open(os.devnull, 'w')) == 0
+
     def cloneRepoWithPrompt(self):
         '''
         Checkout the repository, clone if needed.
@@ -79,16 +83,39 @@ class RepoHandler(object):
          - checkout folder
          - root path
         '''
+        if self.is_git_directory(self.repo_path):
+            return
         pathfound = os.path.exists(self.repo_path)
         if pathfound:
-            return
-        
+            print("Not a git repo, removing folder and contents of %s." % self.repo_path)
+
         print('*** %s will be cloned in [%s]' % (self.getName(), self.root_path))
         doprompt = not (self.silent or args.silent_mode)
         self._promptToContinue(doprompt)
-        
-        runShell('git clone %s %s' % (self.getUrl(), self.repo_path), self.root_path)
-            
+
+        if pathfound:
+            shutil.rmtree(self.repo_path)
+
+        self._cloneWithRetry()
+
+    def _cloneWithRetry(self, attempts=3):
+        '''
+        A bare `git clone` has no resilience against a mid-transfer TLS drop
+        (e.g. GnuTLS recv error), unlike GitLab Runner's own checkout of the
+        pipeline repo, which retries automatically. Retry here too, falling
+        back to HTTP/1.1 since HTTP/2 is the more likely side to drop the
+        connection on some networks/proxies.
+        '''
+        for attempt in range(1, attempts + 1):
+            http_fallback = '' if attempt == 1 else '-c http.version=HTTP/1.1 '
+            cmd = 'git %sclone %s %s' % (http_fallback, self.getUrl(), self.repo_path)
+            if runShell(cmd, self.root_path) is not None:
+                return
+            print('Clone attempt %d/%d failed for %s.' % (attempt, attempts, self.getName()))
+            if os.path.exists(self.repo_path):
+                shutil.rmtree(self.repo_path)
+        sys.exit('ERROR: failed to clone %s after %d attempts.' % (self.getName(), attempts))
+
     def getUrl(self):
         url_base = self.url_base
         if self.args.gitrepo_main_site_base:
@@ -106,7 +133,7 @@ class RepoHandler(object):
         - if main_branch is set, use that, else:
         -   try the default and fallback branches
         '''
-        runShell('git fetch', self.repo_path)
+        runShell('git fetch --prune --prune-tags', self.repo_path)
 
         tag = self.args.git_tag
         if tag:

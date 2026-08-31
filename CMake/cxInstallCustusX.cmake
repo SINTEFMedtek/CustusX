@@ -70,6 +70,16 @@ cx_install_add_library_dirs(
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins
 )
 
+# IGSTK_DIR is only set when BUILD_IGSTK is enabled; an unconditional
+# ${IGSTK_DIR}/lib and /bin above would expand to the filesystem root
+# ("/lib", "/bin") on builds where it isn't.
+if(IGSTK_DIR)
+    cx_install_add_library_dirs(
+        ${IGSTK_DIR}/lib
+        ${IGSTK_DIR}/bin
+    )
+endif()
+
 #message(STATUS "QT_LIB: "   ${QT_LIBRARY_DIRS}) - empty
 #message(STATUS "QT_BIN: "   ${QT_BINARY_DIR}) - empty
 

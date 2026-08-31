@@ -70,9 +70,27 @@ class CppBuilder(object):
 
     def gitClone(self, repository, folder=''):
         self._changeDirToBase()
-        runShell('git clone %s %s' % (repository, folder))
+        self._gitCloneWithRetry(repository, folder)
         self._changeDirToSource()
-        
+
+    def _gitCloneWithRetry(self, repository, folder, attempts=3):
+        '''
+        A bare `git clone` has no resilience against a mid-transfer TLS drop
+        (e.g. GnuTLS recv error). Retry here, falling back to HTTP/1.1 since
+        HTTP/2 is the more likely side to drop the connection on some
+        networks/proxies. Mirrors cxRepoHandler.RepoHandler._cloneWithRetry.
+        '''
+        target = os.path.join(self.mBasePath, folder) if folder else self.mBasePath
+        for attempt in range(1, attempts + 1):
+            http_fallback = '' if attempt == 1 else '-c http.version=HTTP/1.1 '
+            cmd = 'git %sclone %s %s' % (http_fallback, repository, folder)
+            if runShell(cmd, ignoreFailure=True):
+                return
+            print('Clone attempt %d/%d failed for %s.' % (attempt, attempts, repository))
+            if os.path.exists(target):
+                shutil.rmtree(target)
+        exit('ERROR: failed to clone %s after %d attempts.' % (repository, attempts))
+
     def gitCloneIntoExistingDirectory(self, repository, branch):
         '''
         Use in the case that the source folder already contains stuff,
@@ -230,6 +248,13 @@ class CppBuilder(object):
         if(platform.system() != 'Windows'):
             # append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-unknown-warning-option -Wno-inconsistent-missing-override -Wno-self-assign-field')
             append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
+        if(platform.system() == 'Windows' and self.controlData.getCMakeGenerator() == 'Ninja'):
+            # Without this, Ninja builds compile commands as a single CreateProcess call.
+            # The superbuild's VTK/ITK/CTK include-path lists routinely exceed Windows'
+            # 32767-char command-line limit, causing "CreateProcess failed... is the
+            # command line too long?" errors on targets like cxResourceVisualization.
+            # Forcing response files makes cl.exe read args from an @file instead.
+            add('CMAKE_NINJA_FORCE_RESPONSE_FILE:BOOL', 'ON')
         add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')

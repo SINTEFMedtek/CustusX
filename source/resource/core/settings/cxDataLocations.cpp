@@ -95,7 +95,7 @@ QString DataLocations::readTestDataPathFromFile(QString filename)
 
 QString DataLocations::getPersistentWritablePath()
 {
-	QString homepath = QDir::homePath() + "/" + CX_SYSTEM_BASE_NAME + "_settings";
+	QString homepath = QDir::homePath() + "/" + CX_SETTINGS_FOLDER_NAME + "_settings";
 
 	if (mTestMode)
 		homepath = homepath + "/temp";

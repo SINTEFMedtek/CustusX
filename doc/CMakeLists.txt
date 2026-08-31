@@ -201,17 +201,31 @@ function(cx_build_user_documentation_qt_help)
 	ADD_DEPENDENCIES(UserDoc ${CX_SYSTEM_DEFAULT_APPLICATION})
 
     find_package(Qt5Help)
-    # works on mac
-    get_target_property(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE Qt5::qcollectiongenerator LOCATION)
-    if (NOT TARGET Qt5::qcollectiongenerator)
-      # qcollectiongenerator was merged into qhelpgenerator in Qt 5.13; use the right tool per version
-      if(Qt5Core_VERSION VERSION_GREATER_EQUAL "5.13")
-        set(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qhelpgenerator)
+    # qcollectiongenerator was merged into qhelpgenerator in Qt 5.13; use the right tool per version.
+    # Check the Qt version first: on Windows the Qt5::qcollectiongenerator CMake target still exists
+    # even in Qt >=5.13, but the binary it points to is only a deprecated shim around qhelpgenerator,
+    # so relying on TARGET existence alone (as before) picked the deprecated tool and printed a warning.
+    # Always resolve to a full path: add_custom_command does not search PATH for the COMMAND executable.
+    if(Qt5Core_VERSION VERSION_GREATER_EQUAL "5.13")
+      if(TARGET Qt5::qhelpgenerator)
+        get_target_property(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE Qt5::qhelpgenerator LOCATION)
       else()
-        set(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qcollectiongenerator)
+        # NOTE: find_program's REQUIRED keyword needs CMake >= 3.18; this project's
+        # minimum is 3.16.3 (matches Ubuntu 20.04's stock cmake), so check manually.
+        find_program(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qhelpgenerator)
+        if(NOT CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+          message(FATAL_ERROR "qhelpgenerator not found")
+        endif()
+      endif()
+    elseif(TARGET Qt5::qcollectiongenerator)
+      # works on mac
+      get_target_property(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE Qt5::qcollectiongenerator LOCATION)
+    else()
+      find_program(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qcollectiongenerator)
+      if(NOT CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE)
+        message(FATAL_ERROR "qcollectiongenerator not found")
       endif()
     endif()
-    # .. not tested on win
 
     add_custom_command(TARGET UserDoc
                POST_BUILD

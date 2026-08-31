@@ -25,98 +25,11 @@ namespace cx
 bool validSpacing(Vector3D spacing)
 {
 	//Assuming (1, 1, 1) is an invalid spacing
-	if((similar(spacing[0], 1.0) && similar(spacing[0], 1.0) && similar(spacing[0], 1.0)) ||
+	if((similar(spacing[0], 1.0) && similar(spacing[1], 1.0) && similar(spacing[2], 1.0)) ||
 			similar(spacing[0], 0.0) || similar(spacing[1], 0.0) || similar(spacing[2], 0.0) )
 		return false;
 	return true;
 }
-
-/**
- * Internal container for holding incoming variable values.
- *
- * Used by ProbeDefinitionFromStringMessages as a container for holding values
- * from string messages. When SectorInfo got a valid/complete data set
- * a ProbeDefinition can be created form these values.
- */
-struct SectorInfo
-{
-	const int tooLarge = 100000;
-
-	ProbeDefinition::TYPE mProbeType; //0 = unknown, 1 = sector, 2 = linear
-
-	ImagePtr mImage;
-
-	//Spacing are sent as separate messages, should be sent with image in the future.
-	double mSpacingX;
-	double mSpacingY;
-	double mSpacingZ;
-
-	//new standard
-	std::vector<double> mOrigin;
-	std::vector<double> mAngles;
-	std::vector<double> mBoundingBox;
-	std::vector<double> mDepths;
-	double mLinearWidth;
-
-	bool mHaveChanged;
-
-	SectorInfo()
-	{
-		reset();
-	}
-	void reset()
-	{
-		mHaveChanged = true;
-		mProbeType = ProbeDefinition::tNONE;
-
-		//new standard
-		mOrigin.clear();
-		mAngles.clear();
-		mBoundingBox.clear();
-		mDepths.clear();
-		mLinearWidth = tooLarge;
-
-		mSpacingX = tooLarge;
-		mSpacingY = tooLarge;
-		mSpacingZ = 1.0; //Spacing z may not be received
-
-		mImage = ImagePtr();
-	}
-	bool isValid()
-	{
-		if(!mImage)
-			return false;
-
-		bool retval = true;
-		retval = retval && mImage;
-		retval = retval && ((mProbeType == ProbeDefinition::tSECTOR) || (mProbeType == ProbeDefinition::tLINEAR));
-		retval = retval && (mOrigin.size() == 3);
-		retval = retval && ((mAngles.size() == 2) || (mAngles.size() == 4));//2D == 2, 3D == 4
-		retval = retval && ((mBoundingBox.size() == 4) || (mBoundingBox.size() == 6)); //2D == 4, 3D == 6
-		retval = retval && (mDepths.size() == 2);
-		if(mProbeType == ProbeDefinition::tLINEAR)
-			retval = retval && (mLinearWidth < tooLarge);//Only for linear probes
-
-		Vector3D spacing = mImage->getSpacing();
-		if(!validSpacing(spacing))
-		{
-			retval = retval && (mSpacingX < tooLarge);
-			retval = retval && (mSpacingY < tooLarge);
-			retval = retval && !similar(mSpacingX, 0);
-			retval = retval && !similar(mSpacingY, 0);
-			retval = retval && !similar(mSpacingZ, 0);
-		}
-
-		return retval;
-	}
-
-	bool haveChanged()
-	{
-		return mHaveChanged;
-	}
-
-};
-
 
 ProbeDefinitionFromStringMessages::ProbeDefinitionFromStringMessages() :
 	mSectorInfo(new SectorInfo),

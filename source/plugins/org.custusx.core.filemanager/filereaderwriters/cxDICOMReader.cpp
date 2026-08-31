@@ -384,7 +384,7 @@ std::vector<ImagePtr> DICOMReader::importAllSeries(ctkDICOMDatabasePtr database,
 		if (convertedImage)
 			retval.push_back(convertedImage);
 		else
-			reportError(QString("Failed to convert DICOM series %1").arg(allSeriesUid[i]));
+			reportWarning(QString("Failed to convert DICOM series %1").arg(allSeriesUid[i]));
 	}
 
 	return retval;

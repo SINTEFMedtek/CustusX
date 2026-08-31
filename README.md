@@ -12,6 +12,13 @@ DISCLAIMER: CustusX is a research tool: It is not intended for normal clinical u
 
 The code is free to download and use under a BSD-3 license. However, the code base is currently undergoing large changes, thus there is no guarantee that internal interfaces will be stable.
 
+### Installers
+
+Pre-built installers for Ubuntu (20.04, 22.04, 24.04) and Windows are available on the
+[releases page](https://gitlab.sintef.no/custusx/CustusX/-/releases). Ubuntu is the
+primary, most thoroughly tested platform. The Windows installer uses IGSTK for
+tracking and has not been as extensively tested and verified as the Ubuntu builds.
+
 ### Build instructions
 
 [Build instructions available here.](https://custusx.pages.sintef.no/CustusX/developer_doc/build_instructions.html)

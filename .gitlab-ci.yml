@@ -15,14 +15,24 @@ default:
 
 stages:
   - build-libs
-  - build
-  - test
+  # Platforms build+test serially (24 -> 22 -> 20) to reduce concurrent runner load.
+  - build-24
+  - test-24
+  - build-22
+  - test-22
+  - build-20
+  - test-20
   - deploy
 
 variables:
   IMAGE_UBUNTU2004: "gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02"
   IMAGE_UBUNTU2204: "gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:26.04.02"
   IMAGE_UBUNTU2404: "gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2404:26.04.02"
+  # Shared between build.yml and external-libs.yml: VTK/ITK's generated CMake
+  # config files embed absolute paths and are not relocatable, so the IGSTK-enabled
+  # build and its matching external-libs build must use the exact same BASE_DIR.
+  BASE_DIR_UBUNTU2004_IGSTK: "/builds/Ubuntu2004igstk"
+  BASE_DIR_UBUNTU2204_IGSTK: "/builds/Ubuntu2204igstk"
 
 include:
   - local: '.gitlab/ci/external-libs.yml'
