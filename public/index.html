@@ -385,6 +385,17 @@
 			A Windows installer is also available, built with IGSTK tracking, but it has not been as
 			extensively tested and verified as the Ubuntu builds.
 		</p>
+		<p>
+			On Ubuntu, each release also includes <code>installCustusX.sh</code> — a single installer
+			script that downloads and unpacks CustusX automatically.
+		</p>
+		<p>After downloading, run:</p>
+		<pre style="background:#eef1f8;border:1px solid #c8d4e8;padding:12px 16px;margin:12px 0;font-size:13px;">chmod +x installCustusX.sh
+./installCustusX.sh</pre>
+
+		<p>Alternatively, install directly via <code>curl</code>:</p>
+		<pre style="background:#eef1f8;border:1px solid #c8d4e8;padding:12px 16px;margin:12px 0;font-size:13px;">sudo apt install curl -y  # optional, if curl is not already installed
+curl -fsSL https://gitlab.sintef.no/custusx/CustusX/-/releases/permalink/latest/downloads/installCustusX.sh | bash</pre>
 
 		<div class="disclaimer">
 			CustusX is a research tool: It is not intended for normal clinical use, and is not FDA nor CE approved.
