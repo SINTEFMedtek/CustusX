@@ -246,6 +246,23 @@ cx::LogicManager::shutdown();
 vtk_module_autoinit(TARGETS cxtest_my_filter MODULES VTK::FiltersCore VTK::FiltersGeneral)
 ```
 
+### Private plugin repos (separate git repo, e.g. org.custusx.core.tracking.system.ndi)
+
+A private plugin living in its own git repo (rather than directly under `source/plugins/` in
+this repo) joins the coordinated multi-repo release process (CustusS's `script/cxRelease.py` /
+`script/cxPrivateReposActions.py`) once it's registered as a component and added to
+`_getAllRepositories()` there. That process assumes every repo it touches already has a
+`master` branch (`--phase final` merges `release/vYY.MM` into it) and a `develop` branch
+(`--phase rc` branches the first release candidate off it).
+
+**Create both `master` and `develop` (and push them) before adding a new private plugin repo
+to `_getAllRepositories()`**, even if the repo only has a few commits so far. A repo missing
+`master` was silently mishandled during the v26.08 final release
+(`org.custusx.core.tracking.system.ndi`): the release script found the repo fine, but its
+per-repo git commands failed with no visible summary, so `git checkout master` silently left
+it on the wrong branch for every subsequent step (pull/merge/tag/push) -- the branch had to be
+created and backfilled by hand after the fact.
+
 ## Documentation
 
 - Developer manual: `doc/dev_manual/` (architecture, build instructions, code style)
