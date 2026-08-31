@@ -127,7 +127,7 @@ QStringList Profile::getAllRootConfigPaths()
 QString Profile::getDefaultSessionRootFolder() const
 {
 	QStringList path;
-	path << QDir::homePath() << "Patients" << this->getName();
+	path << DataLocations::getFamilyRootPath() << "Patients" << this->getName();
 	return path.join("/");
 }
 

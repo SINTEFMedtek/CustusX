@@ -41,11 +41,12 @@ public:
 	static QString getExistingTestData(QString pathRelativeToTestDataRoot, QString filename=""); ///< Return full path to test data, both normal and large repositories are searched.
 
 	static QString getDocPath(); ///< return path to folder containing documentation files
-	static QString getPersistentWritablePath(); ///< Path to location usable for persistent and temporary storage of config. Do not use directly, prefer to create methods displaying subpaths.
+	static QString getFamilyRootPath(); ///< Path to the shared family folder (~/<family>/), holding this app's own settings folder plus data shared with sibling apps (see CX_FAMILY_FOLDER_NAME).
+	static QString getPersistentWritablePath(); ///< Path to location usable for persistent and temporary storage of config. Per-app, not shared with sibling apps. Do not use directly, prefer to create methods displaying subpaths.
 	static void deletePersistentWritablePath(); ///< Deletes the folder called *_settings
 	static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
-	static QString getModelsPath(); ///< return path to a folder containing AI processing/segmentation models.
-	static QString getVirtualEnvironmentsPath(); ///< return path to a folder containing virtual environments.
+	static QString getModelsPath(); ///< return path to a folder containing AI processing/segmentation models. Shared with sibling apps in the same family.
+	static QString getVirtualEnvironmentsPath(); ///< return path to a folder containing virtual environments. Shared with sibling apps in the same family.
 	static QStringList getDefaultPluginsPath(); ///< return the folder where plugins should be located, by default.
 
 	static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.

@@ -83,11 +83,10 @@ public:
 
 	void setTestScriptFile(bool useLungsFile = false)
 	{
-		QString configPath = cx::DataLocations::getRootConfigPath();
-		//CX_LOG_DEBUG() << "config path: " << configPath;
-		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_test.ini";
+		QString filterScriptsPath = cx::DataLocations::getFilterScriptsPath();
+		QString scriptFile = filterScriptsPath + "python_test.ini";
 		if(useLungsFile)
-			scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_LungVessels.ini";
+			scriptFile = filterScriptsPath + "python_LungVessels.ini";
 		CX_LOG_DEBUG() << "Using script file: " << scriptFile;
 
 		mScriptFile->setValueFromVariant(scriptFile);
@@ -95,8 +94,7 @@ public:
 
 	void setRaidionicsScriptFile()
 	{
-		QString configPath = cx::DataLocations::getRootConfigPath();
-		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/raidionics_LungAll.ini";
+		QString scriptFile = cx::DataLocations::getFilterScriptsPath() + "raidionics_LungAll.ini";
 		mScriptFile->setValueFromVariant(scriptFile);
 	}
 
