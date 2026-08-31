@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=CustusX
+Comment=Research platform for Image-Guided Surgery and Navigation
+Exec=CustusX
+Icon=CustusX
+Path=
+Terminal=false
+Categories=Science;Education;Graphics;

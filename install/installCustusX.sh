@@ -117,8 +117,22 @@ EOF
     chmod +x ~/Desktop/CustusX_Patients.desktop
 fi
 
+# ---------------------------------------------------------------------------
+# Install desktop launcher
+# ---------------------------------------------------------------------------
+cd ~/CustusX/CustusX
+if [ -f "CustusX.desktop" ] && [ -d ~/Desktop ]; then
+    EXEC_PATH="$HOME/CustusX/CustusX/bin/CustusX"
+    ICON_PATH="$HOME/CustusX/CustusX/icons/CustusX.png"
+    sed -i "s|Path=.*|Path=$HOME/CustusX/CustusX/bin|g" CustusX.desktop
+    sed -i "s|Exec=.*|Exec=$EXEC_PATH|g" CustusX.desktop
+    sed -i "s|Icon=.*|Icon=$ICON_PATH|g" CustusX.desktop
+    cp CustusX.desktop ~/Desktop/
+    gio set ~/Desktop/CustusX.desktop metadata::trusted true 2>/dev/null || true
+    chmod +x ~/Desktop/CustusX.desktop
+fi
+
 echo ""
 echo "---------- CustusX installation complete ----------"
-echo "No desktop launcher is created for CustusX itself yet (the release"
-echo "tarball doesn't include a .desktop file or icon) -- launch it with:"
+echo "Launch CustusX from the desktop shortcut (if created) or run:"
 echo "  cd $HOME/CustusX/CustusX/bin && ./CustusX"
