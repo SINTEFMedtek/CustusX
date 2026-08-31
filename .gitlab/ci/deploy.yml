@@ -17,6 +17,14 @@
           --upload-file $INSTALLER_FILE \
           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/CustusX-${OS}.tar.gz"
       done
+    # Upload install script with version baked in so users get a single-file installer
+    - cd $CI_PROJECT_DIR
+    - sed "s/^CUSTUSX_VERSION=.*/CUSTUSX_VERSION=\"${VERSION}\"/" install/installCustusX.sh > /tmp/installCustusX.sh
+    - |
+      curl \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --upload-file /tmp/installCustusX.sh \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/installCustusX.sh"
 
 deploy-commit:
   extends: .deploy
@@ -57,11 +65,14 @@ create-release:
         exit 0
       fi
 
+      # filepath enables the permalink/latest/downloads/installCustusX.sh shortcut,
+      # so the README install command doesn't need updating on every release.
       LINKS=$(jq -n --arg base "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}" \
         '[
           {name: "CustusX Ubuntu 20.04 installer", url: ($base + "/CustusX-Ubuntu2004.tar.gz"), link_type: "package"},
           {name: "CustusX Ubuntu 22.04 installer", url: ($base + "/CustusX-Ubuntu2204.tar.gz"), link_type: "package"},
-          {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404.tar.gz"), link_type: "package"}
+          {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404.tar.gz"), link_type: "package"},
+          {name: "CustusX installer script (all Ubuntu versions)", url: ($base + "/installCustusX.sh"), link_type: "package", filepath: "/installCustusX.sh"}
         ]')
 
       DESCRIPTION=$(jq -Rs . < "$NOTES_MD")
