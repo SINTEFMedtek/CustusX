@@ -61,7 +61,15 @@ create-release:
       BASE_VERSION=$(echo "$CI_COMMIT_TAG" | sed -E 's/-rc[0-9]+$//')
       NOTES_MD="doc/release_notes/release_notes_${BASE_VERSION}.md"
       if [ ! -f "$NOTES_MD" ]; then
-        echo "WARNING: $NOTES_MD not found for tag ${CI_COMMIT_TAG}. Skipping release creation."
+        # No notes file for this tag (e.g. a test tag, or an rc pushed before the
+        # real notes file was written) -- fall back to a generic test-release
+        # notes file instead of silently skipping release creation, so a tag
+        # pushed to test the installers still gets a clearly-marked release page.
+        echo "$NOTES_MD not found for tag ${CI_COMMIT_TAG} -- using generic test-release notes."
+        NOTES_MD="doc/release_notes/release_notes_test.md"
+      fi
+      if [ ! -f "$NOTES_MD" ]; then
+        echo "WARNING: fallback $NOTES_MD not found either. Skipping release creation."
         exit 0
       fi
 
