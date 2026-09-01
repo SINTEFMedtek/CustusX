@@ -166,11 +166,18 @@ MACRO(cx_set_version_today_alpha)
 	cx_get_git_branch(GIT_BRANCH)
 
 	string(REPLACE "-" ";" TODAY_DATE_LIST ${TODAY_DATE})
-	# truncate branch name - this is encoded into the exename and should be
-	# kept within reasonable size (think windows filepath restrictions)
+	# Truncate branch name - this is encoded into the exe/package name, which
+	# CPack's NSIS generator then nests deep config file trees under (e.g.
+	# _CPack_Packages/win64/NSIS/<name>/Core/config/...), so even a "moderate"
+	# length here can push a real config file path over Windows' 260-char
+	# MAX_PATH (CustusX#43). The previous cap of 30 chars, and the
+	# string(SUBSTRING ...) call implementing it, both used commas instead of
+	# CMake's space-separated argument syntax - a no-op that never actually
+	# truncated anything, which is how a 28-char branch name made it all the
+	# way into a failing package path.
 	string(LENGTH ${GIT_BRANCH} TEXT_LENGTH)
-	if(${TEXT_LENGTH} GREATER 30)
-		string(SUBSTRING ${GIT_BRANCH} 0, 30, GIT_BRANCH)
+	if(${TEXT_LENGTH} GREATER 8)
+		string(SUBSTRING ${GIT_BRANCH} 0 8 GIT_BRANCH)
 	endif()
 
 	list(GET TODAY_DATE_LIST 0 YEAR)
