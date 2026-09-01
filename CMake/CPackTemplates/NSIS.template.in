@@ -843,6 +843,9 @@ Section "Uninstall"
 
 @CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS@
 
+  ; ---- Fraxinus post-uninstall (optional cleanup of shared external tools) ----
+  !include "FraxinusPostUninstall.nsh"
+
   ;Remove files we installed.
   ;Keep the list of directories here in sync with the File commands above.
 @CPACK_NSIS_DELETE_FILES@
@@ -911,6 +914,29 @@ Section "Uninstall"
     Call un.RemoveFromPath
   doNotRemoveFromPath:
 SectionEnd
+
+;--------------------------------------------------------------------------
+; Fraxinus: pre-uncheck optional external-tool components that are already
+; installed at the currently pinned version, so users aren't forced to
+; re-run these slow (tens of minutes) setups needlessly. A missing marker
+; file, or one whose content doesn't match the pinned version below, leaves
+; the box checked -- this covers both "never installed" and "needs
+; upgrading" the same way. See installRaidionics.ps1 / installTotalsegmentator.ps1
+; / installElastix.ps1, which write the marker on success.
+!macro FraxinusPreCheckComponent SecName MarkerFile PinnedVersion
+  ClearErrors
+  IfFileExists "${MarkerFile}" "" fxpc_${SecName}_done
+    FileOpen $8 "${MarkerFile}" r
+    IfErrors fxpc_${SecName}_done
+    FileRead $8 $9
+    FileClose $8
+    StrCmp $9 "${PinnedVersion}" fxpc_${SecName}_uptodate fxpc_${SecName}_done
+    fxpc_${SecName}_uptodate:
+      SectionGetFlags ${${SecName}} $R0
+      IntOp $R0 $R0 & 0xFFFE ;Turn off SF_SELECTED (same mask as InitSection above)
+      SectionSetFlags ${${SecName}} $R0
+  fxpc_${SecName}_done:
+!macroend
 
 ;--------------------------------
 ; determine admin versus local install
@@ -1005,4 +1031,8 @@ inst:
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "NSIS.InstallOptions.ini"
 
   noOptionsPage:
+
+  !insertmacro FraxinusPreCheckComponent RaidionicsSetup $PROFILE\Fraxinus\virtualEnvironments\raidionicsVenv\installed_version.txt @CPACK_FRAX_RAIDIONICS_VERSION@
+  !insertmacro FraxinusPreCheckComponent TotalSegSetup   $PROFILE\Fraxinus\virtualEnvironments\TotalSegmentator\installed_version.txt @CPACK_FRAX_TOTALSEG_VERSION@
+  !insertmacro FraxinusPreCheckComponent ElastixSetup    C:\Elastix\installed_version.txt @CPACK_FRAX_ELASTIX_VERSION@
 FunctionEnd
