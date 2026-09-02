@@ -25,6 +25,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class LiverSegmentationRunner> LiverSegmentationRunnerPtr;
+typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
 
 /**
  * Widget for selecting and running one or more of the liver segmentation
@@ -52,10 +53,12 @@ private slots:
 private:
 	QGroupBox* buildSegmentationGroup();
 	QGroupBox* buildProcessingInfoGroup();
-	bool activeImageIsCT() const;
+	ImagePtr selectedImage() const;
+	bool selectedImageIsCT() const;
 
 	VisServicesPtr mServices;
 	LiverSegmentationRunnerPtr mRunner;
+	StringPropertySelectImagePtr mImageSelector;
 
 	QCheckBox* mCheckBoxLiverPancreas;
 	QCheckBox* mCheckBoxLiverVessels;

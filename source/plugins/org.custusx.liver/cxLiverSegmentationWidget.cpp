@@ -26,6 +26,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxDefinitions.h"
+#include "cxSelectDataStringProperty.h"
+#include "cxHelperWidgets.h"
 
 namespace cx
 {
@@ -33,19 +35,30 @@ namespace cx
 LiverSegmentationWidget::LiverSegmentationWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, this->getWidgetName(), "Liver Segmentation"),
 	mServices(services),
-	mRunner(new LiverSegmentationRunner(services, this))
+	mRunner(new LiverSegmentationRunner(services, this)),
+	mImageSelector(StringPropertySelectImage::New(services->patient()))
 {
 	connect(mRunner.get(), &LiverSegmentationRunner::filterStarted, this, &LiverSegmentationWidget::onFilterStarted);
 	connect(mRunner.get(), &LiverSegmentationRunner::allFinished, this, &LiverSegmentationWidget::onAllFinished);
+
+	mImageSelector->setValueName("CT Volume");
+	mImageSelector->setHelp("Select the CT volume to segment");
+	ImagePtr activeImage = mServices->patient()->getActiveData()->getActive<Image>();
+	if (activeImage)
+		mImageSelector->setValue(activeImage->getUid());
+	connect(mImageSelector.get(), &SelectDataStringPropertyBase::dataChanged, this, &LiverSegmentationWidget::updateRunButtonState);
 
 	mRunSegmentationButton = new QPushButton("Run Segmentation");
 	mRunSegmentationButton->setEnabled(false);
 	connect(mRunSegmentationButton, &QPushButton::clicked, this, &LiverSegmentationWidget::runSegmentationClicked);
 
 	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &LiverSegmentationWidget::updateRunButtonState);
-	connect(mServices->patient()->getActiveData().get(), &ActiveData::activeImageChanged, this, &LiverSegmentationWidget::updateRunButtonState);
+
+	QGridLayout* imageSelectorLayout = new QGridLayout();
+	sscCreateDataWidget(this, mImageSelector, imageSelectorLayout, 0);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->addLayout(imageSelectorLayout);
 	layout->addWidget(this->buildSegmentationGroup());
 	layout->addWidget(this->buildProcessingInfoGroup());
 	layout->addWidget(mRunSegmentationButton);
@@ -125,7 +138,7 @@ void LiverSegmentationWidget::runSegmentationClicked()
 	if (iniFileNames.isEmpty())
 		return;
 
-	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	ImagePtr image = this->selectedImage();
 	if (!image)
 		return;
 
@@ -147,15 +160,27 @@ void LiverSegmentationWidget::onAllFinished()
 	this->updateRunButtonState();
 }
 
-bool LiverSegmentationWidget::activeImageIsCT() const
+ImagePtr LiverSegmentationWidget::selectedImage() const
 {
-	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	return mImageSelector->getImage();
+}
+
+bool LiverSegmentationWidget::selectedImageIsCT() const
+{
+	ImagePtr image = this->selectedImage();
 	return image && (image->getModality() == imCT);
 }
 
 void LiverSegmentationWidget::updateRunButtonState()
 {
-	mRunSegmentationButton->setEnabled(this->activeImageIsCT() && !mRunner->isRunning());
+	bool isCT = this->selectedImageIsCT();
+	mRunSegmentationButton->setEnabled(isCT && !mRunner->isRunning());
+	if (!this->selectedImage())
+		mRunSegmentationButton->setToolTip("Select a CT volume above to enable segmentation");
+	else if (!isCT)
+		mRunSegmentationButton->setToolTip("Selected volume is not a CT image");
+	else
+		mRunSegmentationButton->setToolTip("");
 }
 
 } /* namespace cx */
