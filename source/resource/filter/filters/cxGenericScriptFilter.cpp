@@ -869,6 +869,8 @@ QString GenericScriptFilter::colorForOrganType(QString outputClass)
 		color = "70,240,240,100";break;
 	case otLIVER_SEGMENT_8:
 		color = "240,50,230,100";break;
+	case otLIVER_SEGMENTS_COMBINED:
+		color = "200,80,80,100";break;
 
 	default:
 //	otUNKNOWN,
@@ -921,6 +923,7 @@ int GenericScriptFilter::contourFilterSettingForOrganType(QString outputClass)
 	case otLIVER_SEGMENT_6:
 	case otLIVER_SEGMENT_7:
 	case otLIVER_SEGMENT_8:
+	case otLIVER_SEGMENTS_COMBINED:
 		filtering = 3;break;
 
 	default:
