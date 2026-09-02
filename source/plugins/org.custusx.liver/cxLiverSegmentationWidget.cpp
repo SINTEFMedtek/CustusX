@@ -27,7 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxDefinitions.h"
 #include "cxSelectDataStringProperty.h"
-#include "cxHelperWidgets.h"
+#include "cxDataSelectWidget.h"
 
 namespace cx
 {
@@ -55,7 +55,7 @@ LiverSegmentationWidget::LiverSegmentationWidget(VisServicesPtr services, QWidge
 	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &LiverSegmentationWidget::updateRunButtonState);
 
 	QGridLayout* imageSelectorLayout = new QGridLayout();
-	sscCreateDataWidget(this, mImageSelector, imageSelectorLayout, 0);
+	new DataSelectWidget(mServices->view(), mServices->patient(), this, mImageSelector, imageSelectorLayout, 0);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->addLayout(imageSelectorLayout);
