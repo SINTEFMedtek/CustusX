@@ -34,7 +34,9 @@ SelectableLiverStructure::SelectableLiverStructure() :
 
 LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, this->getWidgetName(), "Liver Visibility"),
-	mServices(services)
+	mServices(services),
+	mAllSegmentsButton(nullptr),
+	mAllSegmentsViewEnabled(false)
 {
 	QGridLayout* structuresLayout = new QGridLayout();
 	int row = 0;
@@ -47,10 +49,16 @@ LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* p
 
 	QGridLayout* segmentsLayout = new QGridLayout();
 	int segmentRow = 0;
-	ORGAN_TYPE segments[8] = {otLIVER_SEGMENT_1, otLIVER_SEGMENT_2, otLIVER_SEGMENT_3, otLIVER_SEGMENT_4,
-	                          otLIVER_SEGMENT_5, otLIVER_SEGMENT_6, otLIVER_SEGMENT_7, otLIVER_SEGMENT_8};
-	for (int i = 0; i < 8; ++i)
-		this->addStructureButton(segments[i], QString("Segment %1").arg(i + 1), segmentsLayout, segmentRow++);
+	mSegmentOrganTypes << otLIVER_SEGMENT_1 << otLIVER_SEGMENT_2 << otLIVER_SEGMENT_3 << otLIVER_SEGMENT_4
+	                   << otLIVER_SEGMENT_5 << otLIVER_SEGMENT_6 << otLIVER_SEGMENT_7 << otLIVER_SEGMENT_8;
+	for (int i = 0; i < mSegmentOrganTypes.size(); ++i)
+		this->addStructureButton(mSegmentOrganTypes[i], QString("Segment %1").arg(i + 1), segmentsLayout, segmentRow++);
+	this->addStructureButton(otLIVER_SEGMENTS_COMBINED, "Liver (All Segments Merged)", segmentsLayout, segmentRow++);
+
+	mAllSegmentsButton = new QPushButton("Show/Hide All Segments");
+	connect(mAllSegmentsButton, &QPushButton::clicked, this, &LiverVisibilityWidget::toggleAllSegments);
+	segmentsLayout->addWidget(mAllSegmentsButton, segmentRow++, 0);
+
 	QGroupBox* segmentsGroup = new QGroupBox("Liver Segments (Couinaud)");
 	segmentsGroup->setLayout(segmentsLayout);
 
@@ -66,6 +74,7 @@ LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* p
 
 	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &LiverVisibilityWidget::refreshStructures);
 	this->refreshStructures();
+	this->updateAllSegmentsButtonColor();
 }
 
 LiverVisibilityWidget::~LiverVisibilityWidget()
@@ -101,6 +110,12 @@ void LiverVisibilityWidget::refreshStructures()
 		mStructures[organType].mButton->setEnabled(mesh != nullptr);
 		this->updateButtonColor(organType);
 	}
+
+	bool anySegmentPresent = false;
+	for (int i = 0; i < mSegmentOrganTypes.size(); ++i)
+		anySegmentPresent |= (mStructures[mSegmentOrganTypes[i]].mMesh != nullptr);
+	if (mAllSegmentsButton)
+		mAllSegmentsButton->setEnabled(anySegmentPresent);
 }
 
 void LiverVisibilityWidget::toggleStructure(ORGAN_TYPE organType)
@@ -124,6 +139,36 @@ void LiverVisibilityWidget::updateButtonColor(ORGAN_TYPE organType)
 	QPalette palette = structure.mButton->palette();
 	palette.setColor(QPalette::Button, structure.mViewEnabled ? Styles::getGreen() : Styles::getRed());
 	structure.mButton->setPalette(palette);
+}
+
+void LiverVisibilityWidget::toggleAllSegments()
+{
+	mAllSegmentsViewEnabled = !mAllSegmentsViewEnabled;
+	for (int i = 0; i < mSegmentOrganTypes.size(); ++i)
+	{
+		ORGAN_TYPE organType = mSegmentOrganTypes[i];
+		SelectableLiverStructure& structure = mStructures[organType];
+		if (!structure.mMesh)
+			continue;
+
+		structure.mViewEnabled = mAllSegmentsViewEnabled;
+		if (structure.mViewEnabled)
+			this->showMesh(structure.mMesh);
+		else
+			this->hideMesh(structure.mMesh);
+		this->updateButtonColor(organType);
+	}
+	this->updateAllSegmentsButtonColor();
+}
+
+void LiverVisibilityWidget::updateAllSegmentsButtonColor()
+{
+	if (!mAllSegmentsButton)
+		return;
+
+	QPalette palette = mAllSegmentsButton->palette();
+	palette.setColor(QPalette::Button, mAllSegmentsViewEnabled ? Styles::getGreen() : Styles::getRed());
+	mAllSegmentsButton->setPalette(palette);
 }
 
 void LiverVisibilityWidget::showMesh(MeshPtr mesh)

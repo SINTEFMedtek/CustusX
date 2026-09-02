@@ -51,16 +51,21 @@ public:
 
 private slots:
 	void refreshStructures();
+	void toggleAllSegments();
 
 private:
 	void addStructureButton(ORGAN_TYPE organType, QString label, QGridLayout* layout, int row);
 	void toggleStructure(ORGAN_TYPE organType);
 	void updateButtonColor(ORGAN_TYPE organType);
+	void updateAllSegmentsButtonColor();
 	void showMesh(MeshPtr mesh);
 	void hideMesh(MeshPtr mesh);
 
 	VisServicesPtr mServices;
 	QMap<ORGAN_TYPE, SelectableLiverStructure> mStructures;
+	QList<ORGAN_TYPE> mSegmentOrganTypes;
+	QPushButton* mAllSegmentsButton;
+	bool mAllSegmentsViewEnabled;
 };
 
 } /* namespace cx */
