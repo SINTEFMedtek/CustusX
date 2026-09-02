@@ -74,6 +74,16 @@ macro(cx_install_initialize_customizable_properties)
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/install/install_text/install_readme.rtf")
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_LICENSE "${CX_LICENSE_FILE}")
 
+	# Default label/description for the (only, on Windows NSIS) visible
+	# component, "Core" - every app has exactly this one unless a plugin
+	# (e.g. Fraxinus, via cxSetupAdditionalNSISWindowsComponents.cmake) adds
+	# more and overrides this. Without it, CustusX/CustusS's own NSIS
+	# component page showed "Core" with a blank description, same symptom as
+	# Fraxinus's component tooltips before that was fixed - just because no
+	# description had ever been written here, not the same relay bug.
+	set_property(GLOBAL PROPERTY CPACK_COMPONENT_CORE_DISPLAY_NAME "${CX_SYSTEM_BASE_NAME} Core")
+	set_property(GLOBAL PROPERTY CPACK_COMPONENT_CORE_DESCRIPTION "Core application files")
+
 	if(CX_WINDOWS)
 		set_property(GLOBAL PROPERTY CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX\\\\CustusX.ico")
 		set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX\\\\CustusX.png")
@@ -96,6 +106,8 @@ macro(cx_install_apply_customizable_properties)
 	get_property(CPACK_RESOURCE_FILE_WELCOME GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME)
 	get_property(CPACK_RESOURCE_FILE_README  GLOBAL PROPERTY CPACK_RESOURCE_FILE_README)
 	get_property(CPACK_RESOURCE_FILE_LICENSE GLOBAL PROPERTY CPACK_RESOURCE_FILE_LICENSE)
+	get_property(CPACK_COMPONENT_CORE_DISPLAY_NAME GLOBAL PROPERTY CPACK_COMPONENT_CORE_DISPLAY_NAME)
+	get_property(CPACK_COMPONENT_CORE_DESCRIPTION  GLOBAL PROPERTY CPACK_COMPONENT_CORE_DESCRIPTION)
 
 	if(CX_WINDOWS)
 		get_property(CPACK_NSIS_MUI_ICON     GLOBAL PROPERTY CPACK_NSIS_MUI_ICON)
