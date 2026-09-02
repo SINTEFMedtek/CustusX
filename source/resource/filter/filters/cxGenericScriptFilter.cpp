@@ -786,7 +786,7 @@ void GenericScriptFilter::setOutputColorsFromClasses()
 {
 	mOutputColorList.clear();
 	for(int i = 0; i < mOutputClasses.size(); ++i)
-		mOutputColorList << Raidionics::colorForLungClass(mOutputClasses[i]);
+		mOutputColorList << this->colorForOrganType(mOutputClasses[i]);
 	this->setupOutputColors(mOutputColorList);
 }
 
@@ -794,7 +794,139 @@ void GenericScriptFilter::setContourFilteringFromClasses()
 {
 	mSmoothingSettings.clear();
 	for(int i = 0; i < mOutputClasses.size(); ++i)
-		mSmoothingSettings << Raidionics::contourFilterSettingForLungClass(mOutputClasses[i]);
+		mSmoothingSettings << this->contourFilterSettingForOrganType(mOutputClasses[i]);
+}
+
+QString GenericScriptFilter::colorForOrganType(QString outputClass)
+{
+	QString color = "255,0,0";
+
+	ORGAN_TYPE target = Raidionics::getOrganType(outputClass);
+	switch (target)
+	{
+	case otAIRWAYS:
+		color = "254,175,180,43";break;
+	case otLUNGS:
+		color = "254,175,180,43";break;
+	case otLYMPH_NODES:
+		color = "0,255,0,255";break;
+	case otTUMOR:
+	case otNODULES:
+		color = "255,255,0,255";break;
+	case otVENA_CAVA:
+		color = "153,153,255,255";break;
+	case otAORTIC_ARCH:
+		color = "255,127,127,255";break;
+	case otASCENDING_AORTA:
+		color = "255,127,127,255";break;
+	case otDESCENDING_AORTA:
+		color = "255,127,127,255";break;
+	case otSPINE:
+		color = "255,255,255,255";break;
+	case otHEART:
+		color = "254,128,204,128";break;
+	case otBRACHIO_CEPHALIC_VEINS:
+		color = "153,153,255,255";break;
+	case otSUBCLAVIAN_ARTERY:
+		color = "255,127,127,255";break;
+	case otAZYGOS:
+		color = "153,153,255,255";break;
+	case otESOPHAGUS:
+		color = "170,85,0,255";break;
+	case otPULMONARY_ARTERIES: // Same color as other arteries (e.g. Subclavian Artery)
+		color = "255,127,127,255";break;
+	case otPULMONARY_VEINS: // Same color as other veins (e.g. Vena Cava)
+		color = "153,153,255,255";break;
+	case otLOBE_LUL:
+	case otLOBE_RUL:
+		color = "255,117,117,100";break;
+	case otLOBE_RML:
+		color = "181,255,117,100";break;
+	case otLOBE_LLL:
+	case otLOBE_RLL:
+		color = "117,186,255,100";break;
+	case otLIVER:
+		color = "165,42,42,100";break;
+	case otPANCREAS:
+		color = "230,200,130,100";break;
+	case otLIVER_VESSELS:
+		color = "220,20,60,100";break;
+	case otLIVER_LESIONS:
+		color = "255,140,0,100";break;
+	case otLIVER_SEGMENT_1:
+		color = "230,25,75,100";break;
+	case otLIVER_SEGMENT_2:
+		color = "60,180,75,100";break;
+	case otLIVER_SEGMENT_3:
+		color = "255,225,25,100";break;
+	case otLIVER_SEGMENT_4:
+		color = "0,130,200,100";break;
+	case otLIVER_SEGMENT_5:
+		color = "245,130,48,100";break;
+	case otLIVER_SEGMENT_6:
+		color = "145,30,180,100";break;
+	case otLIVER_SEGMENT_7:
+		color = "70,240,240,100";break;
+	case otLIVER_SEGMENT_8:
+		color = "240,50,230,100";break;
+
+	default:
+//	otUNKNOWN,
+//	organtypeCOUNT
+		CX_LOG_WARNING() << "GenericScriptFilter::colorForOrganType(): No color found for " << enum2string(target) << " (Converted from string: " << outputClass << "). Setting color to red";
+		break;
+	}
+	return color;
+}
+
+int GenericScriptFilter::contourFilterSettingForOrganType(QString outputClass)
+{
+	int filtering = 1;
+
+	ORGAN_TYPE target = Raidionics::getOrganType(outputClass);
+	switch (target)
+	{
+	case otPULMONARY_ARTERIES:
+	case otPULMONARY_VEINS:
+	case otLIVER_VESSELS:
+		filtering = 1;break;
+
+	case otLYMPH_NODES:
+	case otVENA_CAVA:
+	case otAORTIC_ARCH:
+	case otASCENDING_AORTA:
+	case otDESCENDING_AORTA:
+	case otSPINE:
+	case otBRACHIO_CEPHALIC_VEINS:
+	case otSUBCLAVIAN_ARTERY:
+	case otAZYGOS:
+	case otESOPHAGUS:
+	case otLIVER_LESIONS:
+		filtering = 2;break;
+
+	case otLUNGS:
+	case otHEART:
+	case otLOBE_LUL:
+	case otLOBE_RUL:
+	case otLOBE_RML:
+	case otLOBE_LLL:
+	case otLOBE_RLL:
+	case otLIVER:
+	case otPANCREAS:
+	case otLIVER_SEGMENT_1:
+	case otLIVER_SEGMENT_2:
+	case otLIVER_SEGMENT_3:
+	case otLIVER_SEGMENT_4:
+	case otLIVER_SEGMENT_5:
+	case otLIVER_SEGMENT_6:
+	case otLIVER_SEGMENT_7:
+	case otLIVER_SEGMENT_8:
+		filtering = 3;break;
+
+	default:
+		filtering = 1;break;
+	}
+	return filtering;
 }
 
 void GenericScriptFilter::setupOutputColors(QStringList colorList)

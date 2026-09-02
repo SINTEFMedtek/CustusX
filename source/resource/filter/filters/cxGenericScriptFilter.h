@@ -134,6 +134,10 @@ protected:
 	void setContourFilteringFromClasses();
 	int getClassNumber(QString filePath);
 	ORGAN_TYPE getOrganType(int classNumber);
+	// Applies to all script engines, not just Raidionics - keyed on ORGAN_TYPE,
+	// which every engine's output classes are converted to.
+	QString colorForOrganType(QString outputClass);
+	int contourFilterSettingForOrganType(QString outputClass);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;

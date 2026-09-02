@@ -80,6 +80,10 @@ public:
 		QStringList volumeOption = {"true"};
 		return readGeneratedSegmentationFiles(meshOption, volumeOption);
 	}
+	QString testColorForOrganType(QString outputClass)
+	{
+		return colorForOrganType(outputClass);
+	}
 
 	void setTestScriptFile(bool useLungsFile = false)
 	{
@@ -670,19 +674,21 @@ TEST_CASE("Raidionics: target generation", "[unit]")
 	}
 }
 
-TEST_CASE("Raidionics: Test color generation", "[unit]")
+TEST_CASE("GenericScriptFilter: Test color generation", "[unit]")
 {
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
 	QString testClass;
 	QString colorUnknownClass;
-	colorUnknownClass = cx::Raidionics::colorForLungClass(testClass);
+	colorUnknownClass = filter->testColorForOrganType(testClass);
 	CHECK_FALSE(colorUnknownClass.isEmpty());
 	testClass = "not a correct class name";
-	CHECK(cx::Raidionics::colorForLungClass(testClass) == colorUnknownClass);
+	CHECK(filter->testColorForOrganType(testClass) == colorUnknownClass);
 
 	QString testColor;
 	for(int target = cx::otRAIDIONICS_BEGIN; target < cx::otRAIDIONICS_END; ++target)//Assumes continious numbers in enum
 	{
-		testColor = cx::Raidionics::colorForLungClass(enum2string(cx::ORGAN_TYPE(target)));
+		testColor = filter->testColorForOrganType(enum2string(cx::ORGAN_TYPE(target)));
 		CHECK_FALSE(testColor.isEmpty());
 		CHECK(testColor != colorUnknownClass);
 	}

@@ -33,9 +33,8 @@ public:
 	QStringList setOutputClasses(QStringList outputClasses);
 	//Utility functions
 	static QStringList expandOutputClasses(QStringList targetList);
-	static QString colorForLungClass(QString outputClass);
-	static int contourFilterSettingForLungClass(QString outputClass);
 	static QStringList createTargetList(QString target);
+	static ORGAN_TYPE getOrganType(QString target);
 
 protected:
 	QString createRaidionicsIniFile();
@@ -47,7 +46,6 @@ protected:
 	QString targetDescription(QString target);
 	QJsonArray createTargetArray(QString target);
 	static QString getTarget(ORGAN_TYPE organType);
-	static ORGAN_TYPE getOrganType(QString target);
 
 	VisServicesPtr mServices;
 	CommandStringVariables mVariables;
