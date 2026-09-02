@@ -13,7 +13,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxGenericScriptFilter.h"
 #include "cxFilterTimedAlgorithm.h"
-#include "cxTimedAlgorithmProgressBar.h"
 #include "cxDataLocations.h"
 #include "cxImage.h"
 #include "cxVisServices.h"
@@ -25,18 +24,12 @@ namespace cx
 
 LiverSegmentationRunner::LiverSegmentationRunner(VisServicesPtr services, QObject* parent) :
 	QObject(parent),
-	mServices(services),
-	mProgressBar(new TimedAlgorithmProgressBar())
+	mServices(services)
 {
 }
 
 LiverSegmentationRunner::~LiverSegmentationRunner()
 {
-}
-
-TimedAlgorithmProgressBar* LiverSegmentationRunner::getProgressBar()
-{
-	return mProgressBar;
 }
 
 bool LiverSegmentationRunner::isRunning() const
@@ -80,7 +73,9 @@ void LiverSegmentationRunner::runNext()
 
 	mCurrentThread.reset(new FilterTimedAlgorithm(mCurrentFilter));
 	connect(mCurrentThread.get(), &FilterTimedAlgorithm::finished, this, &LiverSegmentationRunner::onFilterFinished);
-	mProgressBar->attach(mCurrentThread);
+	connect(mCurrentFilter.get(), &GenericScriptFilter::scriptOutput,
+	        this, &LiverSegmentationRunner::onScriptOutput,
+	        Qt::ConnectionType(Qt::QueuedConnection | Qt::UniqueConnection));
 
 	emit filterStarted(iniFileName);
 	mCurrentThread->execute();
@@ -88,12 +83,23 @@ void LiverSegmentationRunner::runNext()
 
 void LiverSegmentationRunner::onFilterFinished()
 {
-	mProgressBar->detach(mCurrentThread);
 	disconnect(mCurrentThread.get(), &FilterTimedAlgorithm::finished, this, &LiverSegmentationRunner::onFilterFinished);
+	disconnect(mCurrentFilter.get(), &GenericScriptFilter::scriptOutput, this, &LiverSegmentationRunner::onScriptOutput);
 	mCurrentThread.reset();
 	mCurrentFilter.reset();
 
 	this->runNext();
+}
+
+void LiverSegmentationRunner::onScriptOutput(const QString& line)
+{
+	if (!line.startsWith("PROGRESS:"))
+		return;
+
+	bool ok = false;
+	int percent = line.mid(9).trimmed().toInt(&ok);
+	if (ok)
+		emit progressChanged(percent);
 }
 
 } /* namespace cx */

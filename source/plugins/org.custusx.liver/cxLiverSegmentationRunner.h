@@ -22,7 +22,6 @@ namespace cx
 
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 typedef boost::shared_ptr<class FilterTimedAlgorithm> FilterTimedAlgorithmPtr;
-class TimedAlgorithmProgressBar;
 
 /**
  * Runs a queue of liver .ini filter files sequentially against the same
@@ -39,21 +38,23 @@ public:
 
 	void start(QStringList iniFileNames, ImagePtr image);
 	bool isRunning() const;
-	TimedAlgorithmProgressBar* getProgressBar();
 
 signals:
 	void filterStarted(QString iniFileName);
+	// percent is 0-100 for the currently running filter; negative means
+	// indeterminate (mirrors the running script's own "PROGRESS: N" output).
+	void progressChanged(int percent);
 	void allFinished();
 
 private slots:
 	void onFilterFinished();
+	void onScriptOutput(const QString& line);
 
 private:
 	void runNext();
 	GenericScriptFilterPtr createFilter(QString iniFileName);
 
 	VisServicesPtr mServices;
-	TimedAlgorithmProgressBar* mProgressBar;
 	QStringList mQueue;
 	ImagePtr mImage;
 	GenericScriptFilterPtr mCurrentFilter;

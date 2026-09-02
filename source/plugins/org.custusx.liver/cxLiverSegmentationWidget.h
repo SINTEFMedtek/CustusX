@@ -15,11 +15,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_liver_Export.h"
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
+#include <QMap>
+#include <QString>
 
 class QCheckBox;
 class QGroupBox;
 class QPushButton;
 class QLabel;
+class QProgressBar;
+class QVBoxLayout;
 
 namespace cx
 {
@@ -48,13 +52,16 @@ private slots:
 	void selectAll(bool checked);
 	void updateRunButtonState();
 	void onFilterStarted(QString iniFileName);
+	void onProgressChanged(int percent);
 	void onAllFinished();
 
 private:
 	QGroupBox* buildSegmentationGroup();
 	QGroupBox* buildProcessingInfoGroup();
+	void rebuildProgressBars(QStringList iniFileNames);
 	ImagePtr selectedImage() const;
 	bool selectedImageIsCT() const;
+	static QString friendlyName(QString iniFileName);
 
 	VisServicesPtr mServices;
 	LiverSegmentationRunnerPtr mRunner;
@@ -68,7 +75,9 @@ private:
 	QPushButton* mRunSegmentationButton;
 	QGroupBox* mSegmentationGroup;
 	QGroupBox* mProcessingInfoGroup;
-	QLabel* mProcessingInfoLabel;
+	QVBoxLayout* mProgressBarsLayout;
+	QMap<QString, QProgressBar*> mProgressBars;
+	QString mCurrentIniFileName;
 };
 
 } /* namespace cx */
