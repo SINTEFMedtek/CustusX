@@ -6,10 +6,10 @@
 # CI runner) and after the CI pipeline has already created the release.
 #
 # Usage (dry-run — shows what would happen):
-#   python install/cxUploadWindowsInstaller.py --version v26.08-rc5 --app fraxinus --installer C:/path/to/Fraxinus-win64.exe
+#   python install/cxUploadWindowsInstaller.py --version v26.08-rc5 --app Fraxinus --installer C:/path/to/Fraxinus-win64.exe
 #
 # Usage (execute):
-#   python install/cxUploadWindowsInstaller.py --version v26.08-rc5 --app fraxinus --installer C:/path/to/Fraxinus-win64.exe --execute
+#   python install/cxUploadWindowsInstaller.py --version v26.08-rc5 --app Fraxinus --installer C:/path/to/Fraxinus-win64.exe --execute
 #
 # Requires a GitLab personal access token with the 'api' scope.  Create one at:
 #   https://gitlab.sintef.no/-/user_settings/personal_access_tokens
@@ -39,25 +39,25 @@ import sys
 GITLAB_BASE = 'https://gitlab.sintef.no'
 
 APP_CONFIG = {
-    'custusx': {
+    'CustusX': {
         'project_path': 'custusx/custusx',
         'package_name': 'CustusX',
         'link_name': 'CustusX Windows installer',
         'upload_filename': 'CustusXWindows.exe',
     },
-    'custusx-s': {
+    'CustusS': {
         'project_path': 'custusx/custuss',
         'package_name': 'CustusS',
         'link_name': 'CustusS Windows installer',
         'upload_filename': 'CustusSWindows.exe',
     },
-    'fraxinus': {
+    'Fraxinus': {
         'project_path': 'custusx/fraxinus',
         'package_name': 'Fraxinus',
         'link_name': 'Fraxinus Windows installer',
         'upload_filename': 'FraxinusWindows.exe',
     },
-    'fraxinus-private': {
+    'FraxinusExcelsior': {
         'project_path': 'custusx/org.custusx.fraxinus.private',
         'package_name': 'FraxinusExcelsior',
         'link_name': 'FraxinusExcelsior Windows installer',
