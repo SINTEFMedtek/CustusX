@@ -11,8 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxLiverGUIExtenderService.h"
 #include "ctkPluginContext.h"
-#include "cxLiverSegmentationWidget.h"
-#include "cxLiverVisibilityWidget.h"
+#include "cxLiverWidget.h"
 #include "cxVisServices.h"
 
 namespace cx
@@ -30,10 +29,7 @@ std::vector<GUIExtenderService::CategorizedWidget> LiverGUIExtenderService::crea
 	VisServicesPtr services = VisServices::create(mContext);
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new LiverSegmentationWidget(services),
-			"Liver"));
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new LiverVisibilityWidget(services),
+			new LiverWidget(services),
 			"Liver"));
 
 	return retval;

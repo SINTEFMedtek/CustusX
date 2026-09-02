@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxLiverSegmentationWidget.h"
 #include "cxLiverVisibilityWidget.h"
+#include "cxLiverWidget.h"
 #include "cxVisServices.h"
 
 TEST_CASE("LiverPlugin: Construct widgets with null services", "[unit][plugins][org.custusx.liver]")
@@ -20,6 +21,7 @@ TEST_CASE("LiverPlugin: Construct widgets with null services", "[unit][plugins][
 
 	cx::LiverSegmentationWidget segmentationWidget(services);
 	cx::LiverVisibilityWidget visibilityWidget(services);
+	cx::LiverWidget liverWidget(services);
 
 	CHECK(true);
 }

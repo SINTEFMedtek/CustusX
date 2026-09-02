@@ -10,6 +10,7 @@ set(PLUGIN_SRCS
 	cxLiverSegmentationRunner.cpp
 	cxLiverSegmentationWidget.cpp
 	cxLiverVisibilityWidget.cpp
+	cxLiverWidget.cpp
 )
 
 set(PLUGIN_MOC_SRCS
@@ -18,6 +19,7 @@ set(PLUGIN_MOC_SRCS
 	cxLiverSegmentationRunner.h
 	cxLiverSegmentationWidget.h
 	cxLiverVisibilityWidget.h
+	cxLiverWidget.h
 )
 
 set(PLUGIN_UI_FORMS
