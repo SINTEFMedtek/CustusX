@@ -59,9 +59,22 @@ elif [[ $reqPath == "TotalSegmentator" ]]; then
 
   source bin/activate
   pip install --upgrade pip
-  pip install TotalSegmentator
+  # Pinned: TotalSegmentator has changed its CLI between releases (e.g. the
+  # weights downloader moved from `python -m totalsegmentator.download_weights`
+  # to the totalseg_download_weights console script), which silently broke the
+  # Windows installer before (see installFraxinus.sh/CustusX#42). Bump this
+  # deliberately, and re-check the totalseg_download_weights invocations below,
+  # when updating.
+  pip install "TotalSegmentator==2.18.0"
+  # One task per class of structure CustusX's script filters use:
+  # total -> LungLobes/Liver, lung_vessels -> LungVessels, lung_nodules ->
+  # Nodules, liver_vessels/liver_lesions/liver_segments -> Liver.
   totalseg_download_weights -t total
   totalseg_download_weights -t lung_vessels
+  totalseg_download_weights -t lung_nodules
+  totalseg_download_weights -t liver_vessels
+  totalseg_download_weights -t liver_lesions
+  totalseg_download_weights -t liver_segments
 else #Install other program, not tested
   python3 -m venv .;
   source bin/activate;
