@@ -22,28 +22,49 @@ if [ -z $reqPath ]; then
 fi
 
 cd "$venvBasePath";
+# venvBasePath is already the intended venv root (GenericScriptFilter derives it
+# by stripping "bin/python" off the .ini's environment path), so the venv must be
+# created directly in "." here - creating a nested "venv" subdir instead leaves
+# the real venv one level too deep, and CustusX then can't find its python binary.
 if [[ $reqPath == *"."* ]] || [[ $reqPath == *"/"* ]]; then # If using requirements.txt
-  python3 -m venv venv;
-  source venv/bin/activate;
+  python3 -m venv .;
+  source bin/activate;
   pip install --upgrade pip;
   python -m pip install -r "$reqPath/requirements.txt";
 elif [[ $reqPath == "TotalSegmentator" ]]; then
-  ubuntuVersion="$(lsb_release -rs)"
-  if [[ $ubuntuVersion == *"20.04"* ]]; then
-    echo "Ubuntu 20.04 - Installing Python 3.10 packages"
-    sudo apt install software-properties-common -y #Needed for Python 3.10 on Ubuntu20.04
-    sudo add-apt-repository ppa:deadsnakes/ppa -y #Needed for Python 3.10 on Ubuntu20.04
+  # TotalSegmentator requires Python >= 3.9. Ubuntu 20.04 ships python3.8, which
+  # is too old, so pull in python3.10 via deadsnakes there. 22.04 (python3.10)
+  # and 24.04 (python3.12) already satisfy this with their own system python3,
+  # so use that directly instead of forcing a specific version that may not
+  # exist/be installable on newer distros.
+  pythonBin="python3"
+  pythonMinor="$(python3 -c 'import sys; print(sys.version_info.minor)')"
+  if [ "$pythonMinor" -lt 9 ]; then
+    echo "System python3 (3.$pythonMinor) is too old for TotalSegmentator (needs >=3.9) - installing python3.10 via deadsnakes"
+    sudo apt install -y software-properties-common #Needed for the deadsnakes PPA
+    sudo add-apt-repository ppa:deadsnakes/ppa -y
+    sudo apt install -y python3.10-venv #Also pulls in the python3.10 interpreter itself
+    pythonBin="python3.10"
   fi
-  sudo apt install -y python3.10-venv
-  python3.10 -m venv venv
-  source venv/bin/activate
+
+  if ! "$pythonBin" -m venv .; then
+    echo "$pythonBin -m venv failed, trying to install ${pythonBin}-venv"
+    sudo apt install -y "${pythonBin}-venv"
+    "$pythonBin" -m venv .
+  fi
+  if [ ! -f bin/activate ]; then
+    echo "ERROR: Could not create virtual environment at $(pwd) using $pythonBin"
+    exit 1
+  fi
+
+  source bin/activate
   pip install --upgrade pip
   pip install TotalSegmentator
   totalseg_download_weights -t total
   totalseg_download_weights -t lung_vessels
 else #Install other program, not tested
-  python3 -m venv venv;
-  source venv/bin/activate;
+  python3 -m venv .;
+  source bin/activate;
   pip install --upgrade pip;
   python -m pip install $reqPath;
 fi
