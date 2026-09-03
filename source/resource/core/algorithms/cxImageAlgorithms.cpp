@@ -98,6 +98,27 @@ ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const
 	return retval;
 }
 
+/** Return an image resampled so its in-plane (x/y) resolution is capped at
+ *  maxInPlaneDimension pixels, keeping the z spacing unchanged.
+ *  The image is not added to the data manager nor saved.
+ */
+ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServicePtr dataManager, ImagePtr image, int maxInPlaneDimension, QString uid, QString name)
+{
+	vtkImageDataPtr vtkImageGrayscale = image->getGrayScaleVtkImageData();
+	if (!vtkImageGrayscale)
+		return image;
+
+	double* spacing = vtkImageGrayscale->GetSpacing();
+	int* dim = vtkImageGrayscale->GetDimensions();
+
+	Vector3D newSpacing;
+	newSpacing[0] = (double)dim[0] / maxInPlaneDimension * spacing[0];
+	newSpacing[1] = (double)dim[1] / maxInPlaneDimension * spacing[1];
+	newSpacing[2] = spacing[2];
+
+	return resampleImage(dataManager, image, newSpacing, uid, name);
+}
+
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */

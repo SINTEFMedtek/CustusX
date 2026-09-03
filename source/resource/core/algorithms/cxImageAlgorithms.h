@@ -40,6 +40,14 @@ namespace cx
 
 cxResource_EXPORT ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
 cxResource_EXPORT ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, Transform3D refMi);
+/**
+ * Resample an image so its in-plane (x/y) resolution is capped at maxInPlaneDimension
+ * pixels, keeping the z spacing unchanged. Used to bound the size of volumes passed to
+ * downstream algorithms (e.g. segmentation) that would otherwise be too slow or memory-
+ * heavy on large/uncropped input. Returns the input image unchanged if it has no scalar
+ * data. The image is not added to the data manager nor saved.
+ */
+cxResource_EXPORT ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServicePtr dataManager, ImagePtr image, int maxInPlaneDimension, QString uid="", QString name="");
 cxResource_EXPORT vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
 cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image);
 cxResource_EXPORT ImagePtr duplicateImage(PatientModelServicePtr dataManager, ImagePtr image);
