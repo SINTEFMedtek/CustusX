@@ -24,6 +24,8 @@ class QGridLayout;
 namespace cx
 {
 
+typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
+
 struct org_custusx_liver_EXPORT SelectableLiverStructure
 {
 	QString mName;
@@ -36,7 +38,10 @@ struct org_custusx_liver_EXPORT SelectableLiverStructure
 
 /**
  * Widget for toggling visibility of the segmented liver structures
- * (liver, pancreas, vessels, lesions, Couinaud segments) in the 2D/3D views.
+ * (liver, pancreas, vessels, lesions, Couinaud segments) in the 2D/3D views,
+ * scoped to one selected source image at a time (since running segmentation
+ * against more than one volume can produce several meshes sharing the same
+ * organ type, one per source image).
  *
  * \ingroup org_custusx_liver
  */
@@ -52,20 +57,27 @@ public:
 private slots:
 	void refreshStructures();
 	void toggleAllSegments();
+	void toggleSourceVolume();
 
 private:
 	void addStructureButton(ORGAN_TYPE organType, QString label, QGridLayout* layout, int row);
 	void toggleStructure(ORGAN_TYPE organType);
 	void updateButtonColor(ORGAN_TYPE organType);
 	void updateAllSegmentsButtonColor();
-	void showMesh(MeshPtr mesh);
-	void hideMesh(MeshPtr mesh);
+	void updateSourceVolumeButtonColor();
+	MeshPtr findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const;
+	bool isShown(QString uid) const;
+	void showData(QString uid);
+	void hideData(QString uid);
 
 	VisServicesPtr mServices;
+	StringPropertySelectImagePtr mSourceImageSelector;
 	QMap<ORGAN_TYPE, SelectableLiverStructure> mStructures;
 	QList<ORGAN_TYPE> mSegmentOrganTypes;
 	QPushButton* mAllSegmentsButton;
 	bool mAllSegmentsViewEnabled;
+	QPushButton* mSourceVolumeButton;
+	bool mSourceVolumeViewEnabled;
 };
 
 } /* namespace cx */

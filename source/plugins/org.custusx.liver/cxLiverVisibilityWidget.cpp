@@ -20,7 +20,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
+#include "cxImage.h"
 #include "cxMesh.h"
+#include "cxSelectDataStringProperty.h"
+#include "cxDataSelectWidget.h"
 #include "cxStyles.h"
 
 namespace cx
@@ -35,9 +38,22 @@ SelectableLiverStructure::SelectableLiverStructure() :
 LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, this->getWidgetName(), "Liver Visibility"),
 	mServices(services),
+	mSourceImageSelector(StringPropertySelectImage::New(services->patient())),
 	mAllSegmentsButton(nullptr),
-	mAllSegmentsViewEnabled(false)
+	mAllSegmentsViewEnabled(false),
+	mSourceVolumeButton(nullptr),
+	mSourceVolumeViewEnabled(false)
 {
+	mSourceImageSelector->setValueName("Source Image");
+	mSourceImageSelector->setHelp("Select which segmented volume's structures to show/hide");
+	connect(mSourceImageSelector.get(), &SelectDataStringPropertyBase::dataChanged, this, &LiverVisibilityWidget::refreshStructures);
+
+	QGridLayout* imageSelectorLayout = new QGridLayout();
+	new DataSelectWidget(mServices->view(), mServices->patient(), this, mSourceImageSelector, imageSelectorLayout, 0);
+
+	mSourceVolumeButton = new QPushButton("Source Volume");
+	connect(mSourceVolumeButton, &QPushButton::clicked, this, &LiverVisibilityWidget::toggleSourceVolume);
+
 	QGridLayout* structuresLayout = new QGridLayout();
 	int row = 0;
 	this->addStructureButton(otLIVER, "Liver", structuresLayout, row++);
@@ -66,6 +82,8 @@ LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* p
 	connect(refreshButton, &QPushButton::clicked, this, &LiverVisibilityWidget::refreshStructures);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->addLayout(imageSelectorLayout);
+	layout->addWidget(mSourceVolumeButton);
 	layout->addWidget(refreshButton);
 	layout->addWidget(structuresGroup);
 	layout->addWidget(segmentsGroup);
@@ -74,7 +92,6 @@ LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* p
 
 	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &LiverVisibilityWidget::refreshStructures);
 	this->refreshStructures();
-	this->updateAllSegmentsButtonColor();
 }
 
 LiverVisibilityWidget::~LiverVisibilityWidget()
@@ -98,15 +115,47 @@ void LiverVisibilityWidget::addStructureButton(ORGAN_TYPE organType, QString lab
 	connect(structure.mButton, &QPushButton::clicked, this, [=]() { this->toggleStructure(organType); });
 }
 
+MeshPtr LiverVisibilityWidget::findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const
+{
+	if (!sourceImage)
+		return MeshPtr();
+
+	std::map<QString, MeshPtr> candidates = mServices->patient()->getDataOfType<Mesh>(organType);
+	std::map<QString, MeshPtr>::iterator it;
+	for (it = candidates.begin(); it != candidates.end(); ++it)
+		if (it->second && it->second->getParentSpace() == sourceImage->getUid())
+			return it->second;
+	return MeshPtr();
+}
+
+bool LiverVisibilityWidget::isShown(QString uid) const
+{
+	if (mServices->view()->groupCount() == 0)
+		return false;
+
+	ViewGroupDataPtr viewGroup = mServices->view()->getGroup(0);
+	if (!viewGroup)
+		return false;
+
+	std::vector<DataPtr> visibleData = viewGroup->getData();
+	for (size_t i = 0; i < visibleData.size(); ++i)
+		if (visibleData[i] && visibleData[i]->getUid() == uid)
+			return true;
+	return false;
+}
+
 void LiverVisibilityWidget::refreshStructures()
 {
+	ImagePtr sourceImage = mSourceImageSelector->getImage();
+
 	QMapIterator<ORGAN_TYPE, SelectableLiverStructure> i(mStructures);
 	while (i.hasNext())
 	{
 		i.next();
 		ORGAN_TYPE organType = i.key();
-		MeshPtr mesh = mServices->patient()->getData<Mesh>(organType);
+		MeshPtr mesh = this->findMeshForSourceImage(organType, sourceImage);
 		mStructures[organType].mMesh = mesh;
+		mStructures[organType].mViewEnabled = mesh && this->isShown(mesh->getUid());
 		mStructures[organType].mButton->setEnabled(mesh != nullptr);
 		this->updateButtonColor(organType);
 	}
@@ -116,6 +165,10 @@ void LiverVisibilityWidget::refreshStructures()
 		anySegmentPresent |= (mStructures[mSegmentOrganTypes[i]].mMesh != nullptr);
 	if (mAllSegmentsButton)
 		mAllSegmentsButton->setEnabled(anySegmentPresent);
+
+	mSourceVolumeViewEnabled = sourceImage && this->isShown(sourceImage->getUid());
+	mSourceVolumeButton->setEnabled(sourceImage != nullptr);
+	this->updateSourceVolumeButtonColor();
 }
 
 void LiverVisibilityWidget::toggleStructure(ORGAN_TYPE organType)
@@ -126,9 +179,9 @@ void LiverVisibilityWidget::toggleStructure(ORGAN_TYPE organType)
 
 	structure.mViewEnabled = !structure.mViewEnabled;
 	if (structure.mViewEnabled)
-		this->showMesh(structure.mMesh);
+		this->showData(structure.mMesh->getUid());
 	else
-		this->hideMesh(structure.mMesh);
+		this->hideData(structure.mMesh->getUid());
 
 	this->updateButtonColor(organType);
 }
@@ -153,9 +206,9 @@ void LiverVisibilityWidget::toggleAllSegments()
 
 		structure.mViewEnabled = mAllSegmentsViewEnabled;
 		if (structure.mViewEnabled)
-			this->showMesh(structure.mMesh);
+			this->showData(structure.mMesh->getUid());
 		else
-			this->hideMesh(structure.mMesh);
+			this->hideData(structure.mMesh->getUid());
 		this->updateButtonColor(organType);
 	}
 	this->updateAllSegmentsButtonColor();
@@ -171,23 +224,45 @@ void LiverVisibilityWidget::updateAllSegmentsButtonColor()
 	mAllSegmentsButton->setPalette(palette);
 }
 
-void LiverVisibilityWidget::showMesh(MeshPtr mesh)
+void LiverVisibilityWidget::toggleSourceVolume()
+{
+	ImagePtr sourceImage = mSourceImageSelector->getImage();
+	if (!sourceImage)
+		return;
+
+	mSourceVolumeViewEnabled = !mSourceVolumeViewEnabled;
+	if (mSourceVolumeViewEnabled)
+		this->showData(sourceImage->getUid());
+	else
+		this->hideData(sourceImage->getUid());
+
+	this->updateSourceVolumeButtonColor();
+}
+
+void LiverVisibilityWidget::updateSourceVolumeButtonColor()
+{
+	QPalette palette = mSourceVolumeButton->palette();
+	palette.setColor(QPalette::Button, mSourceVolumeViewEnabled ? Styles::getGreen() : Styles::getRed());
+	mSourceVolumeButton->setPalette(palette);
+}
+
+void LiverVisibilityWidget::showData(QString uid)
 {
 	for (unsigned i = 0; i < mServices->view()->groupCount(); ++i)
 	{
 		ViewGroupDataPtr viewGroup = mServices->view()->getGroup(i);
 		if (viewGroup)
-			viewGroup->addData(mesh->getUid());
+			viewGroup->addData(uid);
 	}
 }
 
-void LiverVisibilityWidget::hideMesh(MeshPtr mesh)
+void LiverVisibilityWidget::hideData(QString uid)
 {
 	for (unsigned i = 0; i < mServices->view()->groupCount(); ++i)
 	{
 		ViewGroupDataPtr viewGroup = mServices->view()->getGroup(i);
 		if (viewGroup)
-			viewGroup->removeData(mesh->getUid());
+			viewGroup->removeData(uid);
 	}
 }
 
