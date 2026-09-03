@@ -78,13 +78,9 @@ LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* p
 	QGroupBox* segmentsGroup = new QGroupBox("Liver Segments (Couinaud)");
 	segmentsGroup->setLayout(segmentsLayout);
 
-	QPushButton* refreshButton = new QPushButton("Refresh");
-	connect(refreshButton, &QPushButton::clicked, this, &LiverVisibilityWidget::refreshStructures);
-
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->addLayout(imageSelectorLayout);
 	layout->addWidget(mSourceVolumeButton);
-	layout->addWidget(refreshButton);
 	layout->addWidget(structuresGroup);
 	layout->addWidget(segmentsGroup);
 	layout->addStretch();
