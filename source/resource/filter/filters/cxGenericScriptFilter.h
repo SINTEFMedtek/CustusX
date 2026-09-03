@@ -85,6 +85,11 @@ public:
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 	PatientModelServicePtr mPatientModelService;
 	void setOutputClasses(QStringList outputClasses);
+	// Sends SIGTERM to the running script process, if any. Relies on the
+	// script itself terminating any child process it spawned (e.g. a
+	// TotalSegmentator subprocess) on receiving that signal - killing the
+	// script harder (SIGKILL) would leave such a child orphaned.
+	void requestStop();
 
 signals:
 	void scriptOutput(const QString& line);

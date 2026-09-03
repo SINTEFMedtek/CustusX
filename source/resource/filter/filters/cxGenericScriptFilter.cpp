@@ -659,6 +659,12 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 	}
 }
 
+void GenericScriptFilter::requestStop()
+{
+	if (mCommandLine && mCommandLine->getProcess())
+		mCommandLine->getProcess()->terminate();
+}
+
 void GenericScriptFilter::createInputTypes()
 {
 	SelectDataStringPropertyBasePtr temp;
