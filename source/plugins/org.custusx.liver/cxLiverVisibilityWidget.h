@@ -67,6 +67,7 @@ private:
 	void updateAllSegmentsButtonColor();
 	void updateSourceVolumeButtonColor();
 	MeshPtr findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const;
+	bool descendsFrom(QString uid, QString ancestorUid) const;
 	bool isShown(QString uid) const;
 	void showData(QString uid);
 	void hideData(QString uid);

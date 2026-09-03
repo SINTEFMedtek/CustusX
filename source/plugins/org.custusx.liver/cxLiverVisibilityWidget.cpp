@@ -116,6 +116,22 @@ ImagePtr LiverVisibilityWidget::sourceImage() const
 	return boost::dynamic_pointer_cast<Image>(mSourceImageSelector->getData());
 }
 
+bool LiverVisibilityWidget::descendsFrom(QString uid, QString ancestorUid) const
+{
+	// Walk the parent-frame chain: a mesh produced from a resampled copy of
+	// the source image (see LiverSegmentationWidget::prepareInputForFilter())
+	// is parented to that copy, not directly to the source image, so an
+	// exact-match comparison would miss it.
+	for (int steps = 0; !uid.isEmpty() && steps < 10; ++steps)
+	{
+		if (uid == ancestorUid)
+			return true;
+		DataPtr data = mServices->patient()->getData(uid);
+		uid = data ? data->getParentSpace() : QString();
+	}
+	return false;
+}
+
 MeshPtr LiverVisibilityWidget::findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const
 {
 	if (!sourceImage)
@@ -124,7 +140,7 @@ MeshPtr LiverVisibilityWidget::findMeshForSourceImage(ORGAN_TYPE organType, Imag
 	std::map<QString, MeshPtr> candidates = mServices->patient()->getDataOfType<Mesh>(organType);
 	std::map<QString, MeshPtr>::iterator it;
 	for (it = candidates.begin(); it != candidates.end(); ++it)
-		if (it->second && it->second->getParentSpace() == sourceImage->getUid())
+		if (it->second && this->descendsFrom(it->second->getParentSpace(), sourceImage->getUid()))
 			return it->second;
 	return MeshPtr();
 }

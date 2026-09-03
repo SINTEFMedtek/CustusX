@@ -82,6 +82,7 @@ private:
 	QList<PlannedRun> buildPlannedRuns() const;
 	ImagePtr selectedImage1() const;
 	ImagePtr selectedImage2() const;
+	ImagePtr prepareInputForFilter(FilterKind filter, ImagePtr image) const;
 	static QString filterLabel(FilterKind filter);
 	static QString iniFileNameFor(FilterKind filter, IMAGE_MODALITY modality);
 	static QString progressLabel(const PlannedRun& run);

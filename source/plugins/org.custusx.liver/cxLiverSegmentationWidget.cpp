@@ -30,6 +30,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxEnumConversion.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxDataSelectWidget.h"
+#include "cxImageAlgorithms.h"
 #include "cxLogger.h"
 
 namespace cx
@@ -258,7 +259,7 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 	{
 		QueuedRun queuedRun;
 		queuedRun.iniFileName = run.iniFileName;
-		queuedRun.image = run.image;
+		queuedRun.image = this->prepareInputForFilter(run.filter, run.image);
 		queue << queuedRun;
 	}
 	mRunner->start(queue);
@@ -304,6 +305,24 @@ void LiverSegmentationWidget::onAllFinished()
 	mProcessingInfoGroup->setVisible(false);
 	mSegmentationGroup->setVisible(true);
 	this->updateRunButtonState();
+}
+
+ImagePtr LiverSegmentationWidget::prepareInputForFilter(FilterKind filter, ImagePtr image) const
+{
+	if (filter != fkLiverPancreas)
+		return image;
+
+	// Smoothing in the contour step runs on the raw marching-cubes output, so
+	// on a large/uncropped volume it can freeze the main thread for 20+
+	// minutes (observed directly, for this filter, on a 278MB volume vs. a
+	// 58MB one). Fraxinus avoids the same issue for lung segmentation by
+	// capping the in-plane resolution before segmenting (see
+	// resampleImageToMaxInPlaneResolution()); scoped to this filter only,
+	// since it's the one the freeze was observed on and Fraxinus's own
+	// lung filters run unresampled volumes of this size without issue.
+	ImagePtr resampled = resampleImageToMaxInPlaneResolution(mServices->patient(), image, 512);
+	mServices->patient()->insertData(resampled);
+	return resampled;
 }
 
 ImagePtr LiverSegmentationWidget::selectedImage1() const
