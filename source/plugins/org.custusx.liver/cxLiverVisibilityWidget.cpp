@@ -38,14 +38,14 @@ SelectableLiverStructure::SelectableLiverStructure() :
 LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, this->getWidgetName(), "Liver Visibility"),
 	mServices(services),
-	mSourceImageSelector(StringPropertySelectImage::New(services->patient())),
+	mSourceImageSelector(StringPropertyActiveImage::New(services->patient())),
 	mAllSegmentsButton(nullptr),
 	mAllSegmentsViewEnabled(false),
 	mSourceVolumeButton(nullptr),
 	mSourceVolumeViewEnabled(false)
 {
-	mSourceImageSelector->setValueName("Source Image");
-	mSourceImageSelector->setHelp("Select which segmented volume's structures to show/hide");
+	mSourceImageSelector->setValueName("Source Image (Active)");
+	mSourceImageSelector->setHelp("The active volume - shows/hides its segmented structures");
 	connect(mSourceImageSelector.get(), &SelectDataStringPropertyBase::dataChanged, this, &LiverVisibilityWidget::refreshStructures);
 
 	QGridLayout* imageSelectorLayout = new QGridLayout();
@@ -111,6 +111,11 @@ void LiverVisibilityWidget::addStructureButton(ORGAN_TYPE organType, QString lab
 	connect(structure.mButton, &QPushButton::clicked, this, [=]() { this->toggleStructure(organType); });
 }
 
+ImagePtr LiverVisibilityWidget::sourceImage() const
+{
+	return boost::dynamic_pointer_cast<Image>(mSourceImageSelector->getData());
+}
+
 MeshPtr LiverVisibilityWidget::findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const
 {
 	if (!sourceImage)
@@ -142,7 +147,7 @@ bool LiverVisibilityWidget::isShown(QString uid) const
 
 void LiverVisibilityWidget::refreshStructures()
 {
-	ImagePtr sourceImage = mSourceImageSelector->getImage();
+	ImagePtr sourceImage = this->sourceImage();
 
 	QMapIterator<ORGAN_TYPE, SelectableLiverStructure> i(mStructures);
 	while (i.hasNext())
@@ -222,7 +227,7 @@ void LiverVisibilityWidget::updateAllSegmentsButtonColor()
 
 void LiverVisibilityWidget::toggleSourceVolume()
 {
-	ImagePtr sourceImage = mSourceImageSelector->getImage();
+	ImagePtr sourceImage = this->sourceImage();
 	if (!sourceImage)
 		return;
 
