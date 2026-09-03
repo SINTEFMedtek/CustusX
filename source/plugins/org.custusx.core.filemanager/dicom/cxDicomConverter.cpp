@@ -185,7 +185,7 @@ bool DicomConverter::slicesFormRegularGrid(std::map<double, ImagePtr> sorted, Ve
 			distances.push_back(dist);
 
 			Vector3D tilt = cross(p1-p0, e_sort);
-			double sliceGantryTiltTolerance = 0.001;
+			double sliceGantryTiltTolerance = 0.01;
 			if (!similar(tilt.length(), 0.0, sliceGantryTiltTolerance))
 			{
 				reportError(QString("Dicom convert: found gantry tilt: %1, cannot create image.").arg(tilt.length()));
