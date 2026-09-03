@@ -48,7 +48,7 @@ public:
 	static QString getWidgetName();
 
 private slots:
-	void runSegmentationClicked();
+	void runOrStopButtonClicked();
 	void selectAll(bool checked);
 	void updateRunButtonState();
 	void onFilterStarted(QString iniFileName);

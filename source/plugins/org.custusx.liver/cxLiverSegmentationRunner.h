@@ -37,6 +37,9 @@ public:
 	virtual ~LiverSegmentationRunner();
 
 	void start(QStringList iniFileNames, ImagePtr image);
+	// Stops the currently running filter (if any) and drops the rest of the
+	// queue - allFinished() still fires once the running filter actually stops.
+	void stop();
 	bool isRunning() const;
 
 signals:

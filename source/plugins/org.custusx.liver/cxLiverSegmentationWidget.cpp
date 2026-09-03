@@ -52,7 +52,7 @@ LiverSegmentationWidget::LiverSegmentationWidget(VisServicesPtr services, QWidge
 
 	mRunSegmentationButton = new QPushButton("Run Segmentation");
 	mRunSegmentationButton->setEnabled(false);
-	connect(mRunSegmentationButton, &QPushButton::clicked, this, &LiverSegmentationWidget::runSegmentationClicked);
+	connect(mRunSegmentationButton, &QPushButton::clicked, this, &LiverSegmentationWidget::runOrStopButtonClicked);
 
 	connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &LiverSegmentationWidget::updateRunButtonState);
 
@@ -157,8 +157,15 @@ void LiverSegmentationWidget::selectAll(bool checked)
 	mCheckBoxLiverSegments->setChecked(checked);
 }
 
-void LiverSegmentationWidget::runSegmentationClicked()
+void LiverSegmentationWidget::runOrStopButtonClicked()
 {
+	if (mRunner->isRunning())
+	{
+		mRunner->stop();
+		mRunSegmentationButton->setEnabled(false);
+		return;
+	}
+
 	QStringList iniFileNames;
 	if (mCheckBoxLiverPancreas->isChecked())
 		iniFileNames << "python_LiverPancreas.ini";
@@ -179,8 +186,8 @@ void LiverSegmentationWidget::runSegmentationClicked()
 	mCurrentIniFileName = "";
 	mSegmentationGroup->setVisible(false);
 	mProcessingInfoGroup->setVisible(true);
-	mRunSegmentationButton->setEnabled(false);
 	mRunner->start(iniFileNames, image);
+	this->updateRunButtonState();
 }
 
 void LiverSegmentationWidget::onFilterStarted(QString iniFileName)
@@ -237,8 +244,17 @@ bool LiverSegmentationWidget::selectedImageIsCT() const
 
 void LiverSegmentationWidget::updateRunButtonState()
 {
+	if (mRunner->isRunning())
+	{
+		mRunSegmentationButton->setText("Stop Segmentation");
+		mRunSegmentationButton->setEnabled(true);
+		mRunSegmentationButton->setToolTip("Stop the running segmentation");
+		return;
+	}
+
 	bool isCT = this->selectedImageIsCT();
-	mRunSegmentationButton->setEnabled(isCT && !mRunner->isRunning());
+	mRunSegmentationButton->setText("Run Segmentation");
+	mRunSegmentationButton->setEnabled(isCT);
 	if (!this->selectedImage())
 		mRunSegmentationButton->setToolTip("Select a CT volume above to enable segmentation");
 	else if (!isCT)

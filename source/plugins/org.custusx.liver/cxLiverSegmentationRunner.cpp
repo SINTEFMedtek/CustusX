@@ -11,6 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxLiverSegmentationRunner.h"
 
+#include <QApplication>
+
 #include "cxGenericScriptFilter.h"
 #include "cxFilterTimedAlgorithm.h"
 #include "cxDataLocations.h"
@@ -26,6 +28,10 @@ LiverSegmentationRunner::LiverSegmentationRunner(VisServicesPtr services, QObjec
 	QObject(parent),
 	mServices(services)
 {
+	// LogicManager's own aboutToQuit-triggered shutdown is disabled (see
+	// cxLogicManager.cpp) to avoid CTK-related crashes, so a running filter
+	// isn't otherwise given a chance to stop its child process on app exit.
+	connect(qApp, &QApplication::aboutToQuit, this, &LiverSegmentationRunner::stop);
 }
 
 LiverSegmentationRunner::~LiverSegmentationRunner()
@@ -79,6 +85,13 @@ void LiverSegmentationRunner::runNext()
 
 	emit filterStarted(iniFileName);
 	mCurrentThread->execute();
+}
+
+void LiverSegmentationRunner::stop()
+{
+	mQueue.clear();
+	if (mCurrentFilter)
+		mCurrentFilter->requestStop();
 }
 
 void LiverSegmentationRunner::onFilterFinished()
