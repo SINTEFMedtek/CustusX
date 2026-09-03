@@ -48,6 +48,16 @@ cxResource_EXPORT ImagePtr resampleImage(PatientModelServicePtr dataManager, Ima
  * data. The image is not added to the data manager nor saved.
  */
 cxResource_EXPORT ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServicePtr dataManager, ImagePtr image, int maxInPlaneDimension, QString uid="", QString name="");
+/**
+ * Resample an image so its total voxel count is capped at maxVoxelCount, scaling
+ * all three axes uniformly. Unlike resampleImageToMaxInPlaneResolution(), this
+ * also bounds the z extent, so it is suitable for volumes whose z extent may be
+ * large (e.g. whole-body scans) rather than only assuming a short one (e.g.
+ * chest-only scans). Returns the input image unchanged if it is already at or
+ * below maxVoxelCount, or if it has no scalar data. The image is not added to
+ * the data manager nor saved.
+ */
+cxResource_EXPORT ImagePtr resampleImageToMaxVoxelCount(PatientModelServicePtr dataManager, ImagePtr image, double maxVoxelCount, QString uid="", QString name="");
 cxResource_EXPORT vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
 cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image);
 cxResource_EXPORT ImagePtr duplicateImage(PatientModelServicePtr dataManager, ImagePtr image);

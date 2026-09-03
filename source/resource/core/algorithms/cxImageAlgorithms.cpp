@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxImageAlgorithms.h"
 
+#include <cmath>
 #include <vtkImageData.h>
 #include <vtkImageReslice.h>
 #include <vtkMatrix4x4.h>
@@ -115,6 +116,32 @@ ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServicePtr dataManager,
 	newSpacing[0] = (double)dim[0] / maxInPlaneDimension * spacing[0];
 	newSpacing[1] = (double)dim[1] / maxInPlaneDimension * spacing[1];
 	newSpacing[2] = spacing[2];
+
+	return resampleImage(dataManager, image, newSpacing, uid, name);
+}
+
+/** Return an image resampled so its total voxel count is capped at maxVoxelCount,
+ *  scaling all three axes uniformly. Returns the input unchanged if it is already
+ *  at or below maxVoxelCount.
+ *  The image is not added to the data manager nor saved.
+ */
+ImagePtr resampleImageToMaxVoxelCount(PatientModelServicePtr dataManager, ImagePtr image, double maxVoxelCount, QString uid, QString name)
+{
+	vtkImageDataPtr vtkImageGrayscale = image->getGrayScaleVtkImageData();
+	if (!vtkImageGrayscale)
+		return image;
+
+	double* spacing = vtkImageGrayscale->GetSpacing();
+	int* dim = vtkImageGrayscale->GetDimensions();
+	double voxelCount = (double)dim[0] * dim[1] * dim[2];
+	if (voxelCount <= maxVoxelCount)
+		return image;
+
+	double scale = std::cbrt(voxelCount / maxVoxelCount);
+	Vector3D newSpacing;
+	newSpacing[0] = spacing[0] * scale;
+	newSpacing[1] = spacing[1] * scale;
+	newSpacing[2] = spacing[2] * scale;
 
 	return resampleImage(dataManager, image, newSpacing, uid, name);
 }

@@ -254,6 +254,11 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 	mSegmentationGroup->setVisible(false);
 	mProcessingInfoGroup->setVisible(true);
 
+	// Empirically: a ~29M voxel mask (58MB, 16-bit) completes fast, a ~139M
+	// voxel one (278MB) froze the main thread for 20+ minutes. Capped in
+	// between the two, with some margin below the known-good side.
+	const double maxVoxelCountForHeavySmoothing = 40000000;
+
 	QMap<QString, ImagePtr> resampledCache; // source image uid -> resampled copy, avoids one per filter
 	QList<QueuedRun> queue;
 	foreach (const PlannedRun& run, runs)
@@ -267,7 +272,11 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 			ImagePtr& resampled = resampledCache[run.image->getUid()];
 			if (!resampled)
 			{
-				resampled = resampleImageToMaxInPlaneResolution(mServices->patient(), run.image, 512);
+				// Scale all three axes by total voxel count, not just x/y: a
+				// whole-body scan's native in-plane resolution may already be
+				// <=512 (no benefit from an in-plane-only cap), while its z
+				// extent is what actually makes marching-cubes/smoothing slow.
+				resampled = resampleImageToMaxVoxelCount(mServices->patient(), run.image, maxVoxelCountForHeavySmoothing);
 				mServices->patient()->insertData(resampled);
 			}
 			queuedRun.image = resampled;
