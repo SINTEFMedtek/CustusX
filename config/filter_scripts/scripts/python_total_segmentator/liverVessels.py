@@ -7,13 +7,34 @@ import SimpleITK as sitk
 import sys
 import getopt
 import glob
+import time
 
 _child_process = None
 
 def _kill_child():
+    # TotalSegmentator forks its own multiprocessing worker processes, so
+    # killing only the top-level process can leave those orphaned (still
+    # holding GPU memory) - start_new_session=True below puts the whole tree
+    # in its own process group, and killpg targets all of it at once.
     global _child_process
-    if _child_process is not None and _child_process.poll() is None:
-        _child_process.kill()
+    if _child_process is None or _child_process.poll() is not None:
+        return
+    try:
+        pgid = os.getpgid(_child_process.pid)
+    except ProcessLookupError:
+        return
+    try:
+        os.killpg(pgid, signal.SIGTERM)
+    except ProcessLookupError:
+        return
+    for _ in range(50):  # wait up to 5s for a graceful exit
+        if _child_process.poll() is not None:
+            return
+        time.sleep(0.1)
+    try:
+        os.killpg(pgid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
 
 atexit.register(_kill_child)
 signal.signal(signal.SIGTERM, lambda sig, frame: sys.exit(0))
@@ -32,7 +53,7 @@ def runTotalSegmentator(filenameInput):
          '-o', venv_path + '/../../segmentations', '--task', 'liver_vessels',
          '--nr_thr_saving', '1'],
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-        text=True, bufsize=1
+        text=True, bufsize=1, start_new_session=True
     )
     _child_process = process
 
