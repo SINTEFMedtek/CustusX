@@ -106,6 +106,8 @@ def deleteAllFilesInSegmentationFolder():
 
 def main(argv):
     os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
+    # Reduces fragmentation-driven CUDA allocation failures on GPUs with tight VRAM.
+    os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
     try:
         opts, args = getopt.getopt(argv, "ht:a:", ["Task=", "Arguments="])
