@@ -254,13 +254,28 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 	mSegmentationGroup->setVisible(false);
 	mProcessingInfoGroup->setVisible(true);
 
+	QMap<QString, ImagePtr> resampledCache; // source image uid -> resampled copy, avoids one per filter
 	QList<QueuedRun> queue;
 	foreach (const PlannedRun& run, runs)
 	{
 		QueuedRun queuedRun;
 		queuedRun.iniFileName = run.iniFileName;
-		queuedRun.image = this->prepareInputForFilter(run.filter, run.image);
 		queuedRun.key = run.key;
+
+		if (this->needsResampling(run.filter))
+		{
+			ImagePtr& resampled = resampledCache[run.image->getUid()];
+			if (!resampled)
+			{
+				resampled = resampleImageToMaxInPlaneResolution(mServices->patient(), run.image, 512);
+				mServices->patient()->insertData(resampled);
+			}
+			queuedRun.image = resampled;
+		}
+		else
+		{
+			queuedRun.image = run.image;
+		}
 		queue << queuedRun;
 	}
 	mRunner->start(queue);
@@ -308,22 +323,22 @@ void LiverSegmentationWidget::onAllFinished()
 	this->updateRunButtonState();
 }
 
-ImagePtr LiverSegmentationWidget::prepareInputForFilter(FilterKind filter, ImagePtr image) const
+bool LiverSegmentationWidget::needsResampling(FilterKind filter)
 {
-	if (filter != fkLiverPancreas)
-		return image;
-
 	// Smoothing in the contour step runs on the raw marching-cubes output, so
 	// on a large/uncropped volume it can freeze the main thread for 20+
-	// minutes (observed directly, for this filter, on a 278MB volume vs. a
-	// 58MB one). Fraxinus avoids the same issue for lung segmentation by
-	// capping the in-plane resolution before segmenting (see
-	// resampleImageToMaxInPlaneResolution()); scoped to this filter only,
-	// since it's the one the freeze was observed on and Fraxinus's own
-	// lung filters run unresampled volumes of this size without issue.
-	ImagePtr resampled = resampleImageToMaxInPlaneResolution(mServices->patient(), image, 512);
-	mServices->patient()->insertData(resampled);
-	return resampled;
+	// minutes with no way to stop it (the external process is already gone
+	// by the time this runs in postProcess()). Fraxinus avoids the same issue
+	// for lung segmentation by capping the in-plane resolution before
+	// segmenting (see resampleImageToMaxInPlaneResolution()). Scoped to
+	// fkLiverPancreas and fkLiverSegments only: both use the heaviest
+	// smoothing level (GenericScriptFilter::contourFilterSettingForOrganType()
+	// filtering=3, same as Fraxinus's own Lungs/Heart/Lobes), and Segments
+	// additionally produces up to 9 meshes per run - fkLiverVessels/
+	// fkLiverLesions use lighter smoothing (filtering=1/2) and are left
+	// unresampled, matching Fraxinus's own lung filters running unresampled
+	// volumes of this size without issue.
+	return filter == fkLiverPancreas || filter == fkLiverSegments;
 }
 
 ImagePtr LiverSegmentationWidget::selectedImage1() const
