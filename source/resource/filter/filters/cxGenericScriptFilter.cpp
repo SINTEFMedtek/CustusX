@@ -18,6 +18,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTextStream>
 #include <QMessageBox>
 #include <QApplication>
+#ifndef CX_WINDOWS
+#include <csignal>
+#include <sys/types.h>
+#endif //CX_WINDOWS
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -667,11 +671,20 @@ void GenericScriptFilter::requestStop()
 	// execute() runs on a worker thread (see FilterTimedAlgorithm/
 	// ThreadedTimedAlgorithm), and mCommandLine's QProcess is created inside
 	// that call, so it has worker-thread affinity. requestStop() itself may
-	// be called from the main thread (e.g. a Stop button, or on app quit),
-	// so terminate() must be queued onto the process' own thread instead of
-	// invoked directly - calling a QObject's methods across threads without
-	// this is not safe and has been observed to crash.
-	QMetaObject::invokeMethod(mCommandLine->getProcess(), "terminate", Qt::QueuedConnection);
+	// be called from the main thread (e.g. a Stop button, or on app quit).
+	// QProcess::terminate() isn't safe to invoke directly from another
+	// thread, and queuing it via QMetaObject::invokeMethod isn't reliable
+	// either - waitForFinished()'s internal event loop isn't guaranteed to
+	// dispatch cross-object posted events. Sending the OS signal directly
+	// via the process' PID sidesteps Qt's threading model entirely -
+	// processId() just returns an already-cached value, safe to read from
+	// any thread. Only implemented for POSIX - this feature (running
+	// TotalSegmentator through a venv) isn't set up on Windows regardless.
+#ifndef CX_WINDOWS
+	qint64 pid = mCommandLine->getProcess()->processId();
+	if (pid > 0)
+		::kill(pid, SIGTERM);
+#endif //CX_WINDOWS
 }
 
 void GenericScriptFilter::createInputTypes()
