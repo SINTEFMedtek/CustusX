@@ -661,8 +661,17 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 
 void GenericScriptFilter::requestStop()
 {
-	if (mCommandLine && mCommandLine->getProcess())
-		mCommandLine->getProcess()->terminate();
+	if (!mCommandLine || !mCommandLine->getProcess())
+		return;
+
+	// execute() runs on a worker thread (see FilterTimedAlgorithm/
+	// ThreadedTimedAlgorithm), and mCommandLine's QProcess is created inside
+	// that call, so it has worker-thread affinity. requestStop() itself may
+	// be called from the main thread (e.g. a Stop button, or on app quit),
+	// so terminate() must be queued onto the process' own thread instead of
+	// invoked directly - calling a QObject's methods across threads without
+	// this is not safe and has been observed to crash.
+	QMetaObject::invokeMethod(mCommandLine->getProcess(), "terminate", Qt::QueuedConnection);
 }
 
 void GenericScriptFilter::createInputTypes()
