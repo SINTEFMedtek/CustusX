@@ -24,6 +24,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+QString QueuedRun::key() const
+{
+	return iniFileName + "@" + image->getUid();
+}
+
 LiverSegmentationRunner::LiverSegmentationRunner(VisServicesPtr services, QObject* parent) :
 	QObject(parent),
 	mServices(services)
@@ -43,27 +48,26 @@ bool LiverSegmentationRunner::isRunning() const
 	return mCurrentThread != nullptr;
 }
 
-void LiverSegmentationRunner::start(QStringList iniFileNames, ImagePtr image)
+void LiverSegmentationRunner::start(QList<QueuedRun> queue)
 {
 	if (this->isRunning())
 	{
 		reportWarning("LiverSegmentationRunner::start: A segmentation is already running.");
 		return;
 	}
-	mQueue = iniFileNames;
-	mImage = image;
+	mQueue = queue;
 	this->runNext();
 }
 
-GenericScriptFilterPtr LiverSegmentationRunner::createFilter(QString iniFileName)
+GenericScriptFilterPtr LiverSegmentationRunner::createFilter(const QueuedRun& run)
 {
 	GenericScriptFilterPtr filter(new GenericScriptFilter(mServices));
 	std::vector<SelectDataStringPropertyBasePtr> input = filter->getInputTypes();
 	filter->getOutputTypes();
 	filter->getOptions();
-	filter->setParameterFilePath(DataLocations::getFilterScriptsPath() + iniFileName);
+	filter->setParameterFilePath(DataLocations::getFilterScriptsPath() + run.iniFileName);
 	if (!input.empty())
-		input[0]->setValue(mImage->getUid());
+		input[0]->setValue(run.image->getUid());
 	return filter;
 }
 
@@ -74,8 +78,8 @@ void LiverSegmentationRunner::runNext()
 		emit allFinished();
 		return;
 	}
-	QString iniFileName = mQueue.takeFirst();
-	mCurrentFilter = this->createFilter(iniFileName);
+	QueuedRun run = mQueue.takeFirst();
+	mCurrentFilter = this->createFilter(run);
 
 	mCurrentThread.reset(new FilterTimedAlgorithm(mCurrentFilter));
 	connect(mCurrentThread.get(), &FilterTimedAlgorithm::finished, this, &LiverSegmentationRunner::onFilterFinished);
@@ -83,7 +87,7 @@ void LiverSegmentationRunner::runNext()
 	        this, &LiverSegmentationRunner::onScriptOutput,
 	        Qt::ConnectionType(Qt::QueuedConnection | Qt::UniqueConnection));
 
-	emit filterStarted(iniFileName);
+	emit filterStarted(run.key());
 	mCurrentThread->execute();
 }
 

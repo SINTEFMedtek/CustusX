@@ -20,15 +20,17 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QGridLayout>
 #include <QFrame>
 #include <QLayoutItem>
+#include <QPair>
 
 #include "cxLiverSegmentationRunner.h"
 #include "cxVisServices.h"
 #include "cxPatientModelService.h"
-#include "cxActiveData.h"
 #include "cxImage.h"
 #include "cxDefinitions.h"
+#include "cxEnumConversion.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxDataSelectWidget.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -37,18 +39,20 @@ LiverSegmentationWidget::LiverSegmentationWidget(VisServicesPtr services, QWidge
 	BaseWidget(parent, this->getWidgetName(), "Liver Segmentation"),
 	mServices(services),
 	mRunner(new LiverSegmentationRunner(services, this)),
-	mImageSelector(StringPropertySelectImage::New(services->patient()))
+	mImageSelector(StringPropertyActiveImage::New(services->patient())),
+	mImageSelector2(StringPropertySelectImage::New(services->patient()))
 {
 	connect(mRunner.get(), &LiverSegmentationRunner::filterStarted, this, &LiverSegmentationWidget::onFilterStarted);
 	connect(mRunner.get(), &LiverSegmentationRunner::progressChanged, this, &LiverSegmentationWidget::onProgressChanged);
 	connect(mRunner.get(), &LiverSegmentationRunner::allFinished, this, &LiverSegmentationWidget::onAllFinished);
 
-	mImageSelector->setValueName("CT Volume");
-	mImageSelector->setHelp("Select the CT volume to segment");
-	ImagePtr activeImage = mServices->patient()->getActiveData()->getActive<Image>();
-	if (activeImage)
-		mImageSelector->setValue(activeImage->getUid());
+	mImageSelector->setValueName("Volume 1 (Active)");
+	mImageSelector->setHelp("The active CT or MR volume to segment");
 	connect(mImageSelector.get(), &SelectDataStringPropertyBase::dataChanged, this, &LiverSegmentationWidget::updateRunButtonState);
+
+	mImageSelector2->setValueName("Volume 2 (optional)");
+	mImageSelector2->setHelp("An optional second CT or MR volume to run the same filters against");
+	connect(mImageSelector2.get(), &SelectDataStringPropertyBase::dataChanged, this, &LiverSegmentationWidget::updateRunButtonState);
 
 	mRunSegmentationButton = new QPushButton("Run Segmentation");
 	mRunSegmentationButton->setEnabled(false);
@@ -58,6 +62,7 @@ LiverSegmentationWidget::LiverSegmentationWidget(VisServicesPtr services, QWidge
 
 	QGridLayout* imageSelectorLayout = new QGridLayout();
 	new DataSelectWidget(mServices->view(), mServices->patient(), this, mImageSelector, imageSelectorLayout, 0);
+	new DataSelectWidget(mServices->view(), mServices->patient(), this, mImageSelector2, imageSelectorLayout, 1);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->addLayout(imageSelectorLayout);
@@ -79,25 +84,54 @@ QString LiverSegmentationWidget::getWidgetName()
 	return "liver_segmentation_widget";
 }
 
-QString LiverSegmentationWidget::friendlyName(QString iniFileName)
+QString LiverSegmentationWidget::filterLabel(FilterKind filter)
 {
-	if (iniFileName == "python_LiverPancreas.ini")
-		return "Liver and Pancreas";
-	if (iniFileName == "python_LiverVessels.ini")
-		return "Liver Vessels";
-	if (iniFileName == "python_LiverLesions.ini")
-		return "Liver Lesions";
-	if (iniFileName == "python_LiverSegments.ini")
-		return "Liver Segments (Couinaud)";
-	return iniFileName;
+	switch (filter)
+	{
+	case fkLiverPancreas: return "Liver and Pancreas";
+	case fkLiverVessels:  return "Liver Vessels";
+	case fkLiverLesions:  return "Liver Lesions";
+	case fkLiverSegments: return "Liver Segments (Couinaud)";
+	}
+	return "";
+}
+
+QString LiverSegmentationWidget::iniFileNameFor(FilterKind filter, IMAGE_MODALITY modality)
+{
+	if (modality == imCT)
+	{
+		switch (filter)
+		{
+		case fkLiverPancreas: return "python_LiverPancreas.ini";
+		case fkLiverVessels:  return "python_LiverVessels.ini";
+		case fkLiverLesions:  return "python_LiverLesions.ini";
+		case fkLiverSegments: return "python_LiverSegments.ini";
+		}
+	}
+	else if (modality == imMR)
+	{
+		switch (filter)
+		{
+		case fkLiverPancreas: return "python_LiverPancreas_MR.ini";
+		case fkLiverVessels:  return ""; // no MR-capable TotalSegmentator model exists
+		case fkLiverLesions:  return "python_LiverLesions_MR.ini";
+		case fkLiverSegments: return "python_LiverSegments_MR.ini";
+		}
+	}
+	return "";
+}
+
+QString LiverSegmentationWidget::progressLabel(const PlannedRun& run)
+{
+	return QString("%1 (%2)").arg(filterLabel(run.filter)).arg(run.image->getName());
 }
 
 QGroupBox* LiverSegmentationWidget::buildSegmentationGroup()
 {
-	mCheckBoxLiverPancreas = new QCheckBox(this->friendlyName("python_LiverPancreas.ini"));
-	mCheckBoxLiverVessels = new QCheckBox(this->friendlyName("python_LiverVessels.ini"));
-	mCheckBoxLiverLesions = new QCheckBox(this->friendlyName("python_LiverLesions.ini"));
-	mCheckBoxLiverSegments = new QCheckBox(this->friendlyName("python_LiverSegments.ini"));
+	mCheckBoxLiverPancreas = new QCheckBox(filterLabel(fkLiverPancreas));
+	mCheckBoxLiverVessels = new QCheckBox(filterLabel(fkLiverVessels));
+	mCheckBoxLiverLesions = new QCheckBox(filterLabel(fkLiverLesions));
+	mCheckBoxLiverSegments = new QCheckBox(filterLabel(fkLiverSegments));
 	mCheckBoxSelectAll = new QCheckBox("Select all");
 	connect(mCheckBoxSelectAll, &QCheckBox::toggled, this, &LiverSegmentationWidget::selectAll);
 
@@ -128,7 +162,7 @@ QGroupBox* LiverSegmentationWidget::buildProcessingInfoGroup()
 	return mProcessingInfoGroup;
 }
 
-void LiverSegmentationWidget::rebuildProgressBars(QStringList iniFileNames)
+void LiverSegmentationWidget::rebuildProgressBars(const QList<PlannedRun>& runs)
 {
 	QLayoutItem* item;
 	while ((item = mProgressBarsLayout->takeAt(0)) != nullptr)
@@ -138,14 +172,14 @@ void LiverSegmentationWidget::rebuildProgressBars(QStringList iniFileNames)
 	}
 	mProgressBars.clear();
 
-	foreach (QString iniFileName, iniFileNames)
+	foreach (const PlannedRun& run, runs)
 	{
 		QProgressBar* bar = new QProgressBar();
 		bar->setRange(0, 100);
 		bar->setValue(0);
-		mProgressBarsLayout->addWidget(new QLabel(this->friendlyName(iniFileName)));
+		mProgressBarsLayout->addWidget(new QLabel(progressLabel(run)));
 		mProgressBarsLayout->addWidget(bar);
-		mProgressBars.insert(iniFileName, bar);
+		mProgressBars.insert(run.key, bar);
 	}
 }
 
@@ -157,6 +191,50 @@ void LiverSegmentationWidget::selectAll(bool checked)
 	mCheckBoxLiverSegments->setChecked(checked);
 }
 
+QList<LiverSegmentationWidget::PlannedRun> LiverSegmentationWidget::buildPlannedRuns() const
+{
+	QList<PlannedRun> runs;
+
+	QList<ImagePtr> images;
+	if (ImagePtr image1 = this->selectedImage1())
+		images << image1;
+	if (ImagePtr image2 = this->selectedImage2())
+		images << image2;
+
+	QList<QPair<FilterKind, QCheckBox*> > filters;
+	filters << qMakePair(fkLiverPancreas, mCheckBoxLiverPancreas)
+	        << qMakePair(fkLiverVessels, mCheckBoxLiverVessels)
+	        << qMakePair(fkLiverLesions, mCheckBoxLiverLesions)
+	        << qMakePair(fkLiverSegments, mCheckBoxLiverSegments);
+
+	foreach (const ImagePtr& image, images)
+	{
+		for (int i = 0; i < filters.size(); ++i)
+		{
+			FilterKind filter = filters[i].first;
+			QCheckBox* checkbox = filters[i].second;
+			if (!checkbox->isChecked())
+				continue;
+
+			QString iniFileName = this->iniFileNameFor(filter, image->getModality());
+			if (iniFileName.isEmpty())
+			{
+				reportWarning(QString("Liver segmentation: skipping %1 for %2 - no %3-capable model exists")
+				              .arg(filterLabel(filter)).arg(image->getName()).arg(enum2string(image->getModality())));
+				continue;
+			}
+
+			PlannedRun run;
+			run.filter = filter;
+			run.image = image;
+			run.iniFileName = iniFileName;
+			run.key = iniFileName + "@" + image->getUid();
+			runs << run;
+		}
+	}
+	return runs;
+}
+
 void LiverSegmentationWidget::runOrStopButtonClicked()
 {
 	if (mRunner->isRunning())
@@ -166,43 +244,40 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 		return;
 	}
 
-	QStringList iniFileNames;
-	if (mCheckBoxLiverPancreas->isChecked())
-		iniFileNames << "python_LiverPancreas.ini";
-	if (mCheckBoxLiverVessels->isChecked())
-		iniFileNames << "python_LiverVessels.ini";
-	if (mCheckBoxLiverLesions->isChecked())
-		iniFileNames << "python_LiverLesions.ini";
-	if (mCheckBoxLiverSegments->isChecked())
-		iniFileNames << "python_LiverSegments.ini";
-	if (iniFileNames.isEmpty())
+	QList<PlannedRun> runs = this->buildPlannedRuns();
+	if (runs.isEmpty())
 		return;
 
-	ImagePtr image = this->selectedImage();
-	if (!image)
-		return;
-
-	this->rebuildProgressBars(iniFileNames);
-	mCurrentIniFileName = "";
+	this->rebuildProgressBars(runs);
+	mCurrentRunKey = "";
 	mSegmentationGroup->setVisible(false);
 	mProcessingInfoGroup->setVisible(true);
-	mRunner->start(iniFileNames, image);
+
+	QList<QueuedRun> queue;
+	foreach (const PlannedRun& run, runs)
+	{
+		QueuedRun queuedRun;
+		queuedRun.iniFileName = run.iniFileName;
+		queuedRun.image = run.image;
+		queue << queuedRun;
+	}
+	mRunner->start(queue);
 	this->updateRunButtonState();
 }
 
-void LiverSegmentationWidget::onFilterStarted(QString iniFileName)
+void LiverSegmentationWidget::onFilterStarted(QString key)
 {
-	if (QProgressBar* finishedBar = mProgressBars.value(mCurrentIniFileName, nullptr))
+	if (QProgressBar* finishedBar = mProgressBars.value(mCurrentRunKey, nullptr))
 	{
 		finishedBar->setRange(0, 100);
 		finishedBar->setValue(100);
 	}
-	mCurrentIniFileName = iniFileName;
+	mCurrentRunKey = key;
 }
 
 void LiverSegmentationWidget::onProgressChanged(int percent)
 {
-	QProgressBar* bar = mProgressBars.value(mCurrentIniFileName, nullptr);
+	QProgressBar* bar = mProgressBars.value(mCurrentRunKey, nullptr);
 	if (!bar)
 		return;
 
@@ -220,26 +295,25 @@ void LiverSegmentationWidget::onProgressChanged(int percent)
 
 void LiverSegmentationWidget::onAllFinished()
 {
-	if (QProgressBar* finishedBar = mProgressBars.value(mCurrentIniFileName, nullptr))
+	if (QProgressBar* finishedBar = mProgressBars.value(mCurrentRunKey, nullptr))
 	{
 		finishedBar->setRange(0, 100);
 		finishedBar->setValue(100);
 	}
-	mCurrentIniFileName = "";
+	mCurrentRunKey = "";
 	mProcessingInfoGroup->setVisible(false);
 	mSegmentationGroup->setVisible(true);
 	this->updateRunButtonState();
 }
 
-ImagePtr LiverSegmentationWidget::selectedImage() const
+ImagePtr LiverSegmentationWidget::selectedImage1() const
 {
-	return mImageSelector->getImage();
+	return boost::dynamic_pointer_cast<Image>(mImageSelector->getData());
 }
 
-bool LiverSegmentationWidget::selectedImageIsCT() const
+ImagePtr LiverSegmentationWidget::selectedImage2() const
 {
-	ImagePtr image = this->selectedImage();
-	return image && (image->getModality() == imCT);
+	return mImageSelector2->getImage();
 }
 
 void LiverSegmentationWidget::updateRunButtonState()
@@ -252,15 +326,10 @@ void LiverSegmentationWidget::updateRunButtonState()
 		return;
 	}
 
-	bool isCT = this->selectedImageIsCT();
 	mRunSegmentationButton->setText("Run Segmentation");
-	mRunSegmentationButton->setEnabled(isCT);
-	if (!this->selectedImage())
-		mRunSegmentationButton->setToolTip("Select a CT volume above to enable segmentation");
-	else if (!isCT)
-		mRunSegmentationButton->setToolTip("Selected volume is not a CT image");
-	else
-		mRunSegmentationButton->setToolTip("");
+	bool hasImage = this->selectedImage1() != nullptr;
+	mRunSegmentationButton->setEnabled(hasImage);
+	mRunSegmentationButton->setToolTip(hasImage ? "" : "Select a CT or MR volume above to enable segmentation");
 }
 
 } /* namespace cx */

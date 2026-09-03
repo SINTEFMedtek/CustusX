@@ -13,7 +13,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLIVERSEGMENTATIONRUNNER_H_
 
 #include <QObject>
-#include <QStringList>
+#include <QList>
+#include <QString>
 #include "org_custusx_liver_Export.h"
 #include "cxForwardDeclarations.h"
 
@@ -24,8 +25,21 @@ typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 typedef boost::shared_ptr<class FilterTimedAlgorithm> FilterTimedAlgorithmPtr;
 
 /**
- * Runs a queue of liver .ini filter files sequentially against the same
- * input image, one GenericScriptFilter run at a time.
+ * One queued filter run: an .ini file to run against a specific image.
+ *
+ * \ingroup org_custusx_liver
+ */
+struct org_custusx_liver_EXPORT QueuedRun
+{
+	QString iniFileName;
+	ImagePtr image;
+
+	QString key() const;
+};
+
+/**
+ * Runs a queue of liver .ini filter files sequentially, each against its
+ * own image, one GenericScriptFilter run at a time.
  *
  * \ingroup org_custusx_liver
  */
@@ -36,14 +50,14 @@ public:
 	explicit LiverSegmentationRunner(VisServicesPtr services, QObject* parent = 0);
 	virtual ~LiverSegmentationRunner();
 
-	void start(QStringList iniFileNames, ImagePtr image);
+	void start(QList<QueuedRun> queue);
 	// Stops the currently running filter (if any) and drops the rest of the
 	// queue - allFinished() still fires once the running filter actually stops.
 	void stop();
 	bool isRunning() const;
 
 signals:
-	void filterStarted(QString iniFileName);
+	void filterStarted(QString key);
 	// percent is 0-100 for the currently running filter; negative means
 	// indeterminate (mirrors the running script's own "PROGRESS: N" output).
 	void progressChanged(int percent);
@@ -55,11 +69,10 @@ private slots:
 
 private:
 	void runNext();
-	GenericScriptFilterPtr createFilter(QString iniFileName);
+	GenericScriptFilterPtr createFilter(const QueuedRun& run);
 
 	VisServicesPtr mServices;
-	QStringList mQueue;
-	ImagePtr mImage;
+	QList<QueuedRun> mQueue;
 	GenericScriptFilterPtr mCurrentFilter;
 	FilterTimedAlgorithmPtr mCurrentThread;
 };
