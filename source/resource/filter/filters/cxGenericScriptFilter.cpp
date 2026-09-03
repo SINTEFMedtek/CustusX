@@ -1016,8 +1016,15 @@ void GenericScriptFilter::createOutputMesh(QColor color, int smoothing)
 	outputMesh->setColor(color);
 	outputMesh->setOrganType(mOutputImage->getOrganType());
 	patientService()->insertData(outputMesh);
-	outputMesh->get_rMd_History()->setRegistration(mOutputImage->get_rMd());
-	outputMesh->get_rMd_History()->setParentSpace(mOutputImage->getUid());
+
+	// Parent to the actual input image, not mOutputImage: when volume output is
+	// disabled (.ini "volume = false"), mOutputImage is never inserted into the
+	// patient model, so a mesh parented to it is left with a dangling,
+	// unresolvable parent frame - it won't move when the input is registered,
+	// and widgets showing "parent frame" can't resolve it either.
+	ImagePtr inputImage = this->getCopiedInputImage();
+	outputMesh->get_rMd_History()->setRegistration(inputImage->get_rMd());
+	outputMesh->get_rMd_History()->setParentSpace(inputImage->getUid());
 	mServices->view()->autoShowData(outputMesh);
 
 	mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());
