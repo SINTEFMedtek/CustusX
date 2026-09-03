@@ -24,11 +24,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-QString QueuedRun::key() const
-{
-	return iniFileName + "@" + image->getUid();
-}
-
 LiverSegmentationRunner::LiverSegmentationRunner(VisServicesPtr services, QObject* parent) :
 	QObject(parent),
 	mServices(services)
@@ -87,7 +82,7 @@ void LiverSegmentationRunner::runNext()
 	        this, &LiverSegmentationRunner::onScriptOutput,
 	        Qt::ConnectionType(Qt::QueuedConnection | Qt::UniqueConnection));
 
-	emit filterStarted(run.key());
+	emit filterStarted(run.key);
 	mCurrentThread->execute();
 }
 

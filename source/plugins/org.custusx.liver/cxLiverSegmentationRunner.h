@@ -27,14 +27,18 @@ typedef boost::shared_ptr<class FilterTimedAlgorithm> FilterTimedAlgorithmPtr;
 /**
  * One queued filter run: an .ini file to run against a specific image.
  *
+ * key identifies this run for progress reporting (see LiverSegmentationWidget) -
+ * it is set by the caller rather than derived from image, since image may be
+ * a resampled copy of the volume the caller (and its progress bars) actually
+ * refer to.
+ *
  * \ingroup org_custusx_liver
  */
 struct org_custusx_liver_EXPORT QueuedRun
 {
 	QString iniFileName;
 	ImagePtr image;
-
-	QString key() const;
+	QString key;
 };
 
 /**

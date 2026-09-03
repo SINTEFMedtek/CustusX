@@ -260,6 +260,7 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 		QueuedRun queuedRun;
 		queuedRun.iniFileName = run.iniFileName;
 		queuedRun.image = this->prepareInputForFilter(run.filter, run.image);
+		queuedRun.key = run.key;
 		queue << queuedRun;
 	}
 	mRunner->start(queue);
