@@ -173,6 +173,86 @@ TEST_CASE("ImageAlgorithms: computeAutoCropBox() tightly bounds the foreground b
 	CHECK(hugePaddingBox[1] == Approx(19.0));
 }
 
+namespace
+{
+cx::ImagePtr createSyntheticImage(cx::PatientModelServicePtr pasm, QString uid, int dimX, int dimY, int dimZ, double spacing)
+{
+	vtkSmartPointer<vtkImageData> raw = vtkSmartPointer<vtkImageData>::New();
+	raw->SetDimensions(dimX, dimY, dimZ);
+	raw->SetSpacing(spacing, spacing, spacing);
+	raw->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+	memset(raw->GetScalarPointer(), 1, dimX * dimY * dimZ);
+
+	cx::ImagePtr image(new cx::Image(uid, raw));
+	pasm->insertData(image);
+	return image;
+}
+}
+
+TEST_CASE("ImageAlgorithms: resampleImageToMaxVoxelCount() shrinks a large volume", "[unit][resource][core]")
+{
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr pasm = services->patient();
+
+	cx::ImagePtr image = createSyntheticImage(pasm, "big", 40, 40, 40, 1.0); // 64000 voxels
+
+	cx::ImagePtr resampled = cx::resampleImageToMaxVoxelCount(pasm, image, 8000);
+	REQUIRE(resampled);
+	CHECK(resampled != image);
+
+	int dims[3];
+	resampled->getBaseVtkImageData()->GetDimensions(dims);
+	double voxelCount = static_cast<double>(dims[0]) * dims[1] * dims[2];
+	CHECK(voxelCount <= 8000 * 1.5); // some slack for integer dimension rounding
+}
+
+TEST_CASE("ImageAlgorithms: resampleImageToMaxVoxelCount() is a no-op under the target", "[unit][resource][core]")
+{
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr pasm = services->patient();
+
+	cx::ImagePtr image = createSyntheticImage(pasm, "small", 10, 10, 10, 1.0); // 1000 voxels
+
+	cx::ImagePtr resampled = cx::resampleImageToMaxVoxelCount(pasm, image, 8000);
+	CHECK(resampled == image); // same object - no resampling performed
+}
+
+TEST_CASE("ImageAlgorithms: resampleImageToMaxInPlaneResolution() caps x/y and keeps z spacing", "[unit][resource][core]")
+{
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr pasm = services->patient();
+
+	cx::ImagePtr image = createSyntheticImage(pasm, "wide", 40, 40, 10, 1.0);
+
+	cx::ImagePtr resampled = cx::resampleImageToMaxInPlaneResolution(pasm, image, 20);
+	REQUIRE(resampled);
+	double* spacing = resampled->getBaseVtkImageData()->GetSpacing();
+	CHECK(spacing[0] == Approx(2.0)); // 40/20 * 1.0
+	CHECK(spacing[1] == Approx(2.0));
+	CHECK(spacing[2] == Approx(1.0)); // z untouched
+}
+
+TEST_CASE("ImageAlgorithms: cropImage() with an explicit box does not touch image->getCroppingBox()", "[unit][resource][core]")
+{
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr pasm = services->patient();
+
+	cx::ImagePtr image = createSyntheticImage(pasm, "crop_me", 20, 20, 20, 1.0);
+	cx::DoubleBoundingBox3D originalCroppingBox = image->getCroppingBox();
+
+	cx::DoubleBoundingBox3D explicitBox(2, 8, 2, 8, 2, 8);
+	cx::ImagePtr cropped = cx::cropImage(pasm, image, explicitBox);
+	REQUIRE(cropped);
+
+	int dims[3];
+	cropped->getBaseVtkImageData()->GetDimensions(dims);
+	CHECK(dims[0] == 7); // voxel indices 2..8 inclusive
+	CHECK(dims[1] == 7);
+	CHECK(dims[2] == 7);
+
+	CHECK(cx::similar(image->getCroppingBox(), originalCroppingBox));
+}
+
 TEST_CASE("ImageAlgorithms: computeAutoCropBox() returns the full volume for a uniform image", "[unit][resource][core]")
 {
 	// No separable foreground/background - computeOtsuThreshold() degenerates
