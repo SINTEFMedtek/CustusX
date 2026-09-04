@@ -78,9 +78,11 @@ cxResource_EXPORT double computeOtsuThreshold(vtkImageDataPtr image);
 cxResource_EXPORT DoubleBoundingBox3D computeAutoCropBox(ImagePtr image, int paddingVoxels = 5);
 cxResource_EXPORT vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
 /** Crop using an explicit mm-space box, without reading or modifying
- *  image->getCroppingBox()/setCroppingBox().
+ *  image->getCroppingBox()/setCroppingBox(). uid/name default to
+ *  image->getUid()/getName() with " crop%1" appended, as for the no-box
+ *  overload below.
  */
-cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image, DoubleBoundingBox3D box);
+cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image, DoubleBoundingBox3D box, QString uid="", QString name="");
 /** Crop using the box already stored on the image (image->getCroppingBox()).
  */
 cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image);

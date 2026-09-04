@@ -253,6 +253,28 @@ TEST_CASE("ImageAlgorithms: cropImage() with an explicit box does not touch imag
 	CHECK(cx::similar(image->getCroppingBox(), originalCroppingBox));
 }
 
+TEST_CASE("ImageAlgorithms: cropImage()/resampleImageToMaxVoxelCount() use an explicit uid/name as-is", "[unit][resource][core]")
+{
+	// Regression test: an already-processed name (e.g. from a prior manual
+	// crop) must not get another default suffix silently appended on top -
+	// the caller-supplied uid/name should be used exactly, not just as a
+	// fallback.
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr pasm = services->patient();
+
+	cx::ImagePtr image = createSyntheticImage(pasm, "ct_crop", 20, 20, 20, 1.0);
+
+	cx::ImagePtr cropped = cx::cropImage(pasm, image, cx::DoubleBoundingBox3D(2, 8, 2, 8, 2, 8), "ct_prepared", "CT (prepared)");
+	REQUIRE(cropped);
+	CHECK(cropped->getUid() == "ct_prepared");
+	CHECK(cropped->getName() == "CT (prepared)");
+
+	cx::ImagePtr resampled = cx::resampleImageToMaxVoxelCount(pasm, cropped, 10, "ct_prepared", "CT (prepared)");
+	REQUIRE(resampled);
+	CHECK(resampled->getUid() == "ct_prepared");
+	CHECK(resampled->getName() == "CT (prepared)");
+}
+
 TEST_CASE("ImageAlgorithms: computeAutoCropBox() returns the full volume for a uniform image", "[unit][resource][core]")
 {
 	// No separable foreground/background - computeOtsuThreshold() degenerates

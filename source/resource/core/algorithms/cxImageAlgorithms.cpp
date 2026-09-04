@@ -319,7 +319,7 @@ vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox)
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image, DoubleBoundingBox3D bb)
+ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image, DoubleBoundingBox3D bb, QString uid, QString name)
 {
 	double* sp = image->getBaseVtkImageData()->GetSpacing();
 	IntBoundingBox3D cropbox(
@@ -328,8 +328,11 @@ ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image, DoubleBou
 				static_cast<int>(bb[4]/sp[2]+0.5), static_cast<int>(bb[5]/sp[2]+0.5));
 	vtkImageDataPtr rawResult = cropImage(image->getBaseVtkImageData(), cropbox);
 
-	QString uid = image->getUid() + "_crop%1";
-	QString name = image->getName()+" crop%1";
+	if (uid.isEmpty())
+	{
+		uid = image->getUid() + "_crop%1";
+		name = image->getName()+" crop%1";
+	}
 	ImagePtr result = createDerivedImage(dataManager,
 										 uid, name,
 										 rawResult, image);

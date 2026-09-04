@@ -286,13 +286,22 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 
 ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) const
 {
+	// One fixed name for whatever this ends up producing, rather than
+	// chaining each step's own default suffix onto the previous result's
+	// name (e.g. cropImage()'s own default would turn an already-cropped
+	// "CT crop" into "CT crop crop", and a further resample into
+	// "CT crop crop res" - compounding indefinitely across repeated runs
+	// and confusing the resulting mesh names).
+	QString preparedUid = image->getUid() + "_prepared";
+	QString preparedName = image->getName() + " (prepared for segmentation)";
+
 	// Auto-crop first: lossless (just removes surrounding air/background),
 	// and often enough on its own. Skip it if it wouldn't actually shrink
 	// anything (e.g. the volume was already cropped).
 	ImagePtr working = image;
 	DoubleBoundingBox3D autoCropBox = computeAutoCropBox(image);
 	if (!similar(autoCropBox, image->boundingBox()))
-		working = cropImage(mServices->patient(), image, autoCropBox);
+		working = cropImage(mServices->patient(), image, autoCropBox, preparedUid, preparedName);
 
 	// Only resample (lossy - reduces resolution) if still too large after
 	// cropping. Scale all three axes by total voxel count, not just x/y: a
@@ -304,7 +313,7 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 	// voxel one (278MB) froze the main thread for 20+ minutes. Capped in
 	// between the two, with some margin below the known-good side.
 	const double maxVoxelCountForHeavySmoothing = 40000000;
-	return resampleImageToMaxVoxelCount(mServices->patient(), working, maxVoxelCountForHeavySmoothing);
+	return resampleImageToMaxVoxelCount(mServices->patient(), working, maxVoxelCountForHeavySmoothing, preparedUid, preparedName);
 }
 
 void LiverSegmentationWidget::onFilterStarted(QString key)
