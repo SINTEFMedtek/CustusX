@@ -18,6 +18,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTextStream>
 #include <QMessageBox>
 #include <QApplication>
+#include <QThread>
+#include <QtConcurrent/QtConcurrentRun>
+#include <vtkImageData.h>
+#include <vtkPolyData.h>
 #ifndef CX_WINDOWS
 #include <csignal>
 #include <sys/types.h>
@@ -1069,16 +1073,23 @@ vtkPolyDataPtr GenericScriptFilter::contourFilter(int smoothing)
 			passBand = 0.3;
 			break;
 	}
-	vtkPolyDataPtr rawContour = ContourFilter::execute(
-				mOutputImage->getBaseVtkImageData(),
-				threshold,
-				reduceResoluion,
-				applySmoothing,
-				keepTopology,
-				decimation,
-				numberOfIterations,
-				passBand
-				);
+	// The marching-cubes/smoothing computation itself is pure VTK/CPU work
+	// with no patient-model or other main-thread-only state involved, so run
+	// it on a worker thread instead of blocking here directly - unlike the
+	// surrounding code (which creates Mesh/Image objects and inserts them
+	// into the patient model, and must stay on the main thread). This is
+	// what previously blocked the GUI fully for minutes at a time on a
+	// large volume, unable to even repaint or respond to Stop.
+	vtkImageDataPtr input = mOutputImage->getBaseVtkImageData();
+	QFuture<vtkPolyDataPtr> future = QtConcurrent::run([=]() {
+		return ContourFilter::execute(input, threshold, reduceResoluion, applySmoothing, keepTopology, decimation, numberOfIterations, passBand);
+	});
+	while (!future.isFinished())
+	{
+		qApp->processEvents();
+		QThread::msleep(10);
+	}
+	vtkPolyDataPtr rawContour = future.result();
 
 	return rawContour;
 }
