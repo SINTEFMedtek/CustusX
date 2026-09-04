@@ -29,6 +29,8 @@ CMake minimum version: 3.16.3. C++ standard: C++14. All build outputs go to `${P
 
 ## Running Tests
 
+New non-trivial code (algorithms, filter logic, bug fixes) should come with an automated test where practical. Pure/static logic (mappings, threshold/bounding-box computation, etc.) is the easiest target - prefer exposing it as a testable pure function over leaving it embedded in a widget or filter with no coverage. A private method worth testing on its own can be moved to `protected` and exercised via a thin test subclass (see "Testing Filter plugins" below) rather than left untested for lack of access.
+
 Tests use the **Catch** framework. Each plugin has a `testing/` subdirectory; all tests are linked into a single `Catch` executable.
 
 ```bash
