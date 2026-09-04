@@ -319,9 +319,8 @@ vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox)
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image)
+ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image, DoubleBoundingBox3D bb)
 {
-	DoubleBoundingBox3D bb = image->getCroppingBox();
 	double* sp = image->getBaseVtkImageData()->GetSpacing();
 	IntBoundingBox3D cropbox(
 				static_cast<int>(bb[0]/sp[0]+0.5), static_cast<int>(bb[1]/sp[0]+0.5),
@@ -337,6 +336,11 @@ ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image)
 	result->mergevtkSettingsIntosscTransform();
 
 	return result;
+}
+
+ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image)
+{
+	return cropImage(dataManager, image, image->getCroppingBox());
 }
 
 /**

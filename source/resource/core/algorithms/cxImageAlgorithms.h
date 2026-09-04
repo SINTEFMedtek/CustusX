@@ -77,6 +77,12 @@ cxResource_EXPORT double computeOtsuThreshold(vtkImageDataPtr image);
  */
 cxResource_EXPORT DoubleBoundingBox3D computeAutoCropBox(ImagePtr image, int paddingVoxels = 5);
 cxResource_EXPORT vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
+/** Crop using an explicit mm-space box, without reading or modifying
+ *  image->getCroppingBox()/setCroppingBox().
+ */
+cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image, DoubleBoundingBox3D box);
+/** Crop using the box already stored on the image (image->getCroppingBox()).
+ */
 cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image);
 cxResource_EXPORT ImagePtr duplicateImage(PatientModelServicePtr dataManager, ImagePtr image);
 

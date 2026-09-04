@@ -83,6 +83,13 @@ void CroppingWidget::setupUI()
   layout->addWidget(mBBWidget);
   connect(mBBWidget, SIGNAL(changed()), this, SLOT(boxValuesChanged()));
 
+  QPushButton* autoCropButton = new QPushButton("Auto-crop to body");
+  autoCropButton->setToolTip("Set the crop box to tightly enclose the body, removing surrounding air/background. "
+                             "Uses an adaptive intensity threshold (Otsu's method) rather than a fixed value, so it "
+                             "works for both CT and MR. Click 'Create new cropped volume' below to apply.");
+  connect(autoCropButton, SIGNAL(clicked()), this, SLOT(autoCropButtonClickedSlot()));
+  layout->addWidget(autoCropButton);
+
   QPushButton* cropClipButton = new QPushButton("Create new cropped volume");
   cropClipButton->setToolTip("Create a new volume containing only the volume inside the crop box.");
   connect(cropClipButton, SIGNAL(clicked()), this, SLOT(cropClipButtonClickedSlot()));
@@ -123,6 +130,17 @@ ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 	this->hideOldAndShowNewVolume(image, retval);
 
 	return retval;
+}
+
+void CroppingWidget::autoCropButtonClickedSlot()
+{
+	ActiveDataPtr activeData = mPatientModelService->getActiveData();
+	ImagePtr image = activeData->getActive<Image>();
+	if (!image)
+		return;
+
+	DoubleBoundingBox3D box = computeAutoCropBox(image);
+	mInteractiveCropper->setBoundingBox(box);
 }
 
 void CroppingWidget::hideOldAndShowNewVolume(ImagePtr oldImage, ImagePtr newImage)
