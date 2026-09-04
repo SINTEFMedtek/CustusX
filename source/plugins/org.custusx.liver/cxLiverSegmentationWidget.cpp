@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QPair>
 
 #include "cxLiverSegmentationRunner.h"
+#include "cxLiverVisibilityWidget.h"
 #include "cxVisServices.h"
 #include "cxPatientModelService.h"
 #include "cxImage.h"
@@ -251,6 +252,8 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 	if (runs.isEmpty())
 		return;
 
+	this->removePreviousResults(runs);
+
 	this->rebuildProgressBars(runs);
 	mCurrentRunKey = "";
 	mSegmentationGroup->setVisible(false);
@@ -358,6 +361,31 @@ void LiverSegmentationWidget::onAllFinished()
 	this->updateRunButtonState();
 }
 
+void LiverSegmentationWidget::removePreviousResults(const QList<PlannedRun>& runs) const
+{
+	// Re-running a filter against the same source image previously just
+	// added more meshes on top of whatever it had already produced, so
+	// repeated runs in one session accumulated duplicates (most visibly for
+	// Liver Vessels/Lesions, which run every time - Liver+Pancreas/Segments
+	// happen to self-limit less often only because their heavier smoothing
+	// makes people re-run them less). Remove each filter's own prior output
+	// for that same source image first, so a re-run always leaves exactly
+	// one current result per organ per source image.
+	foreach (const PlannedRun& run, runs)
+	{
+		foreach (ORGAN_TYPE organType, organTypesFor(run.filter))
+		{
+			std::map<QString, MeshPtr> candidates = mServices->patient()->getDataOfType<Mesh>(organType);
+			std::map<QString, MeshPtr>::iterator it;
+			for (it = candidates.begin(); it != candidates.end(); ++it)
+			{
+				if (it->second && LiverVisibilityWidget::descendsFrom(mServices->patient(), it->second->getParentSpace(), run.image->getUid()))
+					mServices->patient()->removeData(it->first);
+			}
+		}
+	}
+}
+
 void LiverSegmentationWidget::cleanupPreparedImages()
 {
 	// The resampled copies created in runOrStopButtonClicked() are a purely
@@ -408,6 +436,20 @@ bool LiverSegmentationWidget::needsPreparation(FilterKind filter)
 	// (filtering=1/2) and are left as-is, matching Fraxinus's own lung
 	// filters running unprepared volumes of this size without issue.
 	return filter == fkLiverPancreas || filter == fkLiverSegments;
+}
+
+QList<ORGAN_TYPE> LiverSegmentationWidget::organTypesFor(FilterKind filter)
+{
+	switch (filter)
+	{
+	case fkLiverPancreas: return QList<ORGAN_TYPE>() << otLIVER << otPANCREAS;
+	case fkLiverVessels:  return QList<ORGAN_TYPE>() << otLIVER_VESSELS;
+	case fkLiverLesions:  return QList<ORGAN_TYPE>() << otLIVER_LESIONS;
+	case fkLiverSegments:
+		return QList<ORGAN_TYPE>() << otLIVER_SEGMENT_1 << otLIVER_SEGMENT_2 << otLIVER_SEGMENT_3 << otLIVER_SEGMENT_4
+		                            << otLIVER_SEGMENT_5 << otLIVER_SEGMENT_6 << otLIVER_SEGMENT_7 << otLIVER_SEGMENT_8;
+	}
+	return QList<ORGAN_TYPE>();
 }
 
 ImagePtr LiverSegmentationWidget::selectedImage1() const

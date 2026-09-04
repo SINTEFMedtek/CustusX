@@ -73,6 +73,10 @@ public:
 	static QString filterLabel(FilterKind filter);
 	static QString iniFileNameFor(FilterKind filter, IMAGE_MODALITY modality);
 	static QString progressLabel(const PlannedRun& run);
+	// The organ type(s) a filter's output mesh(es) are tagged with - the
+	// single source of truth for this mapping, also used by
+	// LiverVisibilityWidget (which organ types make up "Liver Segments").
+	static QList<ORGAN_TYPE> organTypesFor(FilterKind filter);
 
 private slots:
 	void runOrStopButtonClicked();
@@ -92,6 +96,12 @@ private:
 	ImagePtr prepareImageForHeavyFilter(ImagePtr image) const;
 	void cleanupPreparedImages();
 
+protected:
+	// Not pure/stateless (mutates the patient model) - protected, exercised
+	// via a thin test subclass, rather than left untested for lack of access.
+	void removePreviousResults(const QList<PlannedRun>& runs) const;
+
+private:
 	VisServicesPtr mServices;
 	LiverSegmentationRunnerPtr mRunner;
 	StringPropertyActiveImagePtr mImageSelector;

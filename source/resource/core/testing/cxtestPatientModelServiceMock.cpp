@@ -35,6 +35,11 @@ void PatientModelServiceMock::insertData(cx::DataPtr data, bool overWrite)
 	mData[data->getUid()] = data;
 }
 
+void PatientModelServiceMock::removeData(QString uid)
+{
+	mData.erase(uid);
+}
+
 cx::DataPtr PatientModelServiceMock::createData(QString type, QString uid, QString name)
 {
 	cx::PatientModelServicePtr self(cx::PatientModelServicePtr(this, cx::null_deleter()));

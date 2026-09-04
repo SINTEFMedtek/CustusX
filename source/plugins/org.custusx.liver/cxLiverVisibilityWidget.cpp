@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QGroupBox>
 
 #include "cxVisServices.h"
+#include "cxLiverSegmentationWidget.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
@@ -65,8 +66,7 @@ LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* p
 
 	QGridLayout* segmentsLayout = new QGridLayout();
 	int segmentRow = 0;
-	mSegmentOrganTypes << otLIVER_SEGMENT_1 << otLIVER_SEGMENT_2 << otLIVER_SEGMENT_3 << otLIVER_SEGMENT_4
-	                   << otLIVER_SEGMENT_5 << otLIVER_SEGMENT_6 << otLIVER_SEGMENT_7 << otLIVER_SEGMENT_8;
+	mSegmentOrganTypes = LiverSegmentationWidget::organTypesFor(LiverSegmentationWidget::fkLiverSegments);
 	for (int i = 0; i < mSegmentOrganTypes.size(); ++i)
 		this->addStructureButton(mSegmentOrganTypes[i], QString("Segment %1").arg(i + 1), segmentsLayout, segmentRow++);
 
