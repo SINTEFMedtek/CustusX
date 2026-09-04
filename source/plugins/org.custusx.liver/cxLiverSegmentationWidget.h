@@ -100,6 +100,9 @@ protected:
 	// Not pure/stateless (mutates the patient model) - protected, exercised
 	// via a thin test subclass, rather than left untested for lack of access.
 	void removePreviousResults(const QList<PlannedRun>& runs) const;
+	// Re-parents (but does NOT re-register - see cleanupPreparedImages())
+	// every mesh directly parented to resampled, to originalUid instead.
+	void reparentMeshesFromPreparedCopy(QString originalUid, ImagePtr resampled) const;
 
 private:
 	VisServicesPtr mServices;

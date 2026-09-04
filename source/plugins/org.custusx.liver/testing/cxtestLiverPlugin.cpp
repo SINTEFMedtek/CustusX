@@ -134,6 +134,10 @@ class TestLiverSegmentationWidget : public cx::LiverSegmentationWidget
 public:
 	explicit TestLiverSegmentationWidget(cx::VisServicesPtr services) : cx::LiverSegmentationWidget(services) {}
 	void testRemovePreviousResults(const QList<PlannedRun>& runs) const { removePreviousResults(runs); }
+	void testReparentMeshesFromPreparedCopy(QString originalUid, cx::ImagePtr resampled) const
+	{
+		reparentMeshesFromPreparedCopy(originalUid, resampled);
+	}
 };
 }
 
@@ -159,6 +163,40 @@ TEST_CASE("LiverPlugin: removePreviousResults() removes only the matching filter
 	CHECK_FALSE(patient->getData<cx::Mesh>("oldVesselsA")); // removed: same filter, same source image
 	CHECK(patient->getData<cx::Mesh>("oldVesselsB"));       // kept: different source image
 	CHECK(patient->getData<cx::Mesh>("oldLesionsA"));       // kept: different organ type/filter
+}
+
+TEST_CASE("LiverPlugin: reparentMeshesFromPreparedCopy() preserves the mesh's world position", "[unit][plugins][org.custusx.liver]")
+{
+	// Regression test for a reported bug: segmented structures on a large
+	// volume ended up 10-20cm off, worse in-plane than along the scan axis
+	// - traced to cleanupPreparedImages() overwriting a mesh's registration
+	// with the *original* (pre-crop) image's, discarding the crop offset
+	// that was already correctly baked into the mesh's own registration at
+	// creation time.
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr patient = services->patient();
+
+	cx::ImagePtr original = createMockImage(patient, "original");
+
+	// A crop with a large offset in x/y and a small one in z, mirroring a
+	// CT gantry field of view being much wider than the patient while the
+	// scan itself is acquired closer to the target anatomy along z.
+	cx::ImagePtr preparedCopy = createMockImage(patient, "original_prepared");
+	cx::Vector3D cropOffset(150, 120, 5);
+	preparedCopy->get_rMd_History()->setRegistration(original->get_rMd() * cx::createTransformTranslate(cropOffset));
+
+	// Mesh created from the prepared copy, exactly as createOutputMesh() does:
+	// registration set equal to its actual (cropped) filter input.
+	cx::MeshPtr mesh = createMockMesh(patient, "liverMesh", cx::otLIVER, preparedCopy);
+	mesh->get_rMd_History()->setRegistration(preparedCopy->get_rMd());
+	cx::Transform3D meshWorldTransformBeforeCleanup = mesh->get_rMd();
+
+	TestLiverSegmentationWidget widget(services);
+	widget.testReparentMeshesFromPreparedCopy(original->getUid(), preparedCopy);
+
+	CHECK(mesh->getParentSpace() == original->getUid()); // bookkeeping updated
+	CHECK(cx::similar(mesh->get_rMd(), meshWorldTransformBeforeCleanup)); // position unchanged
+	CHECK_FALSE(cx::similar(mesh->get_rMd(), original->get_rMd())); // i.e. NOT snapped to the original's own position
 }
 
 TEST_CASE("LiverPlugin: descendsFrom() walks a multi-hop parent-frame chain", "[unit][plugins][org.custusx.liver]")

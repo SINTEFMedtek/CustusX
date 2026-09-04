@@ -423,28 +423,41 @@ void LiverSegmentationWidget::cleanupPreparedImages()
 	while (i.hasNext())
 	{
 		i.next();
-		QString originalUid = i.key();
-		ImagePtr resampled = i.value();
-		if (!resampled)
+		if (!i.value())
 			continue;
-
-		ImagePtr original = mServices->patient()->getData<Image>(originalUid);
-		std::map<QString, MeshPtr> meshes = mServices->patient()->getDataOfType<Mesh>();
-		std::map<QString, MeshPtr>::iterator m;
-		for (m = meshes.begin(); m != meshes.end(); ++m)
-		{
-			if (!m->second || m->second->getParentSpace() != resampled->getUid())
-				continue;
-			if (original)
-			{
-				m->second->get_rMd_History()->setRegistration(original->get_rMd());
-				m->second->get_rMd_History()->setParentSpace(original->getUid());
-			}
-		}
-
-		mServices->patient()->removeData(resampled->getUid());
+		this->reparentMeshesFromPreparedCopy(i.key(), i.value());
+		mServices->patient()->removeData(i.value()->getUid());
 	}
 	mPreparedImageCache.clear();
+}
+
+void LiverSegmentationWidget::reparentMeshesFromPreparedCopy(QString originalUid, ImagePtr resampled) const
+{
+	// Only setParentSpace() is touched here - never setRegistration(). The
+	// mesh's rMd was already set correctly at creation time (in
+	// createOutputMesh()) relative to the *cropped/resampled* copy, which
+	// itself correctly encodes the crop offset via
+	// mergevtkSettingsIntosscTransform(). Overwriting it with the ORIGINAL
+	// (pre-crop) image's rMd here would discard that offset entirely,
+	// moving the mesh by however far the crop shifted it - confirmed
+	// directly: a 10-20cm mismatch on a large volume with a large crop
+	// offset (larger in-plane than in the scan direction, since a CT
+	// gantry's field of view is typically much wider than the patient,
+	// while the scan itself is usually acquired closer to the target
+	// anatomy along the scan axis - matching exactly what was reported).
+	// setParentSpace() alone is pure bookkeeping (which data a future
+	// re-registration should cascade to, and what descendsFrom()'s
+	// parent-chain walk resolves) and does not affect the mesh's current
+	// rendered position.
+	ImagePtr original = mServices->patient()->getData<Image>(originalUid);
+	if (!original)
+		return;
+
+	std::map<QString, MeshPtr> meshes = mServices->patient()->getDataOfType<Mesh>();
+	std::map<QString, MeshPtr>::iterator m;
+	for (m = meshes.begin(); m != meshes.end(); ++m)
+		if (m->second && m->second->getParentSpace() == resampled->getUid())
+			m->second->get_rMd_History()->setParentSpace(original->getUid());
 }
 
 bool LiverSegmentationWidget::needsPreparation(FilterKind filter)
