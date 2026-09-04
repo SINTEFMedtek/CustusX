@@ -84,6 +84,10 @@ public:
 	{
 		return colorForOrganType(outputClass);
 	}
+	int testCountPlannedMeshes(QStringList createOutputMeshList)
+	{
+		return countPlannedMeshes(createOutputMeshList);
+	}
 
 	void setTestScriptFile(bool useLungsFile = false)
 	{
@@ -693,6 +697,27 @@ TEST_CASE("GenericScriptFilter: Test color generation", "[unit]")
 		CHECK(testColor != colorUnknownClass);
 	}
 
+}
+
+TEST_CASE("GenericScriptFilter: countPlannedMeshes()", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	// No output classes yet - nothing planned either way.
+	CHECK(filter->testCountPlannedMeshes(QStringList() << "true") == 0);
+	CHECK(filter->testCountPlannedMeshes(QStringList()) == 0);
+
+	filter->addOutputClass("Liver");
+	filter->addOutputClass("Pancreas");
+
+	// "true" as the sole entry means every class gets a mesh.
+	CHECK(filter->testCountPlannedMeshes(QStringList() << "true") == 2);
+
+	// Otherwise only the explicitly listed classes count.
+	CHECK(filter->testCountPlannedMeshes(QStringList() << "Liver") == 1);
+	CHECK(filter->testCountPlannedMeshes(QStringList() << "Liver" << "Pancreas") == 2);
+	CHECK(filter->testCountPlannedMeshes(QStringList() << "SomethingElse") == 0);
+	CHECK(filter->testCountPlannedMeshes(QStringList()) == 0);
 }
 
 TEST_CASE("Raidionics: target conversion", "[unit]")
