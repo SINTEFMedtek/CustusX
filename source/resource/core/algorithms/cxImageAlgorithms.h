@@ -58,6 +58,24 @@ cxResource_EXPORT ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServi
  * the data manager nor saved.
  */
 cxResource_EXPORT ImagePtr resampleImageToMaxVoxelCount(PatientModelServicePtr dataManager, ImagePtr image, double maxVoxelCount, QString uid="", QString name="");
+/**
+ * Compute an intensity threshold separating background (e.g. surrounding
+ * air) from foreground (e.g. the patient body) using Otsu's method: the
+ * threshold that best splits the volume's own intensity histogram into two
+ * classes. Adapts to the actual data instead of assuming a fixed cutoff
+ * (e.g. a Hounsfield-unit value), which would be wrong for MR, or for CT
+ * that has been shifted to an unsigned representation.
+ */
+cxResource_EXPORT double computeOtsuThreshold(vtkImageDataPtr image);
+/**
+ * Compute a bounding box (in the image's own mm space, as used by
+ * Image::setCroppingBox()) tightly enclosing the voxels at or above an
+ * automatically-selected threshold (see computeOtsuThreshold()), expanded
+ * by paddingVoxels on each side. Intended to auto-crop away surrounding
+ * air/background before an expensive downstream operation. Falls back to
+ * the image's full bounding box if no voxels are at or above the threshold.
+ */
+cxResource_EXPORT DoubleBoundingBox3D computeAutoCropBox(ImagePtr image, int paddingVoxels = 5);
 cxResource_EXPORT vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
 cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image);
 cxResource_EXPORT ImagePtr duplicateImage(PatientModelServicePtr dataManager, ImagePtr image);

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageAlgorithms.h"
 
 #include <vtkImageData.h>
+#include <vtkSmartPointer.h>
 #include "cxImage.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
@@ -106,5 +107,81 @@ TEST_CASE("ImageAlgorithms: resample() works", "[integration][resource][core]")
 
 	cx::LogicManager::shutdown();
 
+}
+
+namespace
+{
+/** A synthetic 20x20x20, 1mm-spacing volume: background everywhere at
+ *  backgroundValue, with a 10x10x10 "body" block (indices 5..14 on every
+ *  axis) at foregroundValue - mimicking a patient body surrounded by air.
+ */
+cx::ImagePtr createSyntheticBodyInAirImage(short backgroundValue, short foregroundValue)
+{
+	vtkSmartPointer<vtkImageData> raw = vtkSmartPointer<vtkImageData>::New();
+	raw->SetDimensions(20, 20, 20);
+	raw->SetSpacing(1.0, 1.0, 1.0);
+	raw->AllocateScalars(VTK_SHORT, 1);
+
+	short* ptr = static_cast<short*>(raw->GetScalarPointer());
+	vtkIdType idx = 0;
+	for (int z = 0; z < 20; ++z)
+		for (int y = 0; y < 20; ++y)
+			for (int x = 0; x < 20; ++x, ++idx)
+			{
+				bool inBody = (x >= 5 && x <= 14) && (y >= 5 && y <= 14) && (z >= 5 && z <= 14);
+				ptr[idx] = inBody ? foregroundValue : backgroundValue;
+			}
+
+	return cx::ImagePtr(new cx::Image("synthetic_body_in_air", raw));
+}
+}
+
+TEST_CASE("ImageAlgorithms: computeOtsuThreshold() separates two intensity populations", "[unit][resource][core]")
+{
+	cx::ImagePtr image = createSyntheticBodyInAirImage(-1000, 0);
+	double threshold = cx::computeOtsuThreshold(image->getBaseVtkImageData());
+	CHECK(threshold > -1000);
+	CHECK(threshold < 0);
+
+	// Should adapt to a shifted (unsigned) representation just as well -
+	// same relative split, different absolute values.
+	cx::ImagePtr shiftedImage = createSyntheticBodyInAirImage(24, 1024);
+	double shiftedThreshold = cx::computeOtsuThreshold(shiftedImage->getBaseVtkImageData());
+	CHECK(shiftedThreshold > 24);
+	CHECK(shiftedThreshold < 1024);
+}
+
+TEST_CASE("ImageAlgorithms: computeAutoCropBox() tightly bounds the foreground block", "[unit][resource][core]")
+{
+	cx::ImagePtr image = createSyntheticBodyInAirImage(-1000, 0);
+
+	cx::DoubleBoundingBox3D box = cx::computeAutoCropBox(image, 0);
+	CHECK(box[0] == Approx(5.0));
+	CHECK(box[1] == Approx(14.0));
+	CHECK(box[2] == Approx(5.0));
+	CHECK(box[3] == Approx(14.0));
+	CHECK(box[4] == Approx(5.0));
+	CHECK(box[5] == Approx(14.0));
+
+	cx::DoubleBoundingBox3D paddedBox = cx::computeAutoCropBox(image, 2);
+	CHECK(paddedBox[0] == Approx(3.0));
+	CHECK(paddedBox[1] == Approx(16.0));
+
+	// Padding should clamp at the volume edge rather than exceed it.
+	cx::DoubleBoundingBox3D hugePaddingBox = cx::computeAutoCropBox(image, 1000);
+	CHECK(hugePaddingBox[0] == Approx(0.0));
+	CHECK(hugePaddingBox[1] == Approx(19.0));
+}
+
+TEST_CASE("ImageAlgorithms: computeAutoCropBox() returns the full volume for a uniform image", "[unit][resource][core]")
+{
+	// No separable foreground/background - computeOtsuThreshold() degenerates
+	// to range[0], under which every voxel counts as foreground, so the
+	// result should still cover the whole volume (rather than, say, an
+	// empty or otherwise invalid box).
+	cx::ImagePtr image = createSyntheticBodyInAirImage(0, 0);
+	cx::DoubleBoundingBox3D box = cx::computeAutoCropBox(image, 0);
+	cx::DoubleBoundingBox3D fullVolume = image->boundingBox();
+	CHECK(cx::similar(box, fullVolume));
 }
 

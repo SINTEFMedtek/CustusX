@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <cmath>
 #include <vtkImageData.h>
+#include <vtkImageAccumulate.h>
 #include <vtkImageReslice.h>
 #include <vtkMatrix4x4.h>
 
@@ -144,6 +145,148 @@ ImagePtr resampleImageToMaxVoxelCount(PatientModelServicePtr dataManager, ImageP
 	newSpacing[2] = spacing[2] * scale;
 
 	return resampleImage(dataManager, image, newSpacing, uid, name);
+}
+
+/** Otsu's method: given a histogram, find the threshold (bin index) that
+ *  maximizes the between-class variance of the two classes it splits the
+ *  histogram into. Standard textbook algorithm.
+ */
+namespace
+{
+int otsuThresholdBin(const std::vector<double>& histogram)
+{
+	double total = 0;
+	for (size_t i = 0; i < histogram.size(); ++i)
+		total += histogram[i];
+	if (total <= 0)
+		return 0;
+
+	double sumAll = 0;
+	for (size_t i = 0; i < histogram.size(); ++i)
+		sumAll += i * histogram[i];
+
+	double weightBackground = 0;
+	double sumBackground = 0;
+	double bestVariance = -1;
+	int bestBin = 0;
+
+	for (size_t i = 0; i < histogram.size(); ++i)
+	{
+		weightBackground += histogram[i];
+		if (weightBackground <= 0 || weightBackground >= total)
+			continue;
+		sumBackground += i * histogram[i];
+
+		double weightForeground = total - weightBackground;
+		double meanBackground = sumBackground / weightBackground;
+		double meanForeground = (sumAll - sumBackground) / weightForeground;
+		double meanDiff = meanBackground - meanForeground;
+		double variance = weightBackground * weightForeground * meanDiff * meanDiff;
+
+		if (variance > bestVariance)
+		{
+			bestVariance = variance;
+			bestBin = static_cast<int>(i);
+		}
+	}
+	return bestBin;
+}
+} // namespace
+
+double computeOtsuThreshold(vtkImageDataPtr image)
+{
+	double range[2];
+	image->GetScalarRange(range);
+	if (range[1] <= range[0])
+		return range[0];
+
+	const int numBins = 256;
+	vtkSmartPointer<vtkImageAccumulate> histogramFilter = vtkSmartPointer<vtkImageAccumulate>::New();
+	histogramFilter->SetInputData(image);
+	histogramFilter->SetComponentExtent(0, numBins - 1, 0, 0, 0, 0);
+	histogramFilter->SetComponentOrigin(range[0], 0, 0);
+	histogramFilter->SetComponentSpacing((range[1] - range[0]) / numBins, 0, 0);
+	histogramFilter->Update();
+
+	vtkImageDataPtr histogramImage = histogramFilter->GetOutput();
+	std::vector<double> histogram(numBins);
+	for (int i = 0; i < numBins; ++i)
+		histogram[i] = histogramImage->GetScalarComponentAsDouble(i, 0, 0, 0);
+
+	int bin = otsuThresholdBin(histogram);
+	return range[0] + (bin + 0.5) * (range[1] - range[0]) / numBins;
+}
+
+namespace
+{
+/** Scan the raw voxel buffer for the tight index range containing all
+ *  voxels at or above threshold. bounds is {xmin,xmax,ymin,ymax,zmin,zmax};
+ *  a xmin>xmax (etc.) result on return means nothing matched.
+ */
+template <class T>
+void findThresholdVoxelBounds(T* data, const int dims[3], double threshold, int bounds[6])
+{
+	bounds[0] = dims[0]; bounds[1] = -1;
+	bounds[2] = dims[1]; bounds[3] = -1;
+	bounds[4] = dims[2]; bounds[5] = -1;
+
+	vtkIdType idx = 0;
+	for (int z = 0; z < dims[2]; ++z)
+	{
+		for (int y = 0; y < dims[1]; ++y)
+		{
+			for (int x = 0; x < dims[0]; ++x, ++idx)
+			{
+				if (static_cast<double>(data[idx]) < threshold)
+					continue;
+				if (x < bounds[0]) bounds[0] = x;
+				if (x > bounds[1]) bounds[1] = x;
+				if (y < bounds[2]) bounds[2] = y;
+				if (y > bounds[3]) bounds[3] = y;
+				if (z < bounds[4]) bounds[4] = z;
+				if (z > bounds[5]) bounds[5] = z;
+			}
+		}
+	}
+}
+} // namespace
+
+DoubleBoundingBox3D computeAutoCropBox(ImagePtr image, int paddingVoxels)
+{
+	vtkImageDataPtr vtkImage = image->getGrayScaleVtkImageData();
+	DoubleBoundingBox3D fullVolume = image->boundingBox();
+	if (!vtkImage)
+		return fullVolume;
+
+	double threshold = computeOtsuThreshold(vtkImage);
+
+	int dims[3];
+	vtkImage->GetDimensions(dims);
+	int bounds[6];
+	void* ptr = vtkImage->GetScalarPointer();
+	switch (vtkImage->GetScalarType())
+	{
+		vtkTemplateMacro(findThresholdVoxelBounds(static_cast<VTK_TT*>(ptr), dims, threshold, bounds));
+	}
+
+	if (bounds[1] < bounds[0] || bounds[3] < bounds[2] || bounds[5] < bounds[4])
+		return fullVolume; // nothing at or above the threshold - fall back to the full volume
+
+	bounds[0] = std::max(0, bounds[0] - paddingVoxels);
+	bounds[1] = std::min(dims[0] - 1, bounds[1] + paddingVoxels);
+	bounds[2] = std::max(0, bounds[2] - paddingVoxels);
+	bounds[3] = std::min(dims[1] - 1, bounds[3] + paddingVoxels);
+	bounds[4] = std::max(0, bounds[4] - paddingVoxels);
+	bounds[5] = std::min(dims[2] - 1, bounds[5] + paddingVoxels);
+
+	// Matches the inverse of cropImage(PatientModelServicePtr, ImagePtr)'s
+	// mm-to-voxel conversion exactly (round(mm/spacing) <-> voxel*spacing),
+	// so a box built here round-trips to the same inclusive voxel extent.
+	double* spacing = vtkImage->GetSpacing();
+	return DoubleBoundingBox3D(
+				bounds[0] * spacing[0], bounds[1] * spacing[0],
+				bounds[2] * spacing[1], bounds[3] * spacing[1],
+				bounds[4] * spacing[2], bounds[5] * spacing[2]);
 }
 
 /** Return an image that is cropped using its own croppingBox.
