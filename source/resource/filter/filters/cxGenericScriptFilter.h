@@ -93,6 +93,11 @@ public:
 
 signals:
 	void scriptOutput(const QString& line);
+	// Emitted from readGeneratedSegmentationFiles(), on the main thread, while
+	// generating output meshes - the external script has already exited by
+	// this point (and reported its own 0-100 progress via scriptOutput), so
+	// this covers the otherwise-silent postProcess() mesh-generation tail.
+	void meshGenerationProgress(int percent);
 	void launchDialog(QString venvPath, QString createCommand, QString command);
 public slots:
 	void launchDialogSlot(QString venvPath, QString createCommand, QString command);
@@ -112,6 +117,7 @@ protected:
 	vtkPolyDataPtr contourFilter(int smoothing);
 	bool readGeneratedSegmentationFiles(QStringList createOutputVolume, QStringList createOutputMesh);
 	QString createImageName(QString parentName, QString filePath);
+	int countPlannedMeshes(QStringList createOutputMeshList) const;
 	void createOutputVolume();
 	void deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume);
 	QString getScriptPath();

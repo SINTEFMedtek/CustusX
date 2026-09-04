@@ -1107,7 +1107,8 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 //	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputDir: " << outputDir;
 //	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputFileNamesNoExtention: " << outputFileNamesNoExtention;
 
-
+	int totalMeshCount = this->countPlannedMeshes(createOutputMeshList);
+	int meshesCreated = 0;
 
 	QDirIterator fileIterator(outputDir, QDir::Files);
 	while (fileIterator.hasNext())
@@ -1173,6 +1174,18 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 				if(mOutputColors.size() > classNumber)
 					outputColor = mOutputColors.at(classNumber);
 				this->createOutputMesh(outputColor, smoothing);
+
+				++meshesCreated;
+				if (totalMeshCount > 0)
+				{
+					emit meshGenerationProgress(90 + 9 * meshesCreated / totalMeshCount);
+					// This entire method runs synchronously on the main thread, so
+					// without this the progress bar update above would not actually
+					// repaint (nor would the app respond to input) until the whole
+					// mesh-generation step - which can take minutes for many output
+					// classes - has completed.
+					qApp->processEvents();
+				}
 			}
 			if(!isUsingRaidionicsEngine())
 				this->deleteNotUsedFiles(filePath, createOutputVolumeBool);
@@ -1222,6 +1235,20 @@ int GenericScriptFilter::getClassNumber(QString filePath)
 		}
 	}
 	return classNumber;
+}
+
+int GenericScriptFilter::countPlannedMeshes(QStringList createOutputMeshList) const
+{
+	// Mirrors the createOutputMesh boolean logic in readGeneratedSegmentationFiles():
+	// either every class produces a mesh, or only the explicitly listed ones do.
+	if (createOutputMeshList.size() > 0 && createOutputMeshList.at(0) == "true")
+		return mOutputClasses.size();
+
+	int count = 0;
+	for (int i = 0; i < mOutputClasses.size(); ++i)
+		if (createOutputMeshList.contains(mOutputClasses.at(i)))
+			++count;
+	return count;
 }
 
 QString GenericScriptFilter::createImageName(QString parentName, QString filePath)

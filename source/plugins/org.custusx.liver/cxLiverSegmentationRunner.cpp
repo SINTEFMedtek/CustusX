@@ -81,6 +81,13 @@ void LiverSegmentationRunner::runNext()
 	connect(mCurrentFilter.get(), &GenericScriptFilter::scriptOutput,
 	        this, &LiverSegmentationRunner::onScriptOutput,
 	        Qt::ConnectionType(Qt::QueuedConnection | Qt::UniqueConnection));
+	// Unlike scriptOutput (emitted from the worker thread during execute()),
+	// meshGenerationProgress is emitted from postProcess() on the main thread,
+	// so a direct connection is correct (and required for the sender's own
+	// processEvents() call to have anything to actually repaint).
+	connect(mCurrentFilter.get(), &GenericScriptFilter::meshGenerationProgress,
+	        this, &LiverSegmentationRunner::progressChanged,
+	        Qt::UniqueConnection);
 
 	emit filterStarted(run.key);
 	mCurrentThread->execute();
@@ -97,6 +104,7 @@ void LiverSegmentationRunner::onFilterFinished()
 {
 	disconnect(mCurrentThread.get(), &FilterTimedAlgorithm::finished, this, &LiverSegmentationRunner::onFilterFinished);
 	disconnect(mCurrentFilter.get(), &GenericScriptFilter::scriptOutput, this, &LiverSegmentationRunner::onScriptOutput);
+	disconnect(mCurrentFilter.get(), &GenericScriptFilter::meshGenerationProgress, this, &LiverSegmentationRunner::progressChanged);
 	mCurrentThread.reset();
 	mCurrentFilter.reset();
 
