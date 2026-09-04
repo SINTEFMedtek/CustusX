@@ -256,12 +256,7 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 	mSegmentationGroup->setVisible(false);
 	mProcessingInfoGroup->setVisible(true);
 
-	// Empirically: a ~29M voxel mask (58MB, 16-bit) completes fast, a ~139M
-	// voxel one (278MB) froze the main thread for 20+ minutes. Capped in
-	// between the two, with some margin below the known-good side.
-	const double maxVoxelCountForHeavySmoothing = 40000000;
-
-	mResampledCache.clear();
+	mPreparedImageCache.clear();
 	QList<QueuedRun> queue;
 	foreach (const PlannedRun& run, runs)
 	{
@@ -269,19 +264,15 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 		queuedRun.iniFileName = run.iniFileName;
 		queuedRun.key = run.key;
 
-		if (this->needsResampling(run.filter))
+		if (this->needsPreparation(run.filter))
 		{
-			ImagePtr& resampled = mResampledCache[run.image->getUid()];
-			if (!resampled)
+			ImagePtr& prepared = mPreparedImageCache[run.image->getUid()];
+			if (!prepared)
 			{
-				// Scale all three axes by total voxel count, not just x/y: a
-				// whole-body scan's native in-plane resolution may already be
-				// <=512 (no benefit from an in-plane-only cap), while its z
-				// extent is what actually makes marching-cubes/smoothing slow.
-				resampled = resampleImageToMaxVoxelCount(mServices->patient(), run.image, maxVoxelCountForHeavySmoothing);
-				mServices->patient()->insertData(resampled);
+				prepared = this->prepareImageForHeavyFilter(run.image);
+				mServices->patient()->insertData(prepared);
 			}
-			queuedRun.image = resampled;
+			queuedRun.image = prepared;
 		}
 		else
 		{
@@ -291,6 +282,29 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 	}
 	mRunner->start(queue);
 	this->updateRunButtonState();
+}
+
+ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) const
+{
+	// Auto-crop first: lossless (just removes surrounding air/background),
+	// and often enough on its own. Skip it if it wouldn't actually shrink
+	// anything (e.g. the volume was already cropped).
+	ImagePtr working = image;
+	DoubleBoundingBox3D autoCropBox = computeAutoCropBox(image);
+	if (!similar(autoCropBox, image->boundingBox()))
+		working = cropImage(mServices->patient(), image, autoCropBox);
+
+	// Only resample (lossy - reduces resolution) if still too large after
+	// cropping. Scale all three axes by total voxel count, not just x/y: a
+	// whole-body scan's native in-plane resolution may already be <=512 (no
+	// benefit from an in-plane-only cap), while its z extent is what
+	// actually makes marching-cubes/smoothing slow.
+	//
+	// Empirically: a ~29M voxel mask (58MB, 16-bit) completes fast, a ~139M
+	// voxel one (278MB) froze the main thread for 20+ minutes. Capped in
+	// between the two, with some margin below the known-good side.
+	const double maxVoxelCountForHeavySmoothing = 40000000;
+	return resampleImageToMaxVoxelCount(mServices->patient(), working, maxVoxelCountForHeavySmoothing);
 }
 
 void LiverSegmentationWidget::onFilterStarted(QString key)
@@ -331,11 +345,11 @@ void LiverSegmentationWidget::onAllFinished()
 	mCurrentRunKey = "";
 	mProcessingInfoGroup->setVisible(false);
 	mSegmentationGroup->setVisible(true);
-	this->cleanupResampledCopies();
+	this->cleanupPreparedImages();
 	this->updateRunButtonState();
 }
 
-void LiverSegmentationWidget::cleanupResampledCopies()
+void LiverSegmentationWidget::cleanupPreparedImages()
 {
 	// The resampled copies created in runOrStopButtonClicked() are a purely
 	// internal implementation detail of this run - remove them once it's
@@ -343,7 +357,7 @@ void LiverSegmentationWidget::cleanupResampledCopies()
 	// clutter. Any mesh created from one is re-parented directly to the
 	// original source image first, since that mesh's parent frame would
 	// otherwise dangle once the copy it actually points to is gone.
-	QMapIterator<QString, ImagePtr> i(mResampledCache);
+	QMapIterator<QString, ImagePtr> i(mPreparedImageCache);
 	while (i.hasNext())
 	{
 		i.next();
@@ -368,24 +382,22 @@ void LiverSegmentationWidget::cleanupResampledCopies()
 
 		mServices->patient()->removeData(resampled->getUid());
 	}
-	mResampledCache.clear();
+	mPreparedImageCache.clear();
 }
 
-bool LiverSegmentationWidget::needsResampling(FilterKind filter)
+bool LiverSegmentationWidget::needsPreparation(FilterKind filter)
 {
 	// Smoothing in the contour step runs on the raw marching-cubes output, so
 	// on a large/uncropped volume it can freeze the main thread for 20+
 	// minutes with no way to stop it (the external process is already gone
-	// by the time this runs in postProcess()). Fraxinus avoids the same issue
-	// for lung segmentation by capping the in-plane resolution before
-	// segmenting (see resampleImageToMaxInPlaneResolution()). Scoped to
-	// fkLiverPancreas and fkLiverSegments only: both use the heaviest
-	// smoothing level (GenericScriptFilter::contourFilterSettingForOrganType()
-	// filtering=3, same as Fraxinus's own Lungs/Heart/Lobes), and Segments
-	// additionally produces up to 9 meshes per run - fkLiverVessels/
-	// fkLiverLesions use lighter smoothing (filtering=1/2) and are left
-	// unresampled, matching Fraxinus's own lung filters running unresampled
-	// volumes of this size without issue.
+	// by the time this runs in postProcess()). See prepareImageForHeavyFilter().
+	// Scoped to fkLiverPancreas and fkLiverSegments only: both use the
+	// heaviest smoothing level (GenericScriptFilter::
+	// contourFilterSettingForOrganType() filtering=3, same as Fraxinus's own
+	// Lungs/Heart/Lobes), and Segments additionally produces up to 8 meshes
+	// per run - fkLiverVessels/fkLiverLesions use lighter smoothing
+	// (filtering=1/2) and are left as-is, matching Fraxinus's own lung
+	// filters running unprepared volumes of this size without issue.
 	return filter == fkLiverPancreas || filter == fkLiverSegments;
 }
 

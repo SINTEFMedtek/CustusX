@@ -82,8 +82,9 @@ private:
 	QList<PlannedRun> buildPlannedRuns() const;
 	ImagePtr selectedImage1() const;
 	ImagePtr selectedImage2() const;
-	void cleanupResampledCopies();
-	static bool needsResampling(FilterKind filter);
+	ImagePtr prepareImageForHeavyFilter(ImagePtr image) const;
+	void cleanupPreparedImages();
+	static bool needsPreparation(FilterKind filter);
 	static QString filterLabel(FilterKind filter);
 	static QString iniFileNameFor(FilterKind filter, IMAGE_MODALITY modality);
 	static QString progressLabel(const PlannedRun& run);
@@ -104,7 +105,7 @@ private:
 	QVBoxLayout* mProgressBarsLayout;
 	QMap<QString, QProgressBar*> mProgressBars;
 	QString mCurrentRunKey;
-	QMap<QString, ImagePtr> mResampledCache; // original source image uid -> its resampled copy, for this run only
+	QMap<QString, ImagePtr> mPreparedImageCache; // original source image uid -> its cropped/resampled copy, for this run only
 };
 
 } /* namespace cx */
