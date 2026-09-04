@@ -52,15 +52,6 @@ public:
 
 	static QString getWidgetName();
 
-private slots:
-	void runOrStopButtonClicked();
-	void selectAll(bool checked);
-	void updateRunButtonState();
-	void onFilterStarted(QString key);
-	void onProgressChanged(int percent);
-	void onAllFinished();
-
-private:
 	enum FilterKind
 	{
 		fkLiverPancreas,
@@ -76,6 +67,22 @@ private:
 		QString key;
 	};
 
+	// Pure/stateless - public so they can be unit tested directly, without
+	// needing a live VisServices/patient session.
+	static bool needsPreparation(FilterKind filter);
+	static QString filterLabel(FilterKind filter);
+	static QString iniFileNameFor(FilterKind filter, IMAGE_MODALITY modality);
+	static QString progressLabel(const PlannedRun& run);
+
+private slots:
+	void runOrStopButtonClicked();
+	void selectAll(bool checked);
+	void updateRunButtonState();
+	void onFilterStarted(QString key);
+	void onProgressChanged(int percent);
+	void onAllFinished();
+
+private:
 	QGroupBox* buildSegmentationGroup();
 	QGroupBox* buildProcessingInfoGroup();
 	void rebuildProgressBars(const QList<PlannedRun>& runs);
@@ -84,10 +91,6 @@ private:
 	ImagePtr selectedImage2() const;
 	ImagePtr prepareImageForHeavyFilter(ImagePtr image) const;
 	void cleanupPreparedImages();
-	static bool needsPreparation(FilterKind filter);
-	static QString filterLabel(FilterKind filter);
-	static QString iniFileNameFor(FilterKind filter, IMAGE_MODALITY modality);
-	static QString progressLabel(const PlannedRun& run);
 
 	VisServicesPtr mServices;
 	LiverSegmentationRunnerPtr mRunner;
