@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageReslice.h>
 #include <vtkMatrix4x4.h>
 
-#include <vtkImageResample.h>
 #include <vtkImageClip.h>
 #include <vtkImageChangeInformation.h>
 
@@ -80,11 +79,55 @@ ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, Trans
  */
 ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid, QString name)
 {
-	vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
-	resampler->SetInputData(image->getBaseVtkImageData());
-	resampler->SetAxisOutputSpacing(0, spacing[0]);
-	resampler->SetAxisOutputSpacing(1, spacing[1]);
-	resampler->SetAxisOutputSpacing(2, spacing[2]);
+	vtkImageDataPtr input = image->getBaseVtkImageData();
+	double* inputOrigin = input->GetOrigin();
+	double* inputSpacing = input->GetSpacing();
+	int* inputDims = input->GetDimensions();
+
+	// vtkImageResample (a vtkImageReslice subclass) computes its output
+	// extent per axis as [ceil(oldExtentMin*factor), floor(oldExtentMax*factor)],
+	// factor=oldSpacing/newSpacing. Under VTK's point-based bounds convention
+	// (physical extent = (dim-1)*spacing), that floor() silently discards up
+	// to one whole new-spacing unit of physical coverage at the far edge,
+	// while the origin/near edge is untouched - an asymmetric, magnification-
+	// dependent drift (confirmed directly: resampling a 20-voxel/1mm axis to
+	// 2mm shifted its physical center by 0.5mm with no crop involved at all).
+	// Two volumes resampled by different factors then drift apart by
+	// different amounts - this is what surfaced as two segmentation results
+	// for the same anatomy appearing in different physical locations.
+	//
+	// Fix: compute the output extent directly (rounding, not flooring), and
+	// use vtkImageReslice directly since vtkImageResample's own
+	// RequestInformation() always recomputes (and would override) extent.
+	// The old/new physical extents still can't match exactly in general
+	// (e.g. 19mm doesn't evenly divide into 2mm steps) - rather than pinning
+	// the origin and leaving 100% of that leftover slack on the far edge
+	// (still an asymmetric, magnification-dependent drift, just halved),
+	// split it evenly across both edges by shifting the origin by half the
+	// slack. That keeps the *center* - what determines whether two
+	// independently resampled volumes of the same anatomy line up - exact,
+	// at the cost of a half-voxel's worth of asymmetry in coverage at each
+	// edge instead of a whole voxel's worth on one edge.
+	int outputExtent[6];
+	double outputOrigin[3];
+	for (int axis = 0; axis < 3; ++axis)
+	{
+		double physicalExtent = (inputDims[axis] - 1) * inputSpacing[axis];
+		int outputDim = std::max(1, static_cast<int>(std::round(physicalExtent / spacing[axis])) + 1);
+		double outputPhysicalExtent = (outputDim - 1) * spacing[axis];
+		double slack = physicalExtent - outputPhysicalExtent;
+
+		outputExtent[axis*2] = 0;
+		outputExtent[axis*2+1] = outputDim - 1;
+		outputOrigin[axis] = inputOrigin[axis] + slack / 2.0;
+	}
+
+	vtkImageReslicePtr resampler = vtkImageReslicePtr::New();
+	resampler->SetInputData(input);
+	resampler->SetInterpolationModeToLinear(); // matches vtkImageResample's own default
+	resampler->SetOutputSpacing(spacing[0], spacing[1], spacing[2]);
+	resampler->SetOutputOrigin(outputOrigin);
+	resampler->SetOutputExtent(outputExtent);
 	resampler->Update();
 	vtkImageDataPtr rawResult = resampler->GetOutput();
 

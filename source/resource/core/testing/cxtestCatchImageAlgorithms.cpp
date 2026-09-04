@@ -275,21 +275,20 @@ TEST_CASE("ImageAlgorithms: cropImage()/resampleImageToMaxVoxelCount() use an ex
 	CHECK(resampled->getName() == "CT (prepared)");
 }
 
-TEST_CASE("ImageAlgorithms: resampleImage() alone (no prior crop) preserves physical position", "[hide][known_issue]")
+TEST_CASE("ImageAlgorithms: resampleImage() alone (no prior crop) preserves physical position", "[unit][resource][core]")
 {
-	// KNOWN BUG, not yet fixed: confirmed via this repro that resampleImage()
-	// (the spacing-based overload) shifts the image's physical center by a
-	// fraction of a voxel at the new (coarser) spacing - independent of any
-	// crop step, so this is pre-existing and affects every caller (Fraxinus's
-	// lung filters, cxResampleImageFilter, etc.), not just the liver plugin.
-	// Adding mergevtkSettingsIntosscTransform() (the fix that works for
-	// cropImage()'s equivalent non-zero-origin issue) does NOT fix this -
-	// the cause looks like a point-vs-cell extent/dimension rounding
-	// mismatch between vtkImageResample's output geometry and how
-	// Image::boundingBox() computes bounds, not a non-zero-origin issue.
-	// Hidden from the default run so a real, subtle, shared-code geometry
-	// bug doesn't silently break CI - kept as the reproducer for whoever
-	// fixes it.
+	// Regression test: resampleImage() (the spacing-based overload) used to
+	// shift an image's physical center by a fraction of a voxel at the new
+	// (coarser) spacing - independent of any crop step, so this was
+	// pre-existing and affected every caller (Fraxinus's lung filters,
+	// cxResampleImageFilter, etc.), not just the liver plugin. Root cause:
+	// vtkImageResample computed its output extent by ceil()/floor()-ing the
+	// input extent scaled by oldSpacing/newSpacing, which under VTK's
+	// point-based bounds convention ((dim-1)*spacing) silently discards
+	// coverage at the far edge only, an asymmetric drift. Fixed by
+	// computing the output extent/origin directly via vtkImageReslice,
+	// splitting any leftover discretization slack evenly across both edges
+	// instead of dropping it all on one - see resampleImage()'s comment.
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr pasm = services->patient();
 
@@ -304,14 +303,12 @@ TEST_CASE("ImageAlgorithms: resampleImage() alone (no prior crop) preserves phys
 	CHECK(resampledPhysicalCenter[2] == Approx(expectedPhysicalCenter[2]));
 }
 
-TEST_CASE("ImageAlgorithms: cropImage() then resampleImageToMaxVoxelCount() preserves physical position", "[hide][known_issue]")
+TEST_CASE("ImageAlgorithms: cropImage() then resampleImageToMaxVoxelCount() preserves physical position", "[unit][resource][core]")
 {
-	// KNOWN BUG, not yet fixed - see the resampleImage()-alone test above for
-	// the isolated root cause; this confirms it also affects the crop-then-
-	// resample chain prepareImageForHeavyFilter() uses, matching the
-	// reported symptom directly: running Liver+Pancreas against two volumes
-	// at once showed the two resulting liver meshes in different physical
-	// locations. Hidden from the default run - see the note above.
+	// Regression test matching the reported symptom directly: running
+	// Liver+Pancreas against two volumes at once showed the two resulting
+	// liver meshes in different physical locations - see the
+	// resampleImage()-alone test above for the isolated root cause/fix.
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr pasm = services->patient();
 
