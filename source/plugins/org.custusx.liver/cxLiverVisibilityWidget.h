@@ -53,6 +53,10 @@ public:
 	virtual ~LiverVisibilityWidget();
 
 	static QString getWidgetName();
+	// Pure/stateless apart from the patient service - public so it can be
+	// unit tested directly with a mock patient service and synthetic
+	// parent-frame chains.
+	static bool descendsFrom(PatientModelServicePtr patient, QString uid, QString ancestorUid);
 
 private slots:
 	void refreshStructures();
@@ -67,7 +71,6 @@ private:
 	void updateAllSegmentsButtonColor();
 	void updateSourceVolumeButtonColor();
 	MeshPtr findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const;
-	bool descendsFrom(QString uid, QString ancestorUid) const;
 	bool isShown(QString uid) const;
 	void showData(QString uid);
 	void hideData(QString uid);

@@ -21,6 +21,7 @@ if(BUILD_TESTING)
       org_custusx_liver
       cxCatch
       cxtestUtilities
+      cxtestResource
       cxResource
       cxResourceFilter
       cxResourceWidgets)
