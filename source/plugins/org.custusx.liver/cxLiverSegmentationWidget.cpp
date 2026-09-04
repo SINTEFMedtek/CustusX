@@ -26,6 +26,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxPatientModelService.h"
 #include "cxImage.h"
+#include "cxMesh.h"
+#include "cxRegistrationTransform.h"
 #include "cxDefinitions.h"
 #include "cxEnumConversion.h"
 #include "cxSelectDataStringProperty.h"
@@ -259,7 +261,7 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 	// between the two, with some margin below the known-good side.
 	const double maxVoxelCountForHeavySmoothing = 40000000;
 
-	QMap<QString, ImagePtr> resampledCache; // source image uid -> resampled copy, avoids one per filter
+	mResampledCache.clear();
 	QList<QueuedRun> queue;
 	foreach (const PlannedRun& run, runs)
 	{
@@ -269,7 +271,7 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 
 		if (this->needsResampling(run.filter))
 		{
-			ImagePtr& resampled = resampledCache[run.image->getUid()];
+			ImagePtr& resampled = mResampledCache[run.image->getUid()];
 			if (!resampled)
 			{
 				// Scale all three axes by total voxel count, not just x/y: a
@@ -329,7 +331,44 @@ void LiverSegmentationWidget::onAllFinished()
 	mCurrentRunKey = "";
 	mProcessingInfoGroup->setVisible(false);
 	mSegmentationGroup->setVisible(true);
+	this->cleanupResampledCopies();
 	this->updateRunButtonState();
+}
+
+void LiverSegmentationWidget::cleanupResampledCopies()
+{
+	// The resampled copies created in runOrStopButtonClicked() are a purely
+	// internal implementation detail of this run - remove them once it's
+	// done (whether it finished or was stopped) so they don't linger as UI
+	// clutter. Any mesh created from one is re-parented directly to the
+	// original source image first, since that mesh's parent frame would
+	// otherwise dangle once the copy it actually points to is gone.
+	QMapIterator<QString, ImagePtr> i(mResampledCache);
+	while (i.hasNext())
+	{
+		i.next();
+		QString originalUid = i.key();
+		ImagePtr resampled = i.value();
+		if (!resampled)
+			continue;
+
+		ImagePtr original = mServices->patient()->getData<Image>(originalUid);
+		std::map<QString, MeshPtr> meshes = mServices->patient()->getDataOfType<Mesh>();
+		std::map<QString, MeshPtr>::iterator m;
+		for (m = meshes.begin(); m != meshes.end(); ++m)
+		{
+			if (!m->second || m->second->getParentSpace() != resampled->getUid())
+				continue;
+			if (original)
+			{
+				m->second->get_rMd_History()->setRegistration(original->get_rMd());
+				m->second->get_rMd_History()->setParentSpace(original->getUid());
+			}
+		}
+
+		mServices->patient()->removeData(resampled->getUid());
+	}
+	mResampledCache.clear();
 }
 
 bool LiverSegmentationWidget::needsResampling(FilterKind filter)

@@ -82,6 +82,7 @@ private:
 	QList<PlannedRun> buildPlannedRuns() const;
 	ImagePtr selectedImage1() const;
 	ImagePtr selectedImage2() const;
+	void cleanupResampledCopies();
 	static bool needsResampling(FilterKind filter);
 	static QString filterLabel(FilterKind filter);
 	static QString iniFileNameFor(FilterKind filter, IMAGE_MODALITY modality);
@@ -103,6 +104,7 @@ private:
 	QVBoxLayout* mProgressBarsLayout;
 	QMap<QString, QProgressBar*> mProgressBars;
 	QString mCurrentRunKey;
+	QMap<QString, ImagePtr> mResampledCache; // original source image uid -> its resampled copy, for this run only
 };
 
 } /* namespace cx */
