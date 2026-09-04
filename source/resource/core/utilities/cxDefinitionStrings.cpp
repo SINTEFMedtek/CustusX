@@ -219,7 +219,6 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
 	"LiverSegment5",
 	"LiverSegment6",
 	"LiverSegment7",
-	"LiverSegment8",
-	"LiverSegmentsCombined"
+	"LiverSegment8"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, ORGAN_TYPE, organtypeCOUNT)

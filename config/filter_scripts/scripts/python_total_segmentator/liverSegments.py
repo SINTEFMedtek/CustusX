@@ -1,6 +1,5 @@
 
 import atexit
-import functools
 import os
 import select
 import signal
@@ -122,19 +121,11 @@ def copyOutput(filenameInput):
     venv_path = os.path.dirname(sys.executable)
     data_path = venv_path + '/../../segmentations/'
     filenameInputNoExt = os.path.splitext(filenameInput)[0]
-    segmentImages = []
     for segment in range(1, 9):
         sourceFile = data_path + 'liver_segment_{}.nii.gz'.format(segment)
         if os.path.isfile(sourceFile):
             image = sitk.ReadImage(sourceFile)
             sitk.WriteImage(image, filenameInputNoExt + '_liverSegments_LiverSegment{}.mhd'.format(segment))
-            segmentImages.append(image)
-
-    # TotalSegmentator's liver_segments task has no combined whole-liver output of
-    # its own, so derive one as the union of the 8 Couinaud segments.
-    if segmentImages:
-        combinedImage = functools.reduce(sitk.Maximum, segmentImages)
-        sitk.WriteImage(combinedImage, filenameInputNoExt + '_liverSegments_LiverSegmentsCombined.mhd')
 
 def deleteAllFilesInSegmentationFolder():
     venv_path = os.path.dirname(sys.executable)

@@ -69,7 +69,6 @@ LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* p
 	                   << otLIVER_SEGMENT_5 << otLIVER_SEGMENT_6 << otLIVER_SEGMENT_7 << otLIVER_SEGMENT_8;
 	for (int i = 0; i < mSegmentOrganTypes.size(); ++i)
 		this->addStructureButton(mSegmentOrganTypes[i], QString("Segment %1").arg(i + 1), segmentsLayout, segmentRow++);
-	this->addStructureButton(otLIVER_SEGMENTS_COMBINED, "Liver (All Segments Merged)", segmentsLayout, segmentRow++);
 
 	mAllSegmentsButton = new QPushButton("Show/Hide All Segments");
 	connect(mAllSegmentsButton, &QPushButton::clicked, this, &LiverVisibilityWidget::toggleAllSegments);
