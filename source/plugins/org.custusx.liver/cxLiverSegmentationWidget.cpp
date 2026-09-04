@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxLiverSegmentationWidget.h"
 
+#include <vtkImageData.h>
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QPushButton>
@@ -298,13 +299,31 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 	QString preparedUid = image->getUid() + "_prepared";
 	QString preparedName = image->getName() + " (prepared for segmentation)";
 
+	// Logged at each step (this all runs synchronously on the main thread -
+	// unlike contourFilter()'s marching-cubes/smoothing, none of this is
+	// backgrounded, so a large-enough volume can freeze the GUI here too).
+	// Kept deliberately so a future freeze is diagnosable from the log
+	// instead of requiring guesswork about which step it's stuck in.
+	int dims[3];
+	image->getBaseVtkImageData()->GetDimensions(dims);
+	CX_LOG_INFO() << "LiverSegmentationWidget: preparing " << image->getName()
+	              << " (" << dims[0] << "x" << dims[1] << "x" << dims[2] << ") for a heavy filter...";
+
 	// Auto-crop first: lossless (just removes surrounding air/background),
 	// and often enough on its own. Skip it if it wouldn't actually shrink
 	// anything (e.g. the volume was already cropped).
+	CX_LOG_INFO() << "LiverSegmentationWidget: computing auto-crop box...";
 	ImagePtr working = image;
 	DoubleBoundingBox3D autoCropBox = computeAutoCropBox(image);
 	if (!similar(autoCropBox, image->boundingBox()))
+	{
+		CX_LOG_INFO() << "LiverSegmentationWidget: cropping...";
 		working = cropImage(mServices->patient(), image, autoCropBox, preparedUid, preparedName);
+	}
+	else
+	{
+		CX_LOG_INFO() << "LiverSegmentationWidget: auto-crop box matches the full volume, skipping crop.";
+	}
 
 	// Only resample (lossy - reduces resolution) if still too large after
 	// cropping. Scale all three axes by total voxel count, not just x/y: a
@@ -316,7 +335,13 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 	// voxel one (278MB) froze the main thread for 20+ minutes. Capped in
 	// between the two, with some margin below the known-good side.
 	const double maxVoxelCountForHeavySmoothing = 40000000;
-	return resampleImageToMaxVoxelCount(mServices->patient(), working, maxVoxelCountForHeavySmoothing, preparedUid, preparedName);
+	CX_LOG_INFO() << "LiverSegmentationWidget: resampling if still needed...";
+	ImagePtr prepared = resampleImageToMaxVoxelCount(mServices->patient(), working, maxVoxelCountForHeavySmoothing, preparedUid, preparedName);
+	int preparedDims[3];
+	prepared->getBaseVtkImageData()->GetDimensions(preparedDims);
+	CX_LOG_INFO() << "LiverSegmentationWidget: prepared " << image->getName() << " -> "
+	              << preparedDims[0] << "x" << preparedDims[1] << "x" << preparedDims[2];
+	return prepared;
 }
 
 void LiverSegmentationWidget::onFilterStarted(QString key)
