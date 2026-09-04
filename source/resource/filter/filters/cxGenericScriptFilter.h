@@ -118,6 +118,10 @@ protected:
 	bool readGeneratedSegmentationFiles(QStringList createOutputVolume, QStringList createOutputMesh);
 	QString createImageName(QString parentName, QString filePath);
 	int countPlannedMeshes(QStringList createOutputMeshList) const;
+	// Appends to mLineBuffer and emits scriptOutput() for each complete
+	// line (terminated by '\r' or '\n') found in it. Split out of
+	// processReadyRead() so it's testable without a live QProcess.
+	void appendToLineBuffer(const QString& newData);
 	void createOutputVolume();
 	void deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume);
 	QString getScriptPath();

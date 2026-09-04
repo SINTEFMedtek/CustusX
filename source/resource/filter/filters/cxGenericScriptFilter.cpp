@@ -177,13 +177,32 @@ void GenericScriptFilter::processReadyRead()
 	if(!mCommandLine || !mCommandLine->getProcess())
 		return;
 
-	QProcess* process = mCommandLine->getProcess();
-	mLineBuffer += QString(process->readAllStandardOutput());
-	int newlinePos;
-	while ((newlinePos = mLineBuffer.indexOf('\n')) != -1)
+	this->appendToLineBuffer(QString(mCommandLine->getProcess()->readAllStandardOutput()));
+}
+
+void GenericScriptFilter::appendToLineBuffer(const QString& newData)
+{
+	mLineBuffer += newData;
+	// Treat '\r' as a line terminator too, not just '\n': a tqdm-style
+	// progress bar (common in TotalSegmentator's own output) repeatedly
+	// overwrites a single terminal line using '\r', with no '\n' until the
+	// whole operation completes. Splitting on '\n' only let mLineBuffer grow
+	// unbounded for as long as that ran, while every readyRead rescanned the
+	// entire (ever-growing) buffer looking for a '\n' that never came -
+	// effectively O(n^2) in total output size. Confirmed directly: this
+	// froze the main thread (CPU-bound, not deadlocked) for 40+ minutes on
+	// a run whose TotalSegmentator task took a while, with progress frozen
+	// the whole time since scriptOutput() was never actually emitted.
+	while (true)
 	{
-		QString line = mLineBuffer.left(newlinePos).trimmed();
-		mLineBuffer = mLineBuffer.mid(newlinePos + 1);
+		int newlinePos = mLineBuffer.indexOf('\n');
+		int crPos = mLineBuffer.indexOf('\r');
+		if (newlinePos == -1 && crPos == -1)
+			break;
+		int splitPos = (newlinePos == -1) ? crPos : (crPos == -1 ? newlinePos : std::min(newlinePos, crPos));
+
+		QString line = mLineBuffer.left(splitPos).trimmed();
+		mLineBuffer = mLineBuffer.mid(splitPos + 1);
 		if(!line.isEmpty())
 		{
 			CX_LOG_CHANNEL_INFO(mOutputChannelName) << line;

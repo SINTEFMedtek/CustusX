@@ -38,11 +38,15 @@ public:
 	TestGenericScriptFilter() :
 		GenericScriptFilter(cx::VisServices::getNullObjects()),
 		mGotOutput(false)
-	{}
+	{
+		connect(this, &cx::GenericScriptFilter::scriptOutput, this, [this](const QString& line) { mCapturedLines << line; });
+	}
 	TestGenericScriptFilter(cx::VisServicesPtr services) :
 		GenericScriptFilter(services),
 		mGotOutput(false)
-	{}
+	{
+		connect(this, &cx::GenericScriptFilter::scriptOutput, this, [this](const QString& line) { mCapturedLines << line; });
+	}
 	void testCreateOptions()
 	{
 		createOptions();
@@ -87,6 +91,11 @@ public:
 	int testCountPlannedMeshes(QStringList createOutputMeshList)
 	{
 		return countPlannedMeshes(createOutputMeshList);
+	}
+	QStringList mCapturedLines;
+	void testAppendToLineBuffer(QString data)
+	{
+		appendToLineBuffer(data);
 	}
 
 	void setTestScriptFile(bool useLungsFile = false)
@@ -718,6 +727,52 @@ TEST_CASE("GenericScriptFilter: countPlannedMeshes()", "[unit]")
 	CHECK(filter->testCountPlannedMeshes(QStringList() << "Liver" << "Pancreas") == 2);
 	CHECK(filter->testCountPlannedMeshes(QStringList() << "SomethingElse") == 0);
 	CHECK(filter->testCountPlannedMeshes(QStringList()) == 0);
+}
+
+TEST_CASE("GenericScriptFilter: appendToLineBuffer() splits on carriage return as well as newline", "[unit]")
+{
+	// Regression test: a tqdm-style progress bar overwrites a single
+	// terminal line using '\r' with no '\n' until the whole operation
+	// completes. Splitting on '\n' only let the internal line buffer grow
+	// unbounded for as long as that ran, rescanning the entire buffer on
+	// every chunk of new data - confirmed directly to freeze the main
+	// thread (CPU-bound) for 40+ minutes on a real run.
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	filter->testAppendToLineBuffer("first\rsecond\rthird\n");
+	REQUIRE(filter->mCapturedLines.size() == 3);
+	CHECK(filter->mCapturedLines[0] == "first");
+	CHECK(filter->mCapturedLines[1] == "second");
+	CHECK(filter->mCapturedLines[2] == "third");
+}
+
+TEST_CASE("GenericScriptFilter: appendToLineBuffer() handles data arriving in separate chunks", "[unit]")
+{
+	// Mirrors how real QProcess output arrives: appendToLineBuffer() is
+	// called once per readyRead, potentially mid-line.
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	filter->testAppendToLineBuffer("partial line, no terminator yet");
+	CHECK(filter->mCapturedLines.isEmpty()); // nothing to emit until a terminator arrives
+
+	filter->testAppendToLineBuffer(" - completed\r");
+	REQUIRE(filter->mCapturedLines.size() == 1);
+	CHECK(filter->mCapturedLines[0] == "partial line, no terminator yet - completed");
+}
+
+TEST_CASE("GenericScriptFilter: appendToLineBuffer() does not grow unbounded across many carriage returns", "[unit]")
+{
+	// The actual regression: many kilobytes of '\r'-only updates (no '\n')
+	// used to accumulate in the line buffer indefinitely. Each one should
+	// now be drained (and emitted) as its own line instead.
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	for (int i = 0; i < 5000; ++i)
+		filter->testAppendToLineBuffer(QString("progress update %1\r").arg(i));
+
+	CHECK(filter->mCapturedLines.size() == 5000);
+	CHECK(filter->mCapturedLines.first() == "progress update 0");
+	CHECK(filter->mCapturedLines.last() == "progress update 4999");
 }
 
 TEST_CASE("Raidionics: target conversion", "[unit]")
