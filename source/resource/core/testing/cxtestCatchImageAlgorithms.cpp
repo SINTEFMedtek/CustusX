@@ -275,6 +275,68 @@ TEST_CASE("ImageAlgorithms: cropImage()/resampleImageToMaxVoxelCount() use an ex
 	CHECK(resampled->getName() == "CT (prepared)");
 }
 
+TEST_CASE("ImageAlgorithms: resampleImage() alone (no prior crop) preserves physical position", "[hide][known_issue]")
+{
+	// KNOWN BUG, not yet fixed: confirmed via this repro that resampleImage()
+	// (the spacing-based overload) shifts the image's physical center by a
+	// fraction of a voxel at the new (coarser) spacing - independent of any
+	// crop step, so this is pre-existing and affects every caller (Fraxinus's
+	// lung filters, cxResampleImageFilter, etc.), not just the liver plugin.
+	// Adding mergevtkSettingsIntosscTransform() (the fix that works for
+	// cropImage()'s equivalent non-zero-origin issue) does NOT fix this -
+	// the cause looks like a point-vs-cell extent/dimension rounding
+	// mismatch between vtkImageResample's output geometry and how
+	// Image::boundingBox() computes bounds, not a non-zero-origin issue.
+	// Hidden from the default run so a real, subtle, shared-code geometry
+	// bug doesn't silently break CI - kept as the reproducer for whoever
+	// fixes it.
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr pasm = services->patient();
+
+	cx::ImagePtr original = createSyntheticImage(pasm, "original2", 20, 20, 20, 1.0);
+	cx::Vector3D expectedPhysicalCenter = original->get_rMd().coord(original->boundingBox().center());
+
+	cx::ImagePtr resampled = cx::resampleImage(pasm, original, cx::Vector3D(2.0, 2.0, 2.0));
+	REQUIRE(resampled);
+	cx::Vector3D resampledPhysicalCenter = resampled->get_rMd().coord(resampled->boundingBox().center());
+	CHECK(resampledPhysicalCenter[0] == Approx(expectedPhysicalCenter[0]));
+	CHECK(resampledPhysicalCenter[1] == Approx(expectedPhysicalCenter[1]));
+	CHECK(resampledPhysicalCenter[2] == Approx(expectedPhysicalCenter[2]));
+}
+
+TEST_CASE("ImageAlgorithms: cropImage() then resampleImageToMaxVoxelCount() preserves physical position", "[hide][known_issue]")
+{
+	// KNOWN BUG, not yet fixed - see the resampleImage()-alone test above for
+	// the isolated root cause; this confirms it also affects the crop-then-
+	// resample chain prepareImageForHeavyFilter() uses, matching the
+	// reported symptom directly: running Liver+Pancreas against two volumes
+	// at once showed the two resulting liver meshes in different physical
+	// locations. Hidden from the default run - see the note above.
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr pasm = services->patient();
+
+	cx::ImagePtr original = createSyntheticImage(pasm, "original", 40, 40, 40, 1.0);
+
+	cx::DoubleBoundingBox3D cropBox(5, 24, 5, 24, 5, 24); // 20x20x20 region, center at (14.5,14.5,14.5)
+	cx::Vector3D expectedPhysicalCenter = original->get_rMd().coord(cropBox.center());
+
+	cx::ImagePtr cropped = cx::cropImage(pasm, original, cropBox);
+	REQUIRE(cropped);
+	cx::Vector3D croppedPhysicalCenter = cropped->get_rMd().coord(cropped->boundingBox().center());
+	CHECK(croppedPhysicalCenter[0] == Approx(expectedPhysicalCenter[0]));
+	CHECK(croppedPhysicalCenter[1] == Approx(expectedPhysicalCenter[1]));
+	CHECK(croppedPhysicalCenter[2] == Approx(expectedPhysicalCenter[2]));
+
+	// Force an actual resample (target well below the cropped voxel count).
+	cx::ImagePtr resampled = cx::resampleImageToMaxVoxelCount(pasm, cropped, 1000);
+	REQUIRE(resampled);
+	REQUIRE(resampled != cropped); // confirm it actually resampled, not a no-op
+	cx::Vector3D resampledPhysicalCenter = resampled->get_rMd().coord(resampled->boundingBox().center());
+	CHECK(resampledPhysicalCenter[0] == Approx(expectedPhysicalCenter[0]));
+	CHECK(resampledPhysicalCenter[1] == Approx(expectedPhysicalCenter[1]));
+	CHECK(resampledPhysicalCenter[2] == Approx(expectedPhysicalCenter[2]));
+}
+
 TEST_CASE("ImageAlgorithms: computeAutoCropBox() returns the full volume for a uniform image", "[unit][resource][core]")
 {
 	// No separable foreground/background - computeOtsuThreshold() degenerates
