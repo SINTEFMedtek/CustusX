@@ -1030,7 +1030,7 @@ void GenericScriptFilter::createOutputMesh(QColor color, int smoothing)
 	vtkPolyDataPtr rawContour = contourFilter(smoothing);
 
 	QString uidOutputMesh = mOutputImage->getUid() + "_mesh";
-	QString nameOutputMesh = mOutputImage->getName() + "_mesh";
+	QString nameOutputMesh = mOutputImage->getName();
 	MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidOutputMesh, nameOutputMesh);
 	outputMesh->setVtkPolyData(rawContour);
 	outputMesh->setColor(color);
