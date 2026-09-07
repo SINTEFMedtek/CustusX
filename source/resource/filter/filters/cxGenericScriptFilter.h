@@ -85,18 +85,13 @@ public:
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 	PatientModelServicePtr mPatientModelService;
 	void setOutputClasses(QStringList outputClasses);
-	// Sends SIGTERM to the running script process, if any. Relies on the
-	// script itself terminating any child process it spawned (e.g. a
-	// TotalSegmentator subprocess) on receiving that signal - killing the
-	// script harder (SIGKILL) would leave such a child orphaned.
+	// Sends SIGTERM, not SIGKILL: the script relies on receiving it to
+	// terminate any child process it spawned (e.g. a TotalSegmentator
+	// subprocess) - SIGKILL would leave such a child orphaned.
 	void requestStop();
 
 signals:
 	void scriptOutput(const QString& line);
-	// Emitted from readGeneratedSegmentationFiles(), on the main thread, while
-	// generating output meshes - the external script has already exited by
-	// this point (and reported its own 0-100 progress via scriptOutput), so
-	// this covers the otherwise-silent postProcess() mesh-generation tail.
 	void meshGenerationProgress(int percent);
 	void launchDialog(QString venvPath, QString createCommand, QString command);
 public slots:
@@ -118,9 +113,6 @@ protected:
 	bool readGeneratedSegmentationFiles(QStringList createOutputVolume, QStringList createOutputMesh);
 	QString createImageName(QString parentName, QString filePath);
 	int countPlannedMeshes(QStringList createOutputMeshList) const;
-	// Appends to mLineBuffer and emits scriptOutput() for each complete
-	// line (terminated by '\r' or '\n') found in it. Split out of
-	// processReadyRead() so it's testable without a live QProcess.
 	void appendToLineBuffer(const QString& newData);
 	void createOutputVolume();
 	void deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume);
@@ -149,8 +141,6 @@ protected:
 	void setContourFilteringFromClasses();
 	int getClassNumber(QString filePath);
 	ORGAN_TYPE getOrganType(int classNumber);
-	// Applies to all script engines, not just Raidionics - keyed on ORGAN_TYPE,
-	// which every engine's output classes are converted to.
 	QString colorForOrganType(QString outputClass);
 	int contourFilterSettingForOrganType(QString outputClass);
 

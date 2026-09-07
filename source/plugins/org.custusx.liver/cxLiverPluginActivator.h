@@ -21,11 +21,6 @@ namespace cx
 typedef boost::shared_ptr<class LiverGUIExtenderService> LiverGUIExtenderServicePtr;
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
-/**
- * Activator for the liver surgery preparation plugin
- *
- * \ingroup org_custusx_liver
- */
 class LiverPluginActivator :  public QObject, public ctkPluginActivator
 {
 	Q_OBJECT

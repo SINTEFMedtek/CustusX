@@ -84,30 +84,6 @@ ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const
 	double* inputSpacing = input->GetSpacing();
 	int* inputDims = input->GetDimensions();
 
-	// vtkImageResample (a vtkImageReslice subclass) computes its output
-	// extent per axis as [ceil(oldExtentMin*factor), floor(oldExtentMax*factor)],
-	// factor=oldSpacing/newSpacing. Under VTK's point-based bounds convention
-	// (physical extent = (dim-1)*spacing), that floor() silently discards up
-	// to one whole new-spacing unit of physical coverage at the far edge,
-	// while the origin/near edge is untouched - an asymmetric, magnification-
-	// dependent drift (confirmed directly: resampling a 20-voxel/1mm axis to
-	// 2mm shifted its physical center by 0.5mm with no crop involved at all).
-	// Two volumes resampled by different factors then drift apart by
-	// different amounts - this is what surfaced as two segmentation results
-	// for the same anatomy appearing in different physical locations.
-	//
-	// Fix: compute the output extent directly (rounding, not flooring), and
-	// use vtkImageReslice directly since vtkImageResample's own
-	// RequestInformation() always recomputes (and would override) extent.
-	// The old/new physical extents still can't match exactly in general
-	// (e.g. 19mm doesn't evenly divide into 2mm steps) - rather than pinning
-	// the origin and leaving 100% of that leftover slack on the far edge
-	// (still an asymmetric, magnification-dependent drift, just halved),
-	// split it evenly across both edges by shifting the origin by half the
-	// slack. That keeps the *center* - what determines whether two
-	// independently resampled volumes of the same anatomy line up - exact,
-	// at the cost of a half-voxel's worth of asymmetry in coverage at each
-	// edge instead of a whole voxel's worth on one edge.
 	int outputExtent[6];
 	double outputOrigin[3];
 	for (int axis = 0; axis < 3; ++axis)
@@ -124,7 +100,7 @@ ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const
 
 	vtkImageReslicePtr resampler = vtkImageReslicePtr::New();
 	resampler->SetInputData(input);
-	resampler->SetInterpolationModeToLinear(); // matches vtkImageResample's own default
+	resampler->SetInterpolationModeToLinear();
 	resampler->SetOutputSpacing(spacing[0], spacing[1], spacing[2]);
 	resampler->SetOutputOrigin(outputOrigin);
 	resampler->SetOutputExtent(outputExtent);
@@ -143,10 +119,6 @@ ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const
 	return retval;
 }
 
-/** Return an image resampled so its in-plane (x/y) resolution is capped at
- *  maxInPlaneDimension pixels, keeping the z spacing unchanged.
- *  The image is not added to the data manager nor saved.
- */
 ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServicePtr dataManager, ImagePtr image, int maxInPlaneDimension, QString uid, QString name)
 {
 	vtkImageDataPtr vtkImageGrayscale = image->getGrayScaleVtkImageData();
@@ -164,11 +136,6 @@ ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServicePtr dataManager,
 	return resampleImage(dataManager, image, newSpacing, uid, name);
 }
 
-/** Return an image resampled so its total voxel count is capped at maxVoxelCount,
- *  scaling all three axes uniformly. Returns the input unchanged if it is already
- *  at or below maxVoxelCount.
- *  The image is not added to the data manager nor saved.
- */
 ImagePtr resampleImageToMaxVoxelCount(PatientModelServicePtr dataManager, ImagePtr image, double maxVoxelCount, QString uid, QString name)
 {
 	vtkImageDataPtr vtkImageGrayscale = image->getGrayScaleVtkImageData();
@@ -190,10 +157,6 @@ ImagePtr resampleImageToMaxVoxelCount(PatientModelServicePtr dataManager, ImageP
 	return resampleImage(dataManager, image, newSpacing, uid, name);
 }
 
-/** Otsu's method: given a histogram, find the threshold (bin index) that
- *  maximizes the between-class variance of the two classes it splits the
- *  histogram into. Standard textbook algorithm.
- */
 namespace
 {
 int otsuThresholdBin(const std::vector<double>& histogram)
@@ -262,10 +225,6 @@ double computeOtsuThreshold(vtkImageDataPtr image)
 
 namespace
 {
-/** Scan the raw voxel buffer for the tight index range containing all
- *  voxels at or above threshold. bounds is {xmin,xmax,ymin,ymax,zmin,zmax};
- *  a xmin>xmax (etc.) result on return means nothing matched.
- */
 template <class T>
 void findThresholdVoxelBounds(T* data, const int dims[3], double threshold, int bounds[6])
 {
@@ -313,7 +272,7 @@ DoubleBoundingBox3D computeAutoCropBox(ImagePtr image, int paddingVoxels)
 	}
 
 	if (bounds[1] < bounds[0] || bounds[3] < bounds[2] || bounds[5] < bounds[4])
-		return fullVolume; // nothing at or above the threshold - fall back to the full volume
+		return fullVolume;
 
 	bounds[0] = std::max(0, bounds[0] - paddingVoxels);
 	bounds[1] = std::min(dims[0] - 1, bounds[1] + paddingVoxels);

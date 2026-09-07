@@ -61,7 +61,7 @@ private slots:
   void boxValuesChanged();
   void cropperChangedSlot();
   ImagePtr cropClipButtonClickedSlot();///< Crete a new image based on the images crop and clip values
-  void autoCropButtonClickedSlot();///< Set the crop box to tightly enclose the body, based on an adaptive intensity threshold
+  void autoCropButtonClickedSlot();
 };
 
 /**

@@ -21,12 +21,6 @@ class QTabWidget;
 namespace cx
 {
 
-/**
- * Top-level liver surgery preparation widget, hosting the segmentation and
- * visibility widgets as tabs.
- *
- * \ingroup org_custusx_liver
- */
 class org_custusx_liver_EXPORT LiverWidget : public BaseWidget
 {
 	Q_OBJECT

@@ -68,10 +68,7 @@ LiverSegmentationWidget::LiverSegmentationWidget(VisServicesPtr services, QWidge
 	QGridLayout* imageSelectorLayout = new QGridLayout();
 	new DataSelectWidget(mServices->view(), mServices->patient(), this, mImageSelector, imageSelectorLayout, 0);
 	new DataSelectWidget(mServices->view(), mServices->patient(), this, mImageSelector2, imageSelectorLayout, 1);
-	// Column 1 is the combobox itself (0=label, 2=show/remove buttons) -
-	// stretch it to show more of the volume's name, matching how
-	// ActiveVolumeWidget's combobox (used in "Volume Properties") expands
-	// to fill its own layout.
+	// Column 1 is the combobox itself (0=label, 2=show/remove buttons).
 	imageSelectorLayout->setColumnStretch(1, 1);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
@@ -319,9 +316,7 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 	CX_LOG_INFO() << "LiverSegmentationWidget: preparing " << image->getName()
 	              << " (" << dims[0] << "x" << dims[1] << "x" << dims[2] << ") for a heavy filter...";
 
-	// Auto-crop first: lossless (just removes surrounding air/background),
-	// and often enough on its own. Skip it if it wouldn't actually shrink
-	// anything (e.g. the volume was already cropped).
+	// Auto-crop is lossless; skip it if it wouldn't actually shrink anything.
 	CX_LOG_INFO() << "LiverSegmentationWidget: computing auto-crop box...";
 	ImagePtr working = image;
 	DoubleBoundingBox3D autoCropBox = computeAutoCropBox(image);
@@ -398,14 +393,10 @@ void LiverSegmentationWidget::onAllFinished()
 
 void LiverSegmentationWidget::removePreviousResults(const QList<PlannedRun>& runs) const
 {
-	// Re-running a filter against the same source image previously just
-	// added more meshes on top of whatever it had already produced, so
-	// repeated runs in one session accumulated duplicates (most visibly for
-	// Liver Vessels/Lesions, which run every time - Liver+Pancreas/Segments
-	// happen to self-limit less often only because their heavier smoothing
-	// makes people re-run them less). Remove each filter's own prior output
-	// for that same source image first, so a re-run always leaves exactly
-	// one current result per organ per source image.
+	// Re-running a filter against the same source image would otherwise just
+	// add more meshes on top of previous output. Remove each filter's own
+	// prior output for that same source image first, so a re-run always
+	// leaves exactly one current result per organ per source image.
 	foreach (const PlannedRun& run, runs)
 	{
 		foreach (ORGAN_TYPE organType, organTypesFor(run.filter))
@@ -444,21 +435,11 @@ void LiverSegmentationWidget::cleanupPreparedImages()
 void LiverSegmentationWidget::reparentMeshesFromPreparedCopy(QString originalUid, ImagePtr resampled) const
 {
 	// Only setParentSpace() is touched here - never setRegistration(). The
-	// mesh's rMd was already set correctly at creation time (in
-	// createOutputMesh()) relative to the *cropped/resampled* copy, which
-	// itself correctly encodes the crop offset via
-	// mergevtkSettingsIntosscTransform(). Overwriting it with the ORIGINAL
-	// (pre-crop) image's rMd here would discard that offset entirely,
-	// moving the mesh by however far the crop shifted it - confirmed
-	// directly: a 10-20cm mismatch on a large volume with a large crop
-	// offset (larger in-plane than in the scan direction, since a CT
-	// gantry's field of view is typically much wider than the patient,
-	// while the scan itself is usually acquired closer to the target
-	// anatomy along the scan axis - matching exactly what was reported).
-	// setParentSpace() alone is pure bookkeeping (which data a future
-	// re-registration should cascade to, and what descendsFrom()'s
-	// parent-chain walk resolves) and does not affect the mesh's current
-	// rendered position.
+	// mesh's rMd was set relative to the cropped/resampled copy, which
+	// encodes the crop offset; overwriting it with the original (pre-crop)
+	// image's rMd would discard that offset and move the mesh by however far
+	// the crop shifted it. setParentSpace() alone is pure bookkeeping and does
+	// not affect the mesh's current rendered position.
 	ImagePtr original = mServices->patient()->getData<Image>(originalUid);
 	if (!original)
 		return;
@@ -474,15 +455,11 @@ bool LiverSegmentationWidget::needsPreparation(FilterKind filter)
 {
 	// Smoothing in the contour step runs on the raw marching-cubes output, so
 	// on a large/uncropped volume it can freeze the main thread for 20+
-	// minutes with no way to stop it (the external process is already gone
-	// by the time this runs in postProcess()). See prepareImageForHeavyFilter().
+	// minutes with no way to stop it. See prepareImageForHeavyFilter().
 	// Scoped to fkLiverPancreas and fkLiverSegments only: both use the
 	// heaviest smoothing level (GenericScriptFilter::
-	// contourFilterSettingForOrganType() filtering=3, same as Fraxinus's own
-	// Lungs/Heart/Lobes), and Segments additionally produces up to 8 meshes
-	// per run - fkLiverVessels/fkLiverLesions use lighter smoothing
-	// (filtering=1/2) and are left as-is, matching Fraxinus's own lung
-	// filters running unprepared volumes of this size without issue.
+	// contourFilterSettingForOrganType() filtering=3), and Segments
+	// additionally produces up to 8 meshes per run.
 	return filter == fkLiverPancreas || filter == fkLiverSegments;
 }
 

@@ -183,16 +183,10 @@ void GenericScriptFilter::processReadyRead()
 void GenericScriptFilter::appendToLineBuffer(const QString& newData)
 {
 	mLineBuffer += newData;
-	// Treat '\r' as a line terminator too, not just '\n': a tqdm-style
-	// progress bar (common in TotalSegmentator's own output) repeatedly
-	// overwrites a single terminal line using '\r', with no '\n' until the
-	// whole operation completes. Splitting on '\n' only let mLineBuffer grow
-	// unbounded for as long as that ran, while every readyRead rescanned the
-	// entire (ever-growing) buffer looking for a '\n' that never came -
-	// effectively O(n^2) in total output size. Confirmed directly: this
-	// froze the main thread (CPU-bound, not deadlocked) for 40+ minutes on
-	// a run whose TotalSegmentator task took a while, with progress frozen
-	// the whole time since scriptOutput() was never actually emitted.
+	// Also split on '\r': tqdm-style progress output (as produced by
+	// TotalSegmentator) only uses '\r', never '\n', until the whole
+	// operation completes, so splitting on '\n' alone let mLineBuffer
+	// grow unbounded for the duration of such a run.
 	while (true)
 	{
 		int newlinePos = mLineBuffer.indexOf('\n');
@@ -691,18 +685,11 @@ void GenericScriptFilter::requestStop()
 	if (!mCommandLine || !mCommandLine->getProcess())
 		return;
 
-	// execute() runs on a worker thread (see FilterTimedAlgorithm/
-	// ThreadedTimedAlgorithm), and mCommandLine's QProcess is created inside
-	// that call, so it has worker-thread affinity. requestStop() itself may
-	// be called from the main thread (e.g. a Stop button, or on app quit).
-	// QProcess::terminate() isn't safe to invoke directly from another
-	// thread, and queuing it via QMetaObject::invokeMethod isn't reliable
-	// either - waitForFinished()'s internal event loop isn't guaranteed to
-	// dispatch cross-object posted events. Sending the OS signal directly
-	// via the process' PID sidesteps Qt's threading model entirely -
-	// processId() just returns an already-cached value, safe to read from
-	// any thread. Only implemented for POSIX - this feature (running
-	// TotalSegmentator through a venv) isn't set up on Windows regardless.
+	// mCommandLine's QProcess has worker-thread affinity (created inside
+	// execute()), but requestStop() may be called from the main thread.
+	// QProcess::terminate() is not safe to invoke cross-thread here, and
+	// queuing it via QMetaObject::invokeMethod is not reliable either, so
+	// send the OS signal directly via the process' PID instead. POSIX only.
 #ifndef CX_WINDOWS
 	qint64 pid = mCommandLine->getProcess()->processId();
 	if (pid > 0)
@@ -884,9 +871,9 @@ QString GenericScriptFilter::colorForOrganType(QString outputClass)
 		color = "153,153,255,255";break;
 	case otESOPHAGUS:
 		color = "170,85,0,255";break;
-	case otPULMONARY_ARTERIES: // Same color as other arteries (e.g. Subclavian Artery)
+	case otPULMONARY_ARTERIES:
 		color = "255,127,127,255";break;
-	case otPULMONARY_VEINS: // Same color as other veins (e.g. Vena Cava)
+	case otPULMONARY_VEINS:
 		color = "153,153,255,255";break;
 	case otLOBE_LUL:
 	case otLOBE_RUL:
@@ -922,8 +909,6 @@ QString GenericScriptFilter::colorForOrganType(QString outputClass)
 		color = "240,50,230,100";break;
 
 	default:
-//	otUNKNOWN,
-//	organtypeCOUNT
 		CX_LOG_WARNING() << "GenericScriptFilter::colorForOrganType(): No color found for " << enum2string(target) << " (Converted from string: " << outputClass << "). Setting color to red";
 		break;
 	}
@@ -1037,11 +1022,10 @@ void GenericScriptFilter::createOutputMesh(QColor color, int smoothing)
 	outputMesh->setOrganType(mOutputImage->getOrganType());
 	patientService()->insertData(outputMesh);
 
-	// Parent to the actual input image, not mOutputImage: when volume output is
-	// disabled (.ini "volume = false"), mOutputImage is never inserted into the
-	// patient model, so a mesh parented to it is left with a dangling,
-	// unresolvable parent frame - it won't move when the input is registered,
-	// and widgets showing "parent frame" can't resolve it either.
+	// Must parent to the actual input image, not mOutputImage: when volume
+	// output is disabled (.ini "volume = false"), mOutputImage is never
+	// inserted into the patient model, leaving a mesh parented to it with a
+	// dangling, unresolvable parent frame.
 	ImagePtr inputImage = this->getCopiedInputImage();
 	outputMesh->get_rMd_History()->setRegistration(inputImage->get_rMd());
 	outputMesh->get_rMd_History()->setParentSpace(inputImage->getUid());
@@ -1092,13 +1076,10 @@ vtkPolyDataPtr GenericScriptFilter::contourFilter(int smoothing)
 			passBand = 0.3;
 			break;
 	}
-	// The marching-cubes/smoothing computation itself is pure VTK/CPU work
-	// with no patient-model or other main-thread-only state involved, so run
-	// it on a worker thread instead of blocking here directly - unlike the
-	// surrounding code (which creates Mesh/Image objects and inserts them
-	// into the patient model, and must stay on the main thread). This is
-	// what previously blocked the GUI fully for minutes at a time on a
-	// large volume, unable to even repaint or respond to Stop.
+	// Runs on a worker thread: pure VTK/CPU work with no patient-model or
+	// other main-thread-only state involved, unlike the surrounding code
+	// (which creates Mesh/Image objects and inserts them into the patient
+	// model, and must stay on the main thread).
 	vtkImageDataPtr input = mOutputImage->getBaseVtkImageData();
 	QFuture<vtkPolyDataPtr> future = QtConcurrent::run([=]() {
 		return ContourFilter::execute(input, threshold, reduceResoluion, applySmoothing, keepTopology, decimation, numberOfIterations, passBand);
@@ -1209,11 +1190,9 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 				if (totalMeshCount > 0)
 				{
 					emit meshGenerationProgress(90 + 9 * meshesCreated / totalMeshCount);
-					// This entire method runs synchronously on the main thread, so
-					// without this the progress bar update above would not actually
-					// repaint (nor would the app respond to input) until the whole
-					// mesh-generation step - which can take minutes for many output
-					// classes - has completed.
+					// This method runs synchronously on the main thread, so without
+					// this the progress update above would not repaint until the
+					// whole mesh-generation step has completed.
 					qApp->processEvents();
 				}
 			}
@@ -1283,10 +1262,9 @@ int GenericScriptFilter::countPlannedMeshes(QStringList createOutputMeshList) co
 
 QString GenericScriptFilter::createImageName(QString parentName, QString filePath)
 {
-	// mResultFileEnding (e.g. "_liverPancreas", "_lobe") disambiguates output
-	// *files on disk* between filters, but is redundant on the *display name*
-	// once the output class (e.g. "Liver", "Liversegment1") is appended below,
-	// and otherwise just leaks into every derived mesh's name.
+	// mResultFileEnding still disambiguates output files on disk between
+	// filters, but is not appended here since it would be redundant with
+	// the output class name and leak into every derived mesh's name.
 	QString retval = parentName;
 	int classNumber = getClassNumber(filePath);
 	if(mOutputClasses.size() > classNumber)

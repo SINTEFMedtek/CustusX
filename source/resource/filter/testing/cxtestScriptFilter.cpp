@@ -712,17 +712,14 @@ TEST_CASE("GenericScriptFilter: countPlannedMeshes()", "[unit]")
 {
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 
-	// No output classes yet - nothing planned either way.
 	CHECK(filter->testCountPlannedMeshes(QStringList() << "true") == 0);
 	CHECK(filter->testCountPlannedMeshes(QStringList()) == 0);
 
 	filter->addOutputClass("Liver");
 	filter->addOutputClass("Pancreas");
 
-	// "true" as the sole entry means every class gets a mesh.
 	CHECK(filter->testCountPlannedMeshes(QStringList() << "true") == 2);
 
-	// Otherwise only the explicitly listed classes count.
 	CHECK(filter->testCountPlannedMeshes(QStringList() << "Liver") == 1);
 	CHECK(filter->testCountPlannedMeshes(QStringList() << "Liver" << "Pancreas") == 2);
 	CHECK(filter->testCountPlannedMeshes(QStringList() << "SomethingElse") == 0);
@@ -731,12 +728,6 @@ TEST_CASE("GenericScriptFilter: countPlannedMeshes()", "[unit]")
 
 TEST_CASE("GenericScriptFilter: appendToLineBuffer() splits on carriage return as well as newline", "[unit]")
 {
-	// Regression test: a tqdm-style progress bar overwrites a single
-	// terminal line using '\r' with no '\n' until the whole operation
-	// completes. Splitting on '\n' only let the internal line buffer grow
-	// unbounded for as long as that ran, rescanning the entire buffer on
-	// every chunk of new data - confirmed directly to freeze the main
-	// thread (CPU-bound) for 40+ minutes on a real run.
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 
 	filter->testAppendToLineBuffer("first\rsecond\rthird\n");
@@ -748,12 +739,10 @@ TEST_CASE("GenericScriptFilter: appendToLineBuffer() splits on carriage return a
 
 TEST_CASE("GenericScriptFilter: appendToLineBuffer() handles data arriving in separate chunks", "[unit]")
 {
-	// Mirrors how real QProcess output arrives: appendToLineBuffer() is
-	// called once per readyRead, potentially mid-line.
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 
 	filter->testAppendToLineBuffer("partial line, no terminator yet");
-	CHECK(filter->mCapturedLines.isEmpty()); // nothing to emit until a terminator arrives
+	CHECK(filter->mCapturedLines.isEmpty());
 
 	filter->testAppendToLineBuffer(" - completed\r");
 	REQUIRE(filter->mCapturedLines.size() == 1);
@@ -762,9 +751,6 @@ TEST_CASE("GenericScriptFilter: appendToLineBuffer() handles data arriving in se
 
 TEST_CASE("GenericScriptFilter: appendToLineBuffer() does not grow unbounded across many carriage returns", "[unit]")
 {
-	// The actual regression: many kilobytes of '\r'-only updates (no '\n')
-	// used to accumulate in the line buffer indefinitely. Each one should
-	// now be drained (and emitted) as its own line instead.
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 
 	for (int i = 0; i < 5000; ++i)

@@ -33,15 +33,15 @@ def runTotalSegmentator(filenameInput):
             predicting_count += 1
         elif 'Resampling' in line:
             if predicting_count == 0:
-                print("PROGRESS: 22", flush=True)   # before rough pass
+                print("PROGRESS: 22", flush=True)
             elif predicting_count == 1:
-                print("PROGRESS: 26", flush=True)   # between rough and main pass
+                print("PROGRESS: 26", flush=True)
         elif 'Saving segmentations' in line:
             print("PROGRESS: 89", flush=True)
         elif '%|' in line and predicting_count >= 2:
             try:
                 within_pct = int(line.split('%')[0].strip())
-                overall = int(28 + 60 * within_pct / 100)  # 28–88
+                overall = int(28 + 60 * within_pct / 100)
                 print("PROGRESS: {}".format(overall), flush=True)
             except (IndexError, ValueError):
                 pass

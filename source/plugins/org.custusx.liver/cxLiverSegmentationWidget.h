@@ -34,15 +34,8 @@ typedef boost::shared_ptr<class LiverSegmentationRunner> LiverSegmentationRunner
 typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
 typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
 
-/**
- * Widget for selecting and running one or more of the liver segmentation
- * filters (Liver+Pancreas, Liver Vessels, Liver Lesions, Liver Segments)
- * against up to two source volumes (CT and/or MR). Liver Vessels has no
- * MR-capable TotalSegmentator model, so it is silently skipped (with a
- * warning) for any MR volume.
- *
- * \ingroup org_custusx_liver
- */
+// Liver Vessels has no MR-capable TotalSegmentator model, so it is silently
+// skipped (with a warning) for any MR volume.
 class org_custusx_liver_EXPORT LiverSegmentationWidget : public BaseWidget
 {
 	Q_OBJECT
@@ -73,9 +66,7 @@ public:
 	static QString filterLabel(FilterKind filter);
 	static QString iniFileNameFor(FilterKind filter, IMAGE_MODALITY modality);
 	static QString progressLabel(const PlannedRun& run);
-	// The organ type(s) a filter's output mesh(es) are tagged with - the
-	// single source of truth for this mapping, also used by
-	// LiverVisibilityWidget (which organ types make up "Liver Segments").
+	// Single source of truth for this filter -> organ-type mapping.
 	static QList<ORGAN_TYPE> organTypesFor(FilterKind filter);
 
 private slots:
@@ -100,8 +91,7 @@ protected:
 	// Not pure/stateless (mutates the patient model) - protected, exercised
 	// via a thin test subclass, rather than left untested for lack of access.
 	void removePreviousResults(const QList<PlannedRun>& runs) const;
-	// Re-parents (but does NOT re-register - see cleanupPreparedImages())
-	// every mesh directly parented to resampled, to originalUid instead.
+	// Does NOT re-register the meshes (see cleanupPreparedImages()).
 	void reparentMeshesFromPreparedCopy(QString originalUid, ImagePtr resampled) const;
 
 private:

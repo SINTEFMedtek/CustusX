@@ -111,10 +111,6 @@ TEST_CASE("ImageAlgorithms: resample() works", "[integration][resource][core]")
 
 namespace
 {
-/** A synthetic 20x20x20, 1mm-spacing volume: background everywhere at
- *  backgroundValue, with a 10x10x10 "body" block (indices 5..14 on every
- *  axis) at foregroundValue - mimicking a patient body surrounded by air.
- */
 cx::ImagePtr createSyntheticBodyInAirImage(short backgroundValue, short foregroundValue)
 {
 	vtkSmartPointer<vtkImageData> raw = vtkSmartPointer<vtkImageData>::New();
@@ -143,8 +139,6 @@ TEST_CASE("ImageAlgorithms: computeOtsuThreshold() separates two intensity popul
 	CHECK(threshold > -1000);
 	CHECK(threshold < 0);
 
-	// Should adapt to a shifted (unsigned) representation just as well -
-	// same relative split, different absolute values.
 	cx::ImagePtr shiftedImage = createSyntheticBodyInAirImage(24, 1024);
 	double shiftedThreshold = cx::computeOtsuThreshold(shiftedImage->getBaseVtkImageData());
 	CHECK(shiftedThreshold > 24);
@@ -167,7 +161,6 @@ TEST_CASE("ImageAlgorithms: computeAutoCropBox() tightly bounds the foreground b
 	CHECK(paddedBox[0] == Approx(3.0));
 	CHECK(paddedBox[1] == Approx(16.0));
 
-	// Padding should clamp at the volume edge rather than exceed it.
 	cx::DoubleBoundingBox3D hugePaddingBox = cx::computeAutoCropBox(image, 1000);
 	CHECK(hugePaddingBox[0] == Approx(0.0));
 	CHECK(hugePaddingBox[1] == Approx(19.0));
@@ -194,7 +187,7 @@ TEST_CASE("ImageAlgorithms: resampleImageToMaxVoxelCount() shrinks a large volum
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr pasm = services->patient();
 
-	cx::ImagePtr image = createSyntheticImage(pasm, "big", 40, 40, 40, 1.0); // 64000 voxels
+	cx::ImagePtr image = createSyntheticImage(pasm, "big", 40, 40, 40, 1.0);
 
 	cx::ImagePtr resampled = cx::resampleImageToMaxVoxelCount(pasm, image, 8000);
 	REQUIRE(resampled);
@@ -203,7 +196,7 @@ TEST_CASE("ImageAlgorithms: resampleImageToMaxVoxelCount() shrinks a large volum
 	int dims[3];
 	resampled->getBaseVtkImageData()->GetDimensions(dims);
 	double voxelCount = static_cast<double>(dims[0]) * dims[1] * dims[2];
-	CHECK(voxelCount <= 8000 * 1.5); // some slack for integer dimension rounding
+	CHECK(voxelCount <= 8000 * 1.5);
 }
 
 TEST_CASE("ImageAlgorithms: resampleImageToMaxVoxelCount() is a no-op under the target", "[unit][resource][core]")
@@ -211,10 +204,10 @@ TEST_CASE("ImageAlgorithms: resampleImageToMaxVoxelCount() is a no-op under the 
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr pasm = services->patient();
 
-	cx::ImagePtr image = createSyntheticImage(pasm, "small", 10, 10, 10, 1.0); // 1000 voxels
+	cx::ImagePtr image = createSyntheticImage(pasm, "small", 10, 10, 10, 1.0);
 
 	cx::ImagePtr resampled = cx::resampleImageToMaxVoxelCount(pasm, image, 8000);
-	CHECK(resampled == image); // same object - no resampling performed
+	CHECK(resampled == image);
 }
 
 TEST_CASE("ImageAlgorithms: resampleImageToMaxInPlaneResolution() caps x/y and keeps z spacing", "[unit][resource][core]")
@@ -227,9 +220,9 @@ TEST_CASE("ImageAlgorithms: resampleImageToMaxInPlaneResolution() caps x/y and k
 	cx::ImagePtr resampled = cx::resampleImageToMaxInPlaneResolution(pasm, image, 20);
 	REQUIRE(resampled);
 	double* spacing = resampled->getBaseVtkImageData()->GetSpacing();
-	CHECK(spacing[0] == Approx(2.0)); // 40/20 * 1.0
+	CHECK(spacing[0] == Approx(2.0));
 	CHECK(spacing[1] == Approx(2.0));
-	CHECK(spacing[2] == Approx(1.0)); // z untouched
+	CHECK(spacing[2] == Approx(1.0));
 }
 
 TEST_CASE("ImageAlgorithms: cropImage() with an explicit box does not touch image->getCroppingBox()", "[unit][resource][core]")
@@ -246,7 +239,7 @@ TEST_CASE("ImageAlgorithms: cropImage() with an explicit box does not touch imag
 
 	int dims[3];
 	cropped->getBaseVtkImageData()->GetDimensions(dims);
-	CHECK(dims[0] == 7); // voxel indices 2..8 inclusive
+	CHECK(dims[0] == 7);
 	CHECK(dims[1] == 7);
 	CHECK(dims[2] == 7);
 
@@ -255,10 +248,6 @@ TEST_CASE("ImageAlgorithms: cropImage() with an explicit box does not touch imag
 
 TEST_CASE("ImageAlgorithms: cropImage()/resampleImageToMaxVoxelCount() use an explicit uid/name as-is", "[unit][resource][core]")
 {
-	// Regression test: an already-processed name (e.g. from a prior manual
-	// crop) must not get another default suffix silently appended on top -
-	// the caller-supplied uid/name should be used exactly, not just as a
-	// fallback.
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr pasm = services->patient();
 
@@ -277,18 +266,6 @@ TEST_CASE("ImageAlgorithms: cropImage()/resampleImageToMaxVoxelCount() use an ex
 
 TEST_CASE("ImageAlgorithms: resampleImage() alone (no prior crop) preserves physical position", "[unit][resource][core]")
 {
-	// Regression test: resampleImage() (the spacing-based overload) used to
-	// shift an image's physical center by a fraction of a voxel at the new
-	// (coarser) spacing - independent of any crop step, so this was
-	// pre-existing and affected every caller (Fraxinus's lung filters,
-	// cxResampleImageFilter, etc.), not just the liver plugin. Root cause:
-	// vtkImageResample computed its output extent by ceil()/floor()-ing the
-	// input extent scaled by oldSpacing/newSpacing, which under VTK's
-	// point-based bounds convention ((dim-1)*spacing) silently discards
-	// coverage at the far edge only, an asymmetric drift. Fixed by
-	// computing the output extent/origin directly via vtkImageReslice,
-	// splitting any leftover discretization slack evenly across both edges
-	// instead of dropping it all on one - see resampleImage()'s comment.
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr pasm = services->patient();
 
@@ -305,16 +282,12 @@ TEST_CASE("ImageAlgorithms: resampleImage() alone (no prior crop) preserves phys
 
 TEST_CASE("ImageAlgorithms: cropImage() then resampleImageToMaxVoxelCount() preserves physical position", "[unit][resource][core]")
 {
-	// Regression test matching the reported symptom directly: running
-	// Liver+Pancreas against two volumes at once showed the two resulting
-	// liver meshes in different physical locations - see the
-	// resampleImage()-alone test above for the isolated root cause/fix.
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr pasm = services->patient();
 
 	cx::ImagePtr original = createSyntheticImage(pasm, "original", 40, 40, 40, 1.0);
 
-	cx::DoubleBoundingBox3D cropBox(5, 24, 5, 24, 5, 24); // 20x20x20 region, center at (14.5,14.5,14.5)
+	cx::DoubleBoundingBox3D cropBox(5, 24, 5, 24, 5, 24);
 	cx::Vector3D expectedPhysicalCenter = original->get_rMd().coord(cropBox.center());
 
 	cx::ImagePtr cropped = cx::cropImage(pasm, original, cropBox);
@@ -324,10 +297,9 @@ TEST_CASE("ImageAlgorithms: cropImage() then resampleImageToMaxVoxelCount() pres
 	CHECK(croppedPhysicalCenter[1] == Approx(expectedPhysicalCenter[1]));
 	CHECK(croppedPhysicalCenter[2] == Approx(expectedPhysicalCenter[2]));
 
-	// Force an actual resample (target well below the cropped voxel count).
 	cx::ImagePtr resampled = cx::resampleImageToMaxVoxelCount(pasm, cropped, 1000);
 	REQUIRE(resampled);
-	REQUIRE(resampled != cropped); // confirm it actually resampled, not a no-op
+	REQUIRE(resampled != cropped);
 	cx::Vector3D resampledPhysicalCenter = resampled->get_rMd().coord(resampled->boundingBox().center());
 	CHECK(resampledPhysicalCenter[0] == Approx(expectedPhysicalCenter[0]));
 	CHECK(resampledPhysicalCenter[1] == Approx(expectedPhysicalCenter[1]));
@@ -336,10 +308,6 @@ TEST_CASE("ImageAlgorithms: cropImage() then resampleImageToMaxVoxelCount() pres
 
 TEST_CASE("ImageAlgorithms: computeAutoCropBox() returns the full volume for a uniform image", "[unit][resource][core]")
 {
-	// No separable foreground/background - computeOtsuThreshold() degenerates
-	// to range[0], under which every voxel counts as foreground, so the
-	// result should still cover the whole volume (rather than, say, an
-	// empty or otherwise invalid box).
 	cx::ImagePtr image = createSyntheticBodyInAirImage(0, 0);
 	cx::DoubleBoundingBox3D box = cx::computeAutoCropBox(image, 0);
 	cx::DoubleBoundingBox3D fullVolume = image->boundingBox();

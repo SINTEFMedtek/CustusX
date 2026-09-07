@@ -24,16 +24,8 @@ namespace cx
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 typedef boost::shared_ptr<class FilterTimedAlgorithm> FilterTimedAlgorithmPtr;
 
-/**
- * One queued filter run: an .ini file to run against a specific image.
- *
- * key identifies this run for progress reporting (see LiverSegmentationWidget) -
- * it is set by the caller rather than derived from image, since image may be
- * a resampled copy of the volume the caller (and its progress bars) actually
- * refer to.
- *
- * \ingroup org_custusx_liver
- */
+// key is set by the caller rather than derived from image, since image may be
+// a resampled copy of the volume the caller's progress bars actually refer to.
 struct org_custusx_liver_EXPORT QueuedRun
 {
 	QString iniFileName;
@@ -41,12 +33,6 @@ struct org_custusx_liver_EXPORT QueuedRun
 	QString key;
 };
 
-/**
- * Runs a queue of liver .ini filter files sequentially, each against its
- * own image, one GenericScriptFilter run at a time.
- *
- * \ingroup org_custusx_liver
- */
 class org_custusx_liver_EXPORT LiverSegmentationRunner : public QObject
 {
 	Q_OBJECT

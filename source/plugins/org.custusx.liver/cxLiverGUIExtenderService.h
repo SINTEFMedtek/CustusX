@@ -19,11 +19,6 @@ class ctkPluginContext;
 namespace cx
 {
 
-/**
- * Implementation of the liver surgery preparation GUI extension.
- *
- * \ingroup org_custusx_liver
- */
 class org_custusx_liver_EXPORT LiverGUIExtenderService : public GUIExtenderService
 {
 	Q_INTERFACES(cx::GUIExtenderService)
