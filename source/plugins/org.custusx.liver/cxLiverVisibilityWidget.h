@@ -24,7 +24,7 @@ class QGridLayout;
 namespace cx
 {
 
-typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
+typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
 
 struct org_custusx_liver_EXPORT SelectableLiverStructure
 {
@@ -76,7 +76,7 @@ private:
 	void hideData(QString uid);
 
 	VisServicesPtr mServices;
-	StringPropertyActiveImagePtr mSourceImageSelector;
+	StringPropertySelectImagePtr mSourceImageSelector;
 	QMap<ORGAN_TYPE, SelectableLiverStructure> mStructures;
 	QList<ORGAN_TYPE> mSegmentOrganTypes;
 	QPushButton* mAllSegmentsButton;
