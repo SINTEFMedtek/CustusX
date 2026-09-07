@@ -60,6 +60,11 @@ LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* p
 
 	QGridLayout* imageSelectorLayout = new QGridLayout();
 	new DataSelectWidget(mServices->view(), mServices->patient(), this, mSourceImageSelector, imageSelectorLayout, 0);
+	// Column 1 is the combobox itself (0=label, 2=show/remove buttons) -
+	// stretch it to show more of the volume's name, matching how
+	// ActiveVolumeWidget's combobox (used in "Volume Properties") expands
+	// to fill its own layout.
+	imageSelectorLayout->setColumnStretch(1, 1);
 
 	mSourceVolumeButton = new QPushButton("Source Volume");
 	connect(mSourceVolumeButton, &QPushButton::clicked, this, &LiverVisibilityWidget::toggleSourceVolume);

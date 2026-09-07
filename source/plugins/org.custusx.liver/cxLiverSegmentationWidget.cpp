@@ -68,6 +68,11 @@ LiverSegmentationWidget::LiverSegmentationWidget(VisServicesPtr services, QWidge
 	QGridLayout* imageSelectorLayout = new QGridLayout();
 	new DataSelectWidget(mServices->view(), mServices->patient(), this, mImageSelector, imageSelectorLayout, 0);
 	new DataSelectWidget(mServices->view(), mServices->patient(), this, mImageSelector2, imageSelectorLayout, 1);
+	// Column 1 is the combobox itself (0=label, 2=show/remove buttons) -
+	// stretch it to show more of the volume's name, matching how
+	// ActiveVolumeWidget's combobox (used in "Volume Properties") expands
+	// to fill its own layout.
+	imageSelectorLayout->setColumnStretch(1, 1);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->addLayout(imageSelectorLayout);
