@@ -19,7 +19,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxLiverSegmentationWidget.h"
 #include "cxPatientModelService.h"
-#include "cxActiveData.h"
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxImage.h"
@@ -40,22 +39,14 @@ SelectableLiverStructure::SelectableLiverStructure() :
 LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, this->getWidgetName(), "Liver Visibility"),
 	mServices(services),
-	mSourceImageSelector(StringPropertySelectImage::New(services->patient())),
+	mSourceImageSelector(StringPropertyActiveImage::New(services->patient())),
 	mAllSegmentsButton(nullptr),
 	mAllSegmentsViewEnabled(false),
 	mSourceVolumeButton(nullptr),
 	mSourceVolumeViewEnabled(false)
 {
-	mSourceImageSelector->setValueName("Source Image");
-	mSourceImageSelector->setHelp("Which segmented volume's structures to show/hide - independent of the app's active image");
-	// An independent selection (not tied to the app's active image, unlike
-	// the segmentation widget's "Volume 1"): switching source image here
-	// should not also change what's active elsewhere, and this selector
-	// should not silently follow whatever else changes the active image
-	// out from under the user. Auto-filled with the current active image
-	// once, purely for convenience, then left alone.
-	if (ImagePtr activeImage = mServices->patient()->getActiveData()->getActive<Image>())
-		mSourceImageSelector->setValue(activeImage->getUid());
+	mSourceImageSelector->setValueName("Source Image (Active)");
+	mSourceImageSelector->setHelp("The active volume - shows/hides its segmented structures");
 	connect(mSourceImageSelector.get(), &SelectDataStringPropertyBase::dataChanged, this, &LiverVisibilityWidget::refreshStructures);
 
 	QGridLayout* imageSelectorLayout = new QGridLayout();
