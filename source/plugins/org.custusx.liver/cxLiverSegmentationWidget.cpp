@@ -290,14 +290,19 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 
 ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) const
 {
-	// One fixed name for whatever this ends up producing, rather than
+	// One fixed uid for whatever this ends up producing, rather than
 	// chaining each step's own default suffix onto the previous result's
-	// name (e.g. cropImage()'s own default would turn an already-cropped
+	// uid/name (e.g. cropImage()'s own default would turn an already-cropped
 	// "CT crop" into "CT crop crop", and a further resample into
-	// "CT crop crop res" - compounding indefinitely across repeated runs
-	// and confusing the resulting mesh names).
+	// "CT crop crop res" - compounding indefinitely across repeated runs).
+	// The *name* is kept identical to the original's, not decorated: the
+	// resulting mesh's own name is derived from this image's name
+	// (GenericScriptFilter uses its filter input's name to name the output
+	// mask, which in turn names the mesh), and that name persists on the
+	// mesh long after this temporary image is deleted - a decorated name
+	// here would permanently show up in every mesh name.
 	QString preparedUid = image->getUid() + "_prepared";
-	QString preparedName = image->getName() + " (prepared for segmentation)";
+	QString preparedName = image->getName();
 
 	// Logged at each step (this all runs synchronously on the main thread -
 	// unlike contourFilter()'s marching-cubes/smoothing, none of this is

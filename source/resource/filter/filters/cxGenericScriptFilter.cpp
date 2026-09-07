@@ -1283,13 +1283,14 @@ int GenericScriptFilter::countPlannedMeshes(QStringList createOutputMeshList) co
 
 QString GenericScriptFilter::createImageName(QString parentName, QString filePath)
 {
+	// mResultFileEnding (e.g. "_liverPancreas", "_lobe") disambiguates output
+	// *files on disk* between filters, but is redundant on the *display name*
+	// once the output class (e.g. "Liver", "Liversegment1") is appended below,
+	// and otherwise just leaks into every derived mesh's name.
 	QString retval = parentName;
-	QString nameEnding = mResultFileEnding;
-	nameEnding.replace(".mhd", "");
 	int classNumber = getClassNumber(filePath);
 	if(mOutputClasses.size() > classNumber)
 		retval = retval + QString("_") + mOutputClasses[classNumber];
-	retval.append(nameEnding);
 	return retval;
 }
 
