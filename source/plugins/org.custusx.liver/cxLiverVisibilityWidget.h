@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 class QPushButton;
 class QGridLayout;
+class QComboBox;
 
 namespace cx
 {
@@ -62,6 +63,7 @@ private slots:
 	void refreshStructures();
 	void toggleAllSegments();
 	void toggleSourceVolume();
+	void rebuildViewGroupSelector();
 
 private:
 	ImagePtr sourceImage() const;
@@ -71,12 +73,14 @@ private:
 	void updateAllSegmentsButtonColor();
 	void updateSourceVolumeButtonColor();
 	MeshPtr findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const;
+	int selectedViewGroupIndex() const;
 	bool isShown(QString uid) const;
 	void showData(QString uid);
 	void hideData(QString uid);
 
 	VisServicesPtr mServices;
 	StringPropertyActiveImagePtr mSourceImageSelector;
+	QComboBox* mViewGroupSelector;
 	QMap<ORGAN_TYPE, SelectableLiverStructure> mStructures;
 	QList<ORGAN_TYPE> mSegmentOrganTypes;
 	QPushButton* mAllSegmentsButton;

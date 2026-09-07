@@ -14,7 +14,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QPushButton>
 #include <QGridLayout>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QGroupBox>
+#include <QComboBox>
+#include <QLabel>
 
 #include "cxVisServices.h"
 #include "cxLiverSegmentationWidget.h"
@@ -26,6 +29,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSelectDataStringProperty.h"
 #include "cxDataSelectWidget.h"
 #include "cxStyles.h"
+#include "cxLogger.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {
@@ -60,6 +65,14 @@ LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* p
 	mSourceVolumeButton = new QPushButton("Source Volume");
 	connect(mSourceVolumeButton, &QPushButton::clicked, this, &LiverVisibilityWidget::toggleSourceVolume);
 
+	mViewGroupSelector = new QComboBox(this);
+	this->rebuildViewGroupSelector();
+	connect(mViewGroupSelector, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LiverVisibilityWidget::refreshStructures);
+	connect(mServices->view().get(), &ViewService::activeViewChanged, this, &LiverVisibilityWidget::rebuildViewGroupSelector);
+	QHBoxLayout* viewGroupLayout = new QHBoxLayout();
+	viewGroupLayout->addWidget(new QLabel("Show/hide in view group"));
+	viewGroupLayout->addWidget(mViewGroupSelector, 1);
+
 	QGridLayout* structuresLayout = new QGridLayout();
 	int row = 0;
 	this->addStructureButton(otLIVER, "Liver", structuresLayout, row++);
@@ -85,6 +98,7 @@ LiverVisibilityWidget::LiverVisibilityWidget(VisServicesPtr services, QWidget* p
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->addLayout(imageSelectorLayout);
 	layout->addWidget(mSourceVolumeButton);
+	layout->addLayout(viewGroupLayout);
 	layout->addWidget(structuresGroup);
 	layout->addWidget(segmentsGroup);
 	layout->addStretch();
@@ -144,17 +158,26 @@ MeshPtr LiverVisibilityWidget::findMeshForSourceImage(ORGAN_TYPE organType, Imag
 	std::map<QString, MeshPtr> candidates = mServices->patient()->getDataOfType<Mesh>(organType);
 	std::map<QString, MeshPtr>::iterator it;
 	for (it = candidates.begin(); it != candidates.end(); ++it)
-		if (it->second && this->descendsFrom(mServices->patient(), it->second->getParentSpace(), sourceImage->getUid()))
+	{
+		bool matches = it->second && this->descendsFrom(mServices->patient(), it->second->getParentSpace(), sourceImage->getUid());
+		CX_LOG_INFO() << "LiverVisibilityWidget: findMeshForSourceImage(" << enum2string(organType) << ", " << sourceImage->getUid()
+		              << "): candidate " << it->first << " parent=" << (it->second ? it->second->getParentSpace() : "<null>")
+		              << " matches=" << matches;
+		if (matches)
 			return it->second;
+	}
 	return MeshPtr();
+}
+
+int LiverVisibilityWidget::selectedViewGroupIndex() const
+{
+	int index = mViewGroupSelector->currentIndex();
+	return index >= 0 ? index : 0;
 }
 
 bool LiverVisibilityWidget::isShown(QString uid) const
 {
-	if (mServices->view()->groupCount() == 0)
-		return false;
-
-	ViewGroupDataPtr viewGroup = mServices->view()->getGroup(0);
+	ViewGroupDataPtr viewGroup = mServices->view()->getGroup(this->selectedViewGroupIndex());
 	if (!viewGroup)
 		return false;
 
@@ -165,9 +188,23 @@ bool LiverVisibilityWidget::isShown(QString uid) const
 	return false;
 }
 
+void LiverVisibilityWidget::rebuildViewGroupSelector()
+{
+	int previousIndex = mViewGroupSelector->currentIndex();
+	mViewGroupSelector->blockSignals(true);
+	mViewGroupSelector->clear();
+	for (unsigned i = 0; i < mServices->view()->groupCount(); ++i)
+		mViewGroupSelector->addItem(QString("View group %1").arg(i + 1));
+	int newIndex = (previousIndex >= 0 && previousIndex < mViewGroupSelector->count()) ? previousIndex : 0;
+	mViewGroupSelector->setCurrentIndex(newIndex);
+	mViewGroupSelector->blockSignals(false);
+}
+
 void LiverVisibilityWidget::refreshStructures()
 {
 	ImagePtr sourceImage = this->sourceImage();
+	CX_LOG_INFO() << "LiverVisibilityWidget::refreshStructures: source image = "
+	              << (sourceImage ? sourceImage->getUid() : "<none>");
 
 	QMapIterator<ORGAN_TYPE, SelectableLiverStructure> i(mStructures);
 	while (i.hasNext())
@@ -269,22 +306,14 @@ void LiverVisibilityWidget::updateSourceVolumeButtonColor()
 
 void LiverVisibilityWidget::showData(QString uid)
 {
-	for (unsigned i = 0; i < mServices->view()->groupCount(); ++i)
-	{
-		ViewGroupDataPtr viewGroup = mServices->view()->getGroup(i);
-		if (viewGroup)
-			viewGroup->addData(uid);
-	}
+	if (ViewGroupDataPtr viewGroup = mServices->view()->getGroup(this->selectedViewGroupIndex()))
+		viewGroup->addData(uid);
 }
 
 void LiverVisibilityWidget::hideData(QString uid)
 {
-	for (unsigned i = 0; i < mServices->view()->groupCount(); ++i)
-	{
-		ViewGroupDataPtr viewGroup = mServices->view()->getGroup(i);
-		if (viewGroup)
-			viewGroup->removeData(uid);
-	}
+	if (ViewGroupDataPtr viewGroup = mServices->view()->getGroup(this->selectedViewGroupIndex()))
+		viewGroup->removeData(uid);
 }
 
 } /* namespace cx */
