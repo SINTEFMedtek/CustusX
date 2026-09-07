@@ -34,8 +34,15 @@ typedef boost::shared_ptr<class LiverSegmentationRunner> LiverSegmentationRunner
 typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
 typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
 
-// Liver Vessels has no MR-capable TotalSegmentator model, so it is silently
-// skipped (with a warning) for any MR volume.
+/**
+ * Widget for selecting and running one or more of the liver segmentation
+ * filters (Liver+Pancreas, Liver Vessels, Liver Lesions, Liver Segments)
+ * against up to two source volumes (CT and/or MR). Liver Vessels has no
+ * MR-capable TotalSegmentator model, so it is silently skipped (with a
+ * warning) for any MR volume.
+ *
+ * \ingroup org_custusx_liver
+ */
 class org_custusx_liver_EXPORT LiverSegmentationWidget : public BaseWidget
 {
 	Q_OBJECT

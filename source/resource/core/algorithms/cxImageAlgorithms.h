@@ -40,12 +40,51 @@ namespace cx
 
 cxResource_EXPORT ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
 cxResource_EXPORT ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, Transform3D refMi);
+/**
+ * Resample an image so its in-plane (x/y) resolution is capped at maxInPlaneDimension
+ * pixels, keeping the z spacing unchanged. Used to bound the size of volumes passed to
+ * downstream algorithms (e.g. segmentation) that would otherwise be too slow or memory-
+ * heavy on large/uncropped input. Returns the input image unchanged if it has no scalar
+ * data. The image is not added to the data manager nor saved.
+ */
 cxResource_EXPORT ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServicePtr dataManager, ImagePtr image, int maxInPlaneDimension, QString uid="", QString name="");
+/**
+ * Resample an image so its total voxel count is capped at maxVoxelCount, scaling
+ * all three axes uniformly. Unlike resampleImageToMaxInPlaneResolution(), this
+ * also bounds the z extent, so it is suitable for volumes whose z extent may be
+ * large (e.g. whole-body scans) rather than only assuming a short one (e.g.
+ * chest-only scans). Returns the input image unchanged if it is already at or
+ * below maxVoxelCount, or if it has no scalar data. The image is not added to
+ * the data manager nor saved.
+ */
 cxResource_EXPORT ImagePtr resampleImageToMaxVoxelCount(PatientModelServicePtr dataManager, ImagePtr image, double maxVoxelCount, QString uid="", QString name="");
+/**
+ * Compute an intensity threshold separating background (e.g. surrounding
+ * air) from foreground (e.g. the patient body) using Otsu's method: the
+ * threshold that best splits the volume's own intensity histogram into two
+ * classes. Adapts to the actual data instead of assuming a fixed cutoff
+ * (e.g. a Hounsfield-unit value), which would be wrong for MR, or for CT
+ * that has been shifted to an unsigned representation.
+ */
 cxResource_EXPORT double computeOtsuThreshold(vtkImageDataPtr image);
+/**
+ * Compute a bounding box (in the image's own mm space, as used by
+ * Image::setCroppingBox()) tightly enclosing the voxels at or above an
+ * automatically-selected threshold (see computeOtsuThreshold()), expanded
+ * by paddingVoxels on each side. Intended to auto-crop away surrounding
+ * air/background before an expensive downstream operation. Falls back to
+ * the image's full bounding box if no voxels are at or above the threshold.
+ */
 cxResource_EXPORT DoubleBoundingBox3D computeAutoCropBox(ImagePtr image, int paddingVoxels = 5);
 cxResource_EXPORT vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
+/** Crop using an explicit mm-space box, without reading or modifying
+ *  image->getCroppingBox()/setCroppingBox(). uid/name default to
+ *  image->getUid()/getName() with " crop%1" appended, as for the no-box
+ *  overload below.
+ */
 cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image, DoubleBoundingBox3D box, QString uid="", QString name="");
+/** Crop using the box already stored on the image (image->getCroppingBox()).
+ */
 cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image);
 cxResource_EXPORT ImagePtr duplicateImage(PatientModelServicePtr dataManager, ImagePtr image);
 

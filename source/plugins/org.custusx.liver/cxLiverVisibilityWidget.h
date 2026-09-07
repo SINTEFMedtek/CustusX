@@ -37,9 +37,15 @@ struct org_custusx_liver_EXPORT SelectableLiverStructure
 	SelectableLiverStructure();
 };
 
-// Scoped to one selected source image at a time, since running segmentation
-// against more than one volume can produce several meshes sharing the same
-// organ type, one per source image.
+/**
+ * Widget for toggling visibility of the segmented liver structures
+ * (liver, pancreas, vessels, lesions, Couinaud segments) in the 2D/3D views,
+ * scoped to one selected source image at a time (since running segmentation
+ * against more than one volume can produce several meshes sharing the same
+ * organ type, one per source image).
+ *
+ * \ingroup org_custusx_liver
+ */
 class org_custusx_liver_EXPORT LiverVisibilityWidget : public BaseWidget
 {
 	Q_OBJECT

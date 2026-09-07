@@ -111,6 +111,10 @@ TEST_CASE("ImageAlgorithms: resample() works", "[integration][resource][core]")
 
 namespace
 {
+/** A synthetic 20x20x20, 1mm-spacing volume: background everywhere at
+ *  backgroundValue, with a 10x10x10 "body" block (indices 5..14 on every
+ *  axis) at foregroundValue - mimicking a patient body surrounded by air.
+ */
 cx::ImagePtr createSyntheticBodyInAirImage(short backgroundValue, short foregroundValue)
 {
 	vtkSmartPointer<vtkImageData> raw = vtkSmartPointer<vtkImageData>::New();

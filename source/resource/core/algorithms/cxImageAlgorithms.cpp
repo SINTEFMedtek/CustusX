@@ -119,6 +119,10 @@ ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const
 	return retval;
 }
 
+/** Return an image resampled so its in-plane (x/y) resolution is capped at
+ *  maxInPlaneDimension pixels, keeping the z spacing unchanged.
+ *  The image is not added to the data manager nor saved.
+ */
 ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServicePtr dataManager, ImagePtr image, int maxInPlaneDimension, QString uid, QString name)
 {
 	vtkImageDataPtr vtkImageGrayscale = image->getGrayScaleVtkImageData();
@@ -136,6 +140,11 @@ ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServicePtr dataManager,
 	return resampleImage(dataManager, image, newSpacing, uid, name);
 }
 
+/** Return an image resampled so its total voxel count is capped at maxVoxelCount,
+ *  scaling all three axes uniformly. Returns the input unchanged if it is already
+ *  at or below maxVoxelCount.
+ *  The image is not added to the data manager nor saved.
+ */
 ImagePtr resampleImageToMaxVoxelCount(PatientModelServicePtr dataManager, ImagePtr image, double maxVoxelCount, QString uid, QString name)
 {
 	vtkImageDataPtr vtkImageGrayscale = image->getGrayScaleVtkImageData();
@@ -157,6 +166,10 @@ ImagePtr resampleImageToMaxVoxelCount(PatientModelServicePtr dataManager, ImageP
 	return resampleImage(dataManager, image, newSpacing, uid, name);
 }
 
+/** Otsu's method: given a histogram, find the threshold (bin index) that
+ *  maximizes the between-class variance of the two classes it splits the
+ *  histogram into. Standard textbook algorithm.
+ */
 namespace
 {
 int otsuThresholdBin(const std::vector<double>& histogram)
@@ -225,6 +238,10 @@ double computeOtsuThreshold(vtkImageDataPtr image)
 
 namespace
 {
+/** Scan the raw voxel buffer for the tight index range containing all
+ *  voxels at or above threshold. bounds is {xmin,xmax,ymin,ymax,zmin,zmax};
+ *  a xmin>xmax (etc.) result on return means nothing matched.
+ */
 template <class T>
 void findThresholdVoxelBounds(T* data, const int dims[3], double threshold, int bounds[6])
 {
