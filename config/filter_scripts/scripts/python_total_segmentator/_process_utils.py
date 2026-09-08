@@ -8,10 +8,51 @@
 import atexit
 import os
 import select
+import shutil
 import signal
 import subprocess
 import sys
 import time
+
+
+def _memoryCapBytes():
+    # TotalSegmentator's own memory use has repeatedly been observed
+    # ballooning past 20-25GB and taking the whole machine down via
+    # swap-thrashing (confirmed via kernel OOM-killer logs) rather than
+    # being cleanly killed - leave enough headroom for the rest of the
+    # system (CustusX/CustusS itself, the desktop, other applications)
+    # by capping at a fraction of total physical RAM, not a fixed value.
+    # CX_TOTALSEGMENTATOR_MEMORY_LIMIT_GB (set from the GUI's advanced
+    # options) overrides this automatic default when present.
+    override = os.environ.get('CX_TOTALSEGMENTATOR_MEMORY_LIMIT_GB')
+    if override:
+        try:
+            return int(float(override) * 1024 ** 3)
+        except ValueError:
+            pass
+    try:
+        total = os.sysconf('SC_PHYS_PAGES') * os.sysconf('SC_PAGE_SIZE')
+    except (ValueError, OSError, AttributeError):
+        return None
+    return int(total * 0.6)
+
+
+def _wrapWithMemoryLimit(args):
+    # Runs args in a transient systemd scope with a memory cgroup limit and
+    # no swap allowed, so hitting the cap kills just this process tree
+    # cleanly (surfacing as a normal non-zero exit code, same as any other
+    # TotalSegmentator failure) instead of the whole system swap-thrashing
+    # into unresponsiveness. Falls back to an unrestricted launch if
+    # systemd-run isn't available - this is defense in depth, not the
+    # primary way of keeping memory use in check.
+    systemdRun = shutil.which('systemd-run')
+    cap = _memoryCapBytes()
+    if not systemdRun or not cap:
+        return args
+    return [systemdRun, '--user', '--scope', '--quiet', '--collect',
+            '-p', 'MemoryMax={}'.format(cap),
+            '-p', 'MemorySwapMax=0',
+            '--'] + args
 
 
 class ManagedProcess:
@@ -29,7 +70,7 @@ class ManagedProcess:
 
     def __init__(self, args):
         self.process = subprocess.Popen(
-            args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            _wrapWithMemoryLimit(args), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, bufsize=1, start_new_session=True
         )
         self._pgid = self.process.pid
