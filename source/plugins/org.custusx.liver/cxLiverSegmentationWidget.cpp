@@ -277,6 +277,9 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 			{
 				prepared = this->prepareImageForHeavyFilter(run.image);
 				mServices->patient()->insertData(prepared);
+				// Purely an internal implementation detail (see cleanupPreparedImages()) -
+				// exclude it from volume selectors etc. while the run is in progress.
+				mServices->patient()->makeAvailable(prepared->getUid(), false);
 			}
 			queuedRun.image = prepared;
 		}
