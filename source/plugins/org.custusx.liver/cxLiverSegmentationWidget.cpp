@@ -23,6 +23,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLayoutItem>
 #include <QPair>
 #include <QDoubleSpinBox>
+#include <QHBoxLayout>
+#include <QToolButton>
+#include <QAction>
+#include <QIcon>
 
 #include "cxLiverSegmentationRunner.h"
 #include "cxVisServices.h"
@@ -71,13 +75,20 @@ LiverSegmentationWidget::LiverSegmentationWidget(VisServicesPtr services, QWidge
 	// Column 1 is the combobox itself (0=label, 2=show/remove buttons).
 	imageSelectorLayout->setColumnStretch(1, 1);
 
-	mAdvancedOptionsButton = new QCheckBox("Show advanced options");
-	connect(mAdvancedOptionsButton, &QCheckBox::toggled, this, &LiverSegmentationWidget::showAdvancedOptions);
+	QAction* advancedOptionsAction = this->createAction(this,
+	                                                     QIcon(":/icons/open_icon_library/system-run-5.png"),
+	                                                     "Advanced Options", "Toggle advanced options",
+	                                                     SLOT(toggleAdvancedOptions()), NULL);
+	QToolButton* advancedOptionsButton = new QToolButton();
+	advancedOptionsButton->setDefaultAction(advancedOptionsAction);
+	QHBoxLayout* advancedOptionsButtonLayout = new QHBoxLayout();
+	advancedOptionsButtonLayout->addWidget(advancedOptionsButton);
+	advancedOptionsButtonLayout->addStretch();
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->addLayout(imageSelectorLayout);
 	layout->addWidget(this->buildSegmentationGroup());
-	layout->addWidget(mAdvancedOptionsButton);
+	layout->addLayout(advancedOptionsButtonLayout);
 	layout->addWidget(this->buildAdvancedOptionsGroup());
 	layout->addWidget(this->buildProcessingInfoGroup());
 	layout->addWidget(mRunSegmentationButton);
@@ -233,9 +244,9 @@ void LiverSegmentationWidget::selectAll(bool checked)
 	mCheckBoxLiverSegments->setChecked(checked);
 }
 
-void LiverSegmentationWidget::showAdvancedOptions(bool show)
+void LiverSegmentationWidget::toggleAdvancedOptions()
 {
-	mAdvancedOptionsGroup->setVisible(show);
+	mAdvancedOptionsGroup->setVisible(mAdvancedOptionsGroup->isHidden());
 }
 
 QList<LiverSegmentationWidget::PlannedRun> LiverSegmentationWidget::buildPlannedRuns() const

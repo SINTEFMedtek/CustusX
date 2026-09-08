@@ -81,7 +81,7 @@ public:
 private slots:
 	void runOrStopButtonClicked();
 	void selectAll(bool checked);
-	void showAdvancedOptions(bool show);
+	void toggleAdvancedOptions();
 	void updateRunButtonState();
 	void onFilterStarted(QString key);
 	void onProgressChanged(int percent);
@@ -118,7 +118,6 @@ private:
 	QCheckBox* mCheckBoxLiverLesions;
 	QCheckBox* mCheckBoxLiverSegments;
 	QCheckBox* mCheckBoxSelectAll;
-	QCheckBox* mAdvancedOptionsButton;
 	QCheckBox* mCheckBoxFastMode;
 	QDoubleSpinBox* mMemoryLimitSpinBox;
 	QPushButton* mRunSegmentationButton;
