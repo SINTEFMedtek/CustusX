@@ -51,6 +51,9 @@ class org_custusx_core_filemanager_EXPORT ImportWidget  : public BaseWidget
 public:
 	ImportWidget(FileManagerServicePtr filemanager, VisServicesPtr services);
 
+	// Pure/stateless - public so it can be unit tested directly.
+	static bool shouldWarnNoDICOMFound(bool fromUSB, bool addedDICOM);
+
 signals:
 	void readyToImport();
 	void finishedImporting();

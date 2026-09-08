@@ -378,6 +378,14 @@ bool ImportWidget::tryAutoAssignModalitiesForCT(ImportDataTypeWidget* widget)
 	return false;
 }
 
+bool ImportWidget::shouldWarnNoDICOMFound(bool fromUSB, bool addedDICOM)
+{
+	// Only relevant for the USB import action, which only ever expects DICOM
+	// data on the stick - the general "add files" dialog also accepts plain
+	// image files (.mhd/.raw etc.), which legitimately have no DICOM data.
+	return fromUSB && !addedDICOM;
+}
+
 ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype, bool fromUSB)
 {
 	ImportDataTypeWidget *widget = NULL;
@@ -423,7 +431,7 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY mod
 		}
 	}
 
-	if(!addedDICOM)
+	if(ImportWidget::shouldWarnNoDICOMFound(fromUSB, addedDICOM))
 		QMessageBox::information(this, "DICOM not found", "No DICOM data was found");
 
 	this->generateParentCandidates();
