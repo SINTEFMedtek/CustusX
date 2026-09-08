@@ -201,10 +201,19 @@ void LiverVisibilityWidget::refreshStructures()
 	}
 
 	bool anySegmentPresent = false;
+	bool allPresentSegmentsShown = true;
 	for (int i = 0; i < mSegmentOrganTypes.size(); ++i)
-		anySegmentPresent |= (mStructures[mSegmentOrganTypes[i]].mMesh != nullptr);
+	{
+		const SelectableLiverStructure& segment = mStructures[mSegmentOrganTypes[i]];
+		if (!segment.mMesh)
+			continue;
+		anySegmentPresent = true;
+		allPresentSegmentsShown = allPresentSegmentsShown && segment.mViewEnabled;
+	}
+	mAllSegmentsViewEnabled = anySegmentPresent && allPresentSegmentsShown;
 	if (mAllSegmentsButton)
 		mAllSegmentsButton->setEnabled(anySegmentPresent);
+	this->updateAllSegmentsButtonColor();
 
 	mSourceVolumeViewEnabled = sourceImage && this->isShown(sourceImage->getUid());
 	mSourceVolumeButton->setEnabled(sourceImage != nullptr);
