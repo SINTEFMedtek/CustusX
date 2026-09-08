@@ -26,6 +26,7 @@ class QPushButton;
 class QLabel;
 class QProgressBar;
 class QVBoxLayout;
+class QDoubleSpinBox;
 
 namespace cx
 {
@@ -65,6 +66,8 @@ public:
 		ImagePtr image;
 		QString iniFileName;
 		QString key;
+		bool fastMode = false;
+		double memoryLimitGB = 0; // 0 = automatic (see _process_utils.py)
 	};
 
 	// Pure/stateless - public so they can be unit tested directly, without
@@ -78,6 +81,7 @@ public:
 private slots:
 	void runOrStopButtonClicked();
 	void selectAll(bool checked);
+	void showAdvancedOptions(bool show);
 	void updateRunButtonState();
 	void onFilterStarted(QString key);
 	void onProgressChanged(int percent);
@@ -85,6 +89,7 @@ private slots:
 
 private:
 	QGroupBox* buildSegmentationGroup();
+	QGroupBox* buildAdvancedOptionsGroup();
 	QGroupBox* buildProcessingInfoGroup();
 	void rebuildProgressBars(const QList<PlannedRun>& runs);
 	QList<PlannedRun> buildPlannedRuns() const;
@@ -113,8 +118,12 @@ private:
 	QCheckBox* mCheckBoxLiverLesions;
 	QCheckBox* mCheckBoxLiverSegments;
 	QCheckBox* mCheckBoxSelectAll;
+	QCheckBox* mAdvancedOptionsButton;
+	QCheckBox* mCheckBoxFastMode;
+	QDoubleSpinBox* mMemoryLimitSpinBox;
 	QPushButton* mRunSegmentationButton;
 	QGroupBox* mSegmentationGroup;
+	QGroupBox* mAdvancedOptionsGroup;
 	QGroupBox* mProcessingInfoGroup;
 	QVBoxLayout* mProgressBarsLayout;
 	QMap<QString, QProgressBar*> mProgressBars;

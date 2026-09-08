@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSettings.h"
 #include "cxProcessWrapper.h"
 #include <QColor>
+#include <QMap>
 #include "cxSelectDataStringProperty.h"
 
 
@@ -89,6 +90,12 @@ public:
 	// terminate any child process it spawned (e.g. a TotalSegmentator
 	// subprocess) - SIGKILL would leave such a child orphaned.
 	void requestStop();
+	// Appended (space-separated) after the .ini file's own "arguments"
+	// value, becoming one extra element of the script's own sys.argv.
+	void setExtraCommandLineArguments(QString args);
+	// Set in the launched process' environment, in addition to (or
+	// overriding) the inherited system environment.
+	void setExtraEnvironmentVariable(QString name, QString value);
 
 signals:
 	void scriptOutput(const QString& line);
@@ -165,6 +172,8 @@ protected:
 	SCRIPT_ENGINE mScriptEngine = seUnknown;
 	RaidionicsPtr mRaidionicsUtilities = nullptr;
 	QString mLineBuffer;
+	QString mExtraCommandLineArguments;
+	QMap<QString, QString> mExtraEnvironmentVariables;
 
 protected slots:
 	void scriptFileChanged();

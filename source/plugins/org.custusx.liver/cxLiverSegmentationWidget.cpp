@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFrame>
 #include <QLayoutItem>
 #include <QPair>
+#include <QDoubleSpinBox>
 
 #include "cxLiverSegmentationRunner.h"
 #include "cxLiverVisibilityWidget.h"
@@ -71,9 +72,14 @@ LiverSegmentationWidget::LiverSegmentationWidget(VisServicesPtr services, QWidge
 	// Column 1 is the combobox itself (0=label, 2=show/remove buttons).
 	imageSelectorLayout->setColumnStretch(1, 1);
 
+	mAdvancedOptionsButton = new QCheckBox("Show advanced options");
+	connect(mAdvancedOptionsButton, &QCheckBox::toggled, this, &LiverSegmentationWidget::showAdvancedOptions);
+
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->addLayout(imageSelectorLayout);
 	layout->addWidget(this->buildSegmentationGroup());
+	layout->addWidget(mAdvancedOptionsButton);
+	layout->addWidget(this->buildAdvancedOptionsGroup());
 	layout->addWidget(this->buildProcessingInfoGroup());
 	layout->addWidget(mRunSegmentationButton);
 	layout->addStretch();
@@ -159,6 +165,36 @@ QGroupBox* LiverSegmentationWidget::buildSegmentationGroup()
 	return mSegmentationGroup;
 }
 
+QGroupBox* LiverSegmentationWidget::buildAdvancedOptionsGroup()
+{
+	mCheckBoxFastMode = new QCheckBox("Fast (lower resolution, less memory)");
+	mCheckBoxFastMode->setToolTip("Uses TotalSegmentator's low-resolution model - faster and "
+	                               "substantially lighter on memory, at the cost of coarser output. "
+	                               "Recommended for whole-body volumes or memory-constrained machines.");
+
+	mMemoryLimitSpinBox = new QDoubleSpinBox();
+	mMemoryLimitSpinBox->setRange(0, 512);
+	mMemoryLimitSpinBox->setSingleStep(1);
+	mMemoryLimitSpinBox->setSuffix(" GB");
+	mMemoryLimitSpinBox->setSpecialValueText("Automatic");
+	mMemoryLimitSpinBox->setValue(0);
+	mMemoryLimitSpinBox->setToolTip("Memory limit for the TotalSegmentator process. If it exceeds this, "
+	                                 "it is stopped cleanly instead of risking the whole system running "
+	                                 "out of memory. \"Automatic\" uses a fraction of the machine's own "
+	                                 "total RAM.");
+
+	QGridLayout* advancedLayout = new QGridLayout();
+	int row = 0;
+	advancedLayout->addWidget(mCheckBoxFastMode, row++, 0, 1, 2);
+	advancedLayout->addWidget(new QLabel("TotalSegmentator memory limit"), row, 0);
+	advancedLayout->addWidget(mMemoryLimitSpinBox, row++, 1);
+
+	mAdvancedOptionsGroup = new QGroupBox("Advanced options");
+	mAdvancedOptionsGroup->setLayout(advancedLayout);
+	mAdvancedOptionsGroup->setVisible(false);
+	return mAdvancedOptionsGroup;
+}
+
 QGroupBox* LiverSegmentationWidget::buildProcessingInfoGroup()
 {
 	mProgressBarsLayout = new QVBoxLayout();
@@ -196,6 +232,11 @@ void LiverSegmentationWidget::selectAll(bool checked)
 	mCheckBoxLiverVessels->setChecked(checked);
 	mCheckBoxLiverLesions->setChecked(checked);
 	mCheckBoxLiverSegments->setChecked(checked);
+}
+
+void LiverSegmentationWidget::showAdvancedOptions(bool show)
+{
+	mAdvancedOptionsGroup->setVisible(show);
 }
 
 QList<LiverSegmentationWidget::PlannedRun> LiverSegmentationWidget::buildPlannedRuns() const
@@ -236,6 +277,8 @@ QList<LiverSegmentationWidget::PlannedRun> LiverSegmentationWidget::buildPlanned
 			run.image = image;
 			run.iniFileName = iniFileName;
 			run.key = iniFileName + "@" + image->getUid();
+			run.fastMode = mCheckBoxFastMode->isChecked();
+			run.memoryLimitGB = mMemoryLimitSpinBox->value();
 			runs << run;
 		}
 	}
@@ -269,6 +312,8 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 		QueuedRun queuedRun;
 		queuedRun.iniFileName = run.iniFileName;
 		queuedRun.key = run.key;
+		queuedRun.fastMode = run.fastMode;
+		queuedRun.memoryLimitGB = run.memoryLimitGB;
 
 		ImagePtr& prepared = mPreparedImageCache[run.image->getUid()];
 		if (!prepared)

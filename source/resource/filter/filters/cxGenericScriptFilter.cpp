@@ -347,6 +347,9 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 	variables.inputFilePath = getInputFilePath(input);
 	variables.outputFilePath = getOutputFilePath(input);
 
+	if (!mExtraCommandLineArguments.isEmpty())
+		variables.cArguments = (variables.cArguments.isEmpty() ? QString() : variables.cArguments + " ") + mExtraCommandLineArguments;
+
 	if(!setScriptEngine(variables))
 	{
 		CX_LOG_ERROR() << "GenericScriptFilter::createCommandStringVariables: Error setting up engine";
@@ -680,6 +683,16 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 	}
 }
 
+void GenericScriptFilter::setExtraCommandLineArguments(QString args)
+{
+	mExtraCommandLineArguments = args;
+}
+
+void GenericScriptFilter::setExtraEnvironmentVariable(QString name, QString value)
+{
+	mExtraEnvironmentVariables[name] = value;
+}
+
 void GenericScriptFilter::requestStop()
 {
 	if (!mCommandLine || !mCommandLine->getProcess())
@@ -760,6 +773,12 @@ bool GenericScriptFilter::createProcess()
 	// Disable Python stdout buffering so output arrives in real time
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 	env.insert("PYTHONUNBUFFERED", "1");
+	QMapIterator<QString, QString> extraEnv(mExtraEnvironmentVariables);
+	while (extraEnv.hasNext())
+	{
+		extraEnv.next();
+		env.insert(extraEnv.key(), extraEnv.value());
+	}
 	mCommandLine->getProcess()->setProcessEnvironment(env);
 
 	connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);

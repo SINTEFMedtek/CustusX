@@ -63,6 +63,10 @@ GenericScriptFilterPtr LiverSegmentationRunner::createFilter(const QueuedRun& ru
 	filter->setParameterFilePath(DataLocations::getFilterScriptsPath() + run.iniFileName);
 	if (!input.empty())
 		input[0]->setValue(run.image->getUid());
+	if (run.fastMode)
+		filter->setExtraCommandLineArguments("--fast");
+	if (run.memoryLimitGB > 0)
+		filter->setExtraEnvironmentVariable("CX_TOTALSEGMENTATOR_MEMORY_LIMIT_GB", QString::number(run.memoryLimitGB));
 	return filter;
 }
 

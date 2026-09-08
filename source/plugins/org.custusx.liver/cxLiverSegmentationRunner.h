@@ -39,6 +39,14 @@ struct org_custusx_liver_EXPORT QueuedRun
 	QString iniFileName;
 	ImagePtr image;
 	QString key;
+	// Passed through to TotalSegmentator as "--fast": its own low-resolution
+	// (3mm) model, using substantially less memory and time at the cost of
+	// coarser output.
+	bool fastMode = false;
+	// Overrides the memory limit TotalSegmentator's own subprocess is
+	// launched under (see _process_utils.py). 0 means "use the automatic,
+	// machine-dependent default".
+	double memoryLimitGB = 0;
 };
 
 /**

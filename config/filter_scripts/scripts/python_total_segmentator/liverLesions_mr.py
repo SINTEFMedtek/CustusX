@@ -8,18 +8,19 @@ import glob
 from _process_utils import ManagedProcess
 
 
-def runTotalSegmentator(filenameInput):
+def runTotalSegmentator(filenameInput, fastMode=False):
     venv_path = os.path.dirname(sys.executable)
     if not filenameInput.endswith('.nii.gz'):
         filenameInput_nii_gz = os.path.splitext(filenameInput)[0] + '.nii.gz'
         sitk.WriteImage(sitk.ReadImage(filenameInput), filenameInput_nii_gz)
         filenameInput = filenameInput_nii_gz
 
-    process = ManagedProcess(
-        [venv_path + '/TotalSegmentator', '-i', filenameInput,
-         '-o', venv_path + '/../../segmentations', '--task', 'liver_lesions_mr',
-         '--nr_thr_saving', '1']
-    )
+    args = [venv_path + '/TotalSegmentator', '-i', filenameInput,
+            '-o', venv_path + '/../../segmentations', '--task', 'liver_lesions_mr',
+            '--nr_thr_saving', '1']
+    if fastMode:
+        args.append('--fast')
+    process = ManagedProcess(args)
 
     # liver_lesions_mr has two prediction phases:
     #   1. Fast rough pass (1/1 iters) used for cropping
@@ -84,10 +85,12 @@ def main(argv):
         print('Too few arguments, script aborted.')
         exit(1)
 
+    fast_mode = '--fast' in sys.argv
+
     print("PROGRESS: 10", flush=True)
     deleteAllFilesInSegmentationFolder()
     print("PROGRESS: 20", flush=True)
-    runTotalSegmentator(input_image_path)
+    runTotalSegmentator(input_image_path, fast_mode)
     print("PROGRESS: 90", flush=True)
     copyOutput(input_image_path)
     print("PROGRESS: 100", flush=True)
