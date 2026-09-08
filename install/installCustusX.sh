@@ -97,6 +97,14 @@ if [ -z "$CUSTUSX_ROOT" ]; then
     echo "ERROR: Could not find a CustusX folder inside the extracted tarball."
     exit 1
 fi
+# The new version is extracted above, so it's safe to now wipe any old
+# install: ~/CustusX/CustusX is pure install payload for this app (no user
+# state -- venvs/models/Patients live at the ~/CustusX family-folder level,
+# shared with CustusS's own ~/CustusX/CustusS, and must not be touched here).
+# A full wipe of just this app's subfolder avoids stale files from a previous
+# version (e.g. an old/renamed plugin .so) lingering and getting loaded
+# alongside the new set.
+rm -rf ~/CustusX/CustusX
 mkdir -p ~/CustusX/CustusX
 cp -r "$CUSTUSX_ROOT"/* ~/CustusX/CustusX/
 rm -rf CustusX_temp
