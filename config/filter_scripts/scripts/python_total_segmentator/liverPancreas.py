@@ -5,7 +5,7 @@ import sys
 import getopt
 import glob
 
-from _process_utils import ManagedProcess
+from _process_utils import ManagedProcess, describeFailure
 
 
 def runTotalSegmentator(filenameInput, fastMode=False):
@@ -52,7 +52,7 @@ def runTotalSegmentator(filenameInput, fastMode=False):
 
     process.wait()
     if process.returncode != 0:
-        print("ERROR: TotalSegmentator failed with exit code {}".format(process.returncode), flush=True)
+        print(describeFailure(process.returncode), flush=True)
         sys.exit(process.returncode)
 
 def copyOutput(filenameInput):

@@ -15,6 +15,15 @@ import sys
 import time
 
 
+def describeFailure(returncode):
+    if returncode == -9:
+        return ("ERROR: TotalSegmentator was killed (signal 9) - most likely because it exceeded "
+                 "the memory limit (see _wrapWithMemoryLimit() below), or a stop was requested. "
+                 "Try enabling Fast mode, raising the memory limit in the segmentation widget's "
+                 "advanced options, or closing other applications.")
+    return "ERROR: TotalSegmentator failed with exit code {}".format(returncode)
+
+
 def _memoryCapBytes():
     # TotalSegmentator's own memory use has repeatedly been observed
     # ballooning past 20-25GB and taking the whole machine down via
