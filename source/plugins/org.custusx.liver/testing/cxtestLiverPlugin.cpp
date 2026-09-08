@@ -63,15 +63,6 @@ TEST_CASE("LiverPlugin: iniFileNameFor() has no MR ini for Liver Vessels only", 
 	CHECK(LiverSegmentationWidget::iniFileNameFor(LiverSegmentationWidget::fkLiverPancreas, cx::imUS).isEmpty());
 }
 
-TEST_CASE("LiverPlugin: needsPreparation() is scoped to the heaviest-smoothing filters", "[unit][plugins][org.custusx.liver]")
-{
-	using cx::LiverSegmentationWidget;
-	CHECK(LiverSegmentationWidget::needsPreparation(LiverSegmentationWidget::fkLiverPancreas));
-	CHECK(LiverSegmentationWidget::needsPreparation(LiverSegmentationWidget::fkLiverSegments));
-	CHECK_FALSE(LiverSegmentationWidget::needsPreparation(LiverSegmentationWidget::fkLiverVessels));
-	CHECK_FALSE(LiverSegmentationWidget::needsPreparation(LiverSegmentationWidget::fkLiverLesions));
-}
-
 TEST_CASE("LiverPlugin: organTypesFor() maps each filter to its own output organ types", "[unit][plugins][org.custusx.liver]")
 {
 	using cx::LiverSegmentationWidget;
@@ -131,6 +122,10 @@ public:
 	{
 		reparentMeshesFromPreparedCopy(originalUid, resampled);
 	}
+	cx::ImagePtr testPrepareImageForHeavyFilter(cx::ImagePtr image) const
+	{
+		return prepareImageForHeavyFilter(image);
+	}
 };
 
 class TestLiverVisibilityWidget : public cx::LiverVisibilityWidget
@@ -189,6 +184,19 @@ TEST_CASE("LiverPlugin: reparentMeshesFromPreparedCopy() preserves the mesh's wo
 	CHECK(mesh->getParentSpace() == original->getUid());
 	CHECK(cx::similar(mesh->get_rMd(), meshWorldTransformBeforeCleanup));
 	CHECK_FALSE(cx::similar(mesh->get_rMd(), original->get_rMd()));
+}
+
+TEST_CASE("LiverPlugin: prepareImageForHeavyFilter() is a no-op for an already-small image", "[unit][plugins][org.custusx.liver]")
+{
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr patient = services->patient();
+
+	cx::ImagePtr small = createMockImage(patient, "small");
+
+	TestLiverSegmentationWidget widget(services);
+	cx::ImagePtr prepared = widget.testPrepareImageForHeavyFilter(small);
+
+	CHECK(prepared == small);
 }
 
 TEST_CASE("LiverPlugin: descendsFrom() walks a multi-hop parent-frame chain", "[unit][plugins][org.custusx.liver]")

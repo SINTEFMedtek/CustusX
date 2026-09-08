@@ -270,23 +270,23 @@ void LiverSegmentationWidget::runOrStopButtonClicked()
 		queuedRun.iniFileName = run.iniFileName;
 		queuedRun.key = run.key;
 
-		if (this->needsPreparation(run.filter))
+		ImagePtr& prepared = mPreparedImageCache[run.image->getUid()];
+		if (!prepared)
 		{
-			ImagePtr& prepared = mPreparedImageCache[run.image->getUid()];
-			if (!prepared)
+			prepared = this->prepareImageForHeavyFilter(run.image);
+			// prepareImageForHeavyFilter() returns the input image itself,
+			// unchanged, if it was already small enough to need neither
+			// cropping nor resampling - nothing to insert/hide in that case,
+			// and cleanupPreparedImages() knows not to remove it either.
+			if (prepared != run.image)
 			{
-				prepared = this->prepareImageForHeavyFilter(run.image);
 				mServices->patient()->insertData(prepared);
 				// Purely an internal implementation detail (see cleanupPreparedImages()) -
 				// exclude it from volume selectors etc. while the run is in progress.
 				mServices->patient()->makeAvailable(prepared->getUid(), false);
 			}
-			queuedRun.image = prepared;
 		}
-		else
-		{
-			queuedRun.image = run.image;
-		}
+		queuedRun.image = prepared;
 		queue << queuedRun;
 	}
 	mRunner->start(queue);
@@ -442,6 +442,10 @@ void LiverSegmentationWidget::cleanupPreparedImages()
 		i.next();
 		if (!i.value())
 			continue;
+		// Not actually a separate prepared copy (see runOrStopButtonClicked()) -
+		// this IS the original source image, never remove it.
+		if (i.value()->getUid() == i.key())
+			continue;
 		this->reparentMeshesFromPreparedCopy(i.key(), i.value());
 		mServices->patient()->removeData(i.value()->getUid());
 	}
@@ -465,18 +469,6 @@ void LiverSegmentationWidget::reparentMeshesFromPreparedCopy(QString originalUid
 	for (m = meshes.begin(); m != meshes.end(); ++m)
 		if (m->second && m->second->getParentSpace() == resampled->getUid())
 			m->second->get_rMd_History()->setParentSpace(original->getUid());
-}
-
-bool LiverSegmentationWidget::needsPreparation(FilterKind filter)
-{
-	// Smoothing in the contour step runs on the raw marching-cubes output, so
-	// on a large/uncropped volume it can freeze the main thread for 20+
-	// minutes with no way to stop it. See prepareImageForHeavyFilter().
-	// Scoped to fkLiverPancreas and fkLiverSegments only: both use the
-	// heaviest smoothing level (GenericScriptFilter::
-	// contourFilterSettingForOrganType() filtering=3), and Segments
-	// additionally produces up to 8 meshes per run.
-	return filter == fkLiverPancreas || filter == fkLiverSegments;
 }
 
 QList<ORGAN_TYPE> LiverSegmentationWidget::organTypesFor(FilterKind filter)

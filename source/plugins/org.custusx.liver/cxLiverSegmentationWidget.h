@@ -69,7 +69,6 @@ public:
 
 	// Pure/stateless - public so they can be unit tested directly, without
 	// needing a live VisServices/patient session.
-	static bool needsPreparation(FilterKind filter);
 	static QString filterLabel(FilterKind filter);
 	static QString iniFileNameFor(FilterKind filter, IMAGE_MODALITY modality);
 	static QString progressLabel(const PlannedRun& run);
@@ -91,7 +90,6 @@ private:
 	QList<PlannedRun> buildPlannedRuns() const;
 	ImagePtr selectedImage1() const;
 	ImagePtr selectedImage2() const;
-	ImagePtr prepareImageForHeavyFilter(ImagePtr image) const;
 	void cleanupPreparedImages();
 
 protected:
@@ -100,6 +98,9 @@ protected:
 	void removePreviousResults(const QList<PlannedRun>& runs) const;
 	// Does NOT re-register the meshes (see cleanupPreparedImages()).
 	void reparentMeshesFromPreparedCopy(QString originalUid, ImagePtr resampled) const;
+	// Returns image itself, unchanged, if it is already small enough to need
+	// neither cropping nor resampling - see runOrStopButtonClicked().
+	ImagePtr prepareImageForHeavyFilter(ImagePtr image) const;
 
 private:
 	VisServicesPtr mServices;
@@ -118,7 +119,7 @@ private:
 	QVBoxLayout* mProgressBarsLayout;
 	QMap<QString, QProgressBar*> mProgressBars;
 	QString mCurrentRunKey;
-	QMap<QString, ImagePtr> mPreparedImageCache; // original source image uid -> its cropped/resampled copy, for this run only
+	QMap<QString, ImagePtr> mPreparedImageCache; // original source image uid -> its cropped/resampled copy (or itself, if already small enough), for this run only
 };
 
 } /* namespace cx */
