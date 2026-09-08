@@ -364,29 +364,16 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 	QString preparedUid = image->getUid() + "_prepared";
 	QString preparedName = image->getName();
 
-	// Logged at each step (this all runs synchronously on the main thread -
-	// unlike contourFilter()'s marching-cubes/smoothing, none of this is
-	// backgrounded, so a large-enough volume can freeze the GUI here too).
-	// Kept deliberately so a future freeze is diagnosable from the log
-	// instead of requiring guesswork about which step it's stuck in.
 	int dims[3];
 	image->getBaseVtkImageData()->GetDimensions(dims);
 	CX_LOG_INFO() << "LiverSegmentationWidget: preparing " << image->getName()
 	              << " (" << dims[0] << "x" << dims[1] << "x" << dims[2] << ") for a heavy filter...";
 
 	// Auto-crop is lossless; skip it if it wouldn't actually shrink anything.
-	CX_LOG_INFO() << "LiverSegmentationWidget: computing auto-crop box...";
 	ImagePtr working = image;
 	DoubleBoundingBox3D autoCropBox = computeAutoCropBox(image);
 	if (!similar(autoCropBox, image->boundingBox()))
-	{
-		CX_LOG_INFO() << "LiverSegmentationWidget: cropping...";
 		working = cropImage(mServices->patient(), image, autoCropBox, preparedUid, preparedName);
-	}
-	else
-	{
-		CX_LOG_INFO() << "LiverSegmentationWidget: auto-crop box matches the full volume, skipping crop.";
-	}
 
 	// Only resample (lossy - reduces resolution) if still too large after
 	// cropping. Scale all three axes by total voxel count, not just x/y: a
@@ -411,7 +398,6 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 		CX_LOG_INFO() << "LiverSegmentationWidget: z extent exceeds " << wholeBodyZExtentThresholdMm
 		              << "mm (whole-body scan) - using a lower voxel cap of " << voxelCap;
 	}
-	CX_LOG_INFO() << "LiverSegmentationWidget: resampling if still needed...";
 	ImagePtr prepared = resampleImageToMaxVoxelCount(mServices->patient(), working, voxelCap, preparedUid, preparedName);
 	int preparedDims[3];
 	prepared->getBaseVtkImageData()->GetDimensions(preparedDims);

@@ -29,7 +29,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSelectDataStringProperty.h"
 #include "cxDataSelectWidget.h"
 #include "cxStyles.h"
-#include "cxLogger.h"
 
 namespace cx
 {
@@ -185,8 +184,6 @@ void LiverVisibilityWidget::rebuildViewGroupSelector()
 void LiverVisibilityWidget::refreshStructures()
 {
 	ImagePtr sourceImage = this->sourceImage();
-	CX_LOG_INFO() << "LiverVisibilityWidget::refreshStructures: source image = "
-	              << (sourceImage ? sourceImage->getUid() : "<none>");
 
 	QMapIterator<ORGAN_TYPE, SelectableLiverStructure> i(mStructures);
 	while (i.hasNext())
