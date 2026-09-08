@@ -134,12 +134,6 @@ void GenericScriptFilter::processStateChanged()
 	}
 }
 
-void GenericScriptFilter::processFinished(int code, QProcess::ExitStatus status)
-{
-	if (status == QProcess::CrashExit)
-		reportError("GenericScriptFilter process crashed");
-}
-
 void GenericScriptFilter::processError(QProcess::ProcessError error)
 {
 	QString msg;
@@ -755,9 +749,22 @@ bool GenericScriptFilter::execute()
 	{
 		processError(mCommandLine->getProcess()->error());
 	}
+	else if (mCommandLine->getProcess()->exitCode() != 0)
+	{
+		// waitForFinished() only reports whether the process exited at all,
+		// not whether it succeeded - a non-zero exit here (e.g. killed for
+		// exceeding the memory limit, see _process_utils.py) otherwise
+		// passes through silently, with no output files for
+		// readGeneratedSegmentationFiles() to find.
+		reportError(QString("Script exited with an error (code %1) - see the log for the script's own output. "
+		                     "This can happen if it was killed for exceeding the memory limit; try Fast mode, "
+		                     "raising the memory limit in advanced options, or closing other applications.")
+		            .arg(mCommandLine->getProcess()->exitCode()));
+		retval = false;
+	}
 	retval = retval & deleteProcess();
 
-	return retval; // Check for error?
+	return retval;
 }
 
 bool GenericScriptFilter::createProcess()
@@ -1032,6 +1039,12 @@ void GenericScriptFilter::createOutputMesh(QColor color, int smoothing)
 {
 	// Make contour of segmented volume
 	vtkPolyDataPtr rawContour = contourFilter(smoothing);
+	if (!rawContour || rawContour->GetNumberOfPolys() == 0)
+	{
+		CX_LOG_WARNING() << "GenericScriptFilter::createOutputMesh: " << mOutputImage->getName()
+		                  << " segmented to an empty mesh (structure not present in this volume) - skipping.";
+		return;
+	}
 
 	QString uidOutputMesh = mOutputImage->getUid() + "_mesh";
 	QString nameOutputMesh = mOutputImage->getName();
