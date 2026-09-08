@@ -65,6 +65,11 @@ private slots:
 	void toggleSourceVolume();
 	void rebuildViewGroupSelector();
 
+protected:
+	// Not pure/stateless (reads the patient model) - protected, exercised
+	// via a thin test subclass, rather than left untested for lack of access.
+	MeshPtr findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const;
+
 private:
 	ImagePtr sourceImage() const;
 	void addStructureButton(ORGAN_TYPE organType, QString label, QGridLayout* layout, int row);
@@ -72,7 +77,6 @@ private:
 	void updateButtonColor(ORGAN_TYPE organType);
 	void updateAllSegmentsButtonColor();
 	void updateSourceVolumeButtonColor();
-	MeshPtr findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const;
 	int selectedViewGroupIndex() const;
 	bool isShown(QString uid) const;
 	void showData(QString uid);

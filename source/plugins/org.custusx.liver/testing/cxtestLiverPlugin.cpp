@@ -132,6 +132,16 @@ public:
 		reparentMeshesFromPreparedCopy(originalUid, resampled);
 	}
 };
+
+class TestLiverVisibilityWidget : public cx::LiverVisibilityWidget
+{
+public:
+	explicit TestLiverVisibilityWidget(cx::VisServicesPtr services) : cx::LiverVisibilityWidget(services) {}
+	cx::MeshPtr testFindMeshForSourceImage(cx::ORGAN_TYPE organType, cx::ImagePtr sourceImage) const
+	{
+		return findMeshForSourceImage(organType, sourceImage);
+	}
+};
 }
 
 TEST_CASE("LiverPlugin: removePreviousResults() removes only the matching filter's own prior output", "[unit][plugins][org.custusx.liver]")
@@ -219,4 +229,38 @@ TEST_CASE("LiverPlugin: descendsFrom() terminates on a broken/cyclic chain", "[u
 	cx::ImagePtr dangling = createMockImage(patient, "dangling");
 	dangling->get_rMd_History()->setParentSpace("doesNotExist");
 	CHECK_FALSE(cx::LiverVisibilityWidget::descendsFrom(patient, dangling->getUid(), "anything"));
+}
+
+TEST_CASE("LiverPlugin: findMeshForSourceImage() prefers an exact parent match over an ancestor-chain match", "[unit][plugins][org.custusx.liver]")
+{
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr patient = services->patient();
+
+	cx::ImagePtr fullVolume = createMockImage(patient, "fullVolume");
+	cx::ImagePtr manualCrop = createMockImage(patient, "manualCrop");
+	manualCrop->get_rMd_History()->setParentSpace(fullVolume->getUid());
+
+	cx::MeshPtr cropMesh = createMockMesh(patient, "cropMesh", cx::otLIVER, manualCrop);
+	cx::MeshPtr fullVolumeMesh = createMockMesh(patient, "fullVolumeMesh", cx::otLIVER, fullVolume);
+
+	TestLiverVisibilityWidget widget(services);
+
+	CHECK(widget.testFindMeshForSourceImage(cx::otLIVER, fullVolume)->getUid() == fullVolumeMesh->getUid());
+	CHECK(widget.testFindMeshForSourceImage(cx::otLIVER, manualCrop)->getUid() == cropMesh->getUid());
+}
+
+TEST_CASE("LiverPlugin: findMeshForSourceImage() falls back to an ancestor-chain match when no exact match exists", "[unit][plugins][org.custusx.liver]")
+{
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr patient = services->patient();
+
+	cx::ImagePtr fullVolume = createMockImage(patient, "fullVolume2");
+	cx::ImagePtr manualCrop = createMockImage(patient, "manualCrop2");
+	manualCrop->get_rMd_History()->setParentSpace(fullVolume->getUid());
+
+	cx::MeshPtr cropMesh = createMockMesh(patient, "cropMesh2", cx::otLIVER, manualCrop);
+
+	TestLiverVisibilityWidget widget(services);
+
+	CHECK(widget.testFindMeshForSourceImage(cx::otLIVER, fullVolume)->getUid() == cropMesh->getUid());
 }

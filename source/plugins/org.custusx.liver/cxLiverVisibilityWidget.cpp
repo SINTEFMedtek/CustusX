@@ -30,7 +30,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataSelectWidget.h"
 #include "cxStyles.h"
 #include "cxLogger.h"
-#include "cxEnumConversion.h"
 
 namespace cx
 {
@@ -153,16 +152,20 @@ MeshPtr LiverVisibilityWidget::findMeshForSourceImage(ORGAN_TYPE organType, Imag
 		return MeshPtr();
 
 	std::map<QString, MeshPtr> candidates = mServices->patient()->getDataOfType<Mesh>(organType);
+
+	// Prefer an exact parent match over an ancestor-chain match: if sourceImage
+	// was itself segmented directly, that mesh's parent equals sourceImage's uid
+	// exactly, and must win over some OTHER mesh that merely descends from
+	// sourceImage (e.g. one segmented from a separate, persisted crop of it) -
+	// descendsFrom()'s chain-walk can't otherwise tell those two cases apart.
 	std::map<QString, MeshPtr>::iterator it;
 	for (it = candidates.begin(); it != candidates.end(); ++it)
-	{
-		bool matches = it->second && this->descendsFrom(mServices->patient(), it->second->getParentSpace(), sourceImage->getUid());
-		CX_LOG_INFO() << "LiverVisibilityWidget: findMeshForSourceImage(" << enum2string(organType) << ", " << sourceImage->getUid()
-		              << "): candidate " << it->first << " parent=" << (it->second ? it->second->getParentSpace() : "<null>")
-		              << " matches=" << matches;
-		if (matches)
+		if (it->second && it->second->getParentSpace() == sourceImage->getUid())
 			return it->second;
-	}
+
+	for (it = candidates.begin(); it != candidates.end(); ++it)
+		if (it->second && this->descendsFrom(mServices->patient(), it->second->getParentSpace(), sourceImage->getUid()))
+			return it->second;
 	return MeshPtr();
 }
 
@@ -191,7 +194,7 @@ void LiverVisibilityWidget::rebuildViewGroupSelector()
 	mViewGroupSelector->blockSignals(true);
 	mViewGroupSelector->clear();
 	for (unsigned i = 0; i < mServices->view()->groupCount(); ++i)
-		mViewGroupSelector->addItem(QString("View group %1").arg(i + 1));
+		mViewGroupSelector->addItem(QString("View group %1").arg(i));
 	int newIndex = (previousIndex >= 0 && previousIndex < mViewGroupSelector->count()) ? previousIndex : 0;
 	mViewGroupSelector->setCurrentIndex(newIndex);
 	mViewGroupSelector->blockSignals(false);
