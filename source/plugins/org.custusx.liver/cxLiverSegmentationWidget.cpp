@@ -338,10 +338,23 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 	//
 	// Empirically: a ~29M voxel mask (58MB, 16-bit) completes fast, a ~139M
 	// voxel one (278MB) froze the main thread for 20+ minutes. Capped in
-	// between the two, with some margin below the known-good side.
+	// between the two, with some margin below the known-good side. A
+	// whole-body scan (much longer along z than a torso/abdomen scan) is
+	// still slow and memory-heavy even at that cap - not just for our own
+	// marching cubes, but for TotalSegmentator's own inference, which runs
+	// against this same prepared copy - so it gets an additional, lower cap.
 	const double maxVoxelCountForHeavySmoothing = 40000000;
+	const double maxVoxelCountForWholeBodyScan = 20000000;
+	const double wholeBodyZExtentThresholdMm = 700;
+	double voxelCap = maxVoxelCountForHeavySmoothing;
+	if (working->boundingBox().range()[2] > wholeBodyZExtentThresholdMm)
+	{
+		voxelCap = maxVoxelCountForWholeBodyScan;
+		CX_LOG_INFO() << "LiverSegmentationWidget: z extent exceeds " << wholeBodyZExtentThresholdMm
+		              << "mm (whole-body scan) - using a lower voxel cap of " << voxelCap;
+	}
 	CX_LOG_INFO() << "LiverSegmentationWidget: resampling if still needed...";
-	ImagePtr prepared = resampleImageToMaxVoxelCount(mServices->patient(), working, maxVoxelCountForHeavySmoothing, preparedUid, preparedName);
+	ImagePtr prepared = resampleImageToMaxVoxelCount(mServices->patient(), working, voxelCap, preparedUid, preparedName);
 	int preparedDims[3];
 	prepared->getBaseVtkImageData()->GetDimensions(preparedDims);
 	CX_LOG_INFO() << "LiverSegmentationWidget: prepared " << image->getName() << " -> "
