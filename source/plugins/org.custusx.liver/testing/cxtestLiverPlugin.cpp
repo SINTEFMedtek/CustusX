@@ -16,7 +16,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLiverWidget.h"
 #include "cxVisServices.h"
 #include "cxtestVisServices.h"
-#include "cxtestPatientModelServiceMock.h"
 #include "cxImage.h"
 #include "cxMesh.h"
 #include "cxRegistrationTransform.h"
@@ -199,47 +198,7 @@ TEST_CASE("LiverPlugin: prepareImageForHeavyFilter() is a no-op for an already-s
 	CHECK(prepared == small);
 }
 
-TEST_CASE("LiverPlugin: descendsFrom() walks a multi-hop parent-frame chain", "[unit][plugins][org.custusx.liver]")
-{
-	cxtest::PatientModelServiceMockPtr patient(new cxtest::PatientModelServiceMock());
-
-	cx::ImagePtr original = createMockImage(patient, "original");
-	cx::ImagePtr resampledCopy = createMockImage(patient, "resampledCopy");
-	resampledCopy->get_rMd_History()->setParentSpace(original->getUid());
-
-	cx::MeshPtr mesh = patient->createSpecificData<cx::Mesh>("mesh", "mesh");
-	mesh->get_rMd_History()->setParentSpace(resampledCopy->getUid());
-	patient->insertData(mesh);
-
-	CHECK(cx::LiverVisibilityWidget::descendsFrom(patient, mesh->getParentSpace(), original->getUid()));
-	CHECK(cx::LiverVisibilityWidget::descendsFrom(patient, mesh->getParentSpace(), resampledCopy->getUid()));
-	CHECK_FALSE(cx::LiverVisibilityWidget::descendsFrom(patient, mesh->getParentSpace(), "someOtherImage"));
-
-	cx::ImagePtr directParent = createMockImage(patient, "directParent");
-	cx::MeshPtr directMesh = patient->createSpecificData<cx::Mesh>("directMesh", "directMesh");
-	directMesh->get_rMd_History()->setParentSpace(directParent->getUid());
-	patient->insertData(directMesh);
-	CHECK(cx::LiverVisibilityWidget::descendsFrom(patient, directMesh->getParentSpace(), directParent->getUid()));
-}
-
-TEST_CASE("LiverPlugin: descendsFrom() terminates on a broken/cyclic chain", "[unit][plugins][org.custusx.liver]")
-{
-	cxtest::PatientModelServiceMockPtr patient(new cxtest::PatientModelServiceMock());
-
-	cx::ImagePtr a = createMockImage(patient, "a");
-	cx::ImagePtr b = createMockImage(patient, "b");
-	a->get_rMd_History()->setParentSpace(b->getUid());
-	b->get_rMd_History()->setParentSpace(a->getUid());
-
-	CHECK(cx::LiverVisibilityWidget::descendsFrom(patient, a->getUid(), b->getUid()));
-	CHECK_FALSE(cx::LiverVisibilityWidget::descendsFrom(patient, a->getUid(), "neverInChain"));
-
-	cx::ImagePtr dangling = createMockImage(patient, "dangling");
-	dangling->get_rMd_History()->setParentSpace("doesNotExist");
-	CHECK_FALSE(cx::LiverVisibilityWidget::descendsFrom(patient, dangling->getUid(), "anything"));
-}
-
-TEST_CASE("LiverPlugin: findMeshForSourceImage() prefers an exact parent match over an ancestor-chain match", "[unit][plugins][org.custusx.liver]")
+TEST_CASE("LiverPlugin: findMeshForSourceImage() matches only the exact source image", "[unit][plugins][org.custusx.liver]")
 {
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr patient = services->patient();
@@ -257,8 +216,12 @@ TEST_CASE("LiverPlugin: findMeshForSourceImage() prefers an exact parent match o
 	CHECK(widget.testFindMeshForSourceImage(cx::otLIVER, manualCrop)->getUid() == cropMesh->getUid());
 }
 
-TEST_CASE("LiverPlugin: findMeshForSourceImage() falls back to an ancestor-chain match when no exact match exists", "[unit][plugins][org.custusx.liver]")
+TEST_CASE("LiverPlugin: findMeshForSourceImage() does not match a mesh belonging to a different (e.g. cropped) volume", "[unit][plugins][org.custusx.liver]")
 {
+	// Regression test: a mesh segmented from a manual crop of a volume must
+	// not be shown when the crop's own source volume is selected instead -
+	// they are two different, independently selectable volumes, even though
+	// one is a crop of the other.
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr patient = services->patient();
 
@@ -266,9 +229,9 @@ TEST_CASE("LiverPlugin: findMeshForSourceImage() falls back to an ancestor-chain
 	cx::ImagePtr manualCrop = createMockImage(patient, "manualCrop2");
 	manualCrop->get_rMd_History()->setParentSpace(fullVolume->getUid());
 
-	cx::MeshPtr cropMesh = createMockMesh(patient, "cropMesh2", cx::otLIVER, manualCrop);
+	createMockMesh(patient, "cropMesh2", cx::otLIVER, manualCrop);
 
 	TestLiverVisibilityWidget widget(services);
 
-	CHECK(widget.testFindMeshForSourceImage(cx::otLIVER, fullVolume)->getUid() == cropMesh->getUid());
+	CHECK_FALSE(widget.testFindMeshForSourceImage(cx::otLIVER, fullVolume));
 }

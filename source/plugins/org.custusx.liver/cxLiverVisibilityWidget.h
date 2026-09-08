@@ -54,10 +54,6 @@ public:
 	virtual ~LiverVisibilityWidget();
 
 	static QString getWidgetName();
-	// Pure/stateless apart from the patient service - public so it can be
-	// unit tested directly with a mock patient service and synthetic
-	// parent-frame chains.
-	static bool descendsFrom(PatientModelServicePtr patient, QString uid, QString ancestorUid);
 
 private slots:
 	void refreshStructures();

@@ -25,7 +25,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDoubleSpinBox>
 
 #include "cxLiverSegmentationRunner.h"
-#include "cxLiverVisibilityWidget.h"
 #include "cxVisServices.h"
 #include "cxPatientModelService.h"
 #include "cxImage.h"
@@ -466,7 +465,7 @@ void LiverSegmentationWidget::removePreviousResults(const QList<PlannedRun>& run
 			std::map<QString, MeshPtr>::iterator it;
 			for (it = candidates.begin(); it != candidates.end(); ++it)
 			{
-				if (it->second && LiverVisibilityWidget::descendsFrom(mServices->patient(), it->second->getParentSpace(), run.image->getUid()))
+				if (it->second && it->second->getParentSpace() == run.image->getUid())
 					mServices->patient()->removeData(it->first);
 			}
 		}

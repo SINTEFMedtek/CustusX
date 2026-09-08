@@ -130,41 +130,23 @@ ImagePtr LiverVisibilityWidget::sourceImage() const
 	return boost::dynamic_pointer_cast<Image>(mSourceImageSelector->getData());
 }
 
-bool LiverVisibilityWidget::descendsFrom(PatientModelServicePtr patient, QString uid, QString ancestorUid)
-{
-	// Walk the parent-frame chain: a mesh produced from a cropped/resampled
-	// copy of the source image (see LiverSegmentationWidget::
-	// prepareImageForHeavyFilter()) is parented to that copy, not directly
-	// to the source image, so an exact-match comparison would miss it.
-	for (int steps = 0; !uid.isEmpty() && steps < 10; ++steps)
-	{
-		if (uid == ancestorUid)
-			return true;
-		DataPtr data = patient->getData(uid);
-		uid = data ? data->getParentSpace() : QString();
-	}
-	return false;
-}
-
 MeshPtr LiverVisibilityWidget::findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const
 {
 	if (!sourceImage)
 		return MeshPtr();
 
+	// Exact parent match only: LiverSegmentationWidget always reparents a
+	// mesh directly to the exact image the user selected to segment (see
+	// reparentMeshesFromPreparedCopy()), collapsing away any internal
+	// crop/resample copy once a run finishes - a mesh's parent is never
+	// several hops away from the volume it was actually run against.
+	// Matching an ancestor further up the chain (e.g. a separate, persisted
+	// crop's own mesh, when the crop's *source* volume is selected here)
+	// previously made two different volumes' structures indistinguishable.
 	std::map<QString, MeshPtr> candidates = mServices->patient()->getDataOfType<Mesh>(organType);
-
-	// Prefer an exact parent match over an ancestor-chain match: if sourceImage
-	// was itself segmented directly, that mesh's parent equals sourceImage's uid
-	// exactly, and must win over some OTHER mesh that merely descends from
-	// sourceImage (e.g. one segmented from a separate, persisted crop of it) -
-	// descendsFrom()'s chain-walk can't otherwise tell those two cases apart.
 	std::map<QString, MeshPtr>::iterator it;
 	for (it = candidates.begin(); it != candidates.end(); ++it)
 		if (it->second && it->second->getParentSpace() == sourceImage->getUid())
-			return it->second;
-
-	for (it = candidates.begin(); it != candidates.end(); ++it)
-		if (it->second && this->descendsFrom(mServices->patient(), it->second->getParentSpace(), sourceImage->getUid()))
 			return it->second;
 	return MeshPtr();
 }
