@@ -375,6 +375,30 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 	if (!similar(autoCropBox, image->boundingBox()))
 		working = cropImage(mServices->patient(), image, autoCropBox, preparedUid, preparedName);
 
+	// A whole-body scan is much longer along z than a torso/abdomen scan,
+	// and includes the head/legs, which are irrelevant to a liver filter and
+	// only cost time/memory (both our own marching cubes, and
+	// TotalSegmentator's own inference downstream). Trim to the torso before
+	// resampling, rather than just resampling everything to a lower
+	// resolution: TotalSegmentator itself resamples its input to a fixed
+	// target spacing per task (e.g. 1.5mm for "total") regardless of what
+	// spacing we give it, so blurring resolution below that only loses
+	// detail (it gets upsampled straight back) without actually shrinking
+	// TotalSegmentator's own inference-time memory - shrinking the physical
+	// extent is what actually helps there. See CustusX#45 and
+	// computeAutoCropBoxAbdomen() in cxImageAlgorithms.cpp.
+	const double wholeBodyZExtentThresholdMm = 700;
+	if (working->boundingBox().range()[2] > wholeBodyZExtentThresholdMm)
+	{
+		DoubleBoundingBox3D abdomenCropBox = computeAutoCropBoxAbdomen(working);
+		if (!similar(abdomenCropBox, working->boundingBox()))
+		{
+			CX_LOG_INFO() << "LiverSegmentationWidget: z extent exceeds " << wholeBodyZExtentThresholdMm
+			              << "mm (whole-body scan) - cropping to the torso/abdomen region";
+			working = cropImage(mServices->patient(), working, abdomenCropBox, preparedUid, preparedName);
+		}
+	}
+
 	// Only resample (lossy - reduces resolution) if still too large after
 	// cropping. Scale all three axes by total voxel count, not just x/y: a
 	// whole-body scan's native in-plane resolution may already be <=512 (no
@@ -383,20 +407,21 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 	//
 	// Empirically: a ~29M voxel mask (58MB, 16-bit) completes fast, a ~139M
 	// voxel one (278MB) froze the main thread for 20+ minutes. Capped in
-	// between the two, with some margin below the known-good side. A
-	// whole-body scan (much longer along z than a torso/abdomen scan) is
-	// still slow and memory-heavy even at that cap - not just for our own
-	// marching cubes, but for TotalSegmentator's own inference, which runs
-	// against this same prepared copy - so it gets an additional, lower cap.
+	// between the two, with some margin below the known-good side.
+	//
+	// If the torso crop above didn't manage to bring a whole-body scan under
+	// the threshold (e.g. neither heuristic found anything usable), fall
+	// back to an additional, lower cap as a last resort - this still helps
+	// our own marching cubes even though it no longer helps
+	// TotalSegmentator's own inference (see the comment above).
 	const double maxVoxelCountForHeavySmoothing = 40000000;
 	const double maxVoxelCountForWholeBodyScan = 20000000;
-	const double wholeBodyZExtentThresholdMm = 700;
 	double voxelCap = maxVoxelCountForHeavySmoothing;
 	if (working->boundingBox().range()[2] > wholeBodyZExtentThresholdMm)
 	{
 		voxelCap = maxVoxelCountForWholeBodyScan;
-		CX_LOG_INFO() << "LiverSegmentationWidget: z extent exceeds " << wholeBodyZExtentThresholdMm
-		              << "mm (whole-body scan) - using a lower voxel cap of " << voxelCap;
+		CX_LOG_INFO() << "LiverSegmentationWidget: z extent still exceeds " << wholeBodyZExtentThresholdMm
+		              << "mm after cropping - using a lower voxel cap of " << voxelCap;
 	}
 	ImagePtr prepared = resampleImageToMaxVoxelCount(mServices->patient(), working, voxelCap, preparedUid, preparedName);
 	int preparedDims[3];

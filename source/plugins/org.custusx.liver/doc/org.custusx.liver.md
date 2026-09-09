@@ -14,11 +14,16 @@ two CT/MR volumes (Volume 1 is the active volume; Volume 2 is optional).
 Liver Vessels has no MR-capable model, so it is silently skipped (with a
 warning) for any MR volume selected.
 
-Large volumes (e.g. whole-body scans) are automatically cropped and, if
-still large, resampled to a lower resolution before being sent to
-TotalSegmentator, to keep processing time and memory use manageable. This
-internal working copy is not shown in volume selectors and is removed once
-the run finishes.
+Large volumes are automatically cropped to remove surrounding air/background.
+A whole-body scan is additionally cropped to the torso/abdomen region (using
+the lung bases as a landmark on CT, or the widest cross-section of the body
+as a cheaper fallback) to remove the head and legs, which are irrelevant to
+a liver filter - reducing the physical size TotalSegmentator has to process
+is far more effective than lowering resolution, since TotalSegmentator
+resamples its input to its own fixed internal resolution regardless. Only if
+still large after that is the volume resampled to a lower resolution before
+being sent to TotalSegmentator. This internal working copy is not shown in
+volume selectors and is removed once the run finishes.
 
 Advanced options (toggle with the icon below the filter list):
 

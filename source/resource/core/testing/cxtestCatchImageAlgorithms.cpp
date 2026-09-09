@@ -318,3 +318,184 @@ TEST_CASE("ImageAlgorithms: computeAutoCropBox() returns the full volume for a u
 	CHECK(cx::similar(box, fullVolume));
 }
 
+namespace
+{
+/** A synthetic CT volume (20x20 in-plane, 5mm spacing) modeling, along z:
+ *   - z[0,9]:    a decoy "arms raised above the head" region - two separate
+ *                tissue blocks with a background gap between them that is
+ *                NOT lung, but is still open to the slice border above them
+ *                (regression test for a real bug: a per-slice bounding-box
+ *                check alone flags this gap as false lung-like air, since
+ *                it sits inside the tight rectangle around both arms).
+ *   - z[10,29]:  "neck" - a narrow tissue block.
+ *   - z[30,69]:  "thorax" - a wide tissue block with two genuinely enclosed
+ *                "lung" air pockets.
+ *   - z[70,149]: "abdomen" - a wide, solid tissue block (no internal air) -
+ *                the largest in-body cross-section in the volume.
+ */
+cx::ImagePtr createSyntheticTorsoImage()
+{
+	const int dimX = 20, dimY = 20, dimZ = 150;
+	vtkSmartPointer<vtkImageData> raw = vtkSmartPointer<vtkImageData>::New();
+	raw->SetDimensions(dimX, dimY, dimZ);
+	raw->SetSpacing(5.0, 5.0, 5.0);
+	raw->AllocateScalars(VTK_SHORT, 1);
+
+	const short background = -1000;
+	const short tissue = 40;
+	const short lungAir = -800;
+
+	short* ptr = static_cast<short*>(raw->GetScalarPointer());
+	vtkIdType idx = 0;
+	for (int z = 0; z < dimZ; ++z)
+	{
+		for (int y = 0; y < dimY; ++y)
+		{
+			for (int x = 0; x < dimX; ++x, ++idx)
+			{
+				short value = background;
+				if (z <= 9)
+				{
+					bool armL = (x >= 2 && x <= 7) && (y >= 5 && y <= 17);
+					bool armR = (x >= 12 && x <= 17) && (y >= 5 && y <= 17);
+					if (armL || armR)
+						value = tissue;
+				}
+				else if (z <= 29)
+				{
+					if (x >= 7 && x <= 12 && y >= 7 && y <= 12)
+						value = tissue;
+				}
+				else if (z <= 69)
+				{
+					bool inTorso = (x >= 2 && x <= 17) && (y >= 2 && y <= 17);
+					bool inLungL = (x >= 3 && x <= 7) && (y >= 4 && y <= 15);
+					bool inLungR = (x >= 12 && x <= 16) && (y >= 4 && y <= 15);
+					if (inTorso)
+						value = (inLungL || inLungR) ? lungAir : tissue;
+				}
+				else
+				{
+					if ((x >= 2 && x <= 17) && (y >= 2 && y <= 17))
+						value = tissue;
+				}
+				ptr[idx] = value;
+			}
+		}
+	}
+
+	// A single, otherwise-irrelevant voxel just above the tissue value:
+	// vtkImageAccumulate's bins are half-open, so a population sitting
+	// exactly at the volume's max scalar value would otherwise fall outside
+	// even the last bin and be silently dropped, corrupting the Otsu split.
+	// Real scan data doesn't have this edge case (a continuous distribution
+	// near the max), but this synthetic image's single-valued "tissue"
+	// spike does.
+	ptr[0] = tissue + 1;
+
+	return cx::ImagePtr(new cx::Image("synthetic_torso", raw, "synthetic_torso", cx::imCT));
+}
+
+/** A synthetic CT volume that's just a short "head/upper chest" scan with a
+ *  genuinely enclosed (not reachable from any slice border) air pocket -
+ *  passes both the lung-fraction and minimum-run-length checks, so it looks
+ *  like a real lung to computeLungBaseCropBox(), but there is no real
+ *  abdomen below it for the designed margin to land in once clamped to the
+ *  volume's own short extent.
+ */
+cx::ImagePtr createSyntheticShortScanWithEnclosedPocketImage()
+{
+	const int dimX = 20, dimY = 20, dimZ = 30;
+	vtkSmartPointer<vtkImageData> raw = vtkSmartPointer<vtkImageData>::New();
+	raw->SetDimensions(dimX, dimY, dimZ);
+	raw->SetSpacing(5.0, 5.0, 5.0);
+	raw->AllocateScalars(VTK_SHORT, 1);
+
+	const short background = -1000;
+	const short tissue = 40;
+	const short lungAir = -800;
+
+	short* ptr = static_cast<short*>(raw->GetScalarPointer());
+	vtkIdType idx = 0;
+	for (int z = 0; z < dimZ; ++z)
+	{
+		for (int y = 0; y < dimY; ++y)
+		{
+			for (int x = 0; x < dimX; ++x, ++idx)
+			{
+				short value = background;
+				if (z <= 24)
+				{
+					bool inTorso = (x >= 2 && x <= 17) && (y >= 2 && y <= 17);
+					bool inPocket = (x >= 6 && x <= 13) && (y >= 6 && y <= 13);
+					if (inTorso)
+						value = inPocket ? lungAir : tissue;
+				}
+				ptr[idx] = value;
+			}
+		}
+	}
+	ptr[0] = tissue + 1; // avoid the max-value histogram edge case (see createSyntheticTorsoImage() above)
+
+	return cx::ImagePtr(new cx::Image("synthetic_short_scan", raw, "synthetic_short_scan", cx::imCT));
+}
+}
+
+TEST_CASE("ImageAlgorithms: computeLungBaseCropBox() discards an implausibly thin result", "[unit][resource][core]")
+{
+	cx::ImagePtr image = createSyntheticShortScanWithEnclosedPocketImage();
+	cx::DoubleBoundingBox3D box = cx::computeLungBaseCropBox(image);
+	CHECK(cx::similar(box, image->boundingBox()));
+}
+
+TEST_CASE("ImageAlgorithms: computeLungBaseCropBox() finds the diaphragm level, not the decoy arms-above-head gap", "[unit][resource][core]")
+{
+	cx::ImagePtr image = createSyntheticTorsoImage();
+	cx::DoubleBoundingBox3D box = cx::computeLungBaseCropBox(image);
+	cx::DoubleBoundingBox3D fullVolume = image->boundingBox();
+
+	CHECK_FALSE(cx::similar(box, fullVolume));
+	CHECK(box[4] == Approx(305.0));
+	CHECK(box[5] == Approx(625.0));
+	CHECK(box[0] == Approx(fullVolume[0]));
+	CHECK(box[1] == Approx(fullVolume[1]));
+	CHECK(box[2] == Approx(fullVolume[2]));
+	CHECK(box[3] == Approx(fullVolume[3]));
+}
+
+TEST_CASE("ImageAlgorithms: computeLungBaseCropBox() returns the full volume for non-CT", "[unit][resource][core]")
+{
+	cx::ImagePtr image = createSyntheticTorsoImage();
+	image->setModality(cx::imMR);
+	cx::DoubleBoundingBox3D box = cx::computeLungBaseCropBox(image);
+	CHECK(cx::similar(box, image->boundingBox()));
+}
+
+TEST_CASE("ImageAlgorithms: computeWidestCrossSectionCropBox() centers on the abdomen, the widest cross-section", "[unit][resource][core]")
+{
+	cx::ImagePtr image = createSyntheticTorsoImage();
+	cx::DoubleBoundingBox3D box = cx::computeWidestCrossSectionCropBox(image);
+	cx::DoubleBoundingBox3D fullVolume = image->boundingBox();
+
+	CHECK_FALSE(cx::similar(box, fullVolume));
+	CHECK(box[4] == Approx(50.0));
+	CHECK(box[5] == Approx(650.0));
+}
+
+TEST_CASE("ImageAlgorithms: computeAutoCropBoxAbdomen() prefers the lung-based result when it is available", "[unit][resource][core]")
+{
+	cx::ImagePtr image = createSyntheticTorsoImage();
+	cx::DoubleBoundingBox3D box = cx::computeAutoCropBoxAbdomen(image);
+	cx::DoubleBoundingBox3D lungBaseBox = cx::computeLungBaseCropBox(image);
+	CHECK(cx::similar(box, lungBaseBox));
+}
+
+TEST_CASE("ImageAlgorithms: computeAutoCropBoxAbdomen() falls back to the cross-section result for non-CT", "[unit][resource][core]")
+{
+	cx::ImagePtr image = createSyntheticTorsoImage();
+	image->setModality(cx::imMR);
+	cx::DoubleBoundingBox3D box = cx::computeAutoCropBoxAbdomen(image);
+	cx::DoubleBoundingBox3D crossSectionBox = cx::computeWidestCrossSectionCropBox(image);
+	CHECK(cx::similar(box, crossSectionBox));
+}
+

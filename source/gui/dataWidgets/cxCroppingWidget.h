@@ -52,6 +52,9 @@ private:
   BoundingBoxWidget* mBBWidget;
   QCheckBox* mUseCropperCheckBox;
   QCheckBox* mShowBoxCheckBox;
+  QCheckBox* mAutoCropBodyCheckBox;
+  QCheckBox* mAutoCropTorsoLungBaseCheckBox;
+  QCheckBox* mAutoCropTorsoCrossSectionCheckBox;
   QLabel* mBoundingBoxDimensions;
   PatientModelServicePtr mPatientModelService;
   ViewServicePtr mViewService;
@@ -61,7 +64,7 @@ private slots:
   void boxValuesChanged();
   void cropperChangedSlot();
   ImagePtr cropClipButtonClickedSlot();///< Crete a new image based on the images crop and clip values
-  void autoCropButtonClickedSlot();
+  void autoCropApplyButtonClickedSlot();
 };
 
 /**
