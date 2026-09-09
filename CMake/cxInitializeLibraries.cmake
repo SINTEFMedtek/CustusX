@@ -152,6 +152,10 @@ macro(cx_initialize_QT)
     find_package(Qt5Concurrent REQUIRED) # attempt to remove warning in cmake
     find_package(Qt5Multimedia REQUIRED)
     find_package(Qt5OpenGL REQUIRED)
+    # Not REQUIRED: only needed when CTK itself was built against Qt5Svg (e.g. macOS/Homebrew).
+    # The CI Ubuntu images don't install libqt5svg5-dev, and their CTK builds don't link
+    # Qt5::Svg either, so this is a no-op there.
+    find_package(Qt5Svg QUIET)
 endmacro()
 
 ###############################################################################
