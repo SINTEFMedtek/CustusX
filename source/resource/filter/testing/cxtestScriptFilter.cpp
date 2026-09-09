@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 #include <QDir>
+#include <QElapsedTimer>
 #include "cxGenericScriptFilter.h"
 #include "cxtestVisServices.h"
 #include "cxProperty.h"
@@ -759,6 +760,34 @@ TEST_CASE("GenericScriptFilter: appendToLineBuffer() does not grow unbounded acr
 	CHECK(filter->mCapturedLines.size() == 5000);
 	CHECK(filter->mCapturedLines.first() == "progress update 0");
 	CHECK(filter->mCapturedLines.last() == "progress update 4999");
+}
+
+TEST_CASE("GenericScriptFilter: appendToLineBuffer() handles many lines arriving in a single call efficiently", "[unit]")
+{
+	// Regression test for a real hang: a single QProcess::readyRead() burst
+	// can contain many thousands of '\r'-delimited tqdm updates at once
+	// (more likely the longer anything - e.g. a slow main-thread caller -
+	// delays draining the process' output). An earlier implementation
+	// re-scanned and re-copied the *entire remaining buffer* per line found
+	// within one call - fine for a line or two, but quadratic for a large
+	// burst like this one, which took minutes rather than the milliseconds
+	// asserted below.
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	QString burst;
+	const int lineCount = 50000;
+	for (int i = 0; i < lineCount; ++i)
+		burst += QString("progress update %1\r").arg(i);
+
+	QElapsedTimer timer;
+	timer.start();
+	filter->testAppendToLineBuffer(burst);
+	qint64 elapsedMs = timer.elapsed();
+
+	CHECK(filter->mCapturedLines.size() == lineCount);
+	CHECK(filter->mCapturedLines.first() == "progress update 0");
+	CHECK(filter->mCapturedLines.last() == QString("progress update %1").arg(lineCount - 1));
+	CHECK(elapsedMs < 2000);
 }
 
 TEST_CASE("Raidionics: target conversion", "[unit]")

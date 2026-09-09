@@ -27,6 +27,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QToolButton>
 #include <QAction>
 #include <QIcon>
+#include <QApplication>
+#include <QThread>
+#include <QtConcurrent/QtConcurrentRun>
 
 #include "cxLiverSegmentationRunner.h"
 #include "cxVisServices.h"
@@ -382,8 +385,22 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 	              << " (" << dims[0] << "x" << dims[1] << "x" << dims[2] << ") for a heavy filter...";
 
 	// Auto-crop is lossless; skip it if it wouldn't actually shrink anything.
+	// Runs on a worker thread: on a full-resolution whole-body scan this is a
+	// multi-second, pure-CPU scan over every voxel with no patient-model or
+	// other main-thread-only state involved - synchronously on the main
+	// thread (as originally written) it froze the UI long enough to trigger
+	// an OS "not responding" warning, same reasoning as contourFilter() in
+	// cxGenericScriptFilter.cpp.
 	ImagePtr working = image;
-	DoubleBoundingBox3D autoCropBox = computeAutoCropBox(image);
+	QFuture<DoubleBoundingBox3D> autoCropFuture = QtConcurrent::run([image]() {
+		return computeAutoCropBox(image);
+	});
+	while (!autoCropFuture.isFinished())
+	{
+		qApp->processEvents();
+		QThread::msleep(10);
+	}
+	DoubleBoundingBox3D autoCropBox = autoCropFuture.result();
 	if (!similar(autoCropBox, image->boundingBox()))
 		working = cropImage(mServices->patient(), image, autoCropBox, preparedUid, preparedName);
 
@@ -402,7 +419,18 @@ ImagePtr LiverSegmentationWidget::prepareImageForHeavyFilter(ImagePtr image) con
 	const double wholeBodyZExtentThresholdMm = 700;
 	if (working->boundingBox().range()[2] > wholeBodyZExtentThresholdMm)
 	{
-		DoubleBoundingBox3D abdomenCropBox = computeAutoCropBoxAbdomen(working);
+		// Same off-main-thread reasoning as the auto-crop above - this does
+		// at least as much per-voxel work (two full scans plus a per-slice
+		// flood fill), so it is at least as slow.
+		QFuture<DoubleBoundingBox3D> abdomenCropFuture = QtConcurrent::run([working]() {
+			return computeAutoCropBoxAbdomen(working);
+		});
+		while (!abdomenCropFuture.isFinished())
+		{
+			qApp->processEvents();
+			QThread::msleep(10);
+		}
+		DoubleBoundingBox3D abdomenCropBox = abdomenCropFuture.result();
 		if (!similar(abdomenCropBox, working->boundingBox()))
 		{
 			CX_LOG_INFO() << "LiverSegmentationWidget: z extent exceeds " << wholeBodyZExtentThresholdMm
