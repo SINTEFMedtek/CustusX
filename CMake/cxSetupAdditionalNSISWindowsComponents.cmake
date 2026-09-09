@@ -55,6 +55,7 @@ if(CX_WINDOWS AND ("${CX_SYSTEM_BASE_NAME}" STREQUAL "Fraxinus" OR CX_FRAXINUS_P
     CPACK_FRAX_RAIDIONICS_VERSION
     CPACK_FRAX_TOTALSEG_VERSION
     CPACK_FRAX_ELASTIX_VERSION
+    CPACK_FRAX_FAMILY_FOLDER_NAME
   )
   foreach(_frax_prop ${_frax_component_props})
     get_property(_frax_prop_val GLOBAL PROPERTY ${_frax_prop})
