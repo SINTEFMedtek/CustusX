@@ -33,6 +33,15 @@ How to use the bounding box:
  * First click the bounding box to get the control spheres
  * Click and drag a sphere to change the crop area
  
+###Button: Auto-crop to body
+Automatically sets the bounding box to tightly enclose the body, removing 
+surrounding air/background. The threshold separating body from background is 
+computed adaptively from the volume's own intensity histogram (Otsu's method) 
+rather than a fixed value, so it works for both CT and MR.
+
+This only moves the bounding box - press "Create new cropped volume" below to 
+apply it.
+
 ###Button: Create new cropped volume
 To make the crop permanent, press the button to create a new volume from the crop.
 This will also hide the original volume and show the new volume.
