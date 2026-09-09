@@ -93,12 +93,12 @@ TEST_CASE("LiverPlugin: organTypesFor() maps each filter to its own output organ
 
 namespace
 {
-cx::ImagePtr createMockImage(cx::PatientModelServicePtr patient, QString uid)
+cx::ImagePtr createMockImage(cx::PatientModelServicePtr patient, QString uid, cx::IMAGE_MODALITY modality = cx::imCT)
 {
 	vtkSmartPointer<vtkImageData> raw = vtkSmartPointer<vtkImageData>::New();
 	raw->SetDimensions(2, 2, 2);
 	raw->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
-	cx::ImagePtr image(new cx::Image(uid, raw));
+	cx::ImagePtr image(new cx::Image(uid, raw, uid, modality));
 	patient->insertData(image);
 	return image;
 }
@@ -196,6 +196,49 @@ TEST_CASE("LiverPlugin: prepareImageForHeavyFilter() is a no-op for an already-s
 	cx::ImagePtr prepared = widget.testPrepareImageForHeavyFilter(small);
 
 	CHECK(prepared == small);
+}
+
+TEST_CASE("LiverPlugin: selectedImagesDeduplicated() keeps both images when they differ", "[unit][plugins][org.custusx.liver]")
+{
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr patient = services->patient();
+
+	cx::ImagePtr imageA = createMockImage(patient, "imageA");
+	cx::ImagePtr imageB = createMockImage(patient, "imageB");
+
+	QList<cx::ImagePtr> images = cx::LiverSegmentationWidget::selectedImagesDeduplicated(imageA, imageB);
+
+	REQUIRE(images.size() == 2);
+	CHECK(images[0]->getUid() == "imageA");
+	CHECK(images[1]->getUid() == "imageB");
+}
+
+TEST_CASE("LiverPlugin: selectedImagesDeduplicated() skips Volume 2 when it is the same image as Volume 1", "[unit][plugins][org.custusx.liver]")
+{
+	// Regression test: picking the same volume in both selectors must not
+	// queue - and actually run - every checked filter twice against it.
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr patient = services->patient();
+
+	cx::ImagePtr imageA = createMockImage(patient, "imageA");
+
+	QList<cx::ImagePtr> images = cx::LiverSegmentationWidget::selectedImagesDeduplicated(imageA, imageA);
+
+	REQUIRE(images.size() == 1);
+	CHECK(images[0]->getUid() == "imageA");
+}
+
+TEST_CASE("LiverPlugin: selectedImagesDeduplicated() handles a missing Volume 2", "[unit][plugins][org.custusx.liver]")
+{
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr patient = services->patient();
+
+	cx::ImagePtr imageA = createMockImage(patient, "imageA");
+
+	QList<cx::ImagePtr> images = cx::LiverSegmentationWidget::selectedImagesDeduplicated(imageA, cx::ImagePtr());
+
+	REQUIRE(images.size() == 1);
+	CHECK(images[0]->getUid() == "imageA");
 }
 
 TEST_CASE("LiverPlugin: findMeshForSourceImage() matches only the exact source image", "[unit][plugins][org.custusx.liver]")

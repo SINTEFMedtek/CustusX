@@ -14,6 +14,22 @@ import subprocess
 import sys
 import time
 
+import SimpleITK as sitk
+
+
+def convertImage(inputPath, outputPath):
+    # Strip the metadata dictionary before writing: a NIfTI file carries
+    # tags (ITK_FileNotes, aux_file, descrip, intent_name, qto_xyz, ...)
+    # that MetaImageIO has no field for, so writing them straight through to
+    # a .mhd otherwise logs one "Unsupported or empty metaData item ...
+    # won't be written to image file" warning per tag, per conversion.
+    # Geometry (spacing/origin/direction) is unaffected - that's tracked
+    # separately from the metadata dictionary.
+    image = sitk.ReadImage(inputPath)
+    for key in image.GetMetaDataKeys():
+        image.EraseMetaData(key)
+    sitk.WriteImage(image, outputPath)
+
 
 def describeFailure(returncode):
     if returncode == -9:

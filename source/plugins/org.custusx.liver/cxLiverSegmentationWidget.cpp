@@ -249,15 +249,27 @@ void LiverSegmentationWidget::toggleAdvancedOptions()
 	mAdvancedOptionsGroup->setVisible(mAdvancedOptionsGroup->isHidden());
 }
 
+QList<ImagePtr> LiverSegmentationWidget::selectedImagesDeduplicated(ImagePtr image1, ImagePtr image2)
+{
+	QList<ImagePtr> images;
+	if (image1)
+		images << image1;
+	if (image2)
+	{
+		if (!images.isEmpty() && images.first()->getUid() == image2->getUid())
+			reportWarning(QString("Liver segmentation: Volume 2 (%1) is the same as Volume 1 - "
+			                       "skipping the duplicate run").arg(image2->getName()));
+		else
+			images << image2;
+	}
+	return images;
+}
+
 QList<LiverSegmentationWidget::PlannedRun> LiverSegmentationWidget::buildPlannedRuns() const
 {
 	QList<PlannedRun> runs;
 
-	QList<ImagePtr> images;
-	if (ImagePtr image1 = this->selectedImage1())
-		images << image1;
-	if (ImagePtr image2 = this->selectedImage2())
-		images << image2;
+	QList<ImagePtr> images = selectedImagesDeduplicated(this->selectedImage1(), this->selectedImage2());
 
 	QList<QPair<FilterKind, QCheckBox*> > filters;
 	filters << qMakePair(fkLiverPancreas, mCheckBoxLiverPancreas)

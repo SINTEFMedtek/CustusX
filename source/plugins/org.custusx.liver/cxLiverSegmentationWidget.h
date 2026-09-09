@@ -77,6 +77,11 @@ public:
 	static QString progressLabel(const PlannedRun& run);
 	// Single source of truth for this filter -> organ-type mapping.
 	static QList<ORGAN_TYPE> organTypesFor(FilterKind filter);
+	// Combines the two selected volumes into the list buildPlannedRuns()
+	// queues filters against - image1 first, then image2 unless it is the
+	// same image as image1 (in which case it is skipped, with a warning,
+	// rather than every checked filter running twice against it).
+	static QList<ImagePtr> selectedImagesDeduplicated(ImagePtr image1, ImagePtr image2);
 
 private slots:
 	void runOrStopButtonClicked();

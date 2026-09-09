@@ -1,18 +1,17 @@
 
 import os
-import SimpleITK as sitk
 import sys
 import getopt
 import glob
 
-from _process_utils import ManagedProcess, describeFailure
+from _process_utils import ManagedProcess, convertImage, describeFailure
 
 
 def runTotalSegmentator(filenameInput, fastMode=False):
     venv_path = os.path.dirname(sys.executable)
     if not filenameInput.endswith('.nii.gz'):
         filenameInput_nii_gz = os.path.splitext(filenameInput)[0] + '.nii.gz'
-        sitk.WriteImage(sitk.ReadImage(filenameInput), filenameInput_nii_gz)
+        convertImage(filenameInput, filenameInput_nii_gz)
         filenameInput = filenameInput_nii_gz
 
     args = [venv_path + '/TotalSegmentator', '-i', filenameInput,
@@ -59,8 +58,7 @@ def copyOutput(filenameInput):
     for segment in range(1, 9):
         sourceFile = data_path + 'liver_segment_{}.nii.gz'.format(segment)
         if os.path.isfile(sourceFile):
-            image = sitk.ReadImage(sourceFile)
-            sitk.WriteImage(image, filenameInputNoExt + '_liverSegments_LiverSegment{}.mhd'.format(segment))
+            convertImage(sourceFile, filenameInputNoExt + '_liverSegments_LiverSegment{}.mhd'.format(segment))
 
 def deleteAllFilesInSegmentationFolder():
     venv_path = os.path.dirname(sys.executable)
