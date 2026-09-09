@@ -16,6 +16,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProcessWrapper.h"
 #include <QColor>
 #include <QMap>
+#include <QMutex>
+#include <QAtomicInt>
 #include "cxSelectDataStringProperty.h"
 
 
@@ -126,6 +128,8 @@ protected:
 	QString getScriptPath();
 	QString getInputFilePath(ImagePtr input);
 	QString getOutputFilePath(ImagePtr input);
+	ProcessWrapperPtr getCommandLine();
+	void setCommandLine(ProcessWrapperPtr commandLine);
 
 	CommandStringVariables createCommandStringVariables(ImagePtr input);
 	QString standardCommandString(CommandStringVariables variables);
@@ -157,7 +161,19 @@ protected:
 
 	vtkImageDataPtr mRawResult;
 	QString mOutputChannelName;
+	// mCommandLine is read from the main thread (requestStop(), and the
+	// processXxx() slots invoked via queued connections) while it is
+	// created/reset from the worker thread (createProcess()/deleteProcess(),
+	// called from execute()). All access goes through
+	// getCommandLine()/setCommandLine() so the shared_ptr's own read/write
+	// is never racy; the ProcessWrapper it points to is not otherwise
+	// protected, since only one thread ever owns it at a time.
 	ProcessWrapperPtr mCommandLine;
+	QMutex mCommandLineMutex;
+	// Set by requestStop() (main thread), read by execute() (worker thread)
+	// after the process exits, so a script that catches SIGTERM and exits
+	// 0 is still treated as stopped rather than as a successful run.
+	QAtomicInt mStopRequested;
 	QString mResultFileEnding;
 	QStringList mOutoutOrgans;
 	ImagePtr mOutputImage;

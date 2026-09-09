@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTextStream>
 #include <QMessageBox>
 #include <QApplication>
-#include <QThread>
+#include <QMutexLocker>
 #include <QtConcurrent/QtConcurrentRun>
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
@@ -108,16 +108,29 @@ GenericScriptFilter::~GenericScriptFilter()
 {
 }
 
+ProcessWrapperPtr GenericScriptFilter::getCommandLine()
+{
+	QMutexLocker lock(&mCommandLineMutex);
+	return mCommandLine;
+}
+
+void GenericScriptFilter::setCommandLine(ProcessWrapperPtr commandLine)
+{
+	QMutexLocker lock(&mCommandLineMutex);
+	mCommandLine = commandLine;
+}
+
 void GenericScriptFilter::processStateChanged()
 {
-	if(!mCommandLine || !mCommandLine->getProcess())
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	if(!commandLine || !commandLine->getProcess())
 	{
 		//Seems like this slot may get called after mCommandLine process is deleted
 		//CX_LOG_ERROR() << "GenericScriptFilter::processStateChanged: Process not existing!";
 		return;
 	}
 
-	QProcess::ProcessState newState = mCommandLine->getProcess()->state();
+	QProcess::ProcessState newState = commandLine->getProcess()->state();
 	if (newState == QProcess::Running)
 	{
 //		CX_LOG_DEBUG() << "GenericScriptFilter process running";
@@ -168,10 +181,11 @@ void GenericScriptFilter::processError(QProcess::ProcessError error)
 
 void GenericScriptFilter::processReadyRead()
 {
-	if(!mCommandLine || !mCommandLine->getProcess())
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	if(!commandLine || !commandLine->getProcess())
 		return;
 
-	this->appendToLineBuffer(QString(mCommandLine->getProcess()->readAllStandardOutput()));
+	this->appendToLineBuffer(QString(commandLine->getProcess()->readAllStandardOutput()));
 }
 
 void GenericScriptFilter::appendToLineBuffer(const QString& newData)
@@ -209,10 +223,11 @@ void GenericScriptFilter::appendToLineBuffer(const QString& newData)
 
 void GenericScriptFilter::processReadyReadError()
 {
-	if(!mCommandLine || !mCommandLine->getProcess())
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	if(!commandLine || !commandLine->getProcess())
 		return;
 
-	QProcess* process = mCommandLine->getProcess();
+	QProcess* process = commandLine->getProcess();
 	CX_LOG_CHANNEL_ERROR(mOutputChannelName) << QString(process->readAllStandardError());
 }
 
@@ -671,13 +686,14 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 {
 	CX_LOG_INFO() << "Command to run: " << command;
 
-	CX_ASSERT(mCommandLine)
-	if(!mCommandLine)
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	CX_ASSERT(commandLine)
+	if(!commandLine)
 		return false;
 
-	bool success = mCommandLine->launch(command);
+	bool success = commandLine->launch(command);
 	if(success)
-		return mCommandLine->waitForFinished(1000*60*30);//Wait at least 30 min
+		return commandLine->waitForFinished(1000*60*30);//Wait at least 30 min
 	else
 	{
 		CX_LOG_WARNING() << "GenericScriptFilter::runCommandStringAndWait: Cannot start command!";
@@ -697,16 +713,25 @@ void GenericScriptFilter::setExtraEnvironmentVariable(QString name, QString valu
 
 void GenericScriptFilter::requestStop()
 {
-	if (!mCommandLine || !mCommandLine->getProcess())
+	// Recorded unconditionally (even if there turns out to be no process to
+	// signal below) so execute() can tell a stopped run apart from a script
+	// that happens to exit 0 on its own - see the exitCode() check there.
+	mStopRequested.storeRelease(1);
+
+	// mCommandLine is created/reset on the worker thread (createProcess()/
+	// deleteProcess(), called from execute()) while requestStop() runs on
+	// the main thread; getCommandLine() takes a local shared_ptr copy under
+	// mCommandLineMutex so the ProcessWrapper stays alive for this call even
+	// if the worker thread resets mCommandLine concurrently.
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	if (!commandLine || !commandLine->getProcess())
 		return;
 
-	// mCommandLine's QProcess has worker-thread affinity (created inside
-	// execute()), but requestStop() may be called from the main thread.
 	// QProcess::terminate() is not safe to invoke cross-thread here, and
 	// queuing it via QMetaObject::invokeMethod is not reliable either, so
 	// send the OS signal directly via the process' PID instead. POSIX only.
 #ifndef CX_WINDOWS
-	qint64 pid = mCommandLine->getProcess()->processId();
+	qint64 pid = commandLine->getProcess()->processId();
 	if (pid > 0)
 		::kill(pid, SIGTERM);
 #endif //CX_WINDOWS
@@ -753,11 +778,21 @@ bool GenericScriptFilter::execute()
 
 	// Run command string on console
 	bool retval = this->runCommandStringAndWait(command);
+	ProcessWrapperPtr commandLine = this->getCommandLine();
 	if(!retval)
 	{
-		processError(mCommandLine->getProcess()->error());
+		processError(commandLine->getProcess()->error());
 	}
-	else if (mCommandLine->getProcess()->exitCode() != 0)
+	else if (mStopRequested.loadAcquire())
+	{
+		// The script's own SIGTERM handler (see _process_utils.py) may exit
+		// 0 on a requested stop, which would otherwise be indistinguishable
+		// from a real, completed run - report it as neither success nor
+		// error, just not-done.
+		CX_LOG_INFO() << "GenericScriptFilter::execute: Script was stopped by the user.";
+		retval = false;
+	}
+	else if (commandLine->getProcess()->exitCode() != 0)
 	{
 		// waitForFinished() only reports whether the process exited at all,
 		// not whether it succeeded - a non-zero exit here (e.g. killed for
@@ -767,7 +802,7 @@ bool GenericScriptFilter::execute()
 		reportError(QString("Script exited with an error (code %1) - see the log for the script's own output. "
 		                     "This can happen if it was killed for exceeding the memory limit; try Fast mode, "
 		                     "raising the memory limit in advanced options, or closing other applications.")
-		            .arg(mCommandLine->getProcess()->exitCode()));
+		            .arg(commandLine->getProcess()->exitCode()));
 		retval = false;
 	}
 	retval = retval & deleteProcess();
@@ -777,13 +812,18 @@ bool GenericScriptFilter::execute()
 
 bool GenericScriptFilter::createProcess()
 {
-	mCommandLine.reset();//delete
+	// A fresh run: any stop requested against a previous run no longer applies.
+	mStopRequested.storeRelease(0);
 	mLineBuffer.clear();
-	mCommandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
-	mCommandLine->turnOffReporting();//Handle output in this class instead
+
+	// Built up locally and only published via setCommandLine() once fully
+	// configured, so requestStop() (main thread) never observes a
+	// half-configured ProcessWrapper through mCommandLine.
+	ProcessWrapperPtr commandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
+	commandLine->turnOffReporting();//Handle output in this class instead
 
 	// Merge channels to get all output in same channel in CustusX console
-	mCommandLine->getProcess()->setProcessChannelMode(QProcess::MergedChannels);
+	commandLine->getProcess()->setProcessChannelMode(QProcess::MergedChannels);
 
 	// Disable Python stdout buffering so output arrives in real time
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -794,15 +834,17 @@ bool GenericScriptFilter::createProcess()
 		extraEnv.next();
 		env.insert(extraEnv.key(), extraEnv.value());
 	}
-	mCommandLine->getProcess()->setProcessEnvironment(env);
+	commandLine->getProcess()->setProcessEnvironment(env);
 
-	connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
+	connect(commandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
 	/**************************************************************************
 	* NB: For Python output to be written Python buffering must be turned off:
 	* E.g. Use python -u
 	**************************************************************************/
 	//Show output from process
-	connect(mCommandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
+	connect(commandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
+
+	this->setCommandLine(commandLine);
 	return true;
 }
 
@@ -810,10 +852,10 @@ bool GenericScriptFilter::deleteProcess()
 {
 	disconnectProcess();
 	CX_LOG_DEBUG() << "deleteProcess";
-	if(mCommandLine)
+	if(this->getCommandLine())
 	{
 		CX_LOG_DEBUG() << "deleting";
-		mCommandLine.reset();
+		this->setCommandLine(ProcessWrapperPtr());
 		return true;
 	}
 	return false;
@@ -822,11 +864,12 @@ bool GenericScriptFilter::deleteProcess()
 bool GenericScriptFilter::disconnectProcess()
 {
 	CX_LOG_DEBUG() << "disconnectProcess";
-	if(mCommandLine)
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	if(commandLine)
 	{
 		CX_LOG_DEBUG() << "disconnecting";
-		disconnect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
-		disconnect(mCommandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
+		disconnect(commandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
+		disconnect(commandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
 		return true;
 	}
 	return false;
@@ -1124,11 +1167,11 @@ vtkPolyDataPtr GenericScriptFilter::contourFilter(int smoothing)
 	QFuture<vtkPolyDataPtr> future = QtConcurrent::run([=]() {
 		return ContourFilter::execute(input, threshold, reduceResoluion, applySmoothing, keepTopology, decimation, numberOfIterations, passBand);
 	});
-	while (!future.isFinished())
-	{
-		qApp->processEvents();
-		QThread::msleep(10);
-	}
+	// A plain blocking wait, not a processEvents() polling loop: this runs
+	// synchronously from postProcess() (main thread), and pumping the event
+	// loop here would let other GUI actions (e.g. starting another filter
+	// run) re-enter this filter's still-mid-postProcess() state.
+	future.waitForFinished();
 	vtkPolyDataPtr rawContour = future.result();
 
 	return rawContour;
