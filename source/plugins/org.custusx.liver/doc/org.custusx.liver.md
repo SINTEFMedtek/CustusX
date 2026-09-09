@@ -27,7 +27,7 @@ Advanced options (toggle with the icon below the filter list):
   Recommended for whole-body volumes or memory-constrained machines.
 * **TotalSegmentator memory limit** - caps how much memory the
   TotalSegmentator process itself is allowed to use before it is stopped.
-  "Automatic" scales this to a fraction of the machine's own total memory.
+  "Automatic" (0) sets this to 60% of the machine's own total physical RAM.
 
 \addindex liver_visibility_widget
 Liver Visibility Widget {#org_custusx_liver_visibility_widget}
