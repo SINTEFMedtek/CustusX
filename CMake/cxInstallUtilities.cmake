@@ -125,7 +125,20 @@ macro(cx_install_set_relative_path)
 		# http://www.cmake.org/Wiki/CMake_RPATH_handling
 		# http://www.cmake.org/pipermail/cmake/2008-January/019329.html
 		# Mac handles this differently
-		SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:\\\$ORIGIN/")
+		#
+		# Note: $ORIGIN must NOT be backslash-escaped here. CMake writes this
+		# value verbatim into a NEW_RPATH argument of file(RPATH_CHANGE) in the
+		# generated cmake_install.cmake (checked directly: grep NEW_RPATH in a
+		# built tree's cmake_install.cmake), not through any shell, so a plain
+		# "$ORIGIN" (bare $ isn't special to CMake's own parser -- only ${...},
+		# $ENV{...} etc are) is exactly what ends up in the installed RPATH. An
+		# escaped "\$ORIGIN" instead bakes a literal backslash character into
+		# every installed binary's RPATH tag, which the dynamic linker does not
+		# recognize as the $ORIGIN token -- it's just a bogus literal path
+		# component -- so every CX/CS/Fraxinus app on Linux could only resolve
+		# its libraries when run from inside its own bin/ (e.g. via ./AppName),
+		# never via an absolute or otherwise-relative path to the executable.
+		SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:$ORIGIN/")
 	endif(CX_LINUX)
         if(CX_APPLE)
                 # Add support for Frameworks installed into the bundle:
@@ -562,6 +575,59 @@ install(DIRECTORY "${QT_QML_DIR}/"
         install(DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}${CX_PLUGIN_DIR}/" # trailing slash copies contents, not plugin folder
 		DESTINATION ${CX_INSTALL_PLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
+
+	if(CX_LINUX)
+		# The plugin .so's above are installed via a plain file copy, not
+		# install(TARGETS...), so CMAKE_INSTALL_RPATH is never applied to them:
+		# they keep whatever RPATH they had when originally built, i.e. absolute
+		# paths into this machine's build tree (.../VTK/build_Release/lib etc).
+		# That's invisible at runtime as long as a plugin is only ever dlopen'd
+		# by CTK's plugin framework (its own further dependencies get resolved
+		# via whatever already-loaded copy satisfies the SONAME), but it breaks
+		# CPack's own packaging-time verify_app check for any executable that
+		# links a plugin directly (e.g. LogConsole, VicReconstructCLI in CS):
+		# verify_app walks the full dependency graph and, for anything only the
+		# plugin itself needs, follows the plugin's stale build-tree RPATH
+		# instead of the installed copy, flagging it as an unresolved "external
+		# prerequisite". Rewriting it to $ORIGIN here matches what every other
+		# installed binary already gets, so plugin .so's can also find their
+		# own dependencies next to themselves in the installed tree.
+		install(CODE "
+			# Glob the plugin *build* output (not the install destination: that's
+			# the same directory as every other installed binary and Qt/system
+			# library, e.g. libxcb*, most of which have no RPATH entry at all to
+			# rewrite) so only the files this DIRECTORY install actually copied
+			# get touched.
+			#
+			# Use READ_ELF + RPATH_CHANGE rather than the simpler RPATH_SET:
+			# RPATH_SET needs a newer CMake than some CI images ship (fails
+			# with \"file does not recognize sub-command RPATH_SET\" there),
+			# while READ_ELF and RPATH_CHANGE are already relied on elsewhere
+			# in this exact install step -- CMake's own generated
+			# cmake_install.cmake already calls RPATH_CHANGE for every regular
+			# install(TARGETS...) target, and verify_app's own get_item_rpaths()
+			# (in BundleUtilities.cmake, used unmodified further down this same
+			# script) already calls READ_ELF -- so both are already proven to
+			# work on every CI image this project packages on.
+			file(GLOB _cx_plugin_sofiles \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}${CX_PLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}*\")
+			foreach(_cx_plugin_so \${_cx_plugin_sofiles})
+				get_filename_component(_cx_plugin_so_name \"\${_cx_plugin_so}\" NAME)
+				set(_cx_installed_so \"\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_PLUGIN_DIR}/\${_cx_plugin_so_name}\")
+				if(EXISTS \"\${_cx_installed_so}\" AND NOT IS_SYMLINK \"\${_cx_installed_so}\")
+					file(READ_ELF \"\${_cx_installed_so}\" RPATH _cx_old_rpath RUNPATH _cx_old_runpath CAPTURE_ERROR _cx_elf_error)
+					# READ_ELF returns a CMake list (;-separated); RPATH_CHANGE
+					# needs the raw, colon-separated on-disk form back.
+					string(REPLACE \";\" \":\" _cx_old_rpath \"\${_cx_old_rpath}\")
+					string(REPLACE \";\" \":\" _cx_old_runpath \"\${_cx_old_runpath}\")
+					if(_cx_old_rpath)
+						file(RPATH_CHANGE FILE \"\${_cx_installed_so}\" OLD_RPATH \"\${_cx_old_rpath}\" NEW_RPATH \"$ORIGIN\")
+					elseif(_cx_old_runpath)
+						file(RPATH_CHANGE FILE \"\${_cx_installed_so}\" OLD_RPATH \"\${_cx_old_runpath}\" NEW_RPATH \"$ORIGIN\")
+					endif()
+				endif()
+			endforeach()
+			")
+	endif()
 
 	# explicitly tell which executables that should be fixed up.
         # why: fixup_bundle seems to fail to assemble exes in some cases.
