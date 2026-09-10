@@ -16,8 +16,12 @@ fi
 cd "$venvBasePath";
 sudo apt-get -y update
 sudo apt install -y python3.8-venv
-python3 -m venv raidionicsVenv
-source raidionicsVenv/bin/activate
+# venvBasePath is already the intended venv root (GenericScriptFilter derives it
+# by stripping "bin/python" off the .ini's environment path), so the venv must be
+# created directly in "." here - creating a nested "raidionicsVenv" subdir instead
+# leaves the real venv one level too deep, and CustusX then can't find its python binary.
+python3 -m venv .
+source bin/activate
 pip install --upgrade pip
 pip install git+https://github.com/dbouget/raidionics-rads-lib.git
 deactivate

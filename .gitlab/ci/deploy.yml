@@ -17,6 +17,14 @@
           --upload-file $INSTALLER_FILE \
           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/CustusX-${OS}.tar.gz"
       done
+    # Upload install script with version baked in so users get a single-file installer
+    - cd $CI_PROJECT_DIR
+    - sed "s/^CUSTUSX_VERSION=.*/CUSTUSX_VERSION=\"${VERSION}\"/" install/installCustusX.sh > /tmp/installCustusX.sh
+    - |
+      curl \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --upload-file /tmp/installCustusX.sh \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/installCustusX.sh"
 
 deploy-commit:
   extends: .deploy
@@ -53,15 +61,26 @@ create-release:
       BASE_VERSION=$(echo "$CI_COMMIT_TAG" | sed -E 's/-rc[0-9]+$//')
       NOTES_MD="doc/release_notes/release_notes_${BASE_VERSION}.md"
       if [ ! -f "$NOTES_MD" ]; then
-        echo "WARNING: $NOTES_MD not found for tag ${CI_COMMIT_TAG}. Skipping release creation."
+        # No notes file for this tag (e.g. a test tag, or an rc pushed before the
+        # real notes file was written) -- fall back to a generic test-release
+        # notes file instead of silently skipping release creation, so a tag
+        # pushed to test the installers still gets a clearly-marked release page.
+        echo "$NOTES_MD not found for tag ${CI_COMMIT_TAG} -- using generic test-release notes."
+        NOTES_MD="doc/release_notes/release_notes_test.md"
+      fi
+      if [ ! -f "$NOTES_MD" ]; then
+        echo "WARNING: fallback $NOTES_MD not found either. Skipping release creation."
         exit 0
       fi
 
+      # filepath enables the permalink/latest/downloads/installCustusX.sh shortcut,
+      # so the README install command doesn't need updating on every release.
       LINKS=$(jq -n --arg base "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}" \
         '[
           {name: "CustusX Ubuntu 20.04 installer", url: ($base + "/CustusX-Ubuntu2004.tar.gz"), link_type: "package"},
           {name: "CustusX Ubuntu 22.04 installer", url: ($base + "/CustusX-Ubuntu2204.tar.gz"), link_type: "package"},
-          {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404.tar.gz"), link_type: "package"}
+          {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404.tar.gz"), link_type: "package"},
+          {name: "CustusX installer script (all Ubuntu versions)", url: ($base + "/installCustusX.sh"), link_type: "package", filepath: "/installCustusX.sh"}
         ]')
 
       DESCRIPTION=$(jq -Rs . < "$NOTES_MD")

@@ -33,6 +33,27 @@ How to use the bounding box:
  * First click the bounding box to get the control spheres
  * Click and drag a sphere to change the crop area
  
+###Group: Auto-crop
+Check one or more of the options below, then press the "Auto-crop" button to 
+set the bounding box to their combined (intersected) result. This only moves 
+the bounding box - press "Create new cropped volume" below to apply it.
+
+* **Crop away outside air** - tightly encloses the body, removing 
+  surrounding air/background. The threshold separating body from background 
+  is computed adaptively from the volume's own intensity histogram (Otsu's 
+  method) rather than a fixed value, so it works for both CT and MR.
+* **Crop away head/legs (lung-based, CT only)** - crops to the torso/abdomen 
+  region of a whole-body scan, using the lung bases as a landmark. Has no 
+  effect if the volume isn't CT or doesn't confidently show the thorax.
+* **Crop away head/legs (cross-section)** - a cheaper, modality-agnostic 
+  fallback that crops around the widest cross-section of the body (the 
+  torso, for any body habitus). Less precise than the lung-based option - 
+  e.g. biased toward the chest rather than the abdomen if the arms are down 
+  at the sides.
+
+Checking both "outside air" and one of the head/legs options combines a 
+lossless x/y crop with a z-axis crop in a single step.
+
 ###Button: Create new cropped volume
 To make the crop permanent, press the button to create a new volume from the crop.
 This will also hide the original volume and show the new volume.

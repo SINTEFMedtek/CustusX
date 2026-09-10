@@ -29,6 +29,8 @@ CMake minimum version: 3.16.3. C++ standard: C++14. All build outputs go to `${P
 
 ## Running Tests
 
+New non-trivial code (algorithms, filter logic, bug fixes) should come with an automated test where practical. Pure/static logic (mappings, threshold/bounding-box computation, etc.) is the easiest target - prefer exposing it as a testable pure function over leaving it embedded in a widget or filter with no coverage. A private method worth testing on its own can be moved to `protected` and exercised via a thin test subclass (see "Testing Filter plugins" below) rather than left untested for lack of access.
+
 Tests use the **Catch** framework. Each plugin has a `testing/` subdirectory; all tests are linked into a single `Catch` executable.
 
 ```bash
@@ -134,6 +136,10 @@ git -C FX/FX remote set-url origin git@gitlab.sintef.no:custusx/Fraxinus.git
 git -C FX/FX push origin <branch>
 git -C FX/FX remote set-url origin https://gitlab.sintef.no/custusx/fraxinus.git
 ```
+
+**Never commit directly to `develop`/`master`**
+
+Always create/use a feature branch for a commit, even a small one-line fix, in any of these repos: CustusX, CustusS, Fraxinus (public or private), or any private plugin repo (`org.custusx.core.tracking.system.ndi`, etc). This applies regardless of how small or obviously-correct the change is, and even if the commit is only local and not yet pushed. If a task naturally lands on `develop` (e.g. because that's where a relevant file currently lives), create a feature branch from that point first (`git checkout -b cxNN-description`) and commit there instead. Commits go to `develop`/`master` only via review/merge (e.g. an MR), never directly.
 
 **Open/Closed code**
 
@@ -245,6 +251,23 @@ cx::LogicManager::shutdown();
 ```cmake
 vtk_module_autoinit(TARGETS cxtest_my_filter MODULES VTK::FiltersCore VTK::FiltersGeneral)
 ```
+
+### Private plugin repos (separate git repo, e.g. org.custusx.core.tracking.system.ndi)
+
+A private plugin living in its own git repo (rather than directly under `source/plugins/` in
+this repo) joins the coordinated multi-repo release process (CustusS's `script/cxRelease.py` /
+`script/cxPrivateReposActions.py`) once it's registered as a component and added to
+`_getAllRepositories()` there. That process assumes every repo it touches already has a
+`master` branch (`--phase final` merges `release/vYY.MM` into it) and a `develop` branch
+(`--phase rc` branches the first release candidate off it).
+
+**Create both `master` and `develop` (and push them) before adding a new private plugin repo
+to `_getAllRepositories()`**, even if the repo only has a few commits so far. A repo missing
+`master` was silently mishandled during the v26.08 final release
+(`org.custusx.core.tracking.system.ndi`): the release script found the repo fine, but its
+per-repo git commands failed with no visible summary, so `git checkout master` silently left
+it on the wrong branch for every subsequent step (pull/merge/tag/push) -- the branch had to be
+created and backfilled by hand after the fact.
 
 ## Documentation
 

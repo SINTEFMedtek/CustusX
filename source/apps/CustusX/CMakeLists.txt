@@ -93,3 +93,12 @@ install(TARGETS CustusX
     BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
     RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
 )
+
+if(CX_LINUX)
+  install(FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/CustusX.desktop
+    DESTINATION ${CX_INSTALL_ROOT_DIR})
+  install(FILES
+    ${CustusX_SOURCE_DIR}/source/gui/icons/CustusX/CustusX.png
+    DESTINATION ${CX_INSTALL_ROOT_DIR}/icons)
+endif(CX_LINUX)

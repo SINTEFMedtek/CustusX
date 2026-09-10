@@ -574,6 +574,13 @@ class CustusX(CppComponent):
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
+        # Distinctly-branded sibling apps (e.g. CustusX+CustusS, Fraxinus+FraxinusExcelsior)
+        # can share one family folder (~/<family>/) for data that's expensive to
+        # duplicate (venvs, downloaded models, Patients) while keeping their own
+        # settings/profiles/cache separate. Defaults to system_base_name (a family
+        # of one) unless a control-data class sets family_folder_name explicitly.
+        family_folder_name = getattr(self.controlData, 'family_folder_name', self.controlData.system_base_name)
+        add('CX_FAMILY_FOLDER_NAME:STRING', family_folder_name)
         if(platform.system() == 'Darwin'):
           add('CMAKE_PREFIX_PATH:PATH', "/opt/homebrew/opt/qt@5/lib/cmake;/opt/homebrew")
         if(platform.system() == 'Linux'):

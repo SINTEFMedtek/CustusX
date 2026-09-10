@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 #include <QDir>
+#include <QElapsedTimer>
 #include "cxGenericScriptFilter.h"
 #include "cxtestVisServices.h"
 #include "cxProperty.h"
@@ -38,11 +39,15 @@ public:
 	TestGenericScriptFilter() :
 		GenericScriptFilter(cx::VisServices::getNullObjects()),
 		mGotOutput(false)
-	{}
+	{
+		connect(this, &cx::GenericScriptFilter::scriptOutput, this, [this](const QString& line) { mCapturedLines << line; });
+	}
 	TestGenericScriptFilter(cx::VisServicesPtr services) :
 		GenericScriptFilter(services),
 		mGotOutput(false)
-	{}
+	{
+		connect(this, &cx::GenericScriptFilter::scriptOutput, this, [this](const QString& line) { mCapturedLines << line; });
+	}
 	void testCreateOptions()
 	{
 		createOptions();
@@ -80,14 +85,26 @@ public:
 		QStringList volumeOption = {"true"};
 		return readGeneratedSegmentationFiles(meshOption, volumeOption);
 	}
+	QString testColorForOrganType(QString outputClass)
+	{
+		return colorForOrganType(outputClass);
+	}
+	int testCountPlannedMeshes(QStringList createOutputMeshList)
+	{
+		return countPlannedMeshes(createOutputMeshList);
+	}
+	QStringList mCapturedLines;
+	void testAppendToLineBuffer(QString data)
+	{
+		appendToLineBuffer(data);
+	}
 
 	void setTestScriptFile(bool useLungsFile = false)
 	{
-		QString configPath = cx::DataLocations::getRootConfigPath();
-		//CX_LOG_DEBUG() << "config path: " << configPath;
-		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_test.ini";
+		QString filterScriptsPath = cx::DataLocations::getFilterScriptsPath();
+		QString scriptFile = filterScriptsPath + "python_test.ini";
 		if(useLungsFile)
-			scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_LungVessels.ini";
+			scriptFile = filterScriptsPath + "python_LungVessels.ini";
 		CX_LOG_DEBUG() << "Using script file: " << scriptFile;
 
 		mScriptFile->setValueFromVariant(scriptFile);
@@ -95,8 +112,7 @@ public:
 
 	void setRaidionicsScriptFile()
 	{
-		QString configPath = cx::DataLocations::getRootConfigPath();
-		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/raidionics_LungAll.ini";
+		QString scriptFile = cx::DataLocations::getFilterScriptsPath() + "raidionics_LungAll.ini";
 		mScriptFile->setValueFromVariant(scriptFile);
 	}
 
@@ -672,23 +688,106 @@ TEST_CASE("Raidionics: target generation", "[unit]")
 	}
 }
 
-TEST_CASE("Raidionics: Test color generation", "[unit]")
+TEST_CASE("GenericScriptFilter: Test color generation", "[unit]")
 {
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
 	QString testClass;
 	QString colorUnknownClass;
-	colorUnknownClass = cx::Raidionics::colorForLungClass(testClass);
+	colorUnknownClass = filter->testColorForOrganType(testClass);
 	CHECK_FALSE(colorUnknownClass.isEmpty());
 	testClass = "not a correct class name";
-	CHECK(cx::Raidionics::colorForLungClass(testClass) == colorUnknownClass);
+	CHECK(filter->testColorForOrganType(testClass) == colorUnknownClass);
 
 	QString testColor;
 	for(int target = cx::otRAIDIONICS_BEGIN; target < cx::otRAIDIONICS_END; ++target)//Assumes continious numbers in enum
 	{
-		testColor = cx::Raidionics::colorForLungClass(enum2string(cx::ORGAN_TYPE(target)));
+		testColor = filter->testColorForOrganType(enum2string(cx::ORGAN_TYPE(target)));
 		CHECK_FALSE(testColor.isEmpty());
 		CHECK(testColor != colorUnknownClass);
 	}
 
+}
+
+TEST_CASE("GenericScriptFilter: countPlannedMeshes()", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	CHECK(filter->testCountPlannedMeshes(QStringList() << "true") == 0);
+	CHECK(filter->testCountPlannedMeshes(QStringList()) == 0);
+
+	filter->addOutputClass("Liver");
+	filter->addOutputClass("Pancreas");
+
+	CHECK(filter->testCountPlannedMeshes(QStringList() << "true") == 2);
+
+	CHECK(filter->testCountPlannedMeshes(QStringList() << "Liver") == 1);
+	CHECK(filter->testCountPlannedMeshes(QStringList() << "Liver" << "Pancreas") == 2);
+	CHECK(filter->testCountPlannedMeshes(QStringList() << "SomethingElse") == 0);
+	CHECK(filter->testCountPlannedMeshes(QStringList()) == 0);
+}
+
+TEST_CASE("GenericScriptFilter: appendToLineBuffer() splits on carriage return as well as newline", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	filter->testAppendToLineBuffer("first\rsecond\rthird\n");
+	REQUIRE(filter->mCapturedLines.size() == 3);
+	CHECK(filter->mCapturedLines[0] == "first");
+	CHECK(filter->mCapturedLines[1] == "second");
+	CHECK(filter->mCapturedLines[2] == "third");
+}
+
+TEST_CASE("GenericScriptFilter: appendToLineBuffer() handles data arriving in separate chunks", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	filter->testAppendToLineBuffer("partial line, no terminator yet");
+	CHECK(filter->mCapturedLines.isEmpty());
+
+	filter->testAppendToLineBuffer(" - completed\r");
+	REQUIRE(filter->mCapturedLines.size() == 1);
+	CHECK(filter->mCapturedLines[0] == "partial line, no terminator yet - completed");
+}
+
+TEST_CASE("GenericScriptFilter: appendToLineBuffer() does not grow unbounded across many carriage returns", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	for (int i = 0; i < 5000; ++i)
+		filter->testAppendToLineBuffer(QString("progress update %1\r").arg(i));
+
+	CHECK(filter->mCapturedLines.size() == 5000);
+	CHECK(filter->mCapturedLines.first() == "progress update 0");
+	CHECK(filter->mCapturedLines.last() == "progress update 4999");
+}
+
+TEST_CASE("GenericScriptFilter: appendToLineBuffer() handles many lines arriving in a single call efficiently", "[unit]")
+{
+	// Regression test for a real hang: a single QProcess::readyRead() burst
+	// can contain many thousands of '\r'-delimited tqdm updates at once
+	// (more likely the longer anything - e.g. a slow main-thread caller -
+	// delays draining the process' output). An earlier implementation
+	// re-scanned and re-copied the *entire remaining buffer* per line found
+	// within one call - fine for a line or two, but quadratic for a large
+	// burst like this one, which took minutes rather than the milliseconds
+	// asserted below.
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	QString burst;
+	const int lineCount = 50000;
+	for (int i = 0; i < lineCount; ++i)
+		burst += QString("progress update %1\r").arg(i);
+
+	QElapsedTimer timer;
+	timer.start();
+	filter->testAppendToLineBuffer(burst);
+	qint64 elapsedMs = timer.elapsed();
+
+	CHECK(filter->mCapturedLines.size() == lineCount);
+	CHECK(filter->mCapturedLines.first() == "progress update 0");
+	CHECK(filter->mCapturedLines.last() == QString("progress update %1").arg(lineCount - 1));
+	CHECK(elapsedMs < 2000);
 }
 
 TEST_CASE("Raidionics: target conversion", "[unit]")

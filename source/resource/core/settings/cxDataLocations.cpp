@@ -93,9 +93,14 @@ QString DataLocations::readTestDataPathFromFile(QString filename)
 	return cxDataRoot;
 }
 
+QString DataLocations::getFamilyRootPath()
+{
+	return QDir::homePath() + "/" + CX_FAMILY_FOLDER_NAME;
+}
+
 QString DataLocations::getPersistentWritablePath()
 {
-	QString homepath = QDir::homePath() + "/" + CX_SETTINGS_FOLDER_NAME + "_settings";
+	QString homepath = DataLocations::getFamilyRootPath() + "/" + CX_SYSTEM_BASE_NAME + "_settings";
 
 	if (mTestMode)
 		homepath = homepath + "/temp";
@@ -250,13 +255,18 @@ QString DataLocations::getCachePath()
 
 QString DataLocations::getModelsPath()
 {
-	QString path(getPersistentWritablePath()+"/models");
+	// Shared at the family level (see CX_FAMILY_FOLDER_NAME): downloaded AI
+	// models are expensive to fetch, and identical across sibling apps
+	// (e.g. Fraxinus and FraxinusExcelsior), so there's no reason to duplicate
+	// them per app.
+	QString path(getFamilyRootPath()+"/models");
 	return path;
 }
 
 QString DataLocations::getVirtualEnvironmentsPath()
 {
-	QString path(getPersistentWritablePath() + "/virtualEnvironments");
+	// Shared at the family level, same reasoning as getModelsPath().
+	QString path(getFamilyRootPath() + "/virtualEnvironments");
 	return path;
 }
 
@@ -363,7 +373,7 @@ bool DataLocations::isRunFromBuildFolder()
 QString DataLocations::getFilterScriptsPath()
 {
 	QString configPath = DataLocations::getRootConfigPath();
-	QString retval = configPath + "/profiles/Laboratory/filter_scripts/";
+	QString retval = configPath + "/filter_scripts/";
 	return retval;
 }
 

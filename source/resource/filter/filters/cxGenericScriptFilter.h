@@ -15,6 +15,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSettings.h"
 #include "cxProcessWrapper.h"
 #include <QColor>
+#include <QMap>
+#include <QMutex>
+#include <QAtomicInt>
 #include "cxSelectDataStringProperty.h"
 
 
@@ -85,9 +88,20 @@ public:
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 	PatientModelServicePtr mPatientModelService;
 	void setOutputClasses(QStringList outputClasses);
+	// Sends SIGTERM, not SIGKILL: the script relies on receiving it to
+	// terminate any child process it spawned (e.g. a TotalSegmentator
+	// subprocess) - SIGKILL would leave such a child orphaned.
+	void requestStop();
+	// Appended (space-separated) after the .ini file's own "arguments"
+	// value, becoming one extra element of the script's own sys.argv.
+	void setExtraCommandLineArguments(QString args);
+	// Set in the launched process' environment, in addition to (or
+	// overriding) the inherited system environment.
+	void setExtraEnvironmentVariable(QString name, QString value);
 
 signals:
 	void scriptOutput(const QString& line);
+	void meshGenerationProgress(int percent);
 	void launchDialog(QString venvPath, QString createCommand, QString command);
 public slots:
 	void launchDialogSlot(QString venvPath, QString createCommand, QString command);
@@ -107,11 +121,15 @@ protected:
 	vtkPolyDataPtr contourFilter(int smoothing);
 	bool readGeneratedSegmentationFiles(QStringList createOutputVolume, QStringList createOutputMesh);
 	QString createImageName(QString parentName, QString filePath);
+	int countPlannedMeshes(QStringList createOutputMeshList) const;
+	void appendToLineBuffer(const QString& newData);
 	void createOutputVolume();
 	void deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume);
 	QString getScriptPath();
 	QString getInputFilePath(ImagePtr input);
 	QString getOutputFilePath(ImagePtr input);
+	ProcessWrapperPtr getCommandLine();
+	void setCommandLine(ProcessWrapperPtr commandLine);
 
 	CommandStringVariables createCommandStringVariables(ImagePtr input);
 	QString standardCommandString(CommandStringVariables variables);
@@ -134,6 +152,8 @@ protected:
 	void setContourFilteringFromClasses();
 	int getClassNumber(QString filePath);
 	ORGAN_TYPE getOrganType(int classNumber);
+	QString colorForOrganType(QString outputClass);
+	int contourFilterSettingForOrganType(QString outputClass);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
@@ -141,7 +161,19 @@ protected:
 
 	vtkImageDataPtr mRawResult;
 	QString mOutputChannelName;
+	// mCommandLine is read from the main thread (requestStop(), and the
+	// processXxx() slots invoked via queued connections) while it is
+	// created/reset from the worker thread (createProcess()/deleteProcess(),
+	// called from execute()). All access goes through
+	// getCommandLine()/setCommandLine() so the shared_ptr's own read/write
+	// is never racy; the ProcessWrapper it points to is not otherwise
+	// protected, since only one thread ever owns it at a time.
 	ProcessWrapperPtr mCommandLine;
+	QMutex mCommandLineMutex;
+	// Set by requestStop() (main thread), read by execute() (worker thread)
+	// after the process exits, so a script that catches SIGTERM and exits
+	// 0 is still treated as stopped rather than as a successful run.
+	QAtomicInt mStopRequested;
 	QString mResultFileEnding;
 	QStringList mOutoutOrgans;
 	ImagePtr mOutputImage;
@@ -156,11 +188,12 @@ protected:
 	SCRIPT_ENGINE mScriptEngine = seUnknown;
 	RaidionicsPtr mRaidionicsUtilities = nullptr;
 	QString mLineBuffer;
+	QString mExtraCommandLineArguments;
+	QMap<QString, QString> mExtraEnvironmentVariables;
 
 protected slots:
 	void scriptFileChanged();
 	void processStateChanged();
-	void processFinished(int code, QProcess::ExitStatus status);
 	void processError(QProcess::ProcessError error);
 	void processReadyRead();
 	void processReadyReadError();

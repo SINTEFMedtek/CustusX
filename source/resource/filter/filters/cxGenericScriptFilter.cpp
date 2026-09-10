@@ -18,6 +18,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTextStream>
 #include <QMessageBox>
 #include <QApplication>
+#include <QMutexLocker>
+#include <QtConcurrent/QtConcurrentRun>
+#include <vtkImageData.h>
+#include <vtkPolyData.h>
+#ifndef CX_WINDOWS
+#include <csignal>
+#include <sys/types.h>
+#endif //CX_WINDOWS
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -100,16 +108,29 @@ GenericScriptFilter::~GenericScriptFilter()
 {
 }
 
+ProcessWrapperPtr GenericScriptFilter::getCommandLine()
+{
+	QMutexLocker lock(&mCommandLineMutex);
+	return mCommandLine;
+}
+
+void GenericScriptFilter::setCommandLine(ProcessWrapperPtr commandLine)
+{
+	QMutexLocker lock(&mCommandLineMutex);
+	mCommandLine = commandLine;
+}
+
 void GenericScriptFilter::processStateChanged()
 {
-	if(!mCommandLine || !mCommandLine->getProcess())
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	if(!commandLine || !commandLine->getProcess())
 	{
 		//Seems like this slot may get called after mCommandLine process is deleted
 		//CX_LOG_ERROR() << "GenericScriptFilter::processStateChanged: Process not existing!";
 		return;
 	}
 
-	QProcess::ProcessState newState = mCommandLine->getProcess()->state();
+	QProcess::ProcessState newState = commandLine->getProcess()->state();
 	if (newState == QProcess::Running)
 	{
 //		CX_LOG_DEBUG() << "GenericScriptFilter process running";
@@ -124,12 +145,6 @@ void GenericScriptFilter::processStateChanged()
 	{
 		CX_LOG_DEBUG() << "GenericScriptFilter process starting";
 	}
-}
-
-void GenericScriptFilter::processFinished(int code, QProcess::ExitStatus status)
-{
-	if (status == QProcess::CrashExit)
-		reportError("GenericScriptFilter process crashed");
 }
 
 void GenericScriptFilter::processError(QProcess::ProcessError error)
@@ -166,30 +181,53 @@ void GenericScriptFilter::processError(QProcess::ProcessError error)
 
 void GenericScriptFilter::processReadyRead()
 {
-	if(!mCommandLine || !mCommandLine->getProcess())
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	if(!commandLine || !commandLine->getProcess())
 		return;
 
-	QProcess* process = mCommandLine->getProcess();
-	mLineBuffer += QString(process->readAllStandardOutput());
-	int newlinePos;
-	while ((newlinePos = mLineBuffer.indexOf('\n')) != -1)
+	this->appendToLineBuffer(QString(commandLine->getProcess()->readAllStandardOutput()));
+}
+
+void GenericScriptFilter::appendToLineBuffer(const QString& newData)
+{
+	mLineBuffer += newData;
+	// Also split on '\r': tqdm-style progress output (as produced by
+	// TotalSegmentator) only uses '\r', never '\n', until the whole
+	// operation completes, so splitting on '\n' alone let mLineBuffer
+	// grow unbounded for the duration of such a run.
+	//
+	// Single pass, one trailing removal - not "re-scan the whole remaining
+	// buffer for the next delimiter, then re-copy the whole remaining tail"
+	// per line found. That combination is O(bufferSize * lineCount) for one
+	// call: harmless for a line or two, but tqdm can flush thousands of
+	// '\r' updates in one burst (worse the longer anything - e.g. a slow
+	// caller of this event, or another main-thread call - delays draining
+	// the process' output), at which point the old approach took minutes.
+	int lineStart = 0;
+	int len = mLineBuffer.size();
+	for (int pos = 0; pos < len; ++pos)
 	{
-		QString line = mLineBuffer.left(newlinePos).trimmed();
-		mLineBuffer = mLineBuffer.mid(newlinePos + 1);
+		QChar c = mLineBuffer.at(pos);
+		if (c != '\n' && c != '\r')
+			continue;
+		QString line = mLineBuffer.mid(lineStart, pos - lineStart).trimmed();
 		if(!line.isEmpty())
 		{
 			CX_LOG_CHANNEL_INFO(mOutputChannelName) << line;
 			emit scriptOutput(line);
 		}
+		lineStart = pos + 1;
 	}
+	mLineBuffer.remove(0, lineStart);
 }
 
 void GenericScriptFilter::processReadyReadError()
 {
-	if(!mCommandLine || !mCommandLine->getProcess())
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	if(!commandLine || !commandLine->getProcess())
 		return;
 
-	QProcess* process = mCommandLine->getProcess();
+	QProcess* process = commandLine->getProcess();
 	CX_LOG_CHANNEL_ERROR(mOutputChannelName) << QString(process->readAllStandardError());
 }
 
@@ -325,6 +363,9 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 	// Get paths
 	variables.inputFilePath = getInputFilePath(input);
 	variables.outputFilePath = getOutputFilePath(input);
+
+	if (!mExtraCommandLineArguments.isEmpty())
+		variables.cArguments = (variables.cArguments.isEmpty() ? QString() : variables.cArguments + " ") + mExtraCommandLineArguments;
 
 	if(!setScriptEngine(variables))
 	{
@@ -645,18 +686,55 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 {
 	CX_LOG_INFO() << "Command to run: " << command;
 
-	CX_ASSERT(mCommandLine)
-	if(!mCommandLine)
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	CX_ASSERT(commandLine)
+	if(!commandLine)
 		return false;
 
-	bool success = mCommandLine->launch(command);
+	bool success = commandLine->launch(command);
 	if(success)
-		return mCommandLine->waitForFinished(1000*60*30);//Wait at least 30 min
+		return commandLine->waitForFinished(1000*60*30);//Wait at least 30 min
 	else
 	{
 		CX_LOG_WARNING() << "GenericScriptFilter::runCommandStringAndWait: Cannot start command!";
 		return false;
 	}
+}
+
+void GenericScriptFilter::setExtraCommandLineArguments(QString args)
+{
+	mExtraCommandLineArguments = args;
+}
+
+void GenericScriptFilter::setExtraEnvironmentVariable(QString name, QString value)
+{
+	mExtraEnvironmentVariables[name] = value;
+}
+
+void GenericScriptFilter::requestStop()
+{
+	// Recorded unconditionally (even if there turns out to be no process to
+	// signal below) so execute() can tell a stopped run apart from a script
+	// that happens to exit 0 on its own - see the exitCode() check there.
+	mStopRequested.storeRelease(1);
+
+	// mCommandLine is created/reset on the worker thread (createProcess()/
+	// deleteProcess(), called from execute()) while requestStop() runs on
+	// the main thread; getCommandLine() takes a local shared_ptr copy under
+	// mCommandLineMutex so the ProcessWrapper stays alive for this call even
+	// if the worker thread resets mCommandLine concurrently.
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	if (!commandLine || !commandLine->getProcess())
+		return;
+
+	// QProcess::terminate() is not safe to invoke cross-thread here, and
+	// queuing it via QMetaObject::invokeMethod is not reliable either, so
+	// send the OS signal directly via the process' PID instead. POSIX only.
+#ifndef CX_WINDOWS
+	qint64 pid = commandLine->getProcess()->processId();
+	if (pid > 0)
+		::kill(pid, SIGTERM);
+#endif //CX_WINDOWS
 }
 
 void GenericScriptFilter::createInputTypes()
@@ -700,37 +778,73 @@ bool GenericScriptFilter::execute()
 
 	// Run command string on console
 	bool retval = this->runCommandStringAndWait(command);
+	ProcessWrapperPtr commandLine = this->getCommandLine();
 	if(!retval)
 	{
-		processError(mCommandLine->getProcess()->error());
+		processError(commandLine->getProcess()->error());
+	}
+	else if (mStopRequested.loadAcquire())
+	{
+		// The script's own SIGTERM handler (see _process_utils.py) may exit
+		// 0 on a requested stop, which would otherwise be indistinguishable
+		// from a real, completed run - report it as neither success nor
+		// error, just not-done.
+		CX_LOG_INFO() << "GenericScriptFilter::execute: Script was stopped by the user.";
+		retval = false;
+	}
+	else if (commandLine->getProcess()->exitCode() != 0)
+	{
+		// waitForFinished() only reports whether the process exited at all,
+		// not whether it succeeded - a non-zero exit here (e.g. killed for
+		// exceeding the memory limit, see _process_utils.py) otherwise
+		// passes through silently, with no output files for
+		// readGeneratedSegmentationFiles() to find.
+		reportError(QString("Script exited with an error (code %1) - see the log for the script's own output. "
+		                     "This can happen if it was killed for exceeding the memory limit; try Fast mode, "
+		                     "raising the memory limit in advanced options, or closing other applications.")
+		            .arg(commandLine->getProcess()->exitCode()));
+		retval = false;
 	}
 	retval = retval & deleteProcess();
 
-	return retval; // Check for error?
+	return retval;
 }
 
 bool GenericScriptFilter::createProcess()
 {
-	mCommandLine.reset();//delete
+	// A fresh run: any stop requested against a previous run no longer applies.
+	mStopRequested.storeRelease(0);
 	mLineBuffer.clear();
-	mCommandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
-	mCommandLine->turnOffReporting();//Handle output in this class instead
+
+	// Built up locally and only published via setCommandLine() once fully
+	// configured, so requestStop() (main thread) never observes a
+	// half-configured ProcessWrapper through mCommandLine.
+	ProcessWrapperPtr commandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
+	commandLine->turnOffReporting();//Handle output in this class instead
 
 	// Merge channels to get all output in same channel in CustusX console
-	mCommandLine->getProcess()->setProcessChannelMode(QProcess::MergedChannels);
+	commandLine->getProcess()->setProcessChannelMode(QProcess::MergedChannels);
 
 	// Disable Python stdout buffering so output arrives in real time
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 	env.insert("PYTHONUNBUFFERED", "1");
-	mCommandLine->getProcess()->setProcessEnvironment(env);
+	QMapIterator<QString, QString> extraEnv(mExtraEnvironmentVariables);
+	while (extraEnv.hasNext())
+	{
+		extraEnv.next();
+		env.insert(extraEnv.key(), extraEnv.value());
+	}
+	commandLine->getProcess()->setProcessEnvironment(env);
 
-	connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
+	connect(commandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
 	/**************************************************************************
 	* NB: For Python output to be written Python buffering must be turned off:
 	* E.g. Use python -u
 	**************************************************************************/
 	//Show output from process
-	connect(mCommandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
+	connect(commandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
+
+	this->setCommandLine(commandLine);
 	return true;
 }
 
@@ -738,10 +852,10 @@ bool GenericScriptFilter::deleteProcess()
 {
 	disconnectProcess();
 	CX_LOG_DEBUG() << "deleteProcess";
-	if(mCommandLine)
+	if(this->getCommandLine())
 	{
 		CX_LOG_DEBUG() << "deleting";
-		mCommandLine.reset();
+		this->setCommandLine(ProcessWrapperPtr());
 		return true;
 	}
 	return false;
@@ -750,11 +864,12 @@ bool GenericScriptFilter::deleteProcess()
 bool GenericScriptFilter::disconnectProcess()
 {
 	CX_LOG_DEBUG() << "disconnectProcess";
-	if(mCommandLine)
+	ProcessWrapperPtr commandLine = this->getCommandLine();
+	if(commandLine)
 	{
 		CX_LOG_DEBUG() << "disconnecting";
-		disconnect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
-		disconnect(mCommandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
+		disconnect(commandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
+		disconnect(commandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
 		return true;
 	}
 	return false;
@@ -786,7 +901,7 @@ void GenericScriptFilter::setOutputColorsFromClasses()
 {
 	mOutputColorList.clear();
 	for(int i = 0; i < mOutputClasses.size(); ++i)
-		mOutputColorList << Raidionics::colorForLungClass(mOutputClasses[i]);
+		mOutputColorList << this->colorForOrganType(mOutputClasses[i]);
 	this->setupOutputColors(mOutputColorList);
 }
 
@@ -794,7 +909,137 @@ void GenericScriptFilter::setContourFilteringFromClasses()
 {
 	mSmoothingSettings.clear();
 	for(int i = 0; i < mOutputClasses.size(); ++i)
-		mSmoothingSettings << Raidionics::contourFilterSettingForLungClass(mOutputClasses[i]);
+		mSmoothingSettings << this->contourFilterSettingForOrganType(mOutputClasses[i]);
+}
+
+QString GenericScriptFilter::colorForOrganType(QString outputClass)
+{
+	QString color = "255,0,0";
+
+	ORGAN_TYPE target = Raidionics::getOrganType(outputClass);
+	switch (target)
+	{
+	case otAIRWAYS:
+		color = "254,175,180,43";break;
+	case otLUNGS:
+		color = "254,175,180,43";break;
+	case otLYMPH_NODES:
+		color = "0,255,0,255";break;
+	case otTUMOR:
+	case otNODULES:
+		color = "255,255,0,255";break;
+	case otVENA_CAVA:
+		color = "153,153,255,255";break;
+	case otAORTIC_ARCH:
+		color = "255,127,127,255";break;
+	case otASCENDING_AORTA:
+		color = "255,127,127,255";break;
+	case otDESCENDING_AORTA:
+		color = "255,127,127,255";break;
+	case otSPINE:
+		color = "255,255,255,255";break;
+	case otHEART:
+		color = "254,128,204,128";break;
+	case otBRACHIO_CEPHALIC_VEINS:
+		color = "153,153,255,255";break;
+	case otSUBCLAVIAN_ARTERY:
+		color = "255,127,127,255";break;
+	case otAZYGOS:
+		color = "153,153,255,255";break;
+	case otESOPHAGUS:
+		color = "170,85,0,255";break;
+	case otPULMONARY_ARTERIES:
+		color = "255,127,127,255";break;
+	case otPULMONARY_VEINS:
+		color = "153,153,255,255";break;
+	case otLOBE_LUL:
+	case otLOBE_RUL:
+		color = "255,117,117,100";break;
+	case otLOBE_RML:
+		color = "181,255,117,100";break;
+	case otLOBE_LLL:
+	case otLOBE_RLL:
+		color = "117,186,255,100";break;
+	case otLIVER:
+		color = "165,42,42,100";break;
+	case otPANCREAS:
+		color = "230,200,130,100";break;
+	case otLIVER_VESSELS:
+		color = "220,20,60,100";break;
+	case otLIVER_LESIONS:
+		color = "255,140,0,100";break;
+	case otLIVER_SEGMENT_1:
+		color = "230,25,75,100";break;
+	case otLIVER_SEGMENT_2:
+		color = "60,180,75,100";break;
+	case otLIVER_SEGMENT_3:
+		color = "255,225,25,100";break;
+	case otLIVER_SEGMENT_4:
+		color = "0,130,200,100";break;
+	case otLIVER_SEGMENT_5:
+		color = "245,130,48,100";break;
+	case otLIVER_SEGMENT_6:
+		color = "145,30,180,100";break;
+	case otLIVER_SEGMENT_7:
+		color = "70,240,240,100";break;
+	case otLIVER_SEGMENT_8:
+		color = "240,50,230,100";break;
+
+	default:
+		CX_LOG_WARNING() << "GenericScriptFilter::colorForOrganType(): No color found for " << enum2string(target) << " (Converted from string: " << outputClass << "). Setting color to red";
+		break;
+	}
+	return color;
+}
+
+int GenericScriptFilter::contourFilterSettingForOrganType(QString outputClass)
+{
+	int filtering = 1;
+
+	ORGAN_TYPE target = Raidionics::getOrganType(outputClass);
+	switch (target)
+	{
+	case otPULMONARY_ARTERIES:
+	case otPULMONARY_VEINS:
+	case otLIVER_VESSELS:
+		filtering = 1;break;
+
+	case otLYMPH_NODES:
+	case otVENA_CAVA:
+	case otAORTIC_ARCH:
+	case otASCENDING_AORTA:
+	case otDESCENDING_AORTA:
+	case otSPINE:
+	case otBRACHIO_CEPHALIC_VEINS:
+	case otSUBCLAVIAN_ARTERY:
+	case otAZYGOS:
+	case otESOPHAGUS:
+	case otLIVER_LESIONS:
+		filtering = 2;break;
+
+	case otLUNGS:
+	case otHEART:
+	case otLOBE_LUL:
+	case otLOBE_RUL:
+	case otLOBE_RML:
+	case otLOBE_LLL:
+	case otLOBE_RLL:
+	case otLIVER:
+	case otPANCREAS:
+	case otLIVER_SEGMENT_1:
+	case otLIVER_SEGMENT_2:
+	case otLIVER_SEGMENT_3:
+	case otLIVER_SEGMENT_4:
+	case otLIVER_SEGMENT_5:
+	case otLIVER_SEGMENT_6:
+	case otLIVER_SEGMENT_7:
+	case otLIVER_SEGMENT_8:
+		filtering = 3;break;
+
+	default:
+		filtering = 1;break;
+	}
+	return filtering;
 }
 
 void GenericScriptFilter::setupOutputColors(QStringList colorList)
@@ -845,16 +1090,28 @@ void GenericScriptFilter::createOutputMesh(QColor color, int smoothing)
 {
 	// Make contour of segmented volume
 	vtkPolyDataPtr rawContour = contourFilter(smoothing);
+	if (!rawContour || rawContour->GetNumberOfPolys() == 0)
+	{
+		CX_LOG_WARNING() << "GenericScriptFilter::createOutputMesh: " << mOutputImage->getName()
+		                  << " segmented to an empty mesh (structure not present in this volume) - skipping.";
+		return;
+	}
 
 	QString uidOutputMesh = mOutputImage->getUid() + "_mesh";
-	QString nameOutputMesh = mOutputImage->getName() + "_mesh";
+	QString nameOutputMesh = mOutputImage->getName();
 	MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidOutputMesh, nameOutputMesh);
 	outputMesh->setVtkPolyData(rawContour);
 	outputMesh->setColor(color);
 	outputMesh->setOrganType(mOutputImage->getOrganType());
 	patientService()->insertData(outputMesh);
-	outputMesh->get_rMd_History()->setRegistration(mOutputImage->get_rMd());
-	outputMesh->get_rMd_History()->setParentSpace(mOutputImage->getUid());
+
+	// Must parent to the actual input image, not mOutputImage: when volume
+	// output is disabled (.ini "volume = false"), mOutputImage is never
+	// inserted into the patient model, leaving a mesh parented to it with a
+	// dangling, unresolvable parent frame.
+	ImagePtr inputImage = this->getCopiedInputImage();
+	outputMesh->get_rMd_History()->setRegistration(inputImage->get_rMd());
+	outputMesh->get_rMd_History()->setParentSpace(inputImage->getUid());
 	mServices->view()->autoShowData(outputMesh);
 
 	mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());
@@ -902,16 +1159,20 @@ vtkPolyDataPtr GenericScriptFilter::contourFilter(int smoothing)
 			passBand = 0.3;
 			break;
 	}
-	vtkPolyDataPtr rawContour = ContourFilter::execute(
-				mOutputImage->getBaseVtkImageData(),
-				threshold,
-				reduceResoluion,
-				applySmoothing,
-				keepTopology,
-				decimation,
-				numberOfIterations,
-				passBand
-				);
+	// Runs on a worker thread: pure VTK/CPU work with no patient-model or
+	// other main-thread-only state involved, unlike the surrounding code
+	// (which creates Mesh/Image objects and inserts them into the patient
+	// model, and must stay on the main thread).
+	vtkImageDataPtr input = mOutputImage->getBaseVtkImageData();
+	QFuture<vtkPolyDataPtr> future = QtConcurrent::run([=]() {
+		return ContourFilter::execute(input, threshold, reduceResoluion, applySmoothing, keepTopology, decimation, numberOfIterations, passBand);
+	});
+	// A plain blocking wait, not a processEvents() polling loop: this runs
+	// synchronously from postProcess() (main thread), and pumping the event
+	// loop here would let other GUI actions (e.g. starting another filter
+	// run) re-enter this filter's still-mid-postProcess() state.
+	future.waitForFinished();
+	vtkPolyDataPtr rawContour = future.result();
 
 	return rawContour;
 }
@@ -940,7 +1201,8 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 //	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputDir: " << outputDir;
 //	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputFileNamesNoExtention: " << outputFileNamesNoExtention;
 
-
+	int totalMeshCount = this->countPlannedMeshes(createOutputMeshList);
+	int meshesCreated = 0;
 
 	QDirIterator fileIterator(outputDir, QDir::Files);
 	while (fileIterator.hasNext())
@@ -1006,6 +1268,16 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 				if(mOutputColors.size() > classNumber)
 					outputColor = mOutputColors.at(classNumber);
 				this->createOutputMesh(outputColor, smoothing);
+
+				++meshesCreated;
+				if (totalMeshCount > 0)
+				{
+					emit meshGenerationProgress(90 + 9 * meshesCreated / totalMeshCount);
+					// This method runs synchronously on the main thread, so without
+					// this the progress update above would not repaint until the
+					// whole mesh-generation step has completed.
+					qApp->processEvents();
+				}
 			}
 			if(!isUsingRaidionicsEngine())
 				this->deleteNotUsedFiles(filePath, createOutputVolumeBool);
@@ -1057,15 +1329,29 @@ int GenericScriptFilter::getClassNumber(QString filePath)
 	return classNumber;
 }
 
+int GenericScriptFilter::countPlannedMeshes(QStringList createOutputMeshList) const
+{
+	// Mirrors the createOutputMesh boolean logic in readGeneratedSegmentationFiles():
+	// either every class produces a mesh, or only the explicitly listed ones do.
+	if (createOutputMeshList.size() > 0 && createOutputMeshList.at(0) == "true")
+		return mOutputClasses.size();
+
+	int count = 0;
+	for (int i = 0; i < mOutputClasses.size(); ++i)
+		if (createOutputMeshList.contains(mOutputClasses.at(i)))
+			++count;
+	return count;
+}
+
 QString GenericScriptFilter::createImageName(QString parentName, QString filePath)
 {
+	// mResultFileEnding still disambiguates output files on disk between
+	// filters, but is not appended here since it would be redundant with
+	// the output class name and leak into every derived mesh's name.
 	QString retval = parentName;
-	QString nameEnding = mResultFileEnding;
-	nameEnding.replace(".mhd", "");
 	int classNumber = getClassNumber(filePath);
 	if(mOutputClasses.size() > classNumber)
 		retval = retval + QString("_") + mOutputClasses[classNumber];
-	retval.append(nameEnding);
 	return retval;
 }
 

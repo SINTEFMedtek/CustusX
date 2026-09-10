@@ -207,6 +207,18 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
 	"Centerlines",
 	"AirwayCenterlines",
 	"RouteToTarget",
-	"RouteToTargetExtended"
+	"RouteToTargetExtended",
+	"Liver",
+	"Pancreas",
+	"LiverVessels",
+	"LiverLesions",
+	"LiverSegment1",
+	"LiverSegment2",
+	"LiverSegment3",
+	"LiverSegment4",
+	"LiverSegment5",
+	"LiverSegment6",
+	"LiverSegment7",
+	"LiverSegment8"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, ORGAN_TYPE, organtypeCOUNT)

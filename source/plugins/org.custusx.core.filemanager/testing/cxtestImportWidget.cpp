@@ -60,6 +60,14 @@ TEST_CASE("ImportWidget", "[unit]")
 	delete widget;
 }
 
+TEST_CASE("ImportWidget::shouldWarnNoDICOMFound() only warns for the USB import action", "[unit]")
+{
+	CHECK_FALSE(cx::ImportWidget::shouldWarnNoDICOMFound(false, false));
+	CHECK_FALSE(cx::ImportWidget::shouldWarnNoDICOMFound(false, true));
+	CHECK(cx::ImportWidget::shouldWarnNoDICOMFound(true, false));
+	CHECK_FALSE(cx::ImportWidget::shouldWarnNoDICOMFound(true, true));
+}
+
 TEST_CASE("ImportDataTypeWidget::setModality", "[unit]")
 {
 	std::vector<cx::DataPtr> datas;

@@ -83,6 +83,31 @@ void CroppingWidget::setupUI()
   layout->addWidget(mBBWidget);
   connect(mBBWidget, SIGNAL(changed()), this, SLOT(boxValuesChanged()));
 
+  QGroupBox* autoCropGroupBox = new QGroupBox("Auto-crop");
+  autoCropGroupBox->setToolTip("Check one or more, then press 'Auto-crop' to apply their combined result.");
+  layout->addWidget(autoCropGroupBox);
+  QVBoxLayout* autoCropLayout = new QVBoxLayout(autoCropGroupBox);
+
+  mAutoCropBodyCheckBox = new QCheckBox("Crop away outside air");
+  mAutoCropBodyCheckBox->setToolTip("Remove surrounding air/background. Works for both CT and MR.");
+  mAutoCropBodyCheckBox->setChecked(true);
+  autoCropLayout->addWidget(mAutoCropBodyCheckBox);
+
+  mAutoCropTorsoLungBaseCheckBox = new QCheckBox("Crop away head/legs (lung-based, CT only)");
+  mAutoCropTorsoLungBaseCheckBox->setToolTip("Trim to the torso/abdomen using the lung bases as a landmark.");
+  autoCropLayout->addWidget(mAutoCropTorsoLungBaseCheckBox);
+
+  mAutoCropTorsoCrossSectionCheckBox = new QCheckBox("Crop away head/legs (cross-section)");
+  mAutoCropTorsoCrossSectionCheckBox->setToolTip("Trim to the torso's widest cross-section. Cheaper but less "
+                             "precise than the lung-based option; works for both CT and MR.");
+  autoCropLayout->addWidget(mAutoCropTorsoCrossSectionCheckBox);
+
+  QPushButton* autoCropApplyButton = new QPushButton("Auto-crop");
+  autoCropApplyButton->setToolTip("Set the crop box to the combined result of the checked option(s) above. Click "
+                             "'Create new cropped volume' below to apply.");
+  connect(autoCropApplyButton, SIGNAL(clicked()), this, SLOT(autoCropApplyButtonClickedSlot()));
+  autoCropLayout->addWidget(autoCropApplyButton);
+
   QPushButton* cropClipButton = new QPushButton("Create new cropped volume");
   cropClipButton->setToolTip("Create a new volume containing only the volume inside the crop box.");
   connect(cropClipButton, SIGNAL(clicked()), this, SLOT(cropClipButtonClickedSlot()));
@@ -123,6 +148,28 @@ ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 	this->hideOldAndShowNewVolume(image, retval);
 
 	return retval;
+}
+
+void CroppingWidget::autoCropApplyButtonClickedSlot()
+{
+	ActiveDataPtr activeData = mPatientModelService->getActiveData();
+	ImagePtr image = activeData->getActive<Image>();
+	if (!image)
+		return;
+
+	// Combine (intersect) whichever options are checked, rather than each
+	// one overwriting the others' result - e.g. "away outside air" and "away
+	// head/legs" narrow different axes/ranges of the same box, so applying
+	// both together (not just one after the other) gives the full effect.
+	DoubleBoundingBox3D box = image->boundingBox();
+	if (mAutoCropBodyCheckBox->isChecked())
+		box = intersection(box, computeAutoCropBox(image));
+	if (mAutoCropTorsoLungBaseCheckBox->isChecked())
+		box = intersection(box, computeLungBaseCropBox(image));
+	if (mAutoCropTorsoCrossSectionCheckBox->isChecked())
+		box = intersection(box, computeWidestCrossSectionCropBox(image));
+
+	mInteractiveCropper->setBoundingBox(box);
 }
 
 void CroppingWidget::hideOldAndShowNewVolume(ImagePtr oldImage, ImagePtr newImage)

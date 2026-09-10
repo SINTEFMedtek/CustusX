@@ -73,14 +73,16 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 set(CX_SYSTEM_BASE_NAME "CustusX" CACHE STRING "base name of the installed system, use for root folder, version, installer..")
 set(CX_SYSTEM_DEFAULT_APPLICATION "CustusX" CACHE STRING "The application to set as main installed app, must match an exe TARGET")
 # Defaults to CX_SYSTEM_BASE_NAME, but can be set independently (e.g. via -D on
-# the command line) when a build wants a different product identity (exe name,
-# install dir) while still sharing the same ~/<name>_settings persistent data
-# folder (venvs, downloaded models, etc.) as another build -- see FraxinusExcelsior,
-# which shares Fraxinus's settings folder.
-set(CX_SETTINGS_FOLDER_NAME "${CX_SYSTEM_BASE_NAME}" CACHE STRING "folder name for persistent app data, as ~/<name>_settings")
+# the command line, see cx.build.cxComponents.CustusX.configure()) when several
+# distinctly-branded apps should share one family folder (~/<family>/) for the
+# data that's expensive to duplicate per app -- venvs, downloaded models,
+# Patients -- while keeping their own settings/profiles/cache separate so they
+# can run concurrently. See CustusX+CustusS ("CustusX") and
+# Fraxinus+FraxinusExcelsior ("Fraxinus").
+set(CX_FAMILY_FOLDER_NAME "${CX_SYSTEM_BASE_NAME}" CACHE STRING "shared family folder name, as ~/<family>/")
 message(STATUS "Setting CX_SYSTEM_BASE_NAME=[${CX_SYSTEM_BASE_NAME}]")
 message(STATUS "Setting CX_SYSTEM_DEFAULT_APPLICATION=[${CX_SYSTEM_DEFAULT_APPLICATION}]")
-message(STATUS "Setting CX_SETTINGS_FOLDER_NAME=[${CX_SETTINGS_FOLDER_NAME}]")
+message(STATUS "Setting CX_FAMILY_FOLDER_NAME=[${CX_FAMILY_FOLDER_NAME}]")
 
 cx_read_version()
 

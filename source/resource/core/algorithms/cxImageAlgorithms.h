@@ -40,7 +40,102 @@ namespace cx
 
 cxResource_EXPORT ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
 cxResource_EXPORT ImagePtr resampleImage(PatientModelServicePtr dataManager, ImagePtr image, Transform3D refMi);
+/**
+ * Resample an image so its in-plane (x/y) resolution is capped at maxInPlaneDimension
+ * pixels, keeping the z spacing unchanged. Used to bound the size of volumes passed to
+ * downstream algorithms (e.g. segmentation) that would otherwise be too slow or memory-
+ * heavy on large/uncropped input. Returns the input image unchanged if it has no scalar
+ * data. The image is not added to the data manager nor saved.
+ */
+cxResource_EXPORT ImagePtr resampleImageToMaxInPlaneResolution(PatientModelServicePtr dataManager, ImagePtr image, int maxInPlaneDimension, QString uid="", QString name="");
+/**
+ * Resample an image so its total voxel count is capped at maxVoxelCount, scaling
+ * all three axes uniformly. Unlike resampleImageToMaxInPlaneResolution(), this
+ * also bounds the z extent, so it is suitable for volumes whose z extent may be
+ * large (e.g. whole-body scans) rather than only assuming a short one (e.g.
+ * chest-only scans). Returns the input image unchanged if it is already at or
+ * below maxVoxelCount, or if it has no scalar data. The image is not added to
+ * the data manager nor saved.
+ */
+cxResource_EXPORT ImagePtr resampleImageToMaxVoxelCount(PatientModelServicePtr dataManager, ImagePtr image, double maxVoxelCount, QString uid="", QString name="");
+/**
+ * Compute an intensity threshold separating background (e.g. surrounding
+ * air) from foreground (e.g. the patient body) using Otsu's method: the
+ * threshold that best splits the volume's own intensity histogram into two
+ * classes. Adapts to the actual data instead of assuming a fixed cutoff
+ * (e.g. a Hounsfield-unit value), which would be wrong for MR, or for CT
+ * that has been shifted to an unsigned representation.
+ */
+cxResource_EXPORT double computeOtsuThreshold(vtkImageDataPtr image);
+/**
+ * Compute a bounding box (in the image's own mm space, as used by
+ * Image::setCroppingBox()) tightly enclosing the voxels at or above an
+ * automatically-selected threshold (see computeOtsuThreshold()), expanded
+ * by paddingVoxels on each side. Intended to auto-crop away surrounding
+ * air/background before an expensive downstream operation. Falls back to
+ * the image's full bounding box if no voxels are at or above the threshold.
+ */
+cxResource_EXPORT DoubleBoundingBox3D computeAutoCropBox(ImagePtr image, int paddingVoxels = 5);
+/**
+ * Locate the torso/abdomen region along the z axis using the lung bases as a
+ * landmark (CT only): for each axial slice, flood-fills below-threshold
+ * (background) voxels from that slice's own border, then counts voxels in
+ * the lung/air HU band (roughly -1000 to -400 HU) that are NOT reachable
+ * this way - i.e. actually enclosed by tissue, unlike surrounding
+ * background air or a background gap trapped between two limbs (e.g. the
+ * arms, raised alongside the head) that still connects to the outside
+ * air - to find the contiguous lung-bearing slice range. Then compares the
+ * average in-body cross-section just past each end of that range to tell
+ * the abdomen side from the neck side - the abdomen is reliably the wider
+ * of the two, regardless of the volume's own index/patient-orientation
+ * convention. Windows a fixed margin from the abdomen-side lung boundary
+ * (covering the adult liver's ~150-200mm craniocaudal span with margin),
+ * plus a small margin back into the lung range for diaphragm-level
+ * variability. The candidate lung-bearing run must also persist over a
+ * physically plausible craniocaudal distance, and the final result over a
+ * plausible total range - both reject a short-lived false positive (e.g.
+ * a slice or two where the 2D-per-slice flood fill above is still fooled by
+ * a pinch point between limbs) that would otherwise anchor the window near
+ * the very edge of the volume.
+ *
+ * Returns image->boundingBox() unchanged if the image isn't CT, no
+ * confident contiguous lung-bearing range is found (e.g. the volume doesn't
+ * include the thorax), or the resulting window isn't plausible - see
+ * computeAutoCropBoxAbdomen() for a fallback that covers those cases too.
+ */
+cxResource_EXPORT DoubleBoundingBox3D computeLungBaseCropBox(ImagePtr image);
+/**
+ * Cheap, modality-agnostic fallback for locating the torso/abdomen region:
+ * finds the z-slice with the largest in-body cross-sectional area (via
+ * computeOtsuThreshold()) - reliably the torso, not the head or legs, for
+ * any body habitus - and windows a fixed margin around it. Less precise
+ * than computeLungBaseCropBox() (e.g. biased toward the chest rather than
+ * the abdomen if the arms are down at the sides), but far cheaper (a single
+ * threshold pass, no lung detection) and does not require CT.
+ *
+ * Returns image->boundingBox() unchanged if no scalar data is found.
+ */
+cxResource_EXPORT DoubleBoundingBox3D computeWidestCrossSectionCropBox(ImagePtr image);
+/**
+ * Combine computeLungBaseCropBox() and computeWidestCrossSectionCropBox()
+ * into a single best-effort torso/abdomen crop box: prefers the lung-base
+ * result, falling back to the cross-section result when the lung-base
+ * approach isn't applicable or confident. Also logs both results (when the
+ * lung-base one succeeds) so real test runs can compare them.
+ *
+ * Returns image->boundingBox() unchanged if neither approach finds anything
+ * usable.
+ */
+cxResource_EXPORT DoubleBoundingBox3D computeAutoCropBoxAbdomen(ImagePtr image);
 cxResource_EXPORT vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
+/** Crop using an explicit mm-space box, without reading or modifying
+ *  image->getCroppingBox()/setCroppingBox(). uid/name default to
+ *  image->getUid()/getName() with " crop%1" appended, as for the no-box
+ *  overload below.
+ */
+cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image, DoubleBoundingBox3D box, QString uid="", QString name="");
+/** Crop using the box already stored on the image (image->getCroppingBox()).
+ */
 cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image);
 cxResource_EXPORT ImagePtr duplicateImage(PatientModelServicePtr dataManager, ImagePtr image);
 
