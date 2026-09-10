@@ -563,6 +563,39 @@ install(DIRECTORY "${QT_QML_DIR}/"
 		DESTINATION ${CX_INSTALL_PLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
+	if(CX_LINUX)
+		# The plugin .so's above are installed via a plain file copy, not
+		# install(TARGETS...), so CMAKE_INSTALL_RPATH is never applied to them:
+		# they keep whatever RPATH they had when originally built, i.e. absolute
+		# paths into this machine's build tree (.../VTK/build_Release/lib etc).
+		# That's invisible at runtime as long as a plugin is only ever dlopen'd
+		# by CTK's plugin framework (its own further dependencies get resolved
+		# via whatever already-loaded copy satisfies the SONAME), but it breaks
+		# CPack's own packaging-time verify_app check for any executable that
+		# links a plugin directly (e.g. LogConsole, VicReconstructCLI in CS):
+		# verify_app walks the full dependency graph and, for anything only the
+		# plugin itself needs, follows the plugin's stale build-tree RPATH
+		# instead of the installed copy, flagging it as an unresolved "external
+		# prerequisite". Rewriting it to $ORIGIN here matches what every other
+		# installed binary already gets, so plugin .so's can also find their
+		# own dependencies next to themselves in the installed tree.
+		install(CODE "
+			# Glob the plugin *build* output (not the install destination: that's
+			# the same directory as every other installed binary and Qt/system
+			# library, e.g. libxcb*, most of which have no RPATH entry at all to
+			# rewrite) so only the files this DIRECTORY install actually copied
+			# get touched.
+			file(GLOB _cx_plugin_sofiles \"${CMAKE_LIBRARY_OUTPUT_DIRECTORY}${CX_PLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}*\")
+			foreach(_cx_plugin_so \${_cx_plugin_sofiles})
+				get_filename_component(_cx_plugin_so_name \"\${_cx_plugin_so}\" NAME)
+				set(_cx_installed_so \"\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_PLUGIN_DIR}/\${_cx_plugin_so_name}\")
+				if(EXISTS \"\${_cx_installed_so}\" AND NOT IS_SYMLINK \"\${_cx_installed_so}\")
+					file(RPATH_SET FILE \"\${_cx_installed_so}\" NEW_RPATH \"$ORIGIN\")
+				endif()
+			endforeach()
+			")
+	endif()
+
 	# explicitly tell which executables that should be fixed up.
         # why: fixup_bundle seems to fail to assemble exes in some cases.
 	foreach(TARGET ${CX_APPLE_TARGETS_TO_COPY})
