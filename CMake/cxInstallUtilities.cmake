@@ -125,7 +125,20 @@ macro(cx_install_set_relative_path)
 		# http://www.cmake.org/Wiki/CMake_RPATH_handling
 		# http://www.cmake.org/pipermail/cmake/2008-January/019329.html
 		# Mac handles this differently
-		SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:\\\$ORIGIN/")
+		#
+		# Note: $ORIGIN must NOT be backslash-escaped here. CMake writes this
+		# value verbatim into a NEW_RPATH argument of file(RPATH_CHANGE) in the
+		# generated cmake_install.cmake (checked directly: grep NEW_RPATH in a
+		# built tree's cmake_install.cmake), not through any shell, so a plain
+		# "$ORIGIN" (bare $ isn't special to CMake's own parser -- only ${...},
+		# $ENV{...} etc are) is exactly what ends up in the installed RPATH. An
+		# escaped "\$ORIGIN" instead bakes a literal backslash character into
+		# every installed binary's RPATH tag, which the dynamic linker does not
+		# recognize as the $ORIGIN token -- it's just a bogus literal path
+		# component -- so every CX/CS/Fraxinus app on Linux could only resolve
+		# its libraries when run from inside its own bin/ (e.g. via ./AppName),
+		# never via an absolute or otherwise-relative path to the executable.
+		SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:$ORIGIN/")
 	endif(CX_LINUX)
         if(CX_APPLE)
                 # Add support for Frameworks installed into the bundle:
