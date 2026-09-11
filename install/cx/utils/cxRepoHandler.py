@@ -142,19 +142,27 @@ class RepoHandler(object):
                 exit("tag checkout failed")
             return
         
-        branches = [self.args.main_branch, 
+        branches = [self.args.main_branch,
                     self.default_branch,
                     self.fallback_branch]
         branches = self.cleanBranchList(branches)
 
-        print('Checkout+pull {} to to the first existing branch in list [{}]'.format(self.getName(), ','.join(branches)))
-        
+        print('Checkout {} to the first existing branch in list [{}]'.format(self.getName(), ','.join(branches)))
+
         for branch in branches:
-            result = runShell('git checkout %s' % branch, self.repo_path)
+            # A local branch of this name can exist (e.g. left over from an
+            # earlier run on a long-lived build machine or CI runner) even
+            # after its remote counterpart has been deleted or renamed. Don't
+            # trust it just because `git checkout <branch>` trivially succeeds
+            # against it -- verify the remote branch is still there first
+            # (reliable right after the --prune fetch above), and reset the
+            # local branch to match it exactly rather than merging into
+            # whatever local state happens to already be there.
+            if runShell('git rev-parse --verify refs/remotes/origin/%s' % branch, self.repo_path) is None:
+                continue
+            result = runShell('git checkout -B %s origin/%s' % (branch, branch), self.repo_path)
             self.checkSuccess(result)
             if result is not None:
-                result = runShell('git pull origin %s' % branch, self.repo_path)
-                self.checkSuccess(result)
                 break
 
     def checkSuccess(self, gitResult):
