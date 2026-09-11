@@ -17,6 +17,9 @@ import shutil
 def returnCode():
     return 0
 
+def localChangesCode():
+    return 2
+
 def runShell(cmd, path):
     '''
     simple shell implementation.
@@ -38,6 +41,8 @@ def runShell(cmd, path):
         return out.strip()
     if "error: The following untracked working tree files would be overwritten" in err:
         return returnCode()
+    if "local changes to the following files would be overwritten" in err:
+        return localChangesCode()
     return None
 
 def getBranchForRepo(path, fallback=None):
@@ -162,6 +167,11 @@ class RepoHandler(object):
                 continue
             result = runShell('git checkout -B %s origin/%s' % (branch, branch), self.repo_path)
             self.checkSuccess(result)
+            if result is localChangesCode():
+                # Warned already via checkSuccess(); this branch didn't work,
+                # but don't abort the whole build over it -- try the next
+                # candidate instead, same as any other checkout failure.
+                continue
             if result is not None:
                 break
 
@@ -178,6 +188,16 @@ class RepoHandler(object):
             print('- delete the folder containing the above mentioned files and the CustusX build folder.')
             print('- run the script again.')
             sys.exit(1)
+        if gitResult is localChangesCode():
+            print('----------------------------------------------------------------------------')
+            print('|                                     ^                                    |')
+            print('|      You have uncommitted local changes in %s' % self.repo_path)
+            print('----------------------------------------------------------------------------')
+            print('===== Could not switch %s to the branch/commit this build wanted =====' % self.getName())
+            print('Your uncommitted changes were NOT touched or discarded -- git refused to')
+            print('check out over them. Continuing the build with whatever is already checked')
+            print('out there, which may not be what you expect. If that turns out wrong,')
+            print('commit, stash, or discard your local changes in %s and re-run.' % self.repo_path)
 
     def cleanBranchList(self, branches):
         retval = []
