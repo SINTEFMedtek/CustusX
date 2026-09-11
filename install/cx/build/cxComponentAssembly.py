@@ -16,6 +16,7 @@ import argparse
 import re
 import sys
 import os.path
+import shutil
 import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
@@ -64,6 +65,40 @@ class LibraryAssembly(object):
         self.libraries.append(component)
         component.setControlData(self.controlData)
         component.assembly = self # why: config in custusx need all other libs
+
+    def removeComponent(self, component):
+        '''
+        Register a component that USED TO be part of this assembly (call this where
+        addComponent(component) used to be called, when removing a component from an
+        assembly, instead of just deleting/commenting out that line).
+
+        Why: every external component and external plugin is checked out and built
+        into a predictable, name-based location (component.path(), the same location
+        addComponent'd components use) on whatever machine runs the build -- a
+        developer's own machine reused across many builds over time, or a CI runner
+        with a persistent build tree reused across pipeline runs. If a component is
+        simply removed from the assembly (its addComponent(...) call deleted/commented
+        out), a leftover checkout+build from before the removal is never cleaned up by
+        a later build: nothing there is a target of any operation anymore, so it just
+        sits there untouched, and can still be picked up (e.g. a stale plugin .so with
+        an obsolete dependency being swept into CPack packaging by the generic plugin
+        glob). Calling removeComponent() here instead means every build -- a developer
+        rebuilding an old checkout, or CI on any runner -- deletes that leftover the
+        moment it constructs this same assembly, before doing anything else.
+        '''
+        component.setControlData(self.controlData)
+        if component.pluginPath():
+            # Plugin-style component: path() is the *shared* source/plugins folder,
+            # not a private top-level one -- only remove this component's own
+            # checkout inside it, never the whole shared folder.
+            target = component.sourcePath()
+        else:
+            # Regular external component: path() is this component's own private
+            # top-level folder (its source and build dirs alike) -- remove all of it.
+            target = component.path()
+        if os.path.isdir(target):
+            PrintFormatter.printHeader('Removing leftover checkout of removed component %s: %s' % (component.name(), target))
+            shutil.rmtree(target)
 
     def getComponent(self, type):
         for comp in self.libraries:
