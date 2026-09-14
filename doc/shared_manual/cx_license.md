@@ -2,13 +2,13 @@ CustusX license {#license}
 ===================
 
 CustusX is licensed under the BSD-3 license, which means you can use the application
-for whatever you wish. Plugins can have other lisenses, but the plugins bundled inside
+for whatever you wish. Plugins can have other licenses, but the plugins bundled inside
 the CustusX repository use the same license as CustusX. CustusX is built on top of several
 other open-source libraries, with their own licenses. They are listed here: \ref external_libraries.
 
 This is the full CustusX license:
 
-        Copyright (c) 2008-2018, SINTEF Department of Medical Technology
+	Copyright (c) 2008-2026, SINTEF Digital, Department of Health Research
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without 
