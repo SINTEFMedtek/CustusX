@@ -85,11 +85,44 @@ create-release:
 
       DESCRIPTION=$(jq -Rs . < "$NOTES_MD")
 
-      curl --fail --request POST --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+      # GitLab's permalink/latest orders releases purely by released_at, with
+      # no special-casing for pre-release tags -- so an rc tag's own release
+      # would otherwise become "latest" the moment it's created, breaking the
+      # README's curl-install-latest one-liner for everyone until the real
+      # release follows. Backdate an rc release to just before the current
+      # latest non-rc release instead: it still gets its own release page,
+      # just never outranks the real latest release.
+      BACKDATE=""
+      if echo "$CI_COMMIT_TAG" | grep -qE -- '-rc[0-9]+$'; then
+        BACKDATE=$(curl -s --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases?order_by=released_at&sort=desc&per_page=20" \
+          | jq -r '[.[] | select(.tag_name | test("-rc[0-9]+$") | not)]
+                    | (.[0].released_at // empty) | sub("\\.[0-9]+Z$"; "Z")
+                    | fromdateiso8601 - 60 | todateiso8601')
+      fi
+
+      # Not --fail: a retried pipeline (e.g. after fixing an unrelated
+      # failure elsewhere) re-runs this job even though the release from an
+      # earlier successful attempt already exists for this tag, and GitLab
+      # rejects a second POST for the same tag_name with 409. Check the
+      # status manually so that specific case is treated as already done
+      # rather than a real failure -- any other error status still fails
+      # the job.
+      HTTP_CODE=$(curl -s -o /tmp/release_response.json -w "%{http_code}" \
+        --request POST --header "JOB-TOKEN: $CI_JOB_TOKEN" \
         --header "Content-Type: application/json" \
-        --data "$(jq -n --arg tag "$CI_COMMIT_TAG" --argjson links "$LINKS" --argjson desc "$DESCRIPTION" \
-          '{tag_name: $tag, name: $tag, description: $desc, assets: {links: $links}}')" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
+        --data "$(jq -n --arg tag "$CI_COMMIT_TAG" --argjson links "$LINKS" --argjson desc "$DESCRIPTION" --arg backdate "$BACKDATE" \
+          '{tag_name: $tag, name: $tag, description: $desc, assets: {links: $links}}
+           + (if $backdate != "" then {released_at: $backdate} else {} end)')" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases")
+
+      if [ "$HTTP_CODE" = "409" ]; then
+        echo "Release for tag ${CI_COMMIT_TAG} already exists -- treating as already done (e.g. a retried pipeline)."
+      elif [ "$HTTP_CODE" -ge 400 ]; then
+        echo "Release creation failed with HTTP $HTTP_CODE:"
+        cat /tmp/release_response.json
+        exit 1
+      fi
 
 pages:
   stage: deploy
