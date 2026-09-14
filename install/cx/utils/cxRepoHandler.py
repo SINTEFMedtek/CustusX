@@ -17,6 +17,9 @@ import shutil
 def returnCode():
     return 0
 
+def localChangesCode():
+    return 2
+
 def runShell(cmd, path):
     '''
     simple shell implementation.
@@ -40,6 +43,8 @@ def runShell(cmd, path):
         return out.strip()
     if "error: The following untracked working tree files would be overwritten" in err:
         return returnCode()
+    if "local changes to the following files would be overwritten" in err:
+        return localChangesCode()
     return None
 
 def getBranchForRepo(path, fallback=None):
@@ -144,19 +149,32 @@ class RepoHandler(object):
                 exit("tag checkout failed")
             return
         
-        branches = [self.args.main_branch, 
+        branches = [self.args.main_branch,
                     self.default_branch,
                     self.fallback_branch]
         branches = self.cleanBranchList(branches)
 
-        print('Checkout+pull {} to to the first existing branch in list [{}]'.format(self.getName(), ','.join(branches)))
-        
+        print('Checkout {} to the first existing branch in list [{}]'.format(self.getName(), ','.join(branches)))
+
         for branch in branches:
-            result = runShell('git checkout %s' % branch, self.repo_path)
+            # A local branch of this name can exist (e.g. left over from an
+            # earlier run on a long-lived build machine or CI runner) even
+            # after its remote counterpart has been deleted or renamed. Don't
+            # trust it just because `git checkout <branch>` trivially succeeds
+            # against it -- verify the remote branch is still there first
+            # (reliable right after the --prune fetch above), and reset the
+            # local branch to match it exactly rather than merging into
+            # whatever local state happens to already be there.
+            if runShell('git rev-parse --verify refs/remotes/origin/%s' % branch, self.repo_path) is None:
+                continue
+            result = runShell('git checkout -B %s origin/%s' % (branch, branch), self.repo_path)
             self.checkSuccess(result)
+            if result is localChangesCode():
+                # Warned already via checkSuccess(); this branch didn't work,
+                # but don't abort the whole build over it -- try the next
+                # candidate instead, same as any other checkout failure.
+                continue
             if result is not None:
-                result = runShell('git pull origin %s' % branch, self.repo_path)
-                self.checkSuccess(result)
                 break
 
     def checkSuccess(self, gitResult):
@@ -172,6 +190,16 @@ class RepoHandler(object):
             print('- delete the folder containing the above mentioned files and the CustusX build folder.')
             print('- run the script again.')
             sys.exit(1)
+        if gitResult is localChangesCode():
+            print('----------------------------------------------------------------------------')
+            print('|                                     ^                                    |')
+            print('|      You have uncommitted local changes in %s' % self.repo_path)
+            print('----------------------------------------------------------------------------')
+            print('===== Could not switch %s to the branch/commit this build wanted =====' % self.getName())
+            print('Your uncommitted changes were NOT touched or discarded -- git refused to')
+            print('check out over them. Continuing the build with whatever is already checked')
+            print('out there, which may not be what you expect. If that turns out wrong,')
+            print('commit, stash, or discard your local changes in %s and re-run.' % self.repo_path)
 
     def cleanBranchList(self, branches):
         retval = []

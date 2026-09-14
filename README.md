@@ -19,6 +19,20 @@ Pre-built installers for Ubuntu (20.04, 22.04, 24.04) and Windows are available 
 primary, most thoroughly tested platform. The Windows installer uses IGSTK for
 tracking and has not been as extensively tested and verified as the Ubuntu builds.
 
+On Ubuntu, download `installCustusX.sh` and run:
+
+```bash
+chmod +x installCustusX.sh
+./installCustusX.sh
+```
+
+Alternatively, install directly via `curl`:
+
+```bash
+sudo apt install curl -y  # optional, if curl is not already installed
+curl -fsSL https://gitlab.sintef.no/custusx/CustusX/-/releases/permalink/latest/downloads/installCustusX.sh | bash
+```
+
 ### Build instructions
 
 [Build instructions available here.](https://custusx.pages.sintef.no/CustusX/developer_doc/build_instructions.html)
