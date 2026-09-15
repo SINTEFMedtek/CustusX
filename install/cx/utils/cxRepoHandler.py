@@ -165,9 +165,16 @@ class RepoHandler(object):
             # (reliable right after the --prune fetch above), and reset the
             # local branch to match it exactly rather than merging into
             # whatever local state happens to already be there.
-            if runShell('git rev-parse --verify refs/remotes/origin/%s' % branch, self.repo_path) is None:
+            if runShell('git rev-parse --verify refs/remotes/origin/%s' % branch, self.repo_path) is not None:
+                result = runShell('git checkout -B %s origin/%s' % (branch, branch), self.repo_path)
+            elif runShell('git rev-parse --verify refs/tags/%s' % branch, self.repo_path) is not None:
+                # main_branch can also be a tag name (e.g. a tag-triggered CI
+                # build passes its own tag as the ref to check other repos out
+                # to) -- those never exist under refs/remotes/origin/, so fall
+                # back to a plain checkout, which resolves tags directly.
+                result = runShell('git checkout %s' % branch, self.repo_path)
+            else:
                 continue
-            result = runShell('git checkout -B %s origin/%s' % (branch, branch), self.repo_path)
             self.checkSuccess(result)
             if result is localChangesCode():
                 # Warned already via checkSuccess(); this branch didn't work,
