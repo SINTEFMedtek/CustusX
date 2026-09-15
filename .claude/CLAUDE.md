@@ -141,6 +141,10 @@ git -C FX/FX remote set-url origin https://gitlab.sintef.no/custusx/fraxinus.git
 
 Always create/use a feature branch for a commit, even a small one-line fix, in any of these repos: CustusX, CustusS, Fraxinus (public or private), or any private plugin repo (`org.custusx.core.tracking.system.ndi`, etc). This applies regardless of how small or obviously-correct the change is, and even if the commit is only local and not yet pushed. If a task naturally lands on `develop` (e.g. because that's where a relevant file currently lives), create a feature branch from that point first (`git checkout -b cxNN-description`) and commit there instead. Commits go to `develop`/`master` only via review/merge (e.g. an MR), never directly.
 
+**Squashing/amending unpushed commits**
+
+If you need to correct or fold together commits you just made, it's fine to squash or amend them as long as none of them have been pushed to the remote yet (check with `git status`/`git log @{u}..HEAD`, or the fact that the branch was just created locally). Never do this to a commit that has already been pushed — that rewrites history other clones, MRs, or CI may already have fetched; add a new commit on top instead.
+
 **Open/Closed code**
 
 While CustusX is open source, most other repositories are closed source, and Claude should avoid looking into this code unless ordered:
