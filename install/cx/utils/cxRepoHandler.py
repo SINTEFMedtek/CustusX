@@ -162,27 +162,32 @@ class RepoHandler(object):
             # after its remote counterpart has been deleted or renamed. Don't
             # trust it just because `git checkout <branch>` trivially succeeds
             # against it -- verify the remote branch is still there first
-            # (reliable right after the --prune fetch above), and reset the
-            # local branch to match it exactly rather than merging into
-            # whatever local state happens to already be there.
-            if runShell('git rev-parse --verify refs/remotes/origin/%s' % branch, self.repo_path) is not None:
-                result = runShell('git checkout -B %s origin/%s' % (branch, branch), self.repo_path)
-            elif runShell('git rev-parse --verify refs/tags/%s' % branch, self.repo_path) is not None:
-                # main_branch can also be a tag name (e.g. a tag-triggered CI
-                # build passes its own tag as the ref to check other repos out
-                # to) -- those never exist under refs/remotes/origin/, so fall
-                # back to a plain checkout, which resolves tags directly.
-                result = runShell('git checkout %s' % branch, self.repo_path)
-            else:
+            # (reliable right after the --prune fetch above).
+            is_branch = runShell('git rev-parse --verify refs/remotes/origin/%s' % branch, self.repo_path) is not None
+            # main_branch can also be a tag name (e.g. a tag-triggered CI
+            # build passes its own tag as the ref to check other repos out
+            # to) -- those never exist under refs/remotes/origin/, so fall
+            # back to checking for a tag of that name.
+            is_tag = (not is_branch) and runShell('git rev-parse --verify refs/tags/%s' % branch, self.repo_path) is not None
+            if not (is_branch or is_tag):
                 continue
+            result = runShell('git checkout %s' % branch, self.repo_path)
             self.checkSuccess(result)
             if result is localChangesCode():
                 # Warned already via checkSuccess(); this branch didn't work,
                 # but don't abort the whole build over it -- try the next
                 # candidate instead, same as any other checkout failure.
                 continue
-            if result is not None:
-                break
+            if result is None:
+                continue
+            if is_branch:
+                # Merge in any new remote commits instead of resetting to
+                # origin -- a local commit made here but not yet pushed (e.g.
+                # a release-branch fix or merge queued up before the next
+                # `git push`) must survive this sync rather than silently
+                # vanish the next time this repo gets synced.
+                self.checkSuccess(runShell('git merge origin/%s' % branch, self.repo_path))
+            break
 
     def checkSuccess(self, gitResult):
         if gitResult is returnCode():
