@@ -50,6 +50,27 @@ python install/cxRunTests.py --run_catch "MyTestName"
 
 Test tags: `[unit]`, `[unstable]`, plus OS-specific tags.
 
+### Running the Python tests
+
+The Python build/release tooling under `install/cx/` (`cxRepoHandler.py`,
+`cxComponentAssembly.py`, ...) has its own `unittest` suites, separate from the C++ Catch
+tests above. No extra dependencies to install — stdlib `unittest` only, everything runs
+against throwaway temp directories/git repos, never real checkouts. Run all of them from
+the repo root:
+
+```bash
+cd install && python3 -m unittest discover -s cx -v
+```
+
+This recurses into every `cx/**/testing/` package automatically (each needs an
+`__init__.py`, same as the package under test) — a new suite added under `cx/` doesn't
+need this command or the CI job updated. CustusS has an equivalent suite for its own
+physical copy of `cxRepoHandler.py` plus `cxRelease.py`/`cxPrivateReposActions.py` — see
+CS/CS's `doc/dev_manual/cs_dev_build_instructions.md`.
+
+CI runs this automatically in the `test-python` stage, before the much more expensive
+per-platform C++ builds.
+
 ## Architecture
 
 CustusX uses a **layered architecture** built on the CTK OSGi plugin framework:
