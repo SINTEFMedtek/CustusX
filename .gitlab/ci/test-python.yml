@@ -1,0 +1,8 @@
+# Python test stage: unit tests for the Python build/release tooling, kept
+# separate from the C++ Catch tests (test.yml) so a regression here fails
+# fast, before the much more expensive per-platform C++ builds even start.
+
+test-python:
+  stage: test-python
+  script:
+    - cd install && python3 -m unittest discover -s cx/utils/testing -v
