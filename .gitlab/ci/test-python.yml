@@ -5,4 +5,7 @@
 test-python:
   stage: test-python
   script:
-    - cd install && python3 -m unittest discover -s cx/utils/testing -v
+    # Recurses into every cx/**/testing/ package (each needs an __init__.py,
+    # same as the packages under test) -- new test dirs are picked up here
+    # automatically, no need to list them individually.
+    - cd install && python3 -m unittest discover -s cx -v
