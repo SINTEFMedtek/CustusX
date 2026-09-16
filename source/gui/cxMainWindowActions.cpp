@@ -421,7 +421,7 @@ void MainWindowActions::loadPatientFileSlot(bool useSimpleFileDialog)
 	if(useSimpleFileDialog)
 		folder = getUserToSelectExistingPatient();
 	else
-		folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly);
+		folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly | QFileDialog::DontUseNativeDialog);
 
 	if (!folder.isEmpty())
 		mServices->session()->load(folder);
@@ -435,7 +435,7 @@ void MainWindowActions::loadPatientFileCopySlot()
 	QString patientDatafolder = profile()->getPatientTemplatePath();
 
 	// Open file dialog
-	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select template patient to copy", patientDatafolder, QFileDialog::ShowDirsOnly);
+	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select template patient to copy", patientDatafolder, QFileDialog::ShowDirsOnly | QFileDialog::DontUseNativeDialog);
 	if (!folder.isEmpty())
 	{
 		QString newFolder = this->selectNewPatientFolder();
