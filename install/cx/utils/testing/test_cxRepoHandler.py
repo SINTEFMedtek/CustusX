@@ -78,6 +78,12 @@ class SyncToGitRefTest(unittest.TestCase):
 
     def _clone_upstream(self):
         _git(['clone', '-q', self.upstream, self.clone], self.tmp)
+        # `git clone` doesn't carry over repo-local config, and a CI runner
+        # (unlike a dev machine) typically has no global user.name/user.email
+        # configured at all -- commits/tags made directly in the clone (not
+        # just the upstream repo set up in setUp()) need their own identity.
+        _git(['config', 'user.email', 'test@example.com'], self.clone)
+        _git(['config', 'user.name', 'Test'], self.clone)
 
     def test_local_only_commit_survives_sync(self):
         '''
