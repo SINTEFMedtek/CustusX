@@ -8,7 +8,7 @@ the 2D/3D views.
 \addindex liver_segmentation_widget
 
 Liver Segmentation Widget {#org_custusx_liver_segmentation_widget}
------------------------------------------------------------
+===========================================================
 Select one or more of the liver segmentation filters (Liver and Pancreas,
 Liver Vessels, Liver Lesions, Liver Segments) and run them against one or
 two CT/MR volumes (Volume 1 is the active volume; Volume 2 is optional).
@@ -38,7 +38,7 @@ Advanced options (toggle with the icon below the filter list):
 \addindex liver_visibility_widget
 
 Liver Visibility Widget {#org_custusx_liver_visibility_widget}
------------------------------------------------------------
+===========================================================
 Toggle visibility of segmented liver structures in the 2D/3D views, scoped
 to one source image at a time (the active volume) - useful since running
 segmentation against more than one volume can produce several sets of
