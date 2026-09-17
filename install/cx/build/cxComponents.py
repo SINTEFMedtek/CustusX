@@ -220,6 +220,16 @@ class newITK(CppComponent):
         add('ITK_USE_SYSTEM_EIGEN:BOOL', True)
         add('Eigen3_DIR:PATH', self._createSibling(Eigen).configPath())
         add('CMAKE_CXX_STANDARD:STRING', 17)
+        if (platform.system() == 'Darwin' and platform.machine() != 'arm64'):
+            # On Intel Mac with MacPorts installed, CMake's FindIconv picks up
+            # MacPorts' /opt/local/lib/libiconv.dylib, which exports GNU-prefixed
+            # symbol names (libiconv_open etc.) rather than the plain names
+            # (iconv_open etc.) that vendored GDCM code (inside ITK) compiles
+            # against via the system iconv.h -- causing an undefined-symbol link
+            # failure in libitkgdcmMSFF. Point Iconv_LIBRARY at the system's own
+            # iconv (found via the linker's normal default search, not
+            # /opt/local) so it matches the plain symbol names GDCM expects.
+            add('Iconv_LIBRARY:FILEPATH', 'iconv')
         builder.configureCMake()
     def repository(self):
         return 'https://github.com/InsightSoftwareConsortium/ITK.git'
@@ -338,9 +348,13 @@ class CTK(CppComponent):
         #return '%s/CTK.git' % base
         return 'https://github.com/commontk/CTK.git' # Switch to local repo copy for speedup later?
     def update(self):
-        if (platform.system() == 'Darwin'):
+        if (platform.system() == 'Darwin' and platform.machine() == 'arm64'):
+            # Newer CTK commit needed for the arm64 (M-series) Mac build; untested
+            # on Intel Mac, and requires C++17 (conflicts with CustusX's C++14).
             self._getBuilder().gitCheckoutSha('a54983b07cfc64cde7b6de9351b32531623ad1e1')
         else:
+            # Same well-tested CTK commit as Ubuntu/Windows for Linux, Windows and
+            # Intel Mac.
             self._getBuilder().gitCheckoutSha('dec834fccffebdc3b0896c157d39e3c0031c4a0a')
         #self._getBuilder().gitCheckoutSha('2023.07.13') # Makes DICOM import fail
         self._getBuilder().gitSetRemoteURL(self.repository())
