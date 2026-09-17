@@ -191,7 +191,6 @@ QScrollArea* DynamicMainWindowWidgets::addVerticalScroller(QWidget *widget)
 {
 	QScrollArea* scroller = new QScrollArea(NULL);
 	scroller->setWidget(widget);
-	widget->setParent(scroller);
 	scroller->setWidgetResizable(true);
 	scroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	QSizePolicy policy = scroller->sizePolicy();

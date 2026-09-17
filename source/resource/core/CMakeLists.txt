@@ -198,6 +198,7 @@ cx_add_class(cxResource_SOURCE
   utilities/cxTimeKeeper
   utilities/cxMeshHelpers
   utilities/cxApplication
+  utilities/cxMouseWheelWidgetAdjustmentGuard
   utilities/cxSharedMemory
   utilities/cxImageDataContainer
   utilities/cxOptionalValue

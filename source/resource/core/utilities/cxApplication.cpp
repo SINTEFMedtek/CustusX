@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxApplication.h"
 #include "cxLogger.h"
+#include "cxMouseWheelWidgetAdjustmentGuard.h"
 #include <QThread>
 #include <QWidget>
 #include <QFile>
@@ -35,6 +36,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 	QFile stylesheet(":/cxStyleSheet.ss");
 	stylesheet.open(QIODevice::ReadOnly);
 	this->setStyleSheet(stylesheet.readAll());
+
+	this->installEventFilter(new MouseWheelWidgetAdjustmentGuard(this));
 }
 
 void Application::reportException(QString text)
