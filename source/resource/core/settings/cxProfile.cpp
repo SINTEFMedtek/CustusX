@@ -136,6 +136,17 @@ QString Profile::getSessionRootFolder() const
 	QString folder = this->getSettings()->value("globalPatientDataFolder",
 									   this->getDefaultSessionRootFolder()).toString();
 
+	// CustusX#44 moved the default Patients location from <home>/Patients/<profile>
+	// to <home>/<family>/Patients/<profile>, but value()'s default argument above is
+	// only used when nothing is stored yet -- anyone who already had this setting
+	// persisted from before that change keeps pointing at the old location forever,
+	// no matter how the default computation itself changes. Detect and migrate
+	// exactly that one stale, pre-family-folder default; any other stored value is
+	// a deliberate user choice and must not be touched.
+	QString preFamilyFolderDefault = QStringList({QDir::homePath(), "Patients", this->getName()}).join("/");
+	if (folder == preFamilyFolderDefault)
+		folder = this->getDefaultSessionRootFolder();
+
 	// Create folders
 	if (!QDir().exists(folder))
 	{
