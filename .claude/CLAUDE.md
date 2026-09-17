@@ -160,7 +160,7 @@ git -C FX/FX remote set-url origin https://gitlab.sintef.no/custusx/fraxinus.git
 
 **Never commit directly to `develop`/`master`**
 
-Always create/use a feature branch for a commit, even a small one-line fix, in any of these repos: CustusX, CustusS, Fraxinus (public or private), or any private plugin repo (`org.custusx.core.tracking.system.ndi`, etc). This applies regardless of how small or obviously-correct the change is, and even if the commit is only local and not yet pushed. If a task naturally lands on `develop` (e.g. because that's where a relevant file currently lives), create a feature branch from that point first (`git checkout -b cxNN-description`) and commit there instead. Commits go to `develop`/`master` only via review/merge (e.g. an MR), never directly.
+Always commit to a branch other than `develop`/`master` in any of these repos: CustusX, CustusS, Fraxinus (public or private), or any private plugin repo (`org.custusx.core.tracking.system.ndi`, etc) — a feature branch (`cxNN-description`) or a release branch (`release/vYY.MM`) are both fine, and several unrelated fixes/issues can share the same branch. Commits go to `develop`/`master` only via review/merge (e.g. an MR), never directly.
 
 **Squashing/amending unpushed commits**
 
