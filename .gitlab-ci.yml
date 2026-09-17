@@ -16,13 +16,11 @@ default:
 stages:
   - test-python
   - build-libs
-  # Platforms build+test serially (24 -> 22 -> 20) to reduce concurrent runner load.
-  - build-24
-  - test-24
-  - build-22
-  - test-22
-  - build-20
-  - test-20
+  # The three platform build jobs share a resource_group (see build.yml) so only
+  # one builds at a time, reducing concurrent runner load without needing a
+  # separate stage per platform.
+  - build
+  - test
   - deploy
 
 variables:

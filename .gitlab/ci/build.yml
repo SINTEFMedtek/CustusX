@@ -3,7 +3,6 @@
 # CI_PROJECT_DIR is deleted from the Docker image before the build,
 # so a quick build requires out of source build files
 .build-variables:
-  # stage is set per-platform job below, to serialize platform builds.
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
     OS: OS
@@ -98,9 +97,19 @@
       touch "$LIBS_SENTINEL"
     fi
 
+# Shared by all three platform build jobs below so only one builds at a time
+# (they'd otherwise all be eligible to run concurrently, since they're in the
+# same stage and don't depend on each other) -- reduces concurrent runner load
+# without needing a separate stage per platform. Which platform goes first is
+# not guaranteed, just that they never overlap.
+.serialize-platform-build:
+  resource_group: cx-platform-build
+
 build-ubuntu20:
-  extends: .reuse-build
-  stage: build-20
+  extends:
+    - .reuse-build
+    - .serialize-platform-build
+  stage: build
   image: $IMAGE_UBUNTU2004
   variables:
     OS: Ubuntu2004
@@ -111,8 +120,10 @@ build-ubuntu20:
     GIT_CLONE_PATH: $BASE_DIR_UBUNTU2004_IGSTK/CX/CX
 
 build-ubuntu22:
-  extends: .reuse-build
-  stage: build-22
+  extends:
+    - .reuse-build
+    - .serialize-platform-build
+  stage: build
   image: $IMAGE_UBUNTU2204
   variables:
     OS: Ubuntu2204
@@ -123,8 +134,10 @@ build-ubuntu22:
     GIT_CLONE_PATH: $BASE_DIR_UBUNTU2204_IGSTK/CX/CX
 
 build-ubuntu24:
-  extends: .reuse-build
-  stage: build-24
+  extends:
+    - .reuse-build
+    - .serialize-platform-build
+  stage: build
   image: $IMAGE_UBUNTU2404
   variables:
     OS: Ubuntu2404
