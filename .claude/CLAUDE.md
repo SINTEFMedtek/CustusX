@@ -166,6 +166,10 @@ Always commit to a branch other than `develop`/`master` in any of these repos: C
 
 If you need to correct or fold together commits you just made, it's fine to squash or amend them as long as none of them have been pushed to the remote yet (check with `git status`/`git log @{u}..HEAD`, or the fact that the branch was just created locally). Never do this to a commit that has already been pushed — that rewrites history other clones, MRs, or CI may already have fetched; add a new commit on top instead.
 
+**Pull before committing**
+
+Before committing to a branch that already exists on the remote (as opposed to one just created locally), fetch and merge/pull first so the commit is based on the branch's current tip, not a stale local copy — otherwise a push later can fail or, worse, silently diverge from work someone else (or another session) already pushed to the same branch.
+
 **Open/Closed code**
 
 While CustusX is open source, most other repositories are closed source, and Claude should avoid looking into this code unless ordered:
@@ -239,6 +243,18 @@ Use `org.custusx.filter.cpd` or `org.custusx.filter.clipmesh` as a reference. Ev
 
 Also add `org.custusx.filter.<name>:ON` to the plugin list in `source/plugins/CMakeLists.txt`.
 
+**Windows linking: check whether the plugin's test lib needs a dummy exported class.** MSVC
+needs at least one exported symbol to produce a usable `.lib` for a DLL with no exports. A
+test lib whose only source registers Catch `TEST_CASE`s (no actual exported class) links fine
+on Linux but fails on Windows. If the new plugin's `testing/` directory doesn't otherwise
+define a class tagged with its generated export macro, add a
+`cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp` (see any existing
+plugin's `testing/` folder for the ~5-line pattern, and `EXPORT_DUMMY_CLASS_FOR_LINKING_ON_WINDOWS_IN_LIB_WITHOUT_EXPORTED_CLASS`
+in `source/resource/testUtilities/cxtestUtilities.h`) and wire it into `testing/CMakeLists.txt`
+via `cx_add_class()` alongside the other test sources. This was missed when `org.custusx.liver`
+was first added and had to be fixed in a follow-up commit (`85d49db00`) once it broke the
+Windows build.
+
 ### Filter plugin threading model
 
 **Critical — misunderstanding this causes crashes and race conditions:**
@@ -304,7 +320,7 @@ created and backfilled by hand after the fact.
 
 ### Markdown rules for plugin doc files
 
-The doc files are processed by Doxygen and then compiled into Qt Help (`.qhp` XML). Certain Markdown constructs cause the `qcollectiongenerator` step to fail with "Opening and ending tag mismatch" on older Qt/Doxygen versions. Follow these rules:
+**Check this section before the first build of any brand-new `.md` doc page** (a new plugin's `doc/org.custusx.<name>.md`, or any other page added to the `UserDoc`/`DoxygenDoc` input). The doc files are processed by Doxygen and then compiled into Qt Help (`.qhp` XML) — a new page that doesn't follow these rules typically builds fine through Doxygen but then fails the `qhelpgenerator`/`qcollectiongenerator` step with "Opening and ending tag mismatch", which looks like a doc-build/tooling problem but is actually a content problem in the page you just added. The fix is editing the page to match the rules below, then rebuilding — not retrying the same content. Follow these rules:
 
 **Safe heading styles** (match what existing CustusX filter docs use):
 ```markdown
