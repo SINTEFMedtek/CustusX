@@ -20,6 +20,24 @@
 set -e
 
 # ---------------------------------------------------------------------------
+# Retry a download a few times before giving up -- a single transient
+# network/DNS hiccup shouldn't require rerunning the whole install script.
+# ---------------------------------------------------------------------------
+download_with_retry() {
+    local attempt
+    for attempt in 1 2 3 4 5; do
+        if wget "$@"; then
+            return 0
+        fi
+        if [ "$attempt" -lt 5 ]; then
+            echo "Download attempt $attempt failed, retrying in 5s..."
+            sleep 5
+        fi
+    done
+    return 1
+}
+
+# ---------------------------------------------------------------------------
 # Version — set by CI for each release; empty when run from a local checkout
 # ---------------------------------------------------------------------------
 CUSTUSX_VERSION=""
@@ -68,7 +86,7 @@ if [ -n "$CUSTUSX_VERSION" ]; then
     if [ -n "$GITLAB_TOKEN" ]; then
         WGET_ARGS+=(--header "PRIVATE-TOKEN: $GITLAB_TOKEN")
     fi
-    if ! wget "${WGET_ARGS[@]}" -O "$TARBALL" "$DOWNLOAD_URL"; then
+    if ! download_with_retry "${WGET_ARGS[@]}" -O "$TARBALL" "$DOWNLOAD_URL"; then
         echo ""
         echo "ERROR: Download failed. URL: $DOWNLOAD_URL"
         if [ -z "$GITLAB_TOKEN" ]; then
