@@ -91,6 +91,26 @@ class CppBuilder(object):
                 shutil.rmtree(target)
         exit('ERROR: failed to clone %s after %d attempts.' % (repository, attempts))
 
+    def _gitFetchWithRetry(self, attempts=3):
+        '''
+        A bare `git fetch` has no resilience against a transient network
+        failure (e.g. a connection timeout to the remote), unlike
+        _gitCloneWithRetry above. Every checkout/update path below fetches
+        unconditionally on each build, so a single flaky remote (e.g.
+        gitlab.kitware.com being briefly unreachable) would otherwise call
+        exit() and kill the whole build. Retry here too, falling back to
+        HTTP/1.1 since HTTP/2 is the more likely side to drop the connection
+        on some networks/proxies. Mirrors _gitCloneWithRetry/
+        cxRepoHandler.RepoHandler._cloneWithRetry.
+        '''
+        for attempt in range(1, attempts + 1):
+            http_fallback = '' if attempt == 1 else '-c http.version=HTTP/1.1 '
+            cmd = 'git %sfetch' % http_fallback
+            if runShell(cmd, ignoreFailure=True):
+                return
+            print('Fetch attempt %d/%d failed.' % (attempt, attempts))
+        exit('ERROR: failed to fetch after %d attempts.' % attempts)
+
     def gitCloneIntoExistingDirectory(self, repository, branch):
         '''
         Use in the case that the source folder already contains stuff,
@@ -105,7 +125,7 @@ class CppBuilder(object):
     def gitSetRemoteURL(self, new_remote_origin_repository, branch=None):
         self._changeDirToSource()
         runShell('git remote set-url origin %s' % new_remote_origin_repository)
-        runShell('git fetch')
+        self._gitFetchWithRetry()
         # old (1.7) syntax - update if needed to 'git branch --set-upstream-to origin/<branch>' 
         if branch!=None:
             runShell('git branch --set-upstream %s origin/%s' % (branch, branch), ignoreFailure=True) # can fail if branch does not exist, might happen if a nonstandard branch is selected.
@@ -130,7 +150,7 @@ class CppBuilder(object):
         pull latest version of branch, include submodules if asked.
         '''
         self._changeDirToSource()
-        runShell('git fetch')
+        self._gitFetchWithRetry()
         runShell('git checkout %s' % branch)
         runShell('git pull origin %s' % branch)
 
@@ -143,7 +163,7 @@ class CppBuilder(object):
         self._changeDirToSource()
         if self._checkGitIsAtTag(tag):
             return
-        runShell('git fetch')
+        self._gitFetchWithRetry()
         if self._checkGitIsAtRef(tag):
             self._warnIfLocalModifications(tag)
             return
@@ -162,7 +182,7 @@ class CppBuilder(object):
         as they will output confusing warnings
         '''
         self._changeDirToSource()
-        runShell('git fetch')
+        self._gitFetchWithRetry()
         if self._checkGitIsAtRef(sha):
             self._warnIfLocalModifications(sha)
             return
