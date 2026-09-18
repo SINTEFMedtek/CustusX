@@ -246,8 +246,11 @@ class VTK(CppComponent):
         #return '%s/VTK' % self.controlData.gitrepo_open_site_base
         return 'https://gitlab.kitware.com/vtk/vtk.git' # Switch to local repo copy for speedup later?
     def update(self):
-        self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('v9.6.1')
+        builder = self._getBuilder()
+        if builder.isAtTag('v9.6.1'):
+            return
+        builder.gitSetRemoteURL(self.repository())
+        builder.gitCheckout('v9.6.1')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -302,8 +305,11 @@ class oldVTK(CppComponent):
     def repository(self):
         return 'https://gitlab.kitware.com/vtk/vtk.git'
     def update(self):
-        self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('v9.2.6')
+        builder = self._getBuilder()
+        if builder.isAtTag('v9.2.6'):
+            return
+        builder.gitSetRemoteURL(self.repository())
+        builder.gitCheckout('v9.2.6')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

@@ -188,6 +188,18 @@ class CppBuilder(object):
             return
         runShell('git checkout %s' % sha)
 
+    def isAtTag(self, tag):
+        '''
+        True if the source repo's HEAD is already exactly at the given tag.
+        Lets a component's update() skip gitSetRemoteURL()'s unconditional
+        fetch entirely for a pinned external dependency whose tag rarely or
+        never changes between builds (e.g. VTK) - avoiding a network
+        round-trip to a remote that may be temporarily or permanently
+        unreachable even though nothing here needs to change (CustusX#46).
+        '''
+        self._changeDirToSource()
+        return self._checkGitIsAtTag(tag)
+
     def _checkGitIsAtTag(self, tag):
         output = shell.evaluate('git describe --tags --exact-match')
         if not output:

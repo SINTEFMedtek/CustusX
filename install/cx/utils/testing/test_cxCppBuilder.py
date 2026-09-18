@@ -1,8 +1,10 @@
 '''
-Regression tests for cx.utils.cxCppBuilder.CppBuilder._gitFetchWithRetry().
+Regression tests for cx.utils.cxCppBuilder.CppBuilder._gitFetchWithRetry()
+and CppBuilder.isAtTag().
 
-No network access, no real git repos - runShell() is mocked so these only
-exercise the retry/backoff/give-up logic itself (CustusX#46).
+No network access, no real git repos - runShell()/shell.evaluate() are
+mocked so these only exercise the retry/backoff/give-up and
+already-at-tag-skip logic itself (CustusX#46).
 
 Run with:
     cd install && python3 -m unittest discover -s cx/utils/testing -v
@@ -10,7 +12,9 @@ or:
     python3 install/cx/utils/testing/test_cxCppBuilder.py
 '''
 import os
+import shutil
 import sys
+import tempfile
 import unittest
 from unittest import mock
 
@@ -49,6 +53,34 @@ class GitFetchWithRetryTest(unittest.TestCase):
             self.builder._gitFetchWithRetry(attempts=3)
 
         self.assertEqual(mock_run_shell.call_count, 3)
+
+
+class IsAtTagTest(unittest.TestCase):
+    def setUp(self):
+        self.builder = cxCppBuilder.CppBuilder()
+        self.tmp = tempfile.mkdtemp(prefix='cxCppBuilder_test_')
+        self.builder.setPaths(base=self.tmp, build=self.tmp, source=self.tmp)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    @mock.patch('cx.utils.cxCppBuilder.shell')
+    def test_true_when_git_describe_matches_tag(self, mock_shell):
+        mock_shell.evaluate.return_value = mock.Mock(stdout='v9.6.1\n')
+
+        self.assertTrue(self.builder.isAtTag('v9.6.1'))
+
+    @mock.patch('cx.utils.cxCppBuilder.shell')
+    def test_false_when_git_describe_is_a_different_tag(self, mock_shell):
+        mock_shell.evaluate.return_value = mock.Mock(stdout='v9.2.6\n')
+
+        self.assertFalse(self.builder.isAtTag('v9.6.1'))
+
+    @mock.patch('cx.utils.cxCppBuilder.shell')
+    def test_false_when_git_describe_fails(self, mock_shell):
+        mock_shell.evaluate.return_value = None
+
+        self.assertFalse(self.builder.isAtTag('v9.6.1'))
 
 
 if __name__ == '__main__':
