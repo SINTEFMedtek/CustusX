@@ -31,6 +31,8 @@ CMake minimum version: 3.16.3. C++ standard: C++14. All build outputs go to `${P
 
 New non-trivial code (algorithms, filter logic, bug fixes) should come with an automated test where practical. Pure/static logic (mappings, threshold/bounding-box computation, etc.) is the easiest target - prefer exposing it as a testable pure function over leaving it embedded in a widget or filter with no coverage. A private method worth testing on its own can be moved to `protected` and exercised via a thin test subclass (see "Testing Filter plugins" below) rather than left untested for lack of access.
 
+Before changing existing non-trivial code, check whether it already has test coverage. If it doesn't, add a test capturing its current/expected behavior first (where practical) so the change is verifiable and a regression is caught by the test suite rather than only by manual testing or a future bug report.
+
 Tests use the **Catch** framework. Each plugin has a `testing/` subdirectory; all tests are linked into a single `Catch` executable.
 
 ```bash
@@ -317,6 +319,8 @@ created and backfilled by hand after the fact.
 - Built with Doxygen: CMake targets `UserDoc` and `DoxygenDoc`
 - Code style reference: `doc/dev_manual/cx_dev_code_style.md`
 - Incremental rebuild: run `ninja UserDoc` inside the build directory
+
+Add or update the relevant user manual page whenever a change affects what a user sees or does — a new/changed GUI widget, a new plugin's own doc page, a changed workflow, a renamed/moved setting, etc. Look for an existing page covering the affected widget/plugin/feature under `doc/user_manual/` or `doc/shared_manual/` before assuming one needs to be added; a plugin's own page lives at `source/plugins/<plugin>/doc/<plugin>.md` (see "Required files for a new Filter plugin" above).
 
 ### Markdown rules for plugin doc files
 
