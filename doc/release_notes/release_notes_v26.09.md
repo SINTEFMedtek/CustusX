@@ -1,0 +1,37 @@
+# CustusX release notes — v26.09
+
+_Changes since v26.08_
+
+## New Features
+
+| Key | Summary | Release Note |
+|---|---|---|
+| [CustusX#45](https://gitlab.sintef.no/custusx/custusx/-/issues/45) | Liver segmentation | Added a new Liver plugin using TotalSegmentator to segment the liver, pancreas, liver vessels, liver lesions and the 8 Couinaud liver segments from CT/MR, with a combined widget to run and toggle visibility of each structure. Segmentation runs in the background so the UI no longer freezes while it works. |
+| [CustusX#44](https://gitlab.sintef.no/custusx/custusx/-/issues/44) | Single-file Ubuntu installer | Added a single-file Ubuntu installer script (`installCustusX.sh`) that downloads and sets up CustusX automatically, plus a `curl` one-liner that always fetches the latest release. Also added a desktop launcher. |
+
+## Bugfixes
+
+| Key | Summary | Release Note |
+|---|---|---|
+| [CustusX#46](https://gitlab.sintef.no/custusx/custusx/-/issues/46) | Missing glew dependency | The Ubuntu install script now installs `libglew-dev` and other missing dependencies, fixing a "missing glew library" error on a fresh install. |
+| [CustusX#46](https://gitlab.sintef.no/custusx/custusx/-/issues/46) | False "DICOM data was not found" warning | This warning no longer appears incorrectly when importing a non-DICOM file (e.g. an mhd file). |
+| [CustusX#46](https://gitlab.sintef.no/custusx/custusx/-/issues/46) | DICOM import false rejection | Relaxed gantry tilt tolerance during DICOM import so valid series with a near-zero tilt are no longer incorrectly rejected. |
+| [CustusX#46](https://gitlab.sintef.no/custusx/custusx/-/issues/46) | Scripted filter reliability | Fixed a scripted filter (e.g. TotalSegmentator-based filters) sometimes reporting Stop as success, a race condition, and a rare freeze when finishing. |
+| [CustusX#46](https://gitlab.sintef.no/custusx/custusx/-/issues/46) | Unresponsive during DICOM import | Importing DICOM data (e.g. from a USB drive) no longer makes CustusX appear "not responding" during long scans; the progress dialog's Cancel button now also works while a folder is being scanned. |
+| [CustusX#46](https://gitlab.sintef.no/custusx/custusx/-/issues/46) | Scrolling a view only worked over its scrollbar | Scrolling a view now works from anywhere inside it, not just directly on the scrollbar. Previously a tabbed widget's tab bar was especially disruptive here (e.g. the Liver widget), since it sits above all of that widget's content and could block scrolling anywhere inside it. Scrolling over a dropdown/spin box/slider/tab bar still changes its value (or switches tabs) as before once you've clicked into it. |
+| [CustusX#46](https://gitlab.sintef.no/custusx/custusx/-/issues/46) | Load Patient opened the wrong folder | The "Load Patient" dialog now correctly opens the current `~/CustusX/Patients` folder for anyone using an old CustusX_settings, instead of getting stuck on the old `~/Patients` location. |
+
+## Known Issues
+
+| Key | Summary | Release Note |
+|---|---|---|
+| [CustusX#30](https://gitlab.sintef.no/custusx/custusx/-/issues/30) | Tracking on Ubuntu 24.04 | Tracking hardware support is not available in the open-source CustusX build on Ubuntu 24.04. |
+| [CustusX#42](https://gitlab.sintef.no/custusx/custusx/-/issues/42) | Windows testing coverage | The Windows build has not been as thoroughly tested and verified as the Ubuntu builds. Ubuntu remains the primary, best-tested platform. |
+
+<details>
+<summary>Internal changes not included above (CI/build/tooling)</summary>
+
+- CustusX#43 — Windows build object-file paths were close to Windows' 260-char MAX_PATH limit; shortened the default Windows release build root to restore margin
+- CustusX#46 — Various Python release-tooling fixes and test coverage (git sync robustness, release tagging, CI)
+
+</details>
