@@ -386,16 +386,20 @@
 			extensively tested and verified as the Ubuntu builds.
 		</p>
 		<p>
-			On Ubuntu, each release also includes <code>installCustusX.sh</code> — a single installer
-			script that downloads and unpacks CustusX automatically.
+			On Ubuntu, install directly via <code>curl</code>:
 		</p>
-		<p>After downloading, run:</p>
-		<pre style="background:#eef1f8;border:1px solid #c8d4e8;padding:12px 16px;margin:12px 0;font-size:13px;">chmod +x installCustusX.sh
-./installCustusX.sh</pre>
-
-		<p>Alternatively, install directly via <code>curl</code>:</p>
 		<pre style="background:#eef1f8;border:1px solid #c8d4e8;padding:12px 16px;margin:12px 0;font-size:13px;">sudo apt install curl -y  # optional, if curl is not already installed
 curl -fsSL https://gitlab.sintef.no/custusx/CustusX/-/releases/permalink/latest/downloads/installCustusX.sh | bash</pre>
+
+		<p>
+			Alternatively, each release also includes <code>installCustusX.sh</code> — download and run it
+			yourself (e.g. if you'd like to inspect the script first). If you already have an older copy,
+			re-download it rather than running the old one — some browsers save a repeat download as a
+			numbered duplicate (<code>installCustusX (1).sh</code>) instead of overwriting it, which would
+			leave <code>./installCustusX.sh</code> below pointing at a stale or missing file:
+		</p>
+		<pre style="background:#eef1f8;border:1px solid #c8d4e8;padding:12px 16px;margin:12px 0;font-size:13px;">chmod +x installCustusX.sh
+./installCustusX.sh</pre>
 
 		<div class="disclaimer">
 			CustusX is a research tool: It is not intended for normal clinical use, and is not FDA nor CE approved.
