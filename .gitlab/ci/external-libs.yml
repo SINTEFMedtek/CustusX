@@ -195,6 +195,40 @@ cleanup-old-external-libs:
       keep  = int(os.environ.get('KEEP_VERSIONS', '1'))
       pkg_name = 'custusx-external-lib'
 
+      def sanitize_image_tag(image):
+          # Mirrors .lib-package-vars' `sed 's|.*/||' | tr ':' '_'`.
+          return image.rsplit('/', 1)[-1].replace(':', '_')
+
+      # IMAGE_UBUNTU2004/2204/2404 are pipeline-level variables (.gitlab-ci.yml),
+      # so they're available here unchanged even though this job never builds.
+      valid_image_tags = {
+          sanitize_image_tag(os.environ['IMAGE_UBUNTU2004']),
+          sanitize_image_tag(os.environ['IMAGE_UBUNTU2204']),
+          sanitize_image_tag(os.environ['IMAGE_UBUNTU2404']),
+      }
+
+      def is_current_format(prefix):
+          '''
+          A prefix (LIB_VERSION without its trailing -HASH) can only ever be
+          produced again by a live job if it ends with one of today's Docker
+          image tags, and -- right before that -- an IGSTK_VARIANT segment
+          ("plain" or "igstk"). A prefix that doesn't match -- an old image
+          tag left behind by a Docker image bump, or an older key format like
+          the pre-CustusX#50-variant-split one that omitted IGSTK_VARIANT
+          entirely (seen on eigen's very first per-library package, created
+          hours before the variant split) -- can never be matched by a live
+          job again, so its whole group is deleted below regardless of the
+          normal keep-N rotation, which only prevents an *active* prefix from
+          growing unbounded and has no way to notice an *abandoned* one (it
+          would otherwise sit there forever as its own permanently-kept
+          group of 1).
+          '''
+          for tag in valid_image_tags:
+              suffix = '-' + tag
+              if prefix.endswith(suffix) and prefix[:-len(suffix)].endswith(('-plain', '-igstk')):
+                  return True
+          return False
+
       def api_request(path, method='GET'):
           req = urllib.request.Request(
               f'{api}/projects/{proj}/{path}',
@@ -227,9 +261,14 @@ cleanup-old-external-libs:
       deleted = 0
       for prefix, pkgs in sorted(groups.items()):
           pkgs.sort(key=lambda p: p['created_at'], reverse=True)
-          kept = [p['version'] for p in pkgs[:keep]]
-          print(f'{prefix}: keeping {kept}')
-          for old in pkgs[keep:]:
+          if is_current_format(prefix):
+              kept = [p['version'] for p in pkgs[:keep]]
+              print(f'{prefix}: keeping {kept}')
+              to_remove = pkgs[keep:]
+          else:
+              print(f'{prefix}: stale format/image tag, deleting all {len(pkgs)} version(s)')
+              to_remove = pkgs
+          for old in to_remove:
               try:
                   api_request(f'packages/{old["id"]}', method='DELETE')
                   print(f'  Deleted {old["version"]} (id={old["id"]})')
