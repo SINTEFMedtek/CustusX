@@ -173,10 +173,12 @@ void DynamicMainWindowWidgets::onConsoleWindowTitleChanged(const QString & title
 {
 	QWidget* widget = dynamic_cast<QWidget*>(sender());
 
-	for (int i=0; i<3; ++i)
+	// Walk up until a QDockWidget is found, rather than assuming a fixed
+	// number of hops: the ancestor chain's depth here depends on internal
+	// Qt widget wrapping (e.g. QScrollArea reparenting its content onto its
+	// own viewport) that isn't this function's concern to track.
+	while (widget)
 	{
-		if (!widget)
-			return;
 		QDockWidget* dockWidget = dynamic_cast<QDockWidget*>(widget);
 		if (dockWidget)
 		{
