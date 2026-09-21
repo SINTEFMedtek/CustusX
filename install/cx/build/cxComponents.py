@@ -245,6 +245,19 @@ class VTK(CppComponent):
     def repository(self):
         #return '%s/VTK' % self.controlData.gitrepo_open_site_base
         return 'https://gitlab.kitware.com/vtk/vtk.git' # Switch to local repo copy for speedup later?
+    def pinnedTag(self):
+        return 'v9.6.1'
+    def _rawCheckout(self):
+        '''
+        Shallow clone directly at the pinned tag instead of full history
+        (CustusX#50) -- VTK's full clone is several GB, and the tag is
+        already known here, unlike Component._rawCheckout()'s generic full
+        clone (used by every other component), whose tag/sha isn't decided
+        until update() runs afterward. update()'s isAtTag() check then finds
+        this shallow clone already at the tag and skips its own fetch, same
+        as any other build.
+        '''
+        self._getBuilder().gitCloneAtTag(self.repository(), self.pinnedTag(), self.sourceFolder())
     def update(self):
         builder = self._getBuilder()
         # gitSetRemoteURL() must still run every time (CLAUDE.md's documented
@@ -252,11 +265,11 @@ class VTK(CppComponent):
         # change (mirror migration, project rename) still self-heals here --
         # only the network fetch inside it is safe to skip in that case
         # (CustusX#46/CustusX#50).
-        at_tag = builder.isAtTag('v9.6.1')
+        at_tag = builder.isAtTag(self.pinnedTag())
         builder.gitSetRemoteURL(self.repository(), fetch=not at_tag)
         if at_tag:
             return
-        builder.gitCheckout('v9.6.1')
+        builder.gitCheckout(self.pinnedTag())
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -310,15 +323,23 @@ class VTK92(CppComponent):
         return self.controlData.getBuildExternalsType()
     def repository(self):
         return 'https://gitlab.kitware.com/vtk/vtk.git'
+    def pinnedTag(self):
+        return 'v9.2.6'
+    def _rawCheckout(self):
+        '''
+        See VTK._rawCheckout() above -- same shallow-clone-at-tag reasoning
+        (CustusX#50).
+        '''
+        self._getBuilder().gitCloneAtTag(self.repository(), self.pinnedTag(), self.sourceFolder())
     def update(self):
         builder = self._getBuilder()
         # See VTK.update() above for why gitSetRemoteURL() still runs
         # unconditionally, only its internal fetch is skipped.
-        at_tag = builder.isAtTag('v9.2.6')
+        at_tag = builder.isAtTag(self.pinnedTag())
         builder.gitSetRemoteURL(self.repository(), fetch=not at_tag)
         if at_tag:
             return
-        builder.gitCheckout('v9.2.6')
+        builder.gitCheckout(self.pinnedTag())
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

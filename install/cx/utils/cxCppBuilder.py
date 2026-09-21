@@ -74,6 +74,23 @@ class CppBuilder(object):
         self._gitCloneWithRetry(repository, folder)
         self._changeDirToSource()
 
+    def gitCloneAtTag(self, repository, tag, folder=''):
+        '''
+        Like gitClone(), but shallow: clones directly at a known, pinned tag
+        (--branch <tag> --depth 1) instead of full history (CustusX#50). For
+        a large, chronically-flaky-to-clone repo whose tag is fixed and known
+        ahead of time (VTK/VTK92 in particular -- several GB of history vs a
+        few hundred MB shallow), this is both faster and far less likely to
+        drop mid-transfer. Verified directly against gitlab.kitware.com/vtk/
+        vtk.git: a --depth 1 clone at a pinned tag leaves `git describe --tags
+        --exact-match` (what isAtTag()/update() rely on) resolving correctly,
+        so the caller's usual isAtTag() check finds it already at the tag and
+        skips its own update() work, same as any other build.
+        '''
+        self._changeDirToBase()
+        self._gitCloneAtTagWithRetry(repository, tag, folder)
+        self._changeDirToSource()
+
     def _gitCloneWithRetry(self, repository, folder, attempts=3):
         '''
         A bare `git clone` has no resilience against a mid-transfer TLS drop
@@ -91,6 +108,24 @@ class CppBuilder(object):
             if os.path.exists(target):
                 shutil.rmtree(target)
         exit('ERROR: failed to clone %s after %d attempts.' % (repository, attempts))
+
+    def _gitCloneAtTagWithRetry(self, repository, tag, folder, attempts=3):
+        '''
+        Mirrors _gitCloneWithRetry, shallow at a known tag instead of full
+        history -- see gitCloneAtTag() above.
+        '''
+        target = os.path.join(self.mBasePath, folder) if folder else self.mBasePath
+        for attempt in range(1, attempts + 1):
+            http_fallback = '' if attempt == 1 else '-c http.version=HTTP/1.1 '
+            cmd = 'git %sclone --branch %s --depth 1 %s %s' % (http_fallback, tag, repository, folder)
+            if runShell(cmd, ignoreFailure=True):
+                return
+            print('Shallow clone attempt %d/%d failed for %s@%s.' % (attempt, attempts, repository, tag))
+            if os.path.exists(target):
+                shutil.rmtree(target)
+            if attempt < attempts:
+                time.sleep(5)
+        exit('ERROR: failed to shallow-clone %s@%s after %d attempts.' % (repository, tag, attempts))
 
     def _gitFetchWithRetry(self, attempts=3):
         '''
