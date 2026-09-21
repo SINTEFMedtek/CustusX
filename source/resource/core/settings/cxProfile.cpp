@@ -131,6 +131,13 @@ QString Profile::getDefaultSessionRootFolder() const
 	return path.join("/");
 }
 
+QString Profile::migrateStaleSessionRootFolder(QString folder, QString preFamilyFolderDefault, QString familyDefault)
+{
+	if (folder == preFamilyFolderDefault)
+		return familyDefault;
+	return folder;
+}
+
 QString Profile::getSessionRootFolder() const
 {
 	QString folder = this->getSettings()->value("globalPatientDataFolder",
@@ -144,8 +151,7 @@ QString Profile::getSessionRootFolder() const
 	// exactly that one stale, pre-family-folder default; any other stored value is
 	// a deliberate user choice and must not be touched.
 	QString preFamilyFolderDefault = QStringList({QDir::homePath(), "Patients", this->getName()}).join("/");
-	if (folder == preFamilyFolderDefault)
-		folder = this->getDefaultSessionRootFolder();
+	folder = Profile::migrateStaleSessionRootFolder(folder, preFamilyFolderDefault, this->getDefaultSessionRootFolder());
 
 	// Create folders
 	if (!QDir().exists(folder))

@@ -101,6 +101,16 @@ public:
 	void setSessionRootFolder(QString path);
 
 	QString getPatientTemplatePath();
+
+	/**
+	 * Pure migration logic for getSessionRootFolder() (CustusX#44): if folder
+	 * is exactly the pre-family-folder default, return familyDefault instead;
+	 * any other value (a deliberate user choice, or an already-migrated
+	 * value) is returned untouched. Exposed as a static, side-effect-free
+	 * function so it's directly testable without a real Profile/Settings/
+	 * DataLocations setup.
+	 */
+	static QString migrateStaleSessionRootFolder(QString folder, QString preFamilyFolderDefault, QString familyDefault);
 private:
 	QString mPath;
 	SettingsPtr mSettings;
