@@ -44,7 +44,21 @@
         # -HASH" rotation logic keeps each library's own history separate,
         # instead of treating unrelated libraries sharing an OS/image as the
         # same rotation group.
-        LIB_VERSION="${LIB}-${OS}-${IMAGE_TAG}-${LIB_HASH}"
+        # IGSTK_VARIANT must be part of the key: several libraries here (CTK,
+        # ITK, OpenCV, OpenIGTLinkIO) embed an *absolute path* to a sibling
+        # library's own $BASE_DIR-specific build directory in their exported
+        # CMake config (e.g. CTKConfig.cmake's baked-in VTK_DIR). The plain
+        # and -igstk builds of the same OS use different $BASE_DIR values but
+        # otherwise hash identically, so without this a tarball built under
+        # one $BASE_DIR would get extracted under the other and leave stale,
+        # wrong absolute paths behind -- CMake then fails to configure with
+        # "Some (but not all) targets in this export set were already
+        # defined," since it loads two different VTK-targets.cmake files.
+        IGSTK_VARIANT="plain"
+        if [ "${BUILD_IGSTK}" = "true" ]; then
+          IGSTK_VARIANT="igstk"
+        fi
+        LIB_VERSION="${LIB}-${OS}-${IGSTK_VARIANT}-${IMAGE_TAG}-${LIB_HASH}"
         LIB_FILE="cx-external-lib-${LIB}-${OS}.tar.gz"
         LIB_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/custusx-external-lib/${LIB_VERSION}/${LIB_FILE}"
       }
