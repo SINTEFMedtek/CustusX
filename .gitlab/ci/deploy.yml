@@ -159,7 +159,13 @@ create-release:
 
       if [ "$HTTP_CODE" = "409" ]; then
         echo "Release for tag ${CI_COMMIT_TAG} already exists -- treating as already done (e.g. a retried pipeline)."
-      elif [ "$HTTP_CODE" -ge 400 ]; then
+      elif [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+        # Was "-ge 400": a total connection failure (DNS, TLS, timeout) makes
+        # curl write "000" for %{http_code} (no HTTP response received at
+        # all), and "000" -ge 400 is false -- so that case fell through
+        # both branches and the job exited 0 as if the release had been
+        # created. Explicitly require 2xx (or the already-exists 409 above)
+        # instead of only rejecting >= 400.
         echo "Release creation failed with HTTP $HTTP_CODE:"
         cat /tmp/release_response.json
         exit 1
