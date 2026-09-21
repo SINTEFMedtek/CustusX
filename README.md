@@ -30,7 +30,10 @@ Alternatively, download `installCustusX.sh` and run it (e.g. if you'd like to in
 the script first). If you already have an older copy, re-download it rather than
 running the old one -- some browsers save a repeat download as a numbered duplicate
 (`installCustusX (1).sh`) instead of overwriting it, which would leave
-`./installCustusX.sh` below pointing at a stale or missing file:
+`./installCustusX.sh` below pointing at a stale or missing file. Each
+[release page](https://gitlab.sintef.no/custusx/CustusX/-/releases) also lists a
+version-suffixed copy (e.g. `installCustusX-v26.09.sh`) if you'd rather keep several
+versions side by side without this renaming issue:
 
 ```bash
 chmod +x installCustusX.sh
