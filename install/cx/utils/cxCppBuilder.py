@@ -17,6 +17,7 @@ import optparse
 import re
 import sys
 import os.path
+import time
 import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
@@ -109,6 +110,15 @@ class CppBuilder(object):
             if runShell(cmd, ignoreFailure=True):
                 return
             print('Fetch attempt %d/%d failed.' % (attempt, attempts))
+            if attempt < attempts:
+                # A transient network blip (e.g. gitlab.kitware.com briefly
+                # unreachable) needs a moment to clear -- retrying 3x back to
+                # back with no delay (as before) rarely gives it enough time,
+                # and this fires unconditionally for every component's
+                # update(), unlike _gitCloneWithRetry which only runs once
+                # per fresh checkout. Matches the install scripts' own
+                # download_with_retry() 5s pause for the same class of issue.
+                time.sleep(5)
         exit('ERROR: failed to fetch after %d attempts.' % attempts)
 
     def gitCloneIntoExistingDirectory(self, repository, branch):
@@ -122,11 +132,19 @@ class CppBuilder(object):
         runShell('git fetch')
         runShell('git checkout -t origin/%s' % branch)        
 
-    def gitSetRemoteURL(self, new_remote_origin_repository, branch=None):
+    def gitSetRemoteURL(self, new_remote_origin_repository, branch=None, fetch=True):
+        '''
+        `fetch=False` lets a component's update() still self-heal the remote
+        URL (a cheap, local git-config operation) every time, per CLAUDE.md's
+        documented invariant, while skipping only the network fetch that
+        follows it -- e.g. when isAtTag() already confirmed there's nothing
+        new to fetch for a pinned dependency (CustusX#46/CustusX#50).
+        '''
         self._changeDirToSource()
         runShell('git remote set-url origin %s' % new_remote_origin_repository)
-        self._gitFetchWithRetry()
-        # old (1.7) syntax - update if needed to 'git branch --set-upstream-to origin/<branch>' 
+        if fetch:
+            self._gitFetchWithRetry()
+        # old (1.7) syntax - update if needed to 'git branch --set-upstream-to origin/<branch>'
         if branch!=None:
             runShell('git branch --set-upstream %s origin/%s' % (branch, branch), ignoreFailure=True) # can fail if branch does not exist, might happen if a nonstandard branch is selected.
         #runShell('git branch -u origin/%s' % branch)
@@ -191,11 +209,13 @@ class CppBuilder(object):
     def isAtTag(self, tag):
         '''
         True if the source repo's HEAD is already exactly at the given tag.
-        Lets a component's update() skip gitSetRemoteURL()'s unconditional
-        fetch entirely for a pinned external dependency whose tag rarely or
-        never changes between builds (e.g. VTK) - avoiding a network
-        round-trip to a remote that may be temporarily or permanently
-        unreachable even though nothing here needs to change (CustusX#46).
+        Lets a component's update() skip the network fetch inside
+        gitSetRemoteURL() (pass fetch=False there) for a pinned external
+        dependency whose tag rarely or never changes between builds (e.g.
+        VTK) - avoiding a round-trip to a remote that may be temporarily or
+        permanently unreachable even though nothing here needs to change
+        (CustusX#46/CustusX#50). gitSetRemoteURL() itself must still run
+        unconditionally -- only the fetch inside it is safe to skip.
         '''
         self._changeDirToSource()
         return self._checkGitIsAtTag(tag)

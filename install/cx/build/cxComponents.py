@@ -247,9 +247,15 @@ class VTK(CppComponent):
         return 'https://gitlab.kitware.com/vtk/vtk.git' # Switch to local repo copy for speedup later?
     def update(self):
         builder = self._getBuilder()
-        if builder.isAtTag('v9.6.1'):
+        # gitSetRemoteURL() must still run every time (CLAUDE.md's documented
+        # invariant) even when already at the pinned tag, so a canonical-URL
+        # change (mirror migration, project rename) still self-heals here --
+        # only the network fetch inside it is safe to skip in that case
+        # (CustusX#46/CustusX#50).
+        at_tag = builder.isAtTag('v9.6.1')
+        builder.gitSetRemoteURL(self.repository(), fetch=not at_tag)
+        if at_tag:
             return
-        builder.gitSetRemoteURL(self.repository())
         builder.gitCheckout('v9.6.1')
     def configure(self):
         builder = self._getBuilder()
@@ -306,9 +312,12 @@ class oldVTK(CppComponent):
         return 'https://gitlab.kitware.com/vtk/vtk.git'
     def update(self):
         builder = self._getBuilder()
-        if builder.isAtTag('v9.2.6'):
+        # See VTK.update() above for why gitSetRemoteURL() still runs
+        # unconditionally, only its internal fetch is skipped.
+        at_tag = builder.isAtTag('v9.2.6')
+        builder.gitSetRemoteURL(self.repository(), fetch=not at_tag)
+        if at_tag:
             return
-        builder.gitSetRemoteURL(self.repository())
         builder.gitCheckout('v9.2.6')
     def configure(self):
         builder = self._getBuilder()
