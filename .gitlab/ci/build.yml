@@ -48,54 +48,63 @@
   - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=${CI_COMMIT_BRANCH:-$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}; fi
   - !reference [.lib-package-vars, script]
   - find $BASE_DIR/CX/build_Release -name "*igstk*" -delete 2>/dev/null || true
-  - LIBS_SENTINEL="$BASE_DIR/.lib_version_${PACKAGE_VERSION}"
-  - echo "Libs package version $PACKAGE_VERSION"
-  # Try to use prebuilt libs: local cache first, then Package Registry, then full rebuild.
-  # All cd $BASE_DIR calls use subshells to keep the working directory at CI_PROJECT_DIR.
+  # Per-library cache check (CustusX#50): each library is tried independently
+  # (local sentinel first, then Package Registry), instead of one all-or-
+  # nothing combined package -- an unrelated library's version bump no
+  # longer forces every other library to be re-downloaded or rebuilt too.
+  # All cd $BASE_DIR calls use subshells to keep the working directory at
+  # CI_PROJECT_DIR.
   - |
-    LIBS_READY=false
-    if [ -f "$LIBS_SENTINEL" ]; then
-      echo "Lib cache hit: $LIBS_SENTINEL"
-      LIBS_READY=true
-    else
-      echo "Lib cache miss, checking Package Registry..."
-      HTTP_CODE=$(curl -s -o /tmp/$PACKAGE_FILE -w "%{http_code}" \
-        --header "JOB-TOKEN: $CI_JOB_TOKEN" "$PACKAGE_URL")
-      if [ "$HTTP_CODE" = "200" ]; then
-        echo "Downloaded prebuilt libs, extracting to $BASE_DIR..."
-        ( cd $BASE_DIR && rm -rf $IGSTK_LIBS && tar -xzf /tmp/$PACKAGE_FILE )
-        rm -f $BASE_DIR/.lib_version_*
-        touch "$LIBS_SENTINEL"
-        LIBS_READY=true
-      else
-        echo "Package not found (HTTP $HTTP_CODE), will build all from scratch."
+    MISSING_LIBS=""
+    for LIB in $IGSTK_LIBS; do
+      compute_lib_package_vars "$LIB"
+      SENTINEL="$BASE_DIR/.lib_version_${LIB}"
+      if [ -f "$SENTINEL" ] && [ "$(cat "$SENTINEL")" = "$LIB_VERSION" ]; then
+        echo "  $LIB: local cache hit ($LIB_VERSION)."
+        continue
       fi
-    fi
+      echo "  $LIB: local cache miss, checking Package Registry for $LIB_VERSION..."
+      HTTP_CODE=$(curl -s -o /tmp/$LIB_FILE -w "%{http_code}" \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" "$LIB_URL")
+      if [ "$HTTP_CODE" = "200" ]; then
+        echo "  $LIB: downloaded prebuilt package, extracting to $BASE_DIR..."
+        ( cd $BASE_DIR && rm -rf $LIB && tar -xzf /tmp/$LIB_FILE )
+        echo "$LIB_VERSION" > "$SENTINEL"
+      else
+        echo "  $LIB: package not found (HTTP $HTTP_CODE), will build from source."
+        rm -f "$SENTINEL"
+        MISSING_LIBS="$MISSING_LIBS $LIB"
+      fi
+    done
+    echo "Libraries to build from source:$MISSING_LIBS"
   - |
-    if [ "$LIBS_READY" = "true" ]; then
-      echo "Building CustusX only..."
-      eval ./install/cxInstaller.py -s --full -j 15 -t Release --user_doc --developer_doc $IGSTK_FLAG \
-        --main_branch $CX_COMMIT \
-        --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx \
-        components CustusX
-    else
-      echo "Full build (all external libs + CustusX)..."
+    if [ -n "$MISSING_LIBS" ]; then
+      echo "Building missing external libs from source:$MISSING_LIBS"
       # Remove stale CTK build dir — a prior tarball extraction strips .git dirs,
       # which breaks DCMTK's git-update step on warm runners.
       rm -rf $BASE_DIR/CTK
-      eval ./install/cxInstaller.py -s --all --full -j 4 -t Release --user_doc --developer_doc $IGSTK_FLAG \
+      eval ./install/cxInstaller.py -s --full -j 4 -t Release $IGSTK_FLAG \
         --main_branch $CX_COMMIT \
-        --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
-      echo "Uploading libs to Package Registry for future runs..."
-      ( cd $BASE_DIR && tar -czf /tmp/$PACKAGE_FILE \
-        --exclude='*/CMakeFiles' \
-        --exclude='*/.git' \
-        $IGSTK_LIBS )
-      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-        --upload-file /tmp/$PACKAGE_FILE "$PACKAGE_URL" || true
-      rm -f $BASE_DIR/.lib_version_*
-      touch "$LIBS_SENTINEL"
+        --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx \
+        $MISSING_LIBS
+      echo "Uploading newly-built libs to Package Registry for future runs..."
+      for LIB in $MISSING_LIBS; do
+        compute_lib_package_vars "$LIB"
+        ( cd $BASE_DIR && tar -czf /tmp/$LIB_FILE \
+          --exclude='*/CMakeFiles' \
+          --exclude='*/.git' \
+          $LIB )
+        curl --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+          --upload-file /tmp/$LIB_FILE "$LIB_URL" || true
+        echo "$LIB_VERSION" > "$BASE_DIR/.lib_version_${LIB}"
+      done
     fi
+  - |
+    echo "Building CustusX..."
+    eval ./install/cxInstaller.py -s --full -j 15 -t Release --user_doc --developer_doc $IGSTK_FLAG \
+      --main_branch $CX_COMMIT \
+      --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx \
+      components CustusX
 
 # Shared by all three platform build jobs below so only one builds at a time
 # (they'd otherwise all be eligible to run concurrently, since they're in the
