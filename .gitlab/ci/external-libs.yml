@@ -105,19 +105,31 @@
     # CMake refuse to reconfigure ("directory ... is different than the
     # directory ... where CMakeCache.txt was created"). Safe in general since
     # every library removed here is about to be rebuilt from source anyway.
+    # Build and publish libraries one at a time -- not one combined build for
+    # all of $MISSING_LIBS followed by one combined upload pass. A
+    # fast-to-build library (eigen) would otherwise sit unpublished for the
+    # entire time a slow one (VTK) is still compiling, even though nothing
+    # about the upload actually depends on that wait. Publishing each library
+    # the moment it finishes lets downstream consumers -- CX's own next run,
+    # and CS/FX/FraxinusExcelsior's per-library lookups -- start reusing it
+    # immediately instead of only after the whole batch completes.
     - |
       for LIB in $MISSING_LIBS; do
+        # Remove this library's existing directory first. Covers two known
+        # stale-state cases on warm/persistent runners: (1) CTK's
+        # ExternalProjects (DCMTK etc.) losing their .git dir from a prior
+        # tarball extraction, which breaks DCMTK's git-update step; (2) a
+        # build_Release left over from before LIB_VERSION included
+        # IGSTK_VARIANT (CustusX#50), when a plain-built tarball could get
+        # extracted under the -igstk BASE_DIR (or vice versa), baking in the
+        # wrong absolute path and making CMake refuse to reconfigure
+        # ("directory ... is different than the directory ... where
+        # CMakeCache.txt was created"). Safe since it's about to be rebuilt.
         rm -rf $BASE_DIR/$LIB
-      done
-    # Build only the missing libraries. CustusX and CustusX-Data are
-    # intentionally excluded here; they are built in the downstream
-    # build-ubuntu* jobs.
-    - eval ./install/cxInstaller.py -s --full -j 4 -t Release $IGSTK_FLAG $MISSING_LIBS
-    # Pack and publish each newly-built library as its own package. Exclude
-    # CMakeFiles (*.o intermediates) and .git history to keep tarballs small;
-    # neither is needed at configure time.
-    - |
-      for LIB in $MISSING_LIBS; do
+        eval ./install/cxInstaller.py -s --full -j 4 -t Release $IGSTK_FLAG $LIB
+        # Pack and publish as its own package. Exclude CMakeFiles (*.o
+        # intermediates) and .git history to keep the tarball small; neither
+        # is needed at configure time.
         compute_lib_package_vars "$LIB"
         ( cd $BASE_DIR && tar -czf /tmp/$LIB_FILE \
           --exclude='*/CMakeFiles' \
