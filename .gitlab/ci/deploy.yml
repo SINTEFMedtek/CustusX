@@ -94,12 +94,19 @@ create-release:
 
       # filepath enables the permalink/latest/downloads/installCustusX.sh shortcut,
       # so the README install command doesn't need updating on every release.
+      # A second link with the same underlying url but a version-suffixed
+      # filepath gives anyone downloading manually (rather than via the
+      # curl-latest one-liner) a distinctly-named file per release, so
+      # re-downloading a different version doesn't collide with (or get
+      # silently browser-renamed alongside) an earlier download -- CustusX#46.
       LINKS=$(jq -n --arg base "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}" \
+                    --arg tag "${CI_COMMIT_TAG}" \
         '[
           {name: "CustusX Ubuntu 20.04 installer", url: ($base + "/CustusX-Ubuntu2004.tar.gz"), link_type: "package"},
           {name: "CustusX Ubuntu 22.04 installer", url: ($base + "/CustusX-Ubuntu2204.tar.gz"), link_type: "package"},
           {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404.tar.gz"), link_type: "package"},
-          {name: "CustusX installer script (all Ubuntu versions)", url: ($base + "/installCustusX.sh"), link_type: "package", filepath: "/installCustusX.sh"}
+          {name: "CustusX installer script (all Ubuntu versions)", url: ($base + "/installCustusX.sh"), link_type: "package", filepath: "/installCustusX.sh"},
+          {name: ("CustusX installer script, " + $tag + " (all Ubuntu versions)"), url: ($base + "/installCustusX.sh"), link_type: "package", filepath: ("/installCustusX-" + $tag + ".sh")}
         ]')
 
       DESCRIPTION=$(jq -Rs . < "$NOTES_MD")

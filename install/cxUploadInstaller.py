@@ -135,7 +135,10 @@ def main():
 
     cfg = APP_CONFIG[args.app]
     project_path = cfg['project_path']
-    upload_filename = '%s%s%s' % (cfg['package_name'], os_label, ext)
+    # Version in the filename itself (not just the URL path) so downloading
+    # installers for several releases/rcs side by side doesn't collide on
+    # the same local filename -- CustusX#46.
+    upload_filename = '%s%s-%s%s' % (cfg['package_name'], os_label, args.version, ext)
 
     package_url = _api_url(
         project_path,
@@ -155,7 +158,7 @@ def main():
     )
 
     link_data = json.dumps({
-        'name': '%s %s installer' % (cfg['package_name'], os_label),
+        'name': '%s %s installer, %s' % (cfg['package_name'], os_label, args.version),
         'url': package_url,
         'link_type': 'package',
     })
