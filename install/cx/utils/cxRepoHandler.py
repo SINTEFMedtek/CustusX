@@ -199,6 +199,18 @@ class RepoHandler(object):
                 remote_sha = runShell('git rev-parse origin/%s' % branch, self.repo_path)
                 if head_sha is not None and remote_sha is not None and head_sha == remote_sha:
                     break
+                # A workspace reused across many CI jobs on the same runner
+                # (e.g. GitLab CI's GIT_CLONE_PATH pointing every job at the
+                # same directory to speed up builds) can leave a local branch
+                # whose history was shallow-grafted by one job's fetch, while
+                # origin/<branch> was just shallow-fetched fresh by this job
+                # from a different ref -- the two shallow boundaries don't
+                # overlap, so git sees no common ancestor at all ("fatal:
+                # refusing to merge unrelated histories") even though the
+                # real history is shared. Fetch full history first so the
+                # merge below can find it.
+                if runShell('git rev-parse --is-shallow-repository', self.repo_path) == 'true':
+                    runShell('git fetch --unshallow', self.repo_path)
                 # Merge in any new remote commits instead of resetting to
                 # origin -- a local commit made here but not yet pushed (e.g.
                 # a release-branch fix or merge queued up before the next

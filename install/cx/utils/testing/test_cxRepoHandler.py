@@ -230,6 +230,58 @@ class SyncToGitRefTest(unittest.TestCase):
         self.assertFalse(any(c.startswith('git merge') for c in calls), calls)
         self.assertEqual(_current_branch(self.clone), 'release/v1')
 
+    def test_merge_survives_shallow_grafted_unrelated_histories(self):
+        '''
+        A workspace reused across many CI jobs on the same runner (e.g.
+        GitLab CI's GIT_CLONE_PATH) can leave a local branch shallow-grafted
+        by one job's fetch, while origin/<branch> gets shallow-fetched fresh
+        by a later job from a different ref -- the two shallow boundaries
+        don't overlap, so a plain `git merge` fails with "fatal: refusing to
+        merge unrelated histories" even though the real history is shared.
+        syncToGitRef() must recover by unshallowing before merging
+        (CustusX#50).
+        '''
+        _init_repo(self.upstream)
+        for i in range(10):
+            _commit(self.upstream, filename='f.txt', content=str(i), message='commit %d' % i)
+        _git(['branch', '-m', 'release/v1'], self.upstream)
+
+        # `--depth` is silently ignored for local-path clones (git optimizes
+        # them via hardlinks) -- a file:// URL is needed to force a real
+        # shallow clone, matching what a genuine network clone would do.
+        upstream_url = 'file://' + self.upstream
+        _git(['clone', '-q', '--depth', '1', '--branch', 'release/v1', upstream_url, self.clone], self.tmp)
+        _git(['config', 'user.email', 'test@example.com'], self.clone)
+        _git(['config', 'user.name', 'Test'], self.clone)
+        self.assertEqual(_git(['rev-parse', '--is-shallow-repository'], self.clone), 'true')
+
+        # Upstream advances well beyond the clone's shallow depth (simulating
+        # weeks of later commits), then a differently-shallow-fetched ref is
+        # pulled into the clone -- mirroring a fresh CI job's own shallow
+        # MR-ref fetch landing in this same reused workspace.
+        for i in range(10, 60):
+            _commit(self.upstream, filename='f.txt', content=str(i), message='commit %d' % i)
+        _git(['update-ref', 'refs/mr-head', 'HEAD'], self.upstream)
+        _git(['fetch', '--depth', '20', 'origin', 'refs/mr-head:refs/remotes/origin/mr-head'], self.clone)
+        _git(['checkout', '--detach', 'origin/mr-head'], self.clone)
+        _git(['checkout', 'release/v1'], self.clone)
+        _git(['fetch', '--depth', '20', 'origin', 'release/v1'], self.clone)
+
+        # Sanity check: a plain merge really does fail with unrelated
+        # histories here, confirming the repro before checking the fix.
+        plain_merge = subprocess.run(['git', 'merge', 'origin/release/v1'], cwd=self.clone, capture_output=True, text=True)
+        self.assertNotEqual(plain_merge.returncode, 0)
+        self.assertIn('unrelated histories', plain_merge.stderr)
+        # A rejected "unrelated histories" merge never enters an in-progress
+        # merge state (no MERGE_HEAD), unlike a real conflicting merge --
+        # nothing to abort here before retrying for real below.
+
+        handler = _make_handler(self.clone, main_branch='release/v1')
+        handler.syncToGitRef()  # must not raise or abort
+
+        self.assertEqual(_git(['rev-parse', 'HEAD'], self.clone), _git(['rev-parse', 'origin/release/v1'], self.clone))
+        self.assertEqual(_git(['rev-parse', '--is-shallow-repository'], self.clone), 'false')
+
 
 if __name__ == '__main__':
     unittest.main()
