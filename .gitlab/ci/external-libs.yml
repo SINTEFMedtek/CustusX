@@ -261,6 +261,19 @@ cleanup-old-external-libs:
           page += 1
       print(f'Found {len(packages)} package(s) named "{pkg_name}"')
 
+      # Defense in depth: re-verify locally that every returned package is
+      # actually named pkg_name, never trusting the API's package_name filter
+      # alone to scope what gets deleted below. This registry also holds the
+      # real release installers (CustusX/CustusS/Fraxinus/FraxinusExcelsior,
+      # under their own distinct package names) -- this job must never be
+      # able to reach one of those, regardless of any future API/filter quirk.
+      mismatched = [p for p in packages if p.get('name') != pkg_name]
+      if mismatched:
+          print(f'ERROR: API returned {len(mismatched)} package(s) not named "{pkg_name}" -- aborting without deleting anything.', file=sys.stderr)
+          for p in mismatched:
+              print(f'  unexpected: name={p.get("name")!r} version={p.get("version")!r} id={p.get("id")}', file=sys.stderr)
+          sys.exit(1)
+
       # Group by library/OS/image prefix (everything except the trailing
       # -HASH) -- the library name leads the version string precisely so
       # this keeps each library's own rotation separate from every other
