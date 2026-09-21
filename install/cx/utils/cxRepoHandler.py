@@ -186,6 +186,19 @@ class RepoHandler(object):
             if result is None:
                 continue
             if is_branch:
+                # Skip the merge entirely if we're already at the remote's
+                # commit (the normal case right after a fresh CI checkout):
+                # `git merge` still computes a merge-base even for a no-op,
+                # and on a shallow clone (e.g. GitLab CI's GIT_DEPTH) two
+                # independently-shallow-fetched refs for "the same branch"
+                # can carry different synthetic grafted roots, making git
+                # see them as having no common ancestor at all ("fatal:
+                # refusing to merge unrelated histories") even though
+                # they're actually identical commits.
+                head_sha = runShell('git rev-parse HEAD', self.repo_path)
+                remote_sha = runShell('git rev-parse origin/%s' % branch, self.repo_path)
+                if head_sha is not None and remote_sha is not None and head_sha == remote_sha:
+                    break
                 # Merge in any new remote commits instead of resetting to
                 # origin -- a local commit made here but not yet pushed (e.g.
                 # a release-branch fix or merge queued up before the next

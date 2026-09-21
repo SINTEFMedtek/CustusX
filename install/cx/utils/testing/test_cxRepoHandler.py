@@ -195,6 +195,41 @@ class SyncToGitRefTest(unittest.TestCase):
 
         _git(['rev-parse', '--verify', 'refs/tags/v1.0-rc1'], self.clone)  # raises if missing
 
+    def test_merge_skipped_when_already_at_remote_commit(self):
+        '''
+        On a fresh CI checkout, `git checkout <branch>` lands exactly on
+        origin/<branch>'s commit -- syncToGitRef() must not then call
+        `git merge` at all. `git merge` still computes a merge-base even
+        for a no-op, and on a shallow clone (e.g. GitLab CI's GIT_DEPTH)
+        two independently-shallow-fetched refs for "the same branch" can
+        carry different synthetic grafted roots, making git see them as
+        having no common ancestor ("fatal: refusing to merge unrelated
+        histories") even though the commits are identical (CustusX#50).
+        '''
+        _init_repo(self.upstream)
+        _commit(self.upstream)
+        _git(['branch', '-m', 'release/v1'], self.upstream)
+        self._clone_upstream()
+        # Simulate the CI runner's own initial checkout: detached HEAD at
+        # the same commit release/v1 already points to, no local branch of
+        # that name yet -- same starting point as a real MR pipeline.
+        _git(['checkout', '-q', '--detach', 'HEAD'], self.clone)
+
+        calls = []
+        real_run_shell = cxRepoHandler.runShell
+        def spying_run_shell(cmd, path):
+            calls.append(cmd)
+            return real_run_shell(cmd, path)
+        cxRepoHandler.runShell = spying_run_shell
+        try:
+            handler = _make_handler(self.clone, main_branch='release/v1')
+            handler.syncToGitRef()
+        finally:
+            cxRepoHandler.runShell = real_run_shell
+
+        self.assertFalse(any(c.startswith('git merge') for c in calls), calls)
+        self.assertEqual(_current_branch(self.clone), 'release/v1')
+
 
 if __name__ == '__main__':
     unittest.main()
