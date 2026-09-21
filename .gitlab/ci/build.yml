@@ -80,9 +80,19 @@
   - |
     if [ -n "$MISSING_LIBS" ]; then
       echo "Building missing external libs from source:$MISSING_LIBS"
-      # Remove stale CTK build dir — a prior tarball extraction strips .git dirs,
-      # which breaks DCMTK's git-update step on warm runners.
-      rm -rf $BASE_DIR/CTK
+      # Remove each about-to-be-rebuilt library's existing directory first.
+      # Covers two known stale-state cases on warm/persistent runners: (1) CTK's
+      # ExternalProjects (DCMTK etc.) losing their .git dir from a prior tarball
+      # extraction, which breaks DCMTK's git-update step; (2) a build_Release
+      # left over from before LIB_VERSION included IGSTK_VARIANT (CustusX#50),
+      # when a plain-built tarball could get extracted under the -igstk
+      # BASE_DIR (or vice versa), baking in the wrong absolute path and making
+      # CMake refuse to reconfigure ("directory ... is different than the
+      # directory ... where CMakeCache.txt was created"). Safe in general since
+      # every library removed here is about to be rebuilt from source anyway.
+      for LIB in $MISSING_LIBS; do
+        rm -rf $BASE_DIR/$LIB
+      done
       eval ./install/cxInstaller.py -s --full -j 4 -t Release $IGSTK_FLAG \
         --main_branch $CX_COMMIT \
         --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx \

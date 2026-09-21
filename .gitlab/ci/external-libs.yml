@@ -59,7 +59,12 @@
           IGSTK_VARIANT="igstk"
         fi
         LIB_VERSION="${LIB}-${OS}-${IGSTK_VARIANT}-${IMAGE_TAG}-${LIB_HASH}"
-        LIB_FILE="cx-external-lib-${LIB}-${OS}.tar.gz"
+        # IGSTK_VARIANT must also be in the local temp filename, not just
+        # LIB_VERSION: without it, plain and -igstk jobs for the same
+        # OS/library both stage their tarball at the same /tmp path, so a
+        # plain-variant download/upload could clobber or be clobbered by an
+        # -igstk one on a runner where both happen to overlap.
+        LIB_FILE="cx-external-lib-${LIB}-${OS}-${IGSTK_VARIANT}.tar.gz"
         LIB_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/custusx-external-lib/${LIB_VERSION}/${LIB_FILE}"
       }
 
@@ -90,11 +95,20 @@
         echo "All libraries already cached, nothing to do."
         exit 0
       fi
-    # Remove stale CTK build dir so CTK's ExternalProjects (DCMTK etc.) are
-    # re-cloned with a proper .git. A prior tarball extraction strips .git dirs,
-    # which breaks DCMTK's git-update step on warm runners that previously
-    # downloaded a prebuilt package.
-    - rm -rf $BASE_DIR/CTK
+    # Remove each about-to-be-rebuilt library's existing directory first.
+    # Covers two known stale-state cases on warm/persistent runners: (1) CTK's
+    # ExternalProjects (DCMTK etc.) losing their .git dir from a prior tarball
+    # extraction, which breaks DCMTK's git-update step; (2) a build_Release
+    # left over from before LIB_VERSION included IGSTK_VARIANT (CustusX#50),
+    # when a plain-built tarball could get extracted under the -igstk
+    # BASE_DIR (or vice versa), baking in the wrong absolute path and making
+    # CMake refuse to reconfigure ("directory ... is different than the
+    # directory ... where CMakeCache.txt was created"). Safe in general since
+    # every library removed here is about to be rebuilt from source anyway.
+    - |
+      for LIB in $MISSING_LIBS; do
+        rm -rf $BASE_DIR/$LIB
+      done
     # Build only the missing libraries. CustusX and CustusX-Data are
     # intentionally excluded here; they are built in the downstream
     # build-ubuntu* jobs.
