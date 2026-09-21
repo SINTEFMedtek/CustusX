@@ -109,10 +109,14 @@ class CppBuilder(object):
                 shutil.rmtree(target)
         exit('ERROR: failed to clone %s after %d attempts.' % (repository, attempts))
 
-    def _gitCloneAtTagWithRetry(self, repository, tag, folder, attempts=3):
+    def _gitCloneAtTagWithRetry(self, repository, tag, folder, attempts=5):
         '''
         Mirrors _gitCloneWithRetry, shallow at a known tag instead of full
-        history -- see gitCloneAtTag() above.
+        history -- see gitCloneAtTag() above. More attempts than the other
+        retry loops here (3): VTK/VTK92 are cloned from gitlab.kitware.com,
+        a single external host with no fallback mirror, so a sustained
+        outage there is more likely to actually need extra attempts to
+        survive than a transient TLS drop against gitlab.sintef.no.
         '''
         target = os.path.join(self.mBasePath, folder) if folder else self.mBasePath
         for attempt in range(1, attempts + 1):
