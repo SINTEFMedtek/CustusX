@@ -325,9 +325,17 @@ void DICOMReader::addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString
 	// the event loop, same idea as the progress.setValue() calls in the
 	// per-folder loop above. Also wire the dialog's existing Cancel button
 	// through to the indexer, which previously had no effect mid-folder.
-	connect(DICOMIndexer.data(), &ctkDICOMIndexer::progress, [&progress, DICOMIndexer](int){
+	// Capture a raw pointer, not the QSharedPointer itself: capturing
+	// DICOMIndexer by value here would store a copy of it inside the
+	// connection this lambda is registered on -- a self-referencing cycle
+	// (DICOMIndexer's own connection list holding a strong reference back to
+	// itself) that keeps it alive forever after this function returns, since
+	// nothing ever disconnects it. The raw pointer stays valid for as long as
+	// it can possibly be dereferenced: only synchronously, while addDirectory()
+	// below is running and the local DICOMIndexer is still on the stack.
+	connect(DICOMIndexer.data(), &ctkDICOMIndexer::progress, [&progress, indexer = DICOMIndexer.data()](int){
 		if (progress.wasCanceled())
-			DICOMIndexer->cancel();
+			indexer->cancel();
 		else
 			qApp->processEvents();
 	});
