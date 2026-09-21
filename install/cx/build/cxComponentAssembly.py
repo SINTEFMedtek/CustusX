@@ -43,12 +43,12 @@ class LibraryAssembly(object):
 
         self.addComponent(cxComponents.Eigen())
         if self.controlData.mBuildIGSTK:
-            self.addComponent(cxComponents.oldVTK())
-            self.addComponent(cxComponents.ITK())
+            self.addComponent(cxComponents.VTK92())
+            self.addComponent(cxComponents.ITK4())
             self.addComponent(cxComponents.IGSTK())
         else:
             self.addComponent(cxComponents.VTK())
-            self.addComponent(cxComponents.newITK())
+            self.addComponent(cxComponents.ITK())
         self.addComponent(cxComponents.OpenCV())
         self.addComponent(cxComponents.OpenIGTLink())
         self.addComponent(cxComponents.CTK())

@@ -19,7 +19,7 @@ class Controller(cx.script.cxInstallScript.Controller):
     def __init__(self, assembly=None):
         ''
         # Pre-parse --igstk before LibraryAssembly.__init__ so the correct
-        # components (oldVTK/ITK/IGSTK) are added to the library list.
+        # components (VTK92/ITK4/IGSTK) are added to the library list.
         # Then reset to False so add_boolean_inverter registers --igstk
         # (not --skip_igstk) when the parsers are built in super().__init__.
         # applyCommandLine() re-applies --igstk from sys.argv afterwards.

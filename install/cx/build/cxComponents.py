@@ -171,7 +171,7 @@ class CppComponent(Component):
         return self.controlData.getBuildType()
 # ---------------------------------------------------------
 
-class ITK(CppComponent):
+class ITK4(CppComponent):
     def name(self):
         return "ITK"
     def help(self):
@@ -199,7 +199,7 @@ class ITK(CppComponent):
         return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
 
-class newITK(CppComponent):
+class ITK(CppComponent):
     def name(self):
         return "ITK"
     def help(self):
@@ -298,10 +298,10 @@ class VTK(CppComponent):
 # ---------------------------------------------------------
 
 # VTK 9.3+ enforces C++17 via target_compile_features, which breaks ITK 4.12.0
-# headers when CustusX is compiled against both. Use oldVTK (9.2.x) for IGSTK
+# headers when CustusX is compiled against both. Use VTK92 (9.2.x) for IGSTK
 # builds where old ITK is required. Shares the same name/paths as VTK so all
 # _createSibling(VTK) references in IGSTK, CTK, CustusX resolve correctly.
-class oldVTK(CppComponent):
+class VTK92(CppComponent):
     def name(self):
         return "VTK"
     def help(self):
@@ -529,7 +529,7 @@ class IGSTK(CppComponent):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('IGSTK_USE_SceneGraphVisualization:BOOL', False)
-        add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
+        add('ITK_DIR:PATH', self._createSibling(ITK4).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('IGSTK_SERIAL_PORT_0', self._getSerialPort())
         add('BUILD_TESTING:BOOL', False)
@@ -571,7 +571,7 @@ class CustusX(CppComponent):
         add = builder.addCMakeOption
         append = builder.appendCMakeOption
         add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
-        add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
+        add('ITK_DIR:PATH', self._createSibling(ITK4).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenIGTLinkIO_DIR:PATH', self._createSibling(OpenIGTLinkIO).configPath())
