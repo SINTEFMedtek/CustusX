@@ -26,6 +26,17 @@
         --header "JOB-TOKEN: $CI_JOB_TOKEN" \
         --upload-file /tmp/installCustusX.sh \
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/installCustusX.sh"
+    # Second upload of the identical script under a version-suffixed remote
+    # filename: GitLab release links must have a unique url each (a second
+    # link with the same url but a different filepath is rejected with
+    # "Links have duplicate values"), so the version-suffixed manual-download
+    # link created below needs its own distinct asset to point at, not just
+    # an alias of the one above.
+    - |
+      curl \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --upload-file /tmp/installCustusX.sh \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/installCustusX-$VERSION.sh"
 
 deploy-commit:
   extends: .deploy
@@ -106,7 +117,7 @@ create-release:
           {name: "CustusX Ubuntu 22.04 installer", url: ($base + "/CustusX-Ubuntu2204.tar.gz"), link_type: "package"},
           {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404.tar.gz"), link_type: "package"},
           {name: "CustusX installer script (all Ubuntu versions)", url: ($base + "/installCustusX.sh"), link_type: "package", filepath: "/installCustusX.sh"},
-          {name: ("CustusX installer script, " + $tag + " (all Ubuntu versions)"), url: ($base + "/installCustusX.sh"), link_type: "package", filepath: ("/installCustusX-" + $tag + ".sh")}
+          {name: ("CustusX installer script, " + $tag + " (all Ubuntu versions)"), url: ($base + "/installCustusX-" + $tag + ".sh"), link_type: "package", filepath: ("/installCustusX-" + $tag + ".sh")}
         ]')
 
       DESCRIPTION=$(jq -Rs . < "$NOTES_MD")
