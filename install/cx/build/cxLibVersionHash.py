@@ -21,8 +21,10 @@
 #####################################################
 
 import argparse
+import contextlib
 import hashlib
 import inspect
+import io
 import os
 import sys
 
@@ -59,9 +61,17 @@ def main():
     parser.add_argument('--igstk', action='store_true', help='Resolve as the --igstk build variant')
     args = parser.parse_args()
 
-    data = cxInstallData.Common()
-    data.mBuildIGSTK = args.igstk
-    assembly = cxComponentAssembly.LibraryAssembly(controlData=data)
+    # cxInstallData.Common() calls cxRepoHandler.getBranchForRepo(), which
+    # unconditionally prints the git command it runs and its output via
+    # runShell() -- silence that here so this script's stdout is exactly the
+    # hash and nothing else. A caller doing HASH=$(python3
+    # cxLibVersionHash.py ...) would otherwise capture that noise into
+    # $HASH too, producing a multi-line "hash" that breaks a URL built from
+    # it (observed in CI: curl exit code 3, "malformed URL").
+    with contextlib.redirect_stdout(io.StringIO()):
+        data = cxInstallData.Common()
+        data.mBuildIGSTK = args.igstk
+        assembly = cxComponentAssembly.LibraryAssembly(controlData=data)
 
     for component in assembly.libraries:
         if component.name() == args.library_name:
