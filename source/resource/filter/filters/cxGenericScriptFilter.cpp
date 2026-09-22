@@ -188,12 +188,11 @@ void GenericScriptFilter::processReadyRead()
 	this->appendToLineBuffer(QString(commandLine->getProcess()->readAllStandardOutput()));
 }
 
-void GenericScriptFilter::appendToLineBuffer(const QString& newData)
+QStringList GenericScriptFilter::extractCompleteLines(QString& buffer) const
 {
-	mLineBuffer += newData;
 	// Also split on '\r': tqdm-style progress output (as produced by
 	// TotalSegmentator) only uses '\r', never '\n', until the whole
-	// operation completes, so splitting on '\n' alone let mLineBuffer
+	// operation completes, so splitting on '\n' alone let the buffer
 	// grow unbounded for the duration of such a run.
 	//
 	// Single pass, one trailing removal - not "re-scan the whole remaining
@@ -203,22 +202,31 @@ void GenericScriptFilter::appendToLineBuffer(const QString& newData)
 	// '\r' updates in one burst (worse the longer anything - e.g. a slow
 	// caller of this event, or another main-thread call - delays draining
 	// the process' output), at which point the old approach took minutes.
+	QStringList lines;
 	int lineStart = 0;
-	int len = mLineBuffer.size();
+	int len = buffer.size();
 	for (int pos = 0; pos < len; ++pos)
 	{
-		QChar c = mLineBuffer.at(pos);
+		QChar c = buffer.at(pos);
 		if (c != '\n' && c != '\r')
 			continue;
-		QString line = mLineBuffer.mid(lineStart, pos - lineStart).trimmed();
+		QString line = buffer.mid(lineStart, pos - lineStart).trimmed();
 		if(!line.isEmpty())
-		{
-			CX_LOG_CHANNEL_INFO(mOutputChannelName) << line;
-			emit scriptOutput(line);
-		}
+			lines << line;
 		lineStart = pos + 1;
 	}
-	mLineBuffer.remove(0, lineStart);
+	buffer.remove(0, lineStart);
+	return lines;
+}
+
+void GenericScriptFilter::appendToLineBuffer(const QString& newData)
+{
+	mLineBuffer += newData;
+	for (const QString& line : extractCompleteLines(mLineBuffer))
+	{
+		CX_LOG_CHANNEL_INFO(mOutputChannelName) << line;
+		emit scriptOutput(line);
+	}
 }
 
 void GenericScriptFilter::processReadyReadError()

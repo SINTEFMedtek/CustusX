@@ -123,6 +123,7 @@ protected:
 	QString createImageName(QString parentName, QString filePath);
 	int countPlannedMeshes(QStringList createOutputMeshList) const;
 	void appendToLineBuffer(const QString& newData);
+	QStringList extractCompleteLines(QString& buffer) const;
 	void createOutputVolume();
 	void deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume);
 	QString getScriptPath();
