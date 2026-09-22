@@ -140,6 +140,13 @@ class RepoHandler(object):
         - if main_branch is set, use that, else:
         -   try the default and fallback branches
         '''
+        # --prune (not --prune-tags too): the branch-verification loop below
+        # relies on refs/remotes/origin/<branch> accurately reflecting which
+        # branches still exist on the remote, so a plain fetch's stale
+        # remote-tracking refs need pruning. --prune-tags is deliberately
+        # left out -- it would delete local tags that were never pushed,
+        # which the tag-fallback check further down relies on still being
+        # there.
         runShell('git fetch --prune', self.repo_path)
 
         tag = self.args.git_tag

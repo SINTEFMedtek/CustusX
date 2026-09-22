@@ -1,5 +1,6 @@
 '''
-Regression tests for cx.utils.cxRepoHandler.RepoHandler.syncToGitRef().
+Regression tests for cx.utils.cxRepoHandler.RepoHandler.syncToGitRef() and
+.cloneRepoWithPrompt().
 
 Each test builds a throwaway "upstream" repo and a clone of it under a temp
 directory, exercises syncToGitRef() against the clone, and checks the
@@ -347,6 +348,39 @@ class SyncToGitRefTest(unittest.TestCase):
 
         self.assertEqual(_git(['rev-parse', 'HEAD'], self.clone), _git(['rev-parse', 'origin/release/v1'], self.clone))
         self.assertEqual(_git(['rev-parse', '--is-shallow-repository'], self.clone), 'false')
+
+
+class CloneRepoWithPromptTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix='cxRepoHandler_test_')
+        self.repo_path = os.path.join(self.tmp, 'repo')
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_prompts_before_deleting_existing_non_git_directory(self):
+        '''
+        A pre-existing, non-git repo_path must only be deleted *after* the
+        user has had a chance to cancel via the confirmation prompt, not
+        before it - deleting first removes that safety window entirely
+        (CustusX#46: CustusS's own physical copy of this file used to
+        delete immediately on detection instead of prompting first).
+        '''
+        os.makedirs(self.repo_path)
+        marker = os.path.join(self.repo_path, 'leftover_marker.txt')
+        with open(marker, 'w') as f:
+            f.write('leftover, non-git content')
+
+        handler = _make_handler(self.repo_path)
+        events = []
+        handler._promptToContinue = lambda doprompt: events.append(('prompt', os.path.exists(marker)))
+        handler._cloneWithRetry = lambda: events.append(('clone', os.path.exists(marker)))
+
+        handler.cloneRepoWithPrompt()
+
+        self.assertEqual([name for name, _ in events], ['prompt', 'clone'])
+        self.assertTrue(events[0][1], 'the directory must still exist when the user is prompted')
+        self.assertFalse(events[1][1], 'the directory must be deleted before cloning starts')
 
 
 if __name__ == '__main__':
