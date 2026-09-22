@@ -783,6 +783,15 @@ TEST_CASE("GenericScriptFilter: extractCompleteLines() handles many lines arrivi
 	// splitting cost itself, making the timing assertion fail/flake
 	// regardless of how efficient the actual splitting algorithm is
 	// (CustusX#46) - not what this test is meant to guard against.
+	//
+	// The threshold below is deliberately generous: on a shared/loaded CI
+	// runner, wall-clock time for an O(n) operation can legitimately vary
+	// by several times run to run with zero code change (CustusX#46 - this
+	// exact test observed passing and failing across otherwise-identical
+	// runs). The regression this guards against (the old quadratic
+	// implementation) took *minutes* for 50000 lines, not a few seconds -
+	// so a threshold this high still reliably distinguishes "fast O(n)"
+	// from "broken O(n^2)" while tolerating normal CI variance.
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 
 	QString burst;
@@ -798,7 +807,7 @@ TEST_CASE("GenericScriptFilter: extractCompleteLines() handles many lines arrivi
 	CHECK(lines.size() == lineCount);
 	CHECK(lines.first() == "progress update 0");
 	CHECK(lines.last() == QString("progress update %1").arg(lineCount - 1));
-	CHECK(elapsedMs < 2000);
+	CHECK(elapsedMs < 15000);
 }
 
 TEST_CASE("Raidionics: target conversion", "[unit]")
