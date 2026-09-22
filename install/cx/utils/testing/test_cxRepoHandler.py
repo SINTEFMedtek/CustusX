@@ -17,6 +17,7 @@ import sys
 import tempfile
 import shutil
 import unittest
+from unittest import mock
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 
@@ -105,6 +106,71 @@ class SyncToGitRefTest(unittest.TestCase):
 
         self.assertEqual(_head_sha(self.clone), local_sha)
         self.assertTrue(os.path.exists(os.path.join(self.clone, 'local_fix.txt')))
+
+    def test_merge_without_any_git_identity_configured(self):
+        '''
+        A fresh CI build image has no ~/.gitconfig and (unlike this suite's
+        other tests, via _init_repo()/_clone_upstream()) no repo-local
+        identity either -- `git merge` still needs *an* identity to create
+        the resulting merge commit for a genuine local-only commit (see
+        test_local_only_commit_survives_sync above), and a bare container
+        has nowhere to get one from, failing with "Please tell me who you
+        are" (CustusX#46 - this actually happened on a real, long-lived
+        ubuntu20 CI runner workspace).
+        '''
+        _init_repo(self.upstream)
+        _commit(self.upstream)
+        _git(['branch', '-m', 'release/v1'], self.upstream)
+        # Clone with no identity configured anywhere in it (unlike
+        # _clone_upstream(), which the other tests here rely on for their
+        # own setup commits made directly in the clone).
+        _git(['clone', '-q', self.upstream, self.clone], self.tmp)
+
+        # Create the local-only unpushed commit using a one-off identity
+        # passed via environment variables for this single command only --
+        # this must not persist as repo-local config, so the clone ends up
+        # with zero identity configured anywhere in it, same as a bare CI
+        # container that merely inherited a commit from a previous job.
+        with open(os.path.join(self.clone, 'local_fix.txt'), 'w') as f:
+            f.write('fix')
+        _git(['add', 'local_fix.txt'], self.clone)
+        commit_env = dict(os.environ, GIT_AUTHOR_NAME='Test', GIT_AUTHOR_EMAIL='test@example.com',
+                           GIT_COMMITTER_NAME='Test', GIT_COMMITTER_EMAIL='test@example.com')
+        subprocess.run(['git', 'commit', '-q', '-m', 'local unpushed fix'], cwd=self.clone, env=commit_env, check=True)
+        local_sha = _head_sha(self.clone)
+
+        # origin/release/v1 also independently advances (e.g. someone else's
+        # real push) -- touching a different file so the merge below is a
+        # clean, non-conflicting one. Without this, the clone's local commit
+        # would just be a fast-forward ahead of origin, which `git merge`
+        # resolves as a trivial no-op needing no identity at all -- not a
+        # reproduction of the real bug, which only shows up on a genuine
+        # 3-way merge.
+        _commit(self.upstream, filename='upstream_change.txt', content='new', message='real push')
+
+        # Simulate a bare container's environment: no HOME-based ~/.gitconfig,
+        # no system gitconfig, no author/committer override env vars leaking
+        # in from whatever machine actually runs this test suite.
+        tmp_home = os.path.join(self.tmp, 'empty_home')
+        os.makedirs(tmp_home)
+        identity_free_env = dict(os.environ)
+        for key in ('GIT_AUTHOR_NAME', 'GIT_AUTHOR_EMAIL', 'GIT_COMMITTER_NAME',
+                    'GIT_COMMITTER_EMAIL', 'EMAIL', 'GIT_CONFIG_GLOBAL'):
+            identity_free_env.pop(key, None)
+        identity_free_env['HOME'] = tmp_home
+        identity_free_env['GIT_CONFIG_NOSYSTEM'] = '1'
+
+        handler = _make_handler(self.clone, main_branch='release/v1')
+        with mock.patch.dict(os.environ, identity_free_env, clear=True):
+            handler.syncToGitRef()  # must not raise/exit despite no identity anywhere
+
+        # A real merge commit is expected here (local and origin genuinely
+        # diverged) -- HEAD is the new merge commit, not local_sha itself;
+        # what matters is that the local-only commit survived as one of its
+        # parents instead of being discarded.
+        _git(['merge-base', '--is-ancestor', local_sha, 'HEAD'], self.clone)  # raises if not an ancestor
+        self.assertTrue(os.path.exists(os.path.join(self.clone, 'local_fix.txt')))
+        self.assertTrue(os.path.exists(os.path.join(self.clone, 'upstream_change.txt')))
 
     def test_stale_local_branch_falls_back_to_next_candidate(self):
         '''

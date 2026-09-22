@@ -216,6 +216,7 @@ class RepoHandler(object):
                 # a release-branch fix or merge queued up before the next
                 # `git push`) must survive this sync rather than silently
                 # vanish the next time this repo gets synced.
+                self._ensureGitIdentityForMerge(self.repo_path)
                 merge_result = runShell('git merge origin/%s' % branch, self.repo_path)
                 self.checkSuccess(merge_result)
                 if merge_result is None:
@@ -229,6 +230,23 @@ class RepoHandler(object):
                     print('auto-aborted, so the mid-merge state and any local changes are still there.')
                     sys.exit(1)
             break
+
+    def _ensureGitIdentityForMerge(self, path):
+        '''
+        `git merge` needs *an* identity to create the resulting merge commit,
+        even for a real, non-conflicting merge of a legitimate local-only
+        commit (see the "must survive this sync" comment above) -- a CI build
+        image with no ~/.gitconfig has nowhere to get one from and fails with
+        "Please tell me who you are" on the very first such merge, which
+        looks like a merge conflict in the logs but isn't one. Set a local
+        (repo-scoped, never --global), clearly-labelled fallback identity,
+        only if none is configured anywhere already.
+        '''
+        if (runShell('git config user.name', path) is not None
+                and runShell('git config user.email', path) is not None):
+            return
+        runShell('git config user.name "CustusX CI"', path)
+        runShell('git config user.email "ci@custusx.no"', path)
 
     def checkSuccess(self, gitResult):
         if gitResult is returnCode():
