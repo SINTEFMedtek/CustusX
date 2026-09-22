@@ -47,7 +47,8 @@ class CustusXTestInstallation(object):
         self.install_root = install_root
         self.system_base_name = system_base_name
         self.source_custusx_path = source_custusx_path
-        
+        self.hasFailingTests = False
+
     def getTestDataPath(self):
         return "%s/CX/CX/data" % self.root_dir
 
@@ -64,18 +65,23 @@ class CustusXTestInstallation(object):
                      
     def runUnstableTests(self):
         PrintFormatter.printHeader('Run unstable tests', level=2)
-        self._runCatchTestsWrappedInCTestOnInstalled('[unstable]')
+        self._recordTestResult(self._runCatchTestsWrappedInCTestOnInstalled('[unstable]'))
 
     def runUnitTests(self):
         PrintFormatter.printHeader('Run unit tests', level=2)
         if os.environ.get('CX_WRAP_UNIT_TESTS_IN_CTEST'):
-            self._runCatchTestsWrappedInCTestOnInstalled('[unit]~[unstable]')
+            self._recordTestResult(self._runCatchTestsWrappedInCTestOnInstalled('[unit]~[unstable]'))
         else:
-            self._runCatchTestsOnInstalled('[unit]~[unstable]')
+            self._recordTestResult(self._runCatchTestsOnInstalled('[unit]~[unstable]'))
 
     def runIntegrationTests(self):
         PrintFormatter.printHeader('Run integration tests', level=2)
-        self._runCatchTestsWrappedInCTestOnInstalled('[integration]~[unstable]')
+        self._recordTestResult(self._runCatchTestsWrappedInCTestOnInstalled('[integration]~[unstable]'))
+
+    def _recordTestResult(self, result):
+        'Remember across the whole run whether any test step reported non-passing tests.'
+        if result != cxTestRunner.TEST_RESULT_PASSED:
+            self.hasFailingTests = True
 
     def _runCatchTestsWrappedInCTestOnInstalled(self, tags):
         appPath = self._getInstalledBinaryPath()
@@ -84,16 +90,16 @@ class CustusXTestInstallation(object):
         testRunner.resetCustusXDataRepo(self.getTestDataPath())
         tags = testRunner.includeTagsForOS(tags)
         outPath = testRunner.generateOutpath(self.source_custusx_path)
-        testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tags, catchPath=appPath, outPath=outPath)
+        return testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tags, catchPath=appPath, outPath=outPath)
 
     def _runCatchTestsOnInstalled(self, tags):
         appPath = self._getInstalledBinaryPath()
-        self._connectTestDataToInstallation()        
+        self._connectTestDataToInstallation()
         testRunner = cxTestRunner.TestRunner(self.target_platform)
         testRunner.resetCustusXDataRepo(self.getTestDataPath())
         tags = testRunner.includeTagsForOS(tags)
         outPath = testRunner.generateOutpath(self.source_custusx_path)
-        testRunner.runCatch(tag=tags, path=appPath, outpath=outPath)
+        return testRunner.runCatch(tag=tags, path=appPath, outpath=outPath)
 
     def _getInstalledBinaryPath(self):
         'path to binary files / executables in install'
