@@ -2,6 +2,22 @@
 
 _Changes since v26.08_
 
+## Important: the patient and settings folders have moved
+
+CustusX now keeps all its data under a single `CustusX` folder in your home folder (`~` on Linux/macOS, `C:\Users\` + your user name on Windows).
+
+| | v26.08 and earlier | v26.09 |
+|---|---|---|
+| Patients | `~/Patients/Laboratory` | `~/CustusX/Patients/Laboratory` |
+| Settings | `~/CustusX_settings` | `~/CustusX/CustusX_settings` |
+
+(`Laboratory` is the default profile. If you have used other profiles, each one has its own subfolder next to it, in both places.)
+
+Nothing is moved or deleted automatically. Your old folders are left as they were, and v26.09 starts with an empty patient list and default settings. If you want your old data in the new locations, close CustusX first, then copy it over yourself:
+
+- **Patients:** copy the contents of each old profile folder (e.g. `~/Patients/Laboratory`) into the matching new one (e.g. `~/CustusX/Patients/Laboratory`). Each patient is a folder ending in `.cx3`, e.g. `2017-09-29_10-07_Laboratory_4.cx3`, containing `custusdoc.xml` and subfolders such as `Images` and `Logs`. Copy whole `.cx3` folders. After that they show up in **Load Patient**. Old patients can also still be opened directly from their old location with **Load Patient**, without copying anything.
+- **Settings:** copy the contents of the old `~/CustusX_settings` folder (e.g. `profiles`, `settings`) into the new `~/CustusX/CustusX_settings` folder, replacing what v26.09 created there. If the old folder has a `virtualEnvironments` folder, don't copy it: Python environments stop working once moved, and they now live in `~/CustusX/virtualEnvironments`, where they are set up again when needed.
+
 ## New Features
 
 | Key | Summary | Release Note |
