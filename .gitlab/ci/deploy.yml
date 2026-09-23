@@ -3,13 +3,15 @@
 .deploy:
   stage: deploy
   environment: production
+  interruptible: false
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
     GIT_CLONE_PATH: /builds/Ubuntu2004/CX/CX
   script:
     - echo "Deploying application..."
     - |
-      for OS in Ubuntu2004 Ubuntu2204 Ubuntu2404; do
+      # No Ubuntu 20.04 installer any more (CustusX#51), although build-ubuntu20 still runs.
+      for OS in Ubuntu2204 Ubuntu2404; do
         cd $CI_PROJECT_DIR/$OS/package_artefacts
         INSTALLER_FILE=$(find CustusX*.tar.gz)
         curl \
@@ -25,6 +27,17 @@
         --header "JOB-TOKEN: $CI_JOB_TOKEN" \
         --upload-file /tmp/installCustusX.sh \
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/installCustusX.sh"
+    # Second upload of the identical script under a version-suffixed remote
+    # filename: GitLab release links must have a unique url each (a second
+    # link with the same url but a different filepath is rejected with
+    # "Links have duplicate values"), so the version-suffixed manual-download
+    # link created below needs its own distinct asset to point at, not just
+    # an alias of the one above.
+    - |
+      curl \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --upload-file /tmp/installCustusX.sh \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/installCustusX-$VERSION.sh"
 
 deploy-commit:
   extends: .deploy
@@ -49,10 +62,28 @@ create-release:
   stage: deploy
   image: alpine:latest
   needs: ["deploy-tag"]
+  interruptible: false
   rules:
     - if: '$CI_COMMIT_TAG != null'
   script:
-    - apk add --no-cache curl jq
+    - |
+      # apk's package index fetch is a common source of transient DNS
+      # blips ("DNS: transient error (try again later)") on this runner,
+      # same class of issue as the git-fetch retries elsewhere -- retry a
+      # few times before giving up.
+      ok=false
+      for i in 1 2 3; do
+        if apk add --no-cache curl jq; then
+          ok=true
+          break
+        fi
+        echo "apk add failed (attempt $i/3) -- retrying in 5s"
+        sleep 5
+      done
+      if [ "$ok" != true ]; then
+        echo "apk add failed after 3 attempts, giving up"
+        exit 1
+      fi
     - |
       set -e
       # Release-notes files are committed per release cycle (e.g. v26.08), not per
@@ -75,25 +106,86 @@ create-release:
 
       # filepath enables the permalink/latest/downloads/installCustusX.sh shortcut,
       # so the README install command doesn't need updating on every release.
+      # A second link with the same underlying url but a version-suffixed
+      # filepath gives anyone downloading manually (rather than via the
+      # curl-latest one-liner) a distinctly-named file per release, so
+      # re-downloading a different version doesn't collide with (or get
+      # silently browser-renamed alongside) an earlier download -- CustusX#46.
       LINKS=$(jq -n --arg base "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}" \
+                    --arg tag "${CI_COMMIT_TAG}" \
         '[
-          {name: "CustusX Ubuntu 20.04 installer", url: ($base + "/CustusX-Ubuntu2004.tar.gz"), link_type: "package"},
           {name: "CustusX Ubuntu 22.04 installer", url: ($base + "/CustusX-Ubuntu2204.tar.gz"), link_type: "package"},
           {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404.tar.gz"), link_type: "package"},
-          {name: "CustusX installer script (all Ubuntu versions)", url: ($base + "/installCustusX.sh"), link_type: "package", filepath: "/installCustusX.sh"}
+          {name: "CustusX installer script (all Ubuntu versions)", url: ($base + "/installCustusX.sh"), link_type: "package", filepath: "/installCustusX.sh"},
+          {name: ("CustusX installer script, " + $tag + " (all Ubuntu versions)"), url: ($base + "/installCustusX-" + $tag + ".sh"), link_type: "package", filepath: ("/installCustusX-" + $tag + ".sh")}
         ]')
 
       DESCRIPTION=$(jq -Rs . < "$NOTES_MD")
 
-      curl --fail --request POST --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+      # GitLab's permalink/latest orders releases purely by released_at, with
+      # no special-casing for pre-release tags -- so an rc tag's own release
+      # would otherwise become "latest" the moment it's created, breaking the
+      # README's curl-install-latest one-liner for everyone until the real
+      # release follows. Backdate an rc release to just before the current
+      # latest non-rc release instead: it still gets its own release page,
+      # just never outranks the real latest release.
+      BACKDATE=""
+      if echo "$CI_COMMIT_TAG" | grep -qE -- '-rc[0-9]+$'; then
+        # released_at isn't always UTC "Z" -- a release created outside this
+        # job (e.g. via the GitLab UI) can carry a numeric offset like
+        # "+02:00", which fromdateiso8601 can't parse (it only accepts
+        # "%Y-%m-%dT%H:%M:%SZ"). Convert to a UTC epoch by hand instead.
+        BACKDATE=$(curl -s --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases?order_by=released_at&sort=desc&per_page=20" \
+          | jq -r '
+            def to_epoch:
+              capture("^(?<base>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2})(\\.[0-9]+)?(?<tz>Z|[+-][0-9]{2}:[0-9]{2})$")
+              | (.base + "Z" | strptime("%Y-%m-%dT%H:%M:%SZ") | mktime) as $local
+              | (if .tz == "Z" then 0
+                 else (.tz[0:1] + "1" | tonumber) as $sign
+                    | (.tz[1:3] | tonumber) as $oh
+                    | (.tz[4:6] | tonumber) as $om
+                    | $sign * (($oh * 3600) + ($om * 60))
+                 end) as $offset
+              | $local - $offset;
+            [.[] | select(.tag_name | test("-rc[0-9]+$") | not)]
+              | (.[0].released_at // empty)
+              | to_epoch - 60 | todateiso8601')
+      fi
+
+      # Not --fail: a retried pipeline (e.g. after fixing an unrelated
+      # failure elsewhere) re-runs this job even though the release from an
+      # earlier successful attempt already exists for this tag, and GitLab
+      # rejects a second POST for the same tag_name with 409. Check the
+      # status manually so that specific case is treated as already done
+      # rather than a real failure -- any other error status still fails
+      # the job.
+      HTTP_CODE=$(curl -s -o /tmp/release_response.json -w "%{http_code}" \
+        --request POST --header "JOB-TOKEN: $CI_JOB_TOKEN" \
         --header "Content-Type: application/json" \
-        --data "$(jq -n --arg tag "$CI_COMMIT_TAG" --argjson links "$LINKS" --argjson desc "$DESCRIPTION" \
-          '{tag_name: $tag, name: $tag, description: $desc, assets: {links: $links}}')" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
+        --data "$(jq -n --arg tag "$CI_COMMIT_TAG" --argjson links "$LINKS" --argjson desc "$DESCRIPTION" --arg backdate "$BACKDATE" \
+          '{tag_name: $tag, name: $tag, description: $desc, assets: {links: $links}}
+           + (if $backdate != "" then {released_at: $backdate} else {} end)')" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases")
+
+      if [ "$HTTP_CODE" = "409" ]; then
+        echo "Release for tag ${CI_COMMIT_TAG} already exists -- treating as already done (e.g. a retried pipeline)."
+      elif [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+        # Was "-ge 400": a total connection failure (DNS, TLS, timeout) makes
+        # curl write "000" for %{http_code} (no HTTP response received at
+        # all), and "000" -ge 400 is false -- so that case fell through
+        # both branches and the job exited 0 as if the release had been
+        # created. Explicitly require 2xx (or the already-exists 409 above)
+        # instead of only rejecting >= 400.
+        echo "Release creation failed with HTTP $HTTP_CODE:"
+        cat /tmp/release_response.json
+        exit 1
+      fi
 
 pages:
   stage: deploy
   environment: production
+  interruptible: false
   variables:
     OS: Ubuntu2004
     GIT_CLONE_PATH: /builds/$OS/CX/CX

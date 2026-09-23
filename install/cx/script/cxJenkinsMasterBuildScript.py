@@ -16,6 +16,8 @@ import sys
 import argparse        
 import os
 
+import cx.build.cxTestRunner
+from cx.utils.cxPrintFormatter import PrintFormatter
 from . import cxJenkinsBuildScriptBase
 
 
@@ -120,7 +122,14 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
                         
         self.cxBuilder.finish()
         self._deleteBuildFlagFile(buildFlagFile)
-        
+
+        if getattr(self, 'cxInstallation', None) and self.cxInstallation.hasFailingTests:
+            PrintFormatter.printInfo('One or more Catch test suites reported failing tests '
+                                      '(see the junit reports in test_results/). Exiting with '
+                                      'a distinct nonzero code so CI can flag this without '
+                                      'hard-failing the pipeline.')
+            sys.exit(cx.build.cxTestRunner.CATCH_TEST_FAILURE_EXIT_CODE)
+
 if __name__ == '__main__':
     controller = Controller()
     controller.run()

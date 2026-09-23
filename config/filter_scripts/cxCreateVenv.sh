@@ -59,6 +59,14 @@ elif [[ $reqPath == "TotalSegmentator" ]]; then
 
   source bin/activate
   pip install --upgrade pip
+  # Pinned: TotalSegmentator depends on dipy (directly, and via fury<2) without a
+  # version pin. dipy 1.12.0 still allows Python 3.10 but ships no cp310 wheel,
+  # so on Ubuntu 22.04 (python3.10) pip picks it and builds it from source, which
+  # needs Cython/meson and Python dev headers. 1.11.0 is the newest release with
+  # prebuilt wheels for both cp310 (22.04) and cp312 (24.04); installing it first
+  # means the TotalSegmentator install below leaves it alone. Same pin as
+  # installFraxinus.sh/installFraxinusExcelsior.sh.
+  pip install "dipy==1.11.0"
   # Pinned: TotalSegmentator has changed its CLI between releases (e.g. the
   # weights downloader moved from `python -m totalsegmentator.download_weights`
   # to the totalseg_download_weights console script), which silently broke the

@@ -20,6 +20,24 @@
 set -e
 
 # ---------------------------------------------------------------------------
+# Retry a download a few times before giving up -- a single transient
+# network/DNS hiccup shouldn't require rerunning the whole install script.
+# ---------------------------------------------------------------------------
+download_with_retry() {
+    local attempt
+    for attempt in 1 2 3 4 5; do
+        if wget "$@"; then
+            return 0
+        fi
+        if [ "$attempt" -lt 5 ]; then
+            echo "Download attempt $attempt failed, retrying in 5s..."
+            sleep 5
+        fi
+    done
+    return 1
+}
+
+# ---------------------------------------------------------------------------
 # Version — set by CI for each release; empty when run from a local checkout
 # ---------------------------------------------------------------------------
 CUSTUSX_VERSION=""
@@ -34,12 +52,15 @@ UBUNTU_VERSION=$(lsb_release -rs 2>/dev/null || echo "unknown")
 echo "Detected Ubuntu version: $UBUNTU_VERSION"
 
 case "$UBUNTU_VERSION" in
-    20.04) OS="Ubuntu2004" ;;
+    20.04)
+        echo "ERROR: Ubuntu 20.04 is no longer supported (CustusX#51). Please use Ubuntu 22.04 or 24.04."
+        exit 1
+        ;;
     22.04) OS="Ubuntu2204" ;;
     24.04) OS="Ubuntu2404" ;;
     *)
         echo "ERROR: Unsupported Ubuntu version: $UBUNTU_VERSION"
-        echo "Supported versions: 20.04, 22.04, 24.04"
+        echo "Supported versions: 22.04, 24.04"
         exit 1
         ;;
 esac
@@ -68,7 +89,7 @@ if [ -n "$CUSTUSX_VERSION" ]; then
     if [ -n "$GITLAB_TOKEN" ]; then
         WGET_ARGS+=(--header "PRIVATE-TOKEN: $GITLAB_TOKEN")
     fi
-    if ! wget "${WGET_ARGS[@]}" -O "$TARBALL" "$DOWNLOAD_URL"; then
+    if ! download_with_retry "${WGET_ARGS[@]}" -O "$TARBALL" "$DOWNLOAD_URL"; then
         echo ""
         echo "ERROR: Download failed. URL: $DOWNLOAD_URL"
         if [ -z "$GITLAB_TOKEN" ]; then
@@ -87,6 +108,20 @@ else
         echo "  https://gitlab.sintef.no/custusx/CustusX/-/releases"
         exit 1
     fi
+    # Local dev/CI builds encode the OS as e.g. "_Ubuntu22.04" (with a dot);
+    # tagged releases encode it as "-Ubuntu2204" (no dot, matching $OS above).
+    # Refuse a tarball built for a different Ubuntu version outright -- used
+    # silently, it installs fine but fails at runtime with a confusing
+    # missing-.so error (e.g. a 20.04 build's libGLEW.so.2.1 vs 22.04's
+    # libGLEW.so.2.2), long after a clear error here would have helped.
+    case "$TARBALL" in
+        *"$OS"*|*"Ubuntu${UBUNTU_VERSION}"*) ;;
+        *)
+            echo "ERROR: $TARBALL does not look like it was built for Ubuntu $UBUNTU_VERSION."
+            echo "Remove it and place a CustusX*${OS}*.tar.gz build here instead, then re-run."
+            exit 1
+            ;;
+    esac
     echo "Using local tarball: $TARBALL"
 fi
 
@@ -124,32 +159,40 @@ rm -rf CustusX_temp
 # ---------------------------------------------------------------------------
 # Shortcut to the (shared, family-level) Patients folder
 # ---------------------------------------------------------------------------
+# xdg-user-dirs localizes the Desktop folder's name (e.g. ~/Skrivebord on a
+# Norwegian install), so ~/Desktop doesn't reliably exist -- ask xdg-user-dir
+# for the real path, falling back to ~/Desktop if xdg-user-dirs isn't set up.
+DESKTOP_DIR="$(xdg-user-dir DESKTOP 2>/dev/null || true)"
+if [ -z "$DESKTOP_DIR" ]; then
+    DESKTOP_DIR="$HOME/Desktop"
+fi
+
 mkdir -p ~/CustusX/Patients
-if [ -d ~/Desktop ]; then
-    cat > ~/Desktop/CustusX_Patients.desktop <<EOF
+if [ -d "$DESKTOP_DIR" ]; then
+    cat > "$DESKTOP_DIR/CustusX_Patients.desktop" <<EOF
 [Desktop Entry]
 Type=Link
 Name=CustusX Patients
 Icon=folder
 URL=$HOME/CustusX/Patients
 EOF
-    gio set ~/Desktop/CustusX_Patients.desktop metadata::trusted true 2>/dev/null || true
-    chmod +x ~/Desktop/CustusX_Patients.desktop
+    gio set "$DESKTOP_DIR/CustusX_Patients.desktop" metadata::trusted true 2>/dev/null || true
+    chmod +x "$DESKTOP_DIR/CustusX_Patients.desktop"
 fi
 
 # ---------------------------------------------------------------------------
 # Install desktop launcher
 # ---------------------------------------------------------------------------
 cd ~/CustusX/CustusX
-if [ -f "CustusX.desktop" ] && [ -d ~/Desktop ]; then
+if [ -f "CustusX.desktop" ] && [ -d "$DESKTOP_DIR" ]; then
     EXEC_PATH="$HOME/CustusX/CustusX/bin/CustusX"
     ICON_PATH="$HOME/CustusX/CustusX/icons/CustusX.png"
     sed -i "s|Path=.*|Path=$HOME/CustusX/CustusX/bin|g" CustusX.desktop
     sed -i "s|Exec=.*|Exec=$EXEC_PATH|g" CustusX.desktop
     sed -i "s|Icon=.*|Icon=$ICON_PATH|g" CustusX.desktop
-    cp CustusX.desktop ~/Desktop/
-    gio set ~/Desktop/CustusX.desktop metadata::trusted true 2>/dev/null || true
-    chmod +x ~/Desktop/CustusX.desktop
+    cp CustusX.desktop "$DESKTOP_DIR/"
+    gio set "$DESKTOP_DIR/CustusX.desktop" metadata::trusted true 2>/dev/null || true
+    chmod +x "$DESKTOP_DIR/CustusX.desktop"
 fi
 
 echo ""

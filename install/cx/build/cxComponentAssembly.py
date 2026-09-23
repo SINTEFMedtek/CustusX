@@ -17,6 +17,7 @@ import re
 import sys
 import os.path
 import shutil
+import stat
 import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
@@ -42,12 +43,12 @@ class LibraryAssembly(object):
 
         self.addComponent(cxComponents.Eigen())
         if self.controlData.mBuildIGSTK:
-            self.addComponent(cxComponents.oldVTK())
-            self.addComponent(cxComponents.ITK())
+            self.addComponent(cxComponents.VTK92())
+            self.addComponent(cxComponents.ITK4())
             self.addComponent(cxComponents.IGSTK())
         else:
             self.addComponent(cxComponents.VTK())
-            self.addComponent(cxComponents.newITK())
+            self.addComponent(cxComponents.ITK())
         self.addComponent(cxComponents.OpenCV())
         self.addComponent(cxComponents.OpenIGTLink())
         self.addComponent(cxComponents.CTK())
@@ -98,7 +99,19 @@ class LibraryAssembly(object):
             target = component.path()
         if os.path.isdir(target):
             PrintFormatter.printHeader('Removing leftover checkout of removed component %s: %s' % (component.name(), target))
-            shutil.rmtree(target)
+            shutil.rmtree(target, onerror=self._forceRemoveReadonly)
+
+    @staticmethod
+    def _forceRemoveReadonly(func, path, exc_info):
+        '''
+        onerror handler for shutil.rmtree: git leaves loose/packed object
+        files inside .git read-only, and shutil.rmtree's os.unlink can't
+        delete a read-only file on Windows (unlike Linux/Mac, where directory
+        write permission is all that matters). Clear the read-only bit and
+        retry the failed operation.
+        '''
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
 
     def getComponent(self, type):
         for comp in self.libraries:

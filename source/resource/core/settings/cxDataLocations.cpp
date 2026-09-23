@@ -138,24 +138,36 @@ QString DataLocations::getBundlePath()
 #endif
 }
 
+QStringList DataLocations::getInstalledPluginsPathCandidates(QString appPath)
+{
+	QStringList retval;
+#ifndef CX_WINDOWS
+	retval << appPath + "/plugins";
+#endif
+#ifdef __APPLE__
+	// The macOS installer puts the CTK plugins in the bundle's Contents/Frameworks
+	// (CX_INSTALL_PLUGIN_DIR), next to Contents/MacOS where the executable lives.
+	retval << QDir(appPath + "/../Frameworks").absolutePath();
+#endif
+	retval << appPath;
+	return retval;
+}
+
 QStringList DataLocations::getDefaultPluginsPath()
 {
 	QStringList retval;
 
 	if(!isRunFromBuildFolder())
 	{
-		QString appPath(qApp->applicationDirPath());
-
-		QString installLocation = appPath;
-#ifndef CX_WINDOWS
-		installLocation = appPath + "/plugins";
-#endif
-		if (QFile(installLocation).exists())
-			retval << installLocation;
-
-		QString fallbackInstallLocation = appPath;
-		if (QFile(fallbackInstallLocation).exists())
-			retval << fallbackInstallLocation;	}
+		QStringList candidates = getInstalledPluginsPathCandidates(qApp->applicationDirPath());
+		for (int i = 0; i < candidates.size(); ++i)
+		{
+			if (QFile(candidates[i]).exists())
+			{
+				retval << candidates[i];
+			}
+		}
+	}
 	else
 	{
 		QString bundlePath = DataLocations::getBundlePath();

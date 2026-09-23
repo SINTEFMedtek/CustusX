@@ -17,6 +17,7 @@ import optparse
 import re
 import sys
 import os.path
+import time
 import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
@@ -73,6 +74,23 @@ class CppBuilder(object):
         self._gitCloneWithRetry(repository, folder)
         self._changeDirToSource()
 
+    def gitCloneAtTag(self, repository, tag, folder=''):
+        '''
+        Like gitClone(), but shallow: clones directly at a known, pinned tag
+        (--branch <tag> --depth 1) instead of full history (CustusX#50). For
+        a large, chronically-flaky-to-clone repo whose tag is fixed and known
+        ahead of time (VTK/VTK92 in particular -- several GB of history vs a
+        few hundred MB shallow), this is both faster and far less likely to
+        drop mid-transfer. Verified directly against gitlab.kitware.com/vtk/
+        vtk.git: a --depth 1 clone at a pinned tag leaves `git describe --tags
+        --exact-match` (what isAtTag()/update() rely on) resolving correctly,
+        so the caller's usual isAtTag() check finds it already at the tag and
+        skips its own update() work, same as any other build.
+        '''
+        self._changeDirToBase()
+        self._gitCloneAtTagWithRetry(repository, tag, folder)
+        self._changeDirToSource()
+
     def _gitCloneWithRetry(self, repository, folder, attempts=3):
         '''
         A bare `git clone` has no resilience against a mid-transfer TLS drop
@@ -91,6 +109,57 @@ class CppBuilder(object):
                 shutil.rmtree(target)
         exit('ERROR: failed to clone %s after %d attempts.' % (repository, attempts))
 
+    def _gitCloneAtTagWithRetry(self, repository, tag, folder, attempts=5):
+        '''
+        Mirrors _gitCloneWithRetry, shallow at a known tag instead of full
+        history -- see gitCloneAtTag() above. More attempts than the other
+        retry loops here (3): VTK/VTK92 are cloned from gitlab.kitware.com,
+        a single external host with no fallback mirror, so a sustained
+        outage there is more likely to actually need extra attempts to
+        survive than a transient TLS drop against gitlab.sintef.no.
+        '''
+        target = os.path.join(self.mBasePath, folder) if folder else self.mBasePath
+        for attempt in range(1, attempts + 1):
+            http_fallback = '' if attempt == 1 else '-c http.version=HTTP/1.1 '
+            cmd = 'git %sclone --branch %s --depth 1 %s %s' % (http_fallback, tag, repository, folder)
+            if runShell(cmd, ignoreFailure=True):
+                return
+            print('Shallow clone attempt %d/%d failed for %s@%s.' % (attempt, attempts, repository, tag))
+            if os.path.exists(target):
+                shutil.rmtree(target)
+            if attempt < attempts:
+                time.sleep(5)
+        exit('ERROR: failed to shallow-clone %s@%s after %d attempts.' % (repository, tag, attempts))
+
+    def _gitFetchWithRetry(self, attempts=3):
+        '''
+        A bare `git fetch` has no resilience against a transient network
+        failure (e.g. a connection timeout to the remote), unlike
+        _gitCloneWithRetry above. Every checkout/update path below fetches
+        unconditionally on each build, so a single flaky remote (e.g.
+        gitlab.kitware.com being briefly unreachable) would otherwise call
+        exit() and kill the whole build. Retry here too, falling back to
+        HTTP/1.1 since HTTP/2 is the more likely side to drop the connection
+        on some networks/proxies. Mirrors _gitCloneWithRetry/
+        cxRepoHandler.RepoHandler._cloneWithRetry.
+        '''
+        for attempt in range(1, attempts + 1):
+            http_fallback = '' if attempt == 1 else '-c http.version=HTTP/1.1 '
+            cmd = 'git %sfetch' % http_fallback
+            if runShell(cmd, ignoreFailure=True):
+                return
+            print('Fetch attempt %d/%d failed.' % (attempt, attempts))
+            if attempt < attempts:
+                # A transient network blip (e.g. gitlab.kitware.com briefly
+                # unreachable) needs a moment to clear -- retrying 3x back to
+                # back with no delay (as before) rarely gives it enough time,
+                # and this fires unconditionally for every component's
+                # update(), unlike _gitCloneWithRetry which only runs once
+                # per fresh checkout. Matches the install scripts' own
+                # download_with_retry() 5s pause for the same class of issue.
+                time.sleep(5)
+        exit('ERROR: failed to fetch after %d attempts.' % attempts)
+
     def gitCloneIntoExistingDirectory(self, repository, branch):
         '''
         Use in the case that the source folder already contains stuff,
@@ -102,11 +171,19 @@ class CppBuilder(object):
         runShell('git fetch')
         runShell('git checkout -t origin/%s' % branch)        
 
-    def gitSetRemoteURL(self, new_remote_origin_repository, branch=None):
+    def gitSetRemoteURL(self, new_remote_origin_repository, branch=None, fetch=True):
+        '''
+        `fetch=False` lets a component's update() still self-heal the remote
+        URL (a cheap, local git-config operation) every time, per CLAUDE.md's
+        documented invariant, while skipping only the network fetch that
+        follows it -- e.g. when isAtTag() already confirmed there's nothing
+        new to fetch for a pinned dependency (CustusX#46/CustusX#50).
+        '''
         self._changeDirToSource()
         runShell('git remote set-url origin %s' % new_remote_origin_repository)
-        runShell('git fetch')
-        # old (1.7) syntax - update if needed to 'git branch --set-upstream-to origin/<branch>' 
+        if fetch:
+            self._gitFetchWithRetry()
+        # old (1.7) syntax - update if needed to 'git branch --set-upstream-to origin/<branch>'
         if branch!=None:
             runShell('git branch --set-upstream %s origin/%s' % (branch, branch), ignoreFailure=True) # can fail if branch does not exist, might happen if a nonstandard branch is selected.
         #runShell('git branch -u origin/%s' % branch)
@@ -130,7 +207,7 @@ class CppBuilder(object):
         pull latest version of branch, include submodules if asked.
         '''
         self._changeDirToSource()
-        runShell('git fetch')
+        self._gitFetchWithRetry()
         runShell('git checkout %s' % branch)
         runShell('git pull origin %s' % branch)
 
@@ -143,7 +220,7 @@ class CppBuilder(object):
         self._changeDirToSource()
         if self._checkGitIsAtTag(tag):
             return
-        runShell('git fetch')
+        self._gitFetchWithRetry()
         if self._checkGitIsAtRef(tag):
             self._warnIfLocalModifications(tag)
             return
@@ -162,11 +239,25 @@ class CppBuilder(object):
         as they will output confusing warnings
         '''
         self._changeDirToSource()
-        runShell('git fetch')
+        self._gitFetchWithRetry()
         if self._checkGitIsAtRef(sha):
             self._warnIfLocalModifications(sha)
             return
         runShell('git checkout %s' % sha)
+
+    def isAtTag(self, tag):
+        '''
+        True if the source repo's HEAD is already exactly at the given tag.
+        Lets a component's update() skip the network fetch inside
+        gitSetRemoteURL() (pass fetch=False there) for a pinned external
+        dependency whose tag rarely or never changes between builds (e.g.
+        VTK) - avoiding a round-trip to a remote that may be temporarily or
+        permanently unreachable even though nothing here needs to change
+        (CustusX#46/CustusX#50). gitSetRemoteURL() itself must still run
+        unconditionally -- only the fetch inside it is safe to skip.
+        '''
+        self._changeDirToSource()
+        return self._checkGitIsAtTag(tag)
 
     def _checkGitIsAtTag(self, tag):
         output = shell.evaluate('git describe --tags --exact-match')

@@ -31,6 +31,8 @@ CMake minimum version: 3.16.3. C++ standard: C++14. All build outputs go to `${P
 
 New non-trivial code (algorithms, filter logic, bug fixes) should come with an automated test where practical. Pure/static logic (mappings, threshold/bounding-box computation, etc.) is the easiest target - prefer exposing it as a testable pure function over leaving it embedded in a widget or filter with no coverage. A private method worth testing on its own can be moved to `protected` and exercised via a thin test subclass (see "Testing Filter plugins" below) rather than left untested for lack of access.
 
+Before changing existing non-trivial code, check whether it already has test coverage. If it doesn't, add a test capturing its current/expected behavior first (where practical) so the change is verifiable and a regression is caught by the test suite rather than only by manual testing or a future bug report.
+
 Tests use the **Catch** framework. Each plugin has a `testing/` subdirectory; all tests are linked into a single `Catch` executable.
 
 ```bash
@@ -49,6 +51,27 @@ python install/cxRunTests.py --run_catch "MyTestName"
 ```
 
 Test tags: `[unit]`, `[unstable]`, plus OS-specific tags.
+
+### Running the Python tests
+
+The Python build/release tooling under `install/cx/` (`cxRepoHandler.py`,
+`cxComponentAssembly.py`, ...) has its own `unittest` suites, separate from the C++ Catch
+tests above. No extra dependencies to install — stdlib `unittest` only, everything runs
+against throwaway temp directories/git repos, never real checkouts. Run all of them from
+the repo root:
+
+```bash
+cd install && python3 -m unittest discover -s cx -v
+```
+
+This recurses into every `cx/**/testing/` package automatically (each needs an
+`__init__.py`, same as the package under test) — a new suite added under `cx/` doesn't
+need this command or the CI job updated. CustusS has an equivalent suite for its own
+physical copy of `cxRepoHandler.py` plus `cxRelease.py`/`cxPrivateReposActions.py` — see
+CS/CS's `doc/dev_manual/cs_dev_build_instructions.md`.
+
+CI runs this automatically in the `test-python` stage, before the much more expensive
+per-platform C++ builds.
 
 ## Architecture
 
@@ -113,9 +136,15 @@ Build scripts:
 
 Both repos have their own `.gitlab-ci.yml` and `.gitlab/ci/` CI pipelines. The private CI sets `GIT_CLONE_PATH` to place the private repo inside `FX/FX/` on the runner, then clones the public repo alongside it before building.
 
-CI external lib caching:
-- The public CI (`FX/FX`) uses `BASE_DIR=/builds/Ubuntu2004igstk` (etc.) and can reuse prebuilt libs from the CX package registry
-- The private CI uses `BASE_DIR=/builds/FraxinusPrivate/Ubuntu2004igstk` (etc.) and cannot reuse CX prebuilt libs because those have the public `BASE_DIR` baked into their CMake config files; instead it maintains its own lib cache in the private project's package registry — the first run always does a full build
+CI external lib caching (CustusX#50):
+
+CX/CX builds and publishes each pinned external library (eigen, VTK, ITK, OpenCV, OpenIGTLink, CTK, ...) as its own package to its `custusx-external-lib` Package Registry, one package per library rather than one combined bundle, so an unrelated library's version bump doesn't invalidate every other library's cache. The version key is `<lib>-<OS>-<plain|igstk>-<image-tag>-<hash>`, where `<hash>` comes from `install/cx/build/cxLibVersionHash.py` (a hash of just that library's own resolved dependency class in `cxComponents.py`). `.gitlab/ci/external-libs.yml`'s `build-external-libs-*` jobs populate this registry proactively (triggered when `cxComponents.py` changes, or manually); `build.yml`'s own per-OS build jobs also fall back to building+publishing any library missing from the registry, so the cache self-heals even without the dedicated job running.
+
+CS/CS, FX/FX (public), and FraxinusExcelsior (private) all build the same pinned libraries CX does, so each one's own `.gitlab/ci/build.yml` checks **CX's `custusx-external-lib` registry first**, then falls back to its own project-specific registry (`custusx-s-external-lib`, `fraxinus-external-lib`, `fraxinus-private-external-lib` respectively) for whatever CX hasn't published yet, and only builds a library from source as a last resort — publishing the result back to CX's shared registry (not just its own) so every other project's next run can reuse it too. All three use the exact same version-key scheme as CX, so a package built by any one of them is reusable by the others.
+
+This lookup needs `$CX_SOURCE_PATH/install/cx/build/cxLibVersionHash.py` to even compute what to look up — i.e. CX must already be checked out locally. Each consumer's `build.yml` therefore runs a cheap `--checkout`-only pass (no `--configure`/`--make`) immediately before the lookup, specifically to guarantee this on a cold `BASE_DIR` (first run on a runner, or an ephemeral/non-persistent one) — without it, every library is unconditionally treated as a cache miss and built from source every time, even when CX's registry already has a matching package (CustusX#46; found via FraxinusExcelsior's build-ubuntu20 IGSTK-variant job falling through to a from-scratch VTK clone). Don't remove that checkout step as apparently-redundant — it's not a leftover, it's what makes the registry lookup work at all on a cold runner.
+
+`BASE_DIR` differs per app/variant and is *not* namespaced by public-vs-private the way it once was: e.g. FraxinusExcelsior's IGSTK ubuntu20 build job uses `BASE_DIR=/builds/Ubuntu2004igstk`, the same path shape CX/CX's own igstk variant uses (not a `FraxinusPrivate`-prefixed path) — check the actual `variables:` block in the relevant `.gitlab/ci/build.yml` rather than assuming a naming convention.
 
 The private plugin (`org.custusx.fraxinus.private`) follows the standard CTK plugin structure and requires `manifest_headers.cmake` like all other plugins. A missing `manifest_headers.cmake` or a stale `.so` from a renamed plugin causes a "Skipping N plugins not in build manifest" warning at startup; fix by adding the file and doing a clean rebuild.
 
@@ -139,7 +168,15 @@ git -C FX/FX remote set-url origin https://gitlab.sintef.no/custusx/fraxinus.git
 
 **Never commit directly to `develop`/`master`**
 
-Always create/use a feature branch for a commit, even a small one-line fix, in any of these repos: CustusX, CustusS, Fraxinus (public or private), or any private plugin repo (`org.custusx.core.tracking.system.ndi`, etc). This applies regardless of how small or obviously-correct the change is, and even if the commit is only local and not yet pushed. If a task naturally lands on `develop` (e.g. because that's where a relevant file currently lives), create a feature branch from that point first (`git checkout -b cxNN-description`) and commit there instead. Commits go to `develop`/`master` only via review/merge (e.g. an MR), never directly.
+Always commit to a branch other than `develop`/`master` in any of these repos: CustusX, CustusS, Fraxinus (public or private), or any private plugin repo (`org.custusx.core.tracking.system.ndi`, etc) — a feature branch (`cxNN-description`) or a release branch (`release/vYY.MM`) are both fine, and several unrelated fixes/issues can share the same branch. Commits go to `develop`/`master` only via review/merge (e.g. an MR), never directly.
+
+**Squashing/amending unpushed commits**
+
+If you need to correct or fold together commits you just made, it's fine to squash or amend them as long as none of them have been pushed to the remote yet (check with `git status`/`git log @{u}..HEAD`, or the fact that the branch was just created locally). Never do this to a commit that has already been pushed — that rewrites history other clones, MRs, or CI may already have fetched; add a new commit on top instead.
+
+**Pull before committing**
+
+Before committing to a branch that already exists on the remote (as opposed to one just created locally), fetch and merge/pull first so the commit is based on the branch's current tip, not a stale local copy — otherwise a push later can fail or, worse, silently diverge from work someone else (or another session) already pushed to the same branch.
 
 **Open/Closed code**
 
@@ -214,6 +251,18 @@ Use `org.custusx.filter.cpd` or `org.custusx.filter.clipmesh` as a reference. Ev
 
 Also add `org.custusx.filter.<name>:ON` to the plugin list in `source/plugins/CMakeLists.txt`.
 
+**Windows linking: check whether the plugin's test lib needs a dummy exported class.** MSVC
+needs at least one exported symbol to produce a usable `.lib` for a DLL with no exports. A
+test lib whose only source registers Catch `TEST_CASE`s (no actual exported class) links fine
+on Linux but fails on Windows. If the new plugin's `testing/` directory doesn't otherwise
+define a class tagged with its generated export macro, add a
+`cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp` (see any existing
+plugin's `testing/` folder for the ~5-line pattern, and `EXPORT_DUMMY_CLASS_FOR_LINKING_ON_WINDOWS_IN_LIB_WITHOUT_EXPORTED_CLASS`
+in `source/resource/testUtilities/cxtestUtilities.h`) and wire it into `testing/CMakeLists.txt`
+via `cx_add_class()` alongside the other test sources. This was missed when `org.custusx.liver`
+was first added and had to be fixed in a follow-up commit (`85d49db00`) once it broke the
+Windows build.
+
 ### Filter plugin threading model
 
 **Critical — misunderstanding this causes crashes and race conditions:**
@@ -277,9 +326,11 @@ created and backfilled by hand after the fact.
 - Code style reference: `doc/dev_manual/cx_dev_code_style.md`
 - Incremental rebuild: run `ninja UserDoc` inside the build directory
 
+Add or update the relevant user manual page whenever a change affects what a user sees or does — a new/changed GUI widget, a new plugin's own doc page, a changed workflow, a renamed/moved setting, etc. Look for an existing page covering the affected widget/plugin/feature under `doc/user_manual/` or `doc/shared_manual/` before assuming one needs to be added; a plugin's own page lives at `source/plugins/<plugin>/doc/<plugin>.md` (see "Required files for a new Filter plugin" above).
+
 ### Markdown rules for plugin doc files
 
-The doc files are processed by Doxygen and then compiled into Qt Help (`.qhp` XML). Certain Markdown constructs cause the `qcollectiongenerator` step to fail with "Opening and ending tag mismatch" on older Qt/Doxygen versions. Follow these rules:
+**Check this section before the first build of any brand-new `.md` doc page** (a new plugin's `doc/org.custusx.<name>.md`, or any other page added to the `UserDoc`/`DoxygenDoc` input). The doc files are processed by Doxygen and then compiled into Qt Help (`.qhp` XML) — a new page that doesn't follow these rules typically builds fine through Doxygen but then fails the `qhelpgenerator`/`qcollectiongenerator` step with "Opening and ending tag mismatch", which looks like a doc-build/tooling problem but is actually a content problem in the page you just added. The fix is editing the page to match the rules below, then rebuilding — not retrying the same content. Follow these rules:
 
 **Safe heading styles** (match what existing CustusX filter docs use):
 ```markdown

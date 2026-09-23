@@ -48,6 +48,7 @@ public:
 	static QString getModelsPath(); ///< return path to a folder containing AI processing/segmentation models. Shared with sibling apps in the same family.
 	static QString getVirtualEnvironmentsPath(); ///< return path to a folder containing virtual environments. Shared with sibling apps in the same family.
 	static QStringList getDefaultPluginsPath(); ///< return the folder where plugins should be located, by default.
+	static QStringList getInstalledPluginsPathCandidates(QString appPath); ///< plugin folders to search in an installed (not build folder) app, given the executable's folder. Not filtered on existence.
 
 	static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.
 	static QString findExecutableInStandardLocations(QString filename); ///< look for an exe in the same folder as the executable or bundle.

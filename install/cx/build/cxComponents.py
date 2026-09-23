@@ -171,7 +171,7 @@ class CppComponent(Component):
         return self.controlData.getBuildType()
 # ---------------------------------------------------------
 
-class ITK(CppComponent):
+class ITK4(CppComponent):
     def name(self):
         return "ITK"
     def help(self):
@@ -199,7 +199,7 @@ class ITK(CppComponent):
         return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
 
-class newITK(CppComponent):
+class ITK(CppComponent):
     def name(self):
         return "ITK"
     def help(self):
@@ -220,6 +220,16 @@ class newITK(CppComponent):
         add('ITK_USE_SYSTEM_EIGEN:BOOL', True)
         add('Eigen3_DIR:PATH', self._createSibling(Eigen).configPath())
         add('CMAKE_CXX_STANDARD:STRING', 17)
+        if (platform.system() == 'Darwin' and platform.machine() != 'arm64'):
+            # On Intel Mac with MacPorts installed, CMake's FindIconv picks up
+            # MacPorts' /opt/local/lib/libiconv.dylib, which exports GNU-prefixed
+            # symbol names (libiconv_open etc.) rather than the plain names
+            # (iconv_open etc.) that vendored GDCM code (inside ITK) compiles
+            # against via the system iconv.h -- causing an undefined-symbol link
+            # failure in libitkgdcmMSFF. Point Iconv_LIBRARY at the system's own
+            # iconv (found via the linker's normal default search, not
+            # /opt/local) so it matches the plain symbol names GDCM expects.
+            add('Iconv_LIBRARY:FILEPATH', 'iconv')
         builder.configureCMake()
     def repository(self):
         return 'https://github.com/InsightSoftwareConsortium/ITK.git'
@@ -235,9 +245,31 @@ class VTK(CppComponent):
     def repository(self):
         #return '%s/VTK' % self.controlData.gitrepo_open_site_base
         return 'https://gitlab.kitware.com/vtk/vtk.git' # Switch to local repo copy for speedup later?
+    def pinnedTag(self):
+        return 'v9.6.1'
+    def _rawCheckout(self):
+        '''
+        Shallow clone directly at the pinned tag instead of full history
+        (CustusX#50) -- VTK's full clone is several GB, and the tag is
+        already known here, unlike Component._rawCheckout()'s generic full
+        clone (used by every other component), whose tag/sha isn't decided
+        until update() runs afterward. update()'s isAtTag() check then finds
+        this shallow clone already at the tag and skips its own fetch, same
+        as any other build.
+        '''
+        self._getBuilder().gitCloneAtTag(self.repository(), self.pinnedTag(), self.sourceFolder())
     def update(self):
-        self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('v9.6.1')
+        builder = self._getBuilder()
+        # gitSetRemoteURL() must still run every time (CLAUDE.md's documented
+        # invariant) even when already at the pinned tag, so a canonical-URL
+        # change (mirror migration, project rename) still self-heals here --
+        # only the network fetch inside it is safe to skip in that case
+        # (CustusX#46/CustusX#50).
+        at_tag = builder.isAtTag(self.pinnedTag())
+        builder.gitSetRemoteURL(self.repository(), fetch=not at_tag)
+        if at_tag:
+            return
+        builder.gitCheckout(self.pinnedTag())
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -279,10 +311,10 @@ class VTK(CppComponent):
 # ---------------------------------------------------------
 
 # VTK 9.3+ enforces C++17 via target_compile_features, which breaks ITK 4.12.0
-# headers when CustusX is compiled against both. Use oldVTK (9.2.x) for IGSTK
+# headers when CustusX is compiled against both. Use VTK92 (9.2.x) for IGSTK
 # builds where old ITK is required. Shares the same name/paths as VTK so all
 # _createSibling(VTK) references in IGSTK, CTK, CustusX resolve correctly.
-class oldVTK(CppComponent):
+class VTK92(CppComponent):
     def name(self):
         return "VTK"
     def help(self):
@@ -291,9 +323,23 @@ class oldVTK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def repository(self):
         return 'https://gitlab.kitware.com/vtk/vtk.git'
+    def pinnedTag(self):
+        return 'v9.2.6'
+    def _rawCheckout(self):
+        '''
+        See VTK._rawCheckout() above -- same shallow-clone-at-tag reasoning
+        (CustusX#50).
+        '''
+        self._getBuilder().gitCloneAtTag(self.repository(), self.pinnedTag(), self.sourceFolder())
     def update(self):
-        self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('v9.2.6')
+        builder = self._getBuilder()
+        # See VTK.update() above for why gitSetRemoteURL() still runs
+        # unconditionally, only its internal fetch is skipped.
+        at_tag = builder.isAtTag(self.pinnedTag())
+        builder.gitSetRemoteURL(self.repository(), fetch=not at_tag)
+        if at_tag:
+            return
+        builder.gitCheckout(self.pinnedTag())
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -338,9 +384,13 @@ class CTK(CppComponent):
         #return '%s/CTK.git' % base
         return 'https://github.com/commontk/CTK.git' # Switch to local repo copy for speedup later?
     def update(self):
-        if (platform.system() == 'Darwin'):
+        if (platform.system() == 'Darwin' and platform.machine() == 'arm64'):
+            # Newer CTK commit needed for the arm64 (M-series) Mac build; untested
+            # on Intel Mac, and requires C++17 (conflicts with CustusX's C++14).
             self._getBuilder().gitCheckoutSha('a54983b07cfc64cde7b6de9351b32531623ad1e1')
         else:
+            # Same well-tested CTK commit as Ubuntu/Windows for Linux, Windows and
+            # Intel Mac.
             self._getBuilder().gitCheckoutSha('dec834fccffebdc3b0896c157d39e3c0031c4a0a')
         #self._getBuilder().gitCheckoutSha('2023.07.13') # Makes DICOM import fail
         self._getBuilder().gitSetRemoteURL(self.repository())
@@ -500,7 +550,7 @@ class IGSTK(CppComponent):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('IGSTK_USE_SceneGraphVisualization:BOOL', False)
-        add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
+        add('ITK_DIR:PATH', self._createSibling(ITK4).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('IGSTK_SERIAL_PORT_0', self._getSerialPort())
         add('BUILD_TESTING:BOOL', False)
@@ -542,7 +592,7 @@ class CustusX(CppComponent):
         add = builder.addCMakeOption
         append = builder.appendCMakeOption
         add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
-        add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
+        add('ITK_DIR:PATH', self._createSibling(ITK4).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenIGTLinkIO_DIR:PATH', self._createSibling(OpenIGTLinkIO).configPath())

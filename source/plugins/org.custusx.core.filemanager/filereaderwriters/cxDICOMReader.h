@@ -61,7 +61,7 @@ protected:
 	void stopDCMTKMessages();
 	bool canReadDir(QString dirname, bool checkSubDirs);
 	bool canReadFile(QString filename);
-	void addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString folder);
+	void addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString folder, QProgressDialog &progress);
 	QStringList findAllSubfoldersWithDicomFiles(QString folder, QProgressDialog &progress);
 	QStringList findAllSubDirs(QString folder);
 	void indexingCompleteSlot(int patientsAdded, int studiesAdded, int seriesAdded, int imagesAdded);

@@ -1,6 +1,6 @@
 xcode
 xcode32
-build
+/build
 .project
 .metadata
 config/SampledPoints.txt

@@ -6,6 +6,7 @@ if(BUILD_TESTING)
 
     set(RESOURCE_TEST_CATCH_SOURCE_FILES
         cxtestXmlOptionFile.cpp
+        cxtestProfile.cpp
         cxtestCatchStringHelpers.cpp
         cxtestCatchSliceComputer.cpp
         cxtestCatchBoundingBox3D.cpp
@@ -46,6 +47,7 @@ if(BUILD_TESTING)
         cxtestEnumConversion.cpp
         cxTestFrameForest.cpp
         cxtestRegistrationHistory.cpp
+        cxtestMouseWheelWidgetAdjustmentGuard.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS

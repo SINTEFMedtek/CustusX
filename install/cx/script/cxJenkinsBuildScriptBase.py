@@ -104,34 +104,37 @@ class Controller(cxBuildScript.BuildScript):
                         skip_unit_tests=False, 
                         skip_installation_test=False, 
                         skip_integration_test=False):
+        self.cxInstallation.resetTestResults()
         if not skip_extra_install_step_checkout:
             self.checkoutCustusXAndData()
         if not skip_install:
             self.cxInstaller.installPackage()
         if not skip_unit_tests:
             self.cxInstallation.runUnitTests()
-        if not skip_installation_test:            
+        if not skip_installation_test:
             self.cxInstallation.testInstallation()
         if not skip_integration_test:
             self.cxInstallation.runIntegrationTests()
 
-    def integrationTestPackageStep(self, 
-                                   skip_extra_install_step_checkout=False, 
-                                   skip_install=False, 
-                                   skip_installation_test=False, 
+    def integrationTestPackageStep(self,
+                                   skip_extra_install_step_checkout=False,
+                                   skip_install=False,
+                                   skip_installation_test=False,
                                    skip_integration_test=False):
+        self.cxInstallation.resetTestResults()
         if not skip_extra_install_step_checkout:
             self.checkoutCustusXAndData()
         if not skip_install:
             self.cxInstaller.installPackage()
-        if not skip_installation_test:            
+        if not skip_installation_test:
             self.cxInstallation.testInstallation()
         if not skip_integration_test:
             self.cxInstallation.runIntegrationTests()
 
-    def unstableTestPackageStep(self, 
-                                   skip_extra_install_step_checkout=False, 
+    def unstableTestPackageStep(self,
+                                   skip_extra_install_step_checkout=False,
                                    skip_install=False):
+        self.cxInstallation.resetTestResults()
         if not skip_extra_install_step_checkout:
             self.checkoutCustusXAndData()
         if not skip_install:

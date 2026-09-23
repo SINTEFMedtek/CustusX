@@ -2,26 +2,36 @@
 
 workflow:
   rules:
+    # Run automatically for merge requests, the "Run pipeline" button, tags, and
+    # direct pushes to develop/master. A plain push to any other branch (e.g. a
+    # feature or release branch accumulating commits before tagging) creates no
+    # pipeline on its own -- use "Run pipeline" (CI/CD > Pipelines) to test one
+    # before opening an MR or tagging, instead of every push triggering a full
+    # build across all platforms.
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_PIPELINE_SOURCE == "web"
-    - if: $CI_COMMIT_BEFORE_SHA == "0000000000000000000000000000000000000000" && $CI_COMMIT_TAG == null
-      when: never
-    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
-      when: never
-    - when: always
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "master"
+    - when: never
 
 default:
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02
+  # Let a newer pipeline on the same branch/MR cancel this one's still-running
+  # jobs instead of letting superseded work finish (requires "Auto-cancel
+  # redundant, pending pipelines" enabled in Settings > CI/CD > General
+  # pipelines). Deploy-stage jobs override this back to false -- a tag/release
+  # upload must never be cut off mid-way.
+  interruptible: true
 
 stages:
+  - test-python
   - build-libs
-  # Platforms build+test serially (24 -> 22 -> 20) to reduce concurrent runner load.
-  - build-24
-  - test-24
-  - build-22
-  - test-22
-  - build-20
-  - test-20
+  # The three platform build jobs share a resource_group (see build.yml) so only
+  # one builds at a time, reducing concurrent runner load without needing a
+  # separate stage per platform.
+  - build
+  - test
   - deploy
 
 variables:
@@ -35,6 +45,7 @@ variables:
   BASE_DIR_UBUNTU2204_IGSTK: "/builds/Ubuntu2204igstk"
 
 include:
+  - local: '.gitlab/ci/test-python.yml'
   - local: '.gitlab/ci/external-libs.yml'
   - local: '.gitlab/ci/build.yml'
   - local: '.gitlab/ci/test.yml'

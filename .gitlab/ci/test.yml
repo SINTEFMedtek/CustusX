@@ -1,8 +1,9 @@
 # Test stage templates and jobs
 
 .test-job:   # This job runs the Unit + Integration tests
-  # stage is set per-platform job below, to serialize platform builds; it only
-  # starts when the matching platform's build job completes successfully.
+  # needs: (set per-platform job below) makes each test job start as soon as
+  # its matching platform's build job completes, without waiting for the
+  # whole build stage (i.e. all three platform builds) to finish first.
   variables:
     OS: OS
     GIT_CLONE_PATH: /builds/$OS/CX/CX
@@ -13,6 +14,13 @@
     # Use commit tag if existing, otherwise use branch
     - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=${CI_COMMIT_BRANCH:-$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}; fi
     - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+  # Exit code 42 (cx.build.cxTestRunner.CATCH_TEST_FAILURE_EXIT_CODE) means the
+  # Catch tests ran to completion but some assertions failed/crashed - show the
+  # job as an orange "warning" in the pipeline instead of solid green, without
+  # blocking the pipeline/merge. Any other non-zero exit is a real build/install
+  # failure and still hard-fails the job as before.
+  allow_failure:
+    exit_codes: 42
   artifacts:
     when: always
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
@@ -23,7 +31,7 @@
 
 test-ubuntu20:
   extends: .test-job
-  stage: test-20
+  stage: test
   needs: ["build-ubuntu20"]
   image: $IMAGE_UBUNTU2004
   variables:
@@ -31,7 +39,7 @@ test-ubuntu20:
 
 test-ubuntu22:
   extends: .test-job
-  stage: test-22
+  stage: test
   needs: ["build-ubuntu22"]
   image: $IMAGE_UBUNTU2204
   variables:
@@ -39,7 +47,7 @@ test-ubuntu22:
 
 test-ubuntu24:
   extends: .test-job
-  stage: test-24
+  stage: test
   needs: ["build-ubuntu24"]
   image: $IMAGE_UBUNTU2404
   variables:

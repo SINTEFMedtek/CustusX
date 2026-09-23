@@ -709,6 +709,8 @@ install(DIRECTORY "${QT_QML_DIR}/"
             set(_cx_bundle_ignore_igstk "IGNORE_ITEM libIGSTK.so")
         endif()
 
+        set(_cx_bundle_ignore_gestreamer "IGNORE_ITEM libGEStreamer.so;IGNORE_ITEM libStreaming.so")
+
         install(CODE "
     # Begin inserted fixup_bundle snippet
     ${LIB_PATTERN_CODE}
@@ -729,7 +731,7 @@ endfunction()
     file(TO_CMAKE_PATH \"\${CMAKE_INSTALL_PREFIX}/${APPS_LOCAL}\" _APP_PATH)
     message(STATUS \"_APP_PATH:  \${_APP_PATH}\")
     #fixup_bundle(\"\${_APP_PATH}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\")
-    cx_fixup_bundle(\"\${_APP_PATH}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\" ${_cx_bundle_ignore_igstk})
+    cx_fixup_bundle(\"\${_APP_PATH}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\" ${_cx_bundle_ignore_igstk} ${_cx_bundle_ignore_gestreamer})
     # End inserted fixup_bundle snippet
     ")
 endfunction()

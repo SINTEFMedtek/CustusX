@@ -1,38 +1,72 @@
-# Builds all external C++ libraries and publishes them to the Package Registry.
+# Builds all external C++ libraries and publishes them to the Package Registry,
+# one package per library (CustusX#50).
 #
-# The package version key encodes library versions (via a hash of cxComponents.py,
-# where all git SHAs are pinned) and the Docker image tag (compiler/system libs).
-# Any change to either automatically produces a new package version.
+# Each library's package version key is a hash of just that library's own
+# resolved class (and its base classes, e.g. shared CppComponent helpers) in
+# cxComponents.py, via cxLibVersionHash.py -- not the whole file. Editing one
+# library's pinned version only invalidates that library's own cached
+# package, not every other library's, and a library whose config doesn't
+# differ between the --igstk and non---igstk variants (most of them -- only
+# VTK/ITK actually differ) naturally hashes the same either way, so its
+# package is shared across variants instead of built twice.
 #
 # Trigger conditions:
 #   - Automatically when install/cx/build/cxComponents.py changes
 #   - Manually from the GitLab CI/CD UI at any time
 #
 # The build-ubuntu* jobs in build.yml download these packages instead of
-# rebuilding from source. If no package is found, they fall back to a full
-# rebuild and upload the result so the next run can reuse it.
+# rebuilding from source. If no package is found for a given library, they
+# fall back to building just that library from source and upload the result
+# so the next run can reuse it.
 
-# Shared script steps for computing IGSTK variant flags and package coordinates.
-# Referenced by both .build-and-publish-libs (this file) and .reuse-build (build.yml).
+# Shared script steps: computes IGSTK variant flags and defines
+# compute_lib_package_vars(), a shell function setting LIB_VERSION/LIB_FILE/
+# LIB_URL for one library name. Referenced by both .build-and-publish-libs
+# (this file) and .reuse-build (build.yml) so the upload and download sides
+# can never silently drift apart on how a URL is built.
 .lib-package-vars:
   script:
     - |
       if [ "${BUILD_IGSTK}" = "true" ]; then
-        IGSTK_SUFFIX="igstk"
-        IGSTK_FLAG="--igstk"
         IGSTK_LIBS="eigen VTK ITK IGSTK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
+        IGSTK_FLAG="--igstk"
       else
-        IGSTK_SUFFIX="noigstk"
-        IGSTK_FLAG=""
         IGSTK_LIBS="eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
+        IGSTK_FLAG=""
         rm -rf $BASE_DIR/IGSTK
       fi
-    - LIBS_HASH=$(sha256sum install/cx/build/cxComponents.py | awk '{print $1}' | cut -c1-16)
-    - IMAGE_TAG=$(echo $CI_JOB_IMAGE | sed 's|.*/||' | tr ':' '_')
-    - PACKAGE_NAME="custusx-external-libs"
-    - PACKAGE_VERSION="${OS}-${IMAGE_TAG}-${IGSTK_SUFFIX}-${LIBS_HASH}"
-    - PACKAGE_FILE="cx-external-libs-${OS}-${IGSTK_SUFFIX}.tar.gz"
-    - PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/${PACKAGE_FILE}"
+      IMAGE_TAG=$(echo $CI_JOB_IMAGE | sed 's|.*/||' | tr ':' '_')
+      compute_lib_package_vars() {
+        LIB="$1"
+        LIB_HASH=$(python3 install/cx/build/cxLibVersionHash.py "$LIB" $IGSTK_FLAG)
+        # Library name leads the version string (not just the filename) so
+        # cleanup-old-external-libs' "group by everything but the trailing
+        # -HASH" rotation logic keeps each library's own history separate,
+        # instead of treating unrelated libraries sharing an OS/image as the
+        # same rotation group.
+        # IGSTK_VARIANT must be part of the key: several libraries here (CTK,
+        # ITK, OpenCV, OpenIGTLinkIO) embed an *absolute path* to a sibling
+        # library's own $BASE_DIR-specific build directory in their exported
+        # CMake config (e.g. CTKConfig.cmake's baked-in VTK_DIR). The plain
+        # and -igstk builds of the same OS use different $BASE_DIR values but
+        # otherwise hash identically, so without this a tarball built under
+        # one $BASE_DIR would get extracted under the other and leave stale,
+        # wrong absolute paths behind -- CMake then fails to configure with
+        # "Some (but not all) targets in this export set were already
+        # defined," since it loads two different VTK-targets.cmake files.
+        IGSTK_VARIANT="plain"
+        if [ "${BUILD_IGSTK}" = "true" ]; then
+          IGSTK_VARIANT="igstk"
+        fi
+        LIB_VERSION="${LIB}-${OS}-${IGSTK_VARIANT}-${IMAGE_TAG}-${LIB_HASH}"
+        # IGSTK_VARIANT must also be in the local temp filename, not just
+        # LIB_VERSION: without it, plain and -igstk jobs for the same
+        # OS/library both stage their tarball at the same /tmp path, so a
+        # plain-variant download/upload could clobber or be clobbered by an
+        # -igstk one on a runner where both happen to overlap.
+        LIB_FILE="cx-external-lib-${LIB}-${OS}-${IGSTK_VARIANT}.tar.gz"
+        LIB_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/custusx-external-lib/${LIB_VERSION}/${LIB_FILE}"
+      }
 
 .build-and-publish-libs:
   stage: build-libs
@@ -43,35 +77,69 @@
     BUILD_IGSTK: "false"
   script:
     - !reference [.lib-package-vars, script]
-    - echo "Libs package version $PACKAGE_VERSION"
     - |
-      HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-        --header "JOB-TOKEN: $CI_JOB_TOKEN" "$PACKAGE_URL")
-      if [ "$HTTP_CODE" = "200" ]; then
-        echo "Package $PACKAGE_VERSION already in registry, nothing to do."
+      MISSING_LIBS=""
+      for LIB in $IGSTK_LIBS; do
+        compute_lib_package_vars "$LIB"
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+          --header "JOB-TOKEN: $CI_JOB_TOKEN" "$LIB_URL")
+        if [ "$HTTP_CODE" = "200" ]; then
+          echo "  $LIB: package $LIB_VERSION already in registry."
+        else
+          echo "  $LIB: package $LIB_VERSION not found (HTTP $HTTP_CODE), needs building."
+          MISSING_LIBS="$MISSING_LIBS $LIB"
+        fi
+      done
+      echo "Missing libraries:$MISSING_LIBS"
+      if [ -z "$MISSING_LIBS" ]; then
+        echo "All libraries already cached, nothing to do."
         exit 0
       fi
-      echo "Package not found (HTTP $HTTP_CODE), building external libs..."
-    # Remove stale CTK build dir so CTK's ExternalProjects (DCMTK etc.) are
-    # re-cloned with a proper .git. A prior tarball extraction strips .git dirs,
-    # which breaks DCMTK's git-update step on warm runners that previously
-    # downloaded a prebuilt package.
-    - rm -rf $BASE_DIR/CTK
-    # Build all external libraries. CustusX and CustusX-Data are intentionally
-    # excluded here; they are built in the downstream build-ubuntu* jobs.
-    - eval ./install/cxInstaller.py -s --full -j 4 -t Release $IGSTK_FLAG $IGSTK_LIBS
-    # Pack lib directories. Exclude CMakeFiles (*.o intermediates) and .git
-    # history to keep the tarball small; neither is needed at configure time.
+    # Remove each about-to-be-rebuilt library's existing directory first.
+    # Covers two known stale-state cases on warm/persistent runners: (1) CTK's
+    # ExternalProjects (DCMTK etc.) losing their .git dir from a prior tarball
+    # extraction, which breaks DCMTK's git-update step; (2) a build_Release
+    # left over from before LIB_VERSION included IGSTK_VARIANT (CustusX#50),
+    # when a plain-built tarball could get extracted under the -igstk
+    # BASE_DIR (or vice versa), baking in the wrong absolute path and making
+    # CMake refuse to reconfigure ("directory ... is different than the
+    # directory ... where CMakeCache.txt was created"). Safe in general since
+    # every library removed here is about to be rebuilt from source anyway.
+    # Build and publish libraries one at a time -- not one combined build for
+    # all of $MISSING_LIBS followed by one combined upload pass. A
+    # fast-to-build library (eigen) would otherwise sit unpublished for the
+    # entire time a slow one (VTK) is still compiling, even though nothing
+    # about the upload actually depends on that wait. Publishing each library
+    # the moment it finishes lets downstream consumers -- CX's own next run,
+    # and CS/FX/FraxinusExcelsior's per-library lookups -- start reusing it
+    # immediately instead of only after the whole batch completes.
     - |
-      ( cd $BASE_DIR && tar -czf /tmp/$PACKAGE_FILE \
-        --exclude='*/CMakeFiles' \
-        --exclude='*/.git' \
-        $IGSTK_LIBS )
-      echo "Packed $(du -sh /tmp/$PACKAGE_FILE | cut -f1)"
-    - |
-      curl --fail --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-        --upload-file /tmp/$PACKAGE_FILE "$PACKAGE_URL"
-      echo "Published $PACKAGE_VERSION to Package Registry."
+      for LIB in $MISSING_LIBS; do
+        # Remove this library's existing directory first. Covers two known
+        # stale-state cases on warm/persistent runners: (1) CTK's
+        # ExternalProjects (DCMTK etc.) losing their .git dir from a prior
+        # tarball extraction, which breaks DCMTK's git-update step; (2) a
+        # build_Release left over from before LIB_VERSION included
+        # IGSTK_VARIANT (CustusX#50), when a plain-built tarball could get
+        # extracted under the -igstk BASE_DIR (or vice versa), baking in the
+        # wrong absolute path and making CMake refuse to reconfigure
+        # ("directory ... is different than the directory ... where
+        # CMakeCache.txt was created"). Safe since it's about to be rebuilt.
+        rm -rf $BASE_DIR/$LIB
+        eval ./install/cxInstaller.py -s --full -j 4 -t Release $IGSTK_FLAG $LIB
+        # Pack and publish as its own package. Exclude CMakeFiles (*.o
+        # intermediates) and .git history to keep the tarball small; neither
+        # is needed at configure time.
+        compute_lib_package_vars "$LIB"
+        ( cd $BASE_DIR && tar -czf /tmp/$LIB_FILE \
+          --exclude='*/CMakeFiles' \
+          --exclude='*/.git' \
+          $LIB )
+        echo "Packed $LIB: $(du -sh /tmp/$LIB_FILE | cut -f1)"
+        curl --fail --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+          --upload-file /tmp/$LIB_FILE "$LIB_URL"
+        echo "Published $LIB_VERSION to Package Registry."
+      done
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: never
@@ -118,9 +186,9 @@ build-external-libs-ubuntu24:
   variables:
     OS: Ubuntu2404
 
-# Keeps only the KEEP_VERSIONS newest packages per OS/variant group in the
-# custusx-external-libs registry. Run on a schedule (e.g. weekly) to prevent
-# unbounded accumulation. Also available as a manual job.
+# Keeps only the KEEP_VERSIONS newest packages per library/OS/variant group in
+# the custusx-external-lib registry. Run on a schedule (e.g. weekly) to
+# prevent unbounded accumulation. Also available as a manual job.
 cleanup-old-external-libs:
   stage: build-libs
   image: $IMAGE_UBUNTU2404
@@ -137,7 +205,41 @@ cleanup-old-external-libs:
       proj  = os.environ['CI_PROJECT_ID']
       token = os.environ['CI_JOB_TOKEN']
       keep  = int(os.environ.get('KEEP_VERSIONS', '1'))
-      pkg_name = 'custusx-external-libs'
+      pkg_name = 'custusx-external-lib'
+
+      def sanitize_image_tag(image):
+          # Mirrors .lib-package-vars' `sed 's|.*/||' | tr ':' '_'`.
+          return image.rsplit('/', 1)[-1].replace(':', '_')
+
+      # IMAGE_UBUNTU2004/2204/2404 are pipeline-level variables (.gitlab-ci.yml),
+      # so they're available here unchanged even though this job never builds.
+      valid_image_tags = {
+          sanitize_image_tag(os.environ['IMAGE_UBUNTU2004']),
+          sanitize_image_tag(os.environ['IMAGE_UBUNTU2204']),
+          sanitize_image_tag(os.environ['IMAGE_UBUNTU2404']),
+      }
+
+      def is_current_format(prefix):
+          '''
+          A prefix (LIB_VERSION without its trailing -HASH) can only ever be
+          produced again by a live job if it ends with one of today's Docker
+          image tags, and -- right before that -- an IGSTK_VARIANT segment
+          ("plain" or "igstk"). A prefix that doesn't match -- an old image
+          tag left behind by a Docker image bump, or an older key format like
+          the pre-CustusX#50-variant-split one that omitted IGSTK_VARIANT
+          entirely (seen on eigen's very first per-library package, created
+          hours before the variant split) -- can never be matched by a live
+          job again, so its whole group is deleted below regardless of the
+          normal keep-N rotation, which only prevents an *active* prefix from
+          growing unbounded and has no way to notice an *abandoned* one (it
+          would otherwise sit there forever as its own permanently-kept
+          group of 1).
+          '''
+          for tag in valid_image_tags:
+              suffix = '-' + tag
+              if prefix.endswith(suffix) and prefix[:-len(suffix)].endswith(('-plain', '-igstk')):
+                  return True
+          return False
 
       def api_request(path, method='GET'):
           req = urllib.request.Request(
@@ -159,7 +261,23 @@ cleanup-old-external-libs:
           page += 1
       print(f'Found {len(packages)} package(s) named "{pkg_name}"')
 
-      # Group by OS/image/variant prefix (everything except the trailing -HASH)
+      # Defense in depth: re-verify locally that every returned package is
+      # actually named pkg_name, never trusting the API's package_name filter
+      # alone to scope what gets deleted below. This registry also holds the
+      # real release installers (CustusX/CustusS/Fraxinus/FraxinusExcelsior,
+      # under their own distinct package names) -- this job must never be
+      # able to reach one of those, regardless of any future API/filter quirk.
+      mismatched = [p for p in packages if p.get('name') != pkg_name]
+      if mismatched:
+          print(f'ERROR: API returned {len(mismatched)} package(s) not named "{pkg_name}" -- aborting without deleting anything.', file=sys.stderr)
+          for p in mismatched:
+              print(f'  unexpected: name={p.get("name")!r} version={p.get("version")!r} id={p.get("id")}', file=sys.stderr)
+          sys.exit(1)
+
+      # Group by library/OS/image prefix (everything except the trailing
+      # -HASH) -- the library name leads the version string precisely so
+      # this keeps each library's own rotation separate from every other
+      # library sharing the same OS/image.
       groups = defaultdict(list)
       for p in packages:
           prefix = p['version'].rsplit('-', 1)[0]
@@ -168,9 +286,14 @@ cleanup-old-external-libs:
       deleted = 0
       for prefix, pkgs in sorted(groups.items()):
           pkgs.sort(key=lambda p: p['created_at'], reverse=True)
-          kept = [p['version'] for p in pkgs[:keep]]
-          print(f'{prefix}: keeping {kept}')
-          for old in pkgs[keep:]:
+          if is_current_format(prefix):
+              kept = [p['version'] for p in pkgs[:keep]]
+              print(f'{prefix}: keeping {kept}')
+              to_remove = pkgs[keep:]
+          else:
+              print(f'{prefix}: stale format/image tag, deleting all {len(pkgs)} version(s)')
+              to_remove = pkgs
+          for old in to_remove:
               try:
                   api_request(f'packages/{old["id"]}', method='DELETE')
                   print(f'  Deleted {old["version"]} (id={old["id"]})')

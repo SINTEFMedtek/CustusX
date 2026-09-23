@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxDICOMReader.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QProgressDialog>
 #include <vtkImageData.h>
@@ -252,7 +253,7 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 		progress.setValue(i);
 		if (progress.wasCanceled())
 			break;
-		addFolderToDicomDatabase(database,dicomFolders[i]);
+		addFolderToDicomDatabase(database,dicomFolders[i],progress);
 	}
 
 	std::vector<ImagePtr> retval;
@@ -308,13 +309,36 @@ QStringList DICOMReader::findAllSubDirs(QString folder)
 	return allSubDirs;
 }
 
-void DICOMReader::addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString folder)
+void DICOMReader::addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString folder, QProgressDialog &progress)
 {
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer); //TODO: Reuse instead on creating new one?
 //	std::cout.setstate(std::ios_base::failbit);//Hack to silence std::cout. Probably not longer needed with latest CTK
 
 	//For debugging
 //	connect(DICOMIndexer.get(), &ctkDICOMIndexer::indexingComplete, this, &DICOMReader::indexingCompleteSlot);
+
+	// addDirectory() below runs synchronously on this (the GUI) thread and can
+	// take tens of seconds for a folder with many files, with nothing yielding
+	// back to the Qt event loop in the meantime -- the OS reports the app as
+	// "not responding" for the whole duration. ctkDICOMIndexer emits progress()
+	// synchronously as it works (same thread), so use it as a trigger to pump
+	// the event loop, same idea as the progress.setValue() calls in the
+	// per-folder loop above. Also wire the dialog's existing Cancel button
+	// through to the indexer, which previously had no effect mid-folder.
+	// Capture a raw pointer, not the QSharedPointer itself: capturing
+	// DICOMIndexer by value here would store a copy of it inside the
+	// connection this lambda is registered on -- a self-referencing cycle
+	// (DICOMIndexer's own connection list holding a strong reference back to
+	// itself) that keeps it alive forever after this function returns, since
+	// nothing ever disconnects it. The raw pointer stays valid for as long as
+	// it can possibly be dereferenced: only synchronously, while addDirectory()
+	// below is running and the local DICOMIndexer is still on the stack.
+	connect(DICOMIndexer.data(), &ctkDICOMIndexer::progress, [&progress, indexer = DICOMIndexer.data()](int){
+		if (progress.wasCanceled())
+			indexer->cancel();
+		else
+			qApp->processEvents();
+	});
 
 	DICOMIndexer->setDatabase(database.data());
 	DICOMIndexer->addDirectory(folder);

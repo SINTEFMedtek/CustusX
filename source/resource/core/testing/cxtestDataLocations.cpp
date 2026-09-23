@@ -77,3 +77,24 @@ TEST_CASE("Filter scripts path is not tied to a specific profile", "[unit][datal
 
 } // namespace cx
 
+
+TEST_CASE("Installed plugin search path candidates include the app folder", "[unit][datalocations]")
+{
+	QString appPath("/Applications/App.app/Contents/MacOS");
+	QStringList candidates = cx::DataLocations::getInstalledPluginsPathCandidates(appPath);
+	CHECK(candidates.contains(appPath));
+#ifndef CX_WINDOWS
+	CHECK(candidates.contains(appPath + "/plugins"));
+#endif
+}
+
+#ifdef __APPLE__
+TEST_CASE("Installed plugin search path candidates include the macOS bundle's Frameworks folder", "[unit][datalocations]")
+{
+	// The macOS installer puts the CTK plugins in Contents/Frameworks. Without this
+	// search path an installed bundle loads no plugins at all and crashes at startup
+	// on a null ClippersPtr from ViewServiceNull.
+	QStringList candidates = cx::DataLocations::getInstalledPluginsPathCandidates("/Applications/App.app/Contents/MacOS");
+	CHECK(candidates.contains("/Applications/App.app/Contents/Frameworks"));
+}
+#endif

@@ -1,0 +1,11 @@
+# Python test stage: unit tests for the Python build/release tooling, kept
+# separate from the C++ Catch tests (test.yml) so a regression here fails
+# fast, before the much more expensive per-platform C++ builds even start.
+
+test-python:
+  stage: test-python
+  script:
+    # Recurses into every cx/**/testing/ package (each needs an __init__.py,
+    # same as the packages under test) -- new test dirs are picked up here
+    # automatically, no need to list them individually.
+    - cd install && python3 -m unittest discover -s cx -v

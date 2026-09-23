@@ -14,10 +14,31 @@ The code is free to download and use under a BSD-3 license. However, the code ba
 
 ### Installers
 
-Pre-built installers for Ubuntu (20.04, 22.04, 24.04) and Windows are available on the
+Pre-built installers for Ubuntu (22.04, 24.04) and Windows are available on the
 [releases page](https://gitlab.sintef.no/custusx/CustusX/-/releases). Ubuntu is the
 primary, most thoroughly tested platform. The Windows installer uses IGSTK for
 tracking and has not been as extensively tested and verified as the Ubuntu builds.
+
+On Ubuntu, install directly via `curl`:
+
+```bash
+sudo apt install curl -y  # optional, if curl is not already installed
+curl -fsSL https://gitlab.sintef.no/custusx/CustusX/-/releases/permalink/latest/downloads/installCustusX.sh | bash
+```
+
+Alternatively, download `installCustusX.sh` and run it (e.g. if you'd like to inspect
+the script first). If you already have an older copy, re-download it rather than
+running the old one -- some browsers save a repeat download as a numbered duplicate
+(`installCustusX (1).sh`) instead of overwriting it, which would leave
+`./installCustusX.sh` below pointing at a stale or missing file. Each
+[release page](https://gitlab.sintef.no/custusx/CustusX/-/releases) also lists a
+version-suffixed copy (e.g. `installCustusX-v26.09.sh`) if you'd rather keep several
+versions side by side without this renaming issue:
+
+```bash
+chmod +x installCustusX.sh
+./installCustusX.sh
+```
 
 ### Build instructions
 
