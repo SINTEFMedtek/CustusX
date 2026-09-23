@@ -1,6 +1,6 @@
 Supported Platforms {#supported_platforms}
 ===================
-**The supported platforms for CustusX are Ubuntu 20.04, 22.04, 24.04, and Windows**
+**The supported platforms for CustusX are Ubuntu 22.04, 24.04, and Windows**
 
 All platforms have been tested with NVidia GPUs. Other GPUs may also work.
 
@@ -10,7 +10,7 @@ Ubuntu is the primary development and test platform and is built and tested cont
 
 | Name         | Description
 | ------------ | -----------------------------
-| Ubuntu 20.04 | Supported platform
+| Ubuntu 20.04 | No longer supported from v26.09 — no installer is provided
 | Ubuntu 22.04 | Supported platform
 | Ubuntu 24.04 | Supported platform
 | Windows      | Supported platform — installer available on the releases page

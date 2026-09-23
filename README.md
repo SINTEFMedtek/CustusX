@@ -14,7 +14,7 @@ The code is free to download and use under a BSD-3 license. However, the code ba
 
 ### Installers
 
-Pre-built installers for Ubuntu (20.04, 22.04, 24.04) and Windows are available on the
+Pre-built installers for Ubuntu (22.04, 24.04) and Windows are available on the
 [releases page](https://gitlab.sintef.no/custusx/CustusX/-/releases). Ubuntu is the
 primary, most thoroughly tested platform. The Windows installer uses IGSTK for
 tracking and has not been as extensively tested and verified as the Ubuntu builds.

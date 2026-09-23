@@ -10,7 +10,8 @@
   script:
     - echo "Deploying application..."
     - |
-      for OS in Ubuntu2004 Ubuntu2204 Ubuntu2404; do
+      # No Ubuntu 20.04 installer any more (CustusX#51), although build-ubuntu20 still runs.
+      for OS in Ubuntu2204 Ubuntu2404; do
         cd $CI_PROJECT_DIR/$OS/package_artefacts
         INSTALLER_FILE=$(find CustusX*.tar.gz)
         curl \
@@ -113,7 +114,6 @@ create-release:
       LINKS=$(jq -n --arg base "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}" \
                     --arg tag "${CI_COMMIT_TAG}" \
         '[
-          {name: "CustusX Ubuntu 20.04 installer", url: ($base + "/CustusX-Ubuntu2004.tar.gz"), link_type: "package"},
           {name: "CustusX Ubuntu 22.04 installer", url: ($base + "/CustusX-Ubuntu2204.tar.gz"), link_type: "package"},
           {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404.tar.gz"), link_type: "package"},
           {name: "CustusX installer script (all Ubuntu versions)", url: ($base + "/installCustusX.sh"), link_type: "package", filepath: "/installCustusX.sh"},

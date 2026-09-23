@@ -52,12 +52,15 @@ UBUNTU_VERSION=$(lsb_release -rs 2>/dev/null || echo "unknown")
 echo "Detected Ubuntu version: $UBUNTU_VERSION"
 
 case "$UBUNTU_VERSION" in
-    20.04) OS="Ubuntu2004" ;;
+    20.04)
+        echo "ERROR: Ubuntu 20.04 is no longer supported (CustusX#51). Please use Ubuntu 22.04 or 24.04."
+        exit 1
+        ;;
     22.04) OS="Ubuntu2204" ;;
     24.04) OS="Ubuntu2404" ;;
     *)
         echo "ERROR: Unsupported Ubuntu version: $UBUNTU_VERSION"
-        echo "Supported versions: 20.04, 22.04, 24.04"
+        echo "Supported versions: 22.04, 24.04"
         exit 1
         ;;
 esac
