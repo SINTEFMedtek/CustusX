@@ -226,6 +226,8 @@ void LogicManager::shutdownServicesLight()
 	if (mComponent)
 		mComponent->destroy(); // this is the GUI - delete first
 
+	mPluginFramework->stopPlugins(); // skips the framework stop, which used to crash
+
 	this->shutdownLegacyStoredServices();
 
 	GPUImageBufferRepository::shutdown();

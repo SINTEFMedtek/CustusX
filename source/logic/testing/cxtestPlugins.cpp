@@ -50,3 +50,32 @@ TEST_CASE("LogicManager: init and shutdown without it posting the warning: QObje
     REQUIRE(!messageListener->containsText("QObject::killTimer: timers cannot be stopped from another thread"));
 }
 
+
+namespace
+{
+ctkPlugin::State getHelpPluginState()
+{
+	return cx::logicManager()->getPluginFramework()->getStateFromSymbolicName("org.custusx.help");
+}
+}
+
+TEST_CASE("LogicManager: shutdown stops the plugins", "[unit][plugins]")
+{
+	cx::DataLocations::setTestMode();
+	cx::LogicManager::initialize();
+	REQUIRE(getHelpPluginState() == ctkPlugin::ACTIVE);
+
+	cx::LogicManager::shutdown();
+	CHECK(getHelpPluginState() != ctkPlugin::ACTIVE);
+}
+
+TEST_CASE("LogicManager: plugins are started again after shutdown and initialize", "[unit][plugins]")
+{
+	cx::DataLocations::setTestMode();
+	cx::LogicManager::initialize();
+	cx::LogicManager::shutdown();
+
+	cx::LogicManager::initialize();
+	CHECK(getHelpPluginState() == ctkPlugin::ACTIVE);
+	cx::LogicManager::shutdown();
+}
