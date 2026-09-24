@@ -113,11 +113,6 @@ class RemoveComponentTest(unittest.TestCase):
         return paths
 
     def test_plugin_component_deletes_its_stale_plugin_binaries(self):
-        '''
-        CustusS v26.09: a stale liborg_custusx_gestreamer.so left in the build
-        tree after the plugin was removed broke CPack packaging on Ubuntu 22.04.
-        It must be removed even when the checkout itself is already gone.
-        '''
         plugins_bin = os.path.join(self.tmp, 'CX', 'build_Release', 'bin', 'plugins')
         stale = self._makeFiles(plugins_bin, ['liborg_custusx_stale.so', 'liborg_custusx_stale.dylib'])
         keep = self._makeFiles(plugins_bin, ['liborg_custusx_keep.so', 'liborg_custusx_stale_other.so'])
