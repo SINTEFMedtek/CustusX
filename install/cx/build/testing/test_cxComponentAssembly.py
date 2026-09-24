@@ -42,6 +42,9 @@ class _FakeControlData:
     def getRepoFolderName(self):
         return self.getCustusXRepositoryLocation()[2]
 
+    def getBuildFolder(self, component_name):
+        return 'build_Release'
+
 
 class _FakeComponent:
     '''Minimal stand-in implementing only what removeComponent() touches.'''
@@ -101,6 +104,46 @@ class RemoveComponentTest(unittest.TestCase):
 
         self.assertFalse(os.path.exists(remove_me))
         self.assertTrue(os.path.exists(keep))  # the shared plugins/ folder and its siblings must survive
+
+    def _makeFiles(self, folder, names):
+        os.makedirs(folder, exist_ok=True)
+        paths = [os.path.join(folder, name) for name in names]
+        for path in paths:
+            open(path, 'w').close()
+        return paths
+
+    def test_plugin_component_deletes_its_stale_plugin_binaries(self):
+        '''
+        CustusS v26.09: a stale liborg_custusx_gestreamer.so left in the build
+        tree after the plugin was removed broke CPack packaging on Ubuntu 22.04.
+        It must be removed even when the checkout itself is already gone.
+        '''
+        plugins_bin = os.path.join(self.tmp, 'CX', 'build_Release', 'bin', 'plugins')
+        stale = self._makeFiles(plugins_bin, ['liborg_custusx_stale.so', 'liborg_custusx_stale.dylib'])
+        keep = self._makeFiles(plugins_bin, ['liborg_custusx_keep.so', 'liborg_custusx_stale_other.so'])
+        shared_plugins_dir = os.path.join(self.tmp, 'CX', 'CX', 'source', 'plugins')
+
+        _remove(self.control_data, _FakeComponent(plugin_path=shared_plugins_dir,
+                                                  source_path=os.path.join(shared_plugins_dir, 'org.custusx.stale')))
+
+        for path in stale:
+            self.assertFalse(os.path.exists(path), path)
+        for path in keep:
+            self.assertTrue(os.path.exists(path), path)
+
+    def test_plugin_component_deletes_its_stale_windows_plugin_binaries(self):
+        bin_path = os.path.join(self.tmp, 'CX', 'build_Release', 'bin')
+        stale = self._makeFiles(bin_path, ['org_custusx_stale.dll', 'org_custusx_stale.pdb'])
+        keep = self._makeFiles(bin_path, ['org_custusx_keep.dll'])
+        shared_plugins_dir = os.path.join(self.tmp, 'CX', 'CX', 'source', 'plugins')
+
+        _remove(self.control_data, _FakeComponent(plugin_path=shared_plugins_dir,
+                                                  source_path=os.path.join(shared_plugins_dir, 'org.custusx.stale')))
+
+        for path in stale:
+            self.assertFalse(os.path.exists(path), path)
+        for path in keep:
+            self.assertTrue(os.path.exists(path), path)
 
     def test_missing_target_is_a_noop(self):
         component = _FakeComponent(path=os.path.join(self.tmp, 'DoesNotExist'), plugin_path=None)

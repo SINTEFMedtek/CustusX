@@ -16,6 +16,7 @@ import argparse
 import re
 import sys
 import os.path
+import glob
 import shutil
 import stat
 import urllib.request, urllib.parse, urllib.error
@@ -100,6 +101,32 @@ class LibraryAssembly(object):
         if os.path.isdir(target):
             PrintFormatter.printHeader('Removing leftover checkout of removed component %s: %s' % (component.name(), target))
             shutil.rmtree(target, onerror=self._forceRemoveReadonly)
+        if component.pluginPath():
+            self._removeStalePluginBinaries(target)
+
+    def _removeStalePluginBinaries(self, plugin_source_path):
+        '''
+        Removing a plugin's checkout isn't enough: its last built binary stays in
+        CustusX's build output folder, and CPack's plugin install (a plain
+        install(DIRECTORY) copy of that whole folder) keeps packaging it. Its ELF
+        NEEDED entries still name the libraries it was last built against, which
+        fixup_bundle then fails to resolve ("file READ_ELF given FILE ... that does
+        not exist") -- e.g. a stale liborg_custusx_gestreamer.so needing
+        libGEStreamer.so and VTK 9.2 libraries long after VTK was upgraded.
+        '''
+        custusx = cxComponents.CustusX()
+        custusx.setControlData(self.controlData)
+        target_name = os.path.basename(os.path.normpath(plugin_source_path)).replace('.', '_')
+        bin_path = os.path.join(custusx.buildPath(), 'bin')
+        patterns = [os.path.join(bin_path, 'plugins', 'lib%s.*' % target_name), # Linux/macOS
+                    os.path.join(bin_path, '%s.*' % target_name)]                # Windows
+        for pattern in patterns:
+            for stale in glob.glob(pattern):
+                PrintFormatter.printHeader('Removing leftover plugin binary of removed component: %s' % stale)
+                if os.path.isdir(stale) and not os.path.islink(stale):
+                    shutil.rmtree(stale, onerror=self._forceRemoveReadonly)
+                else:
+                    os.remove(stale)
 
     @staticmethod
     def _forceRemoveReadonly(func, path, exc_info):
