@@ -170,6 +170,10 @@ git -C FX/FX remote set-url origin https://gitlab.sintef.no/custusx/fraxinus.git
 
 Always commit to a branch other than `develop`/`master` in any of these repos: CustusX, CustusS, Fraxinus (public or private), or any private plugin repo (`org.custusx.core.tracking.system.ndi`, etc) — a feature branch (`cxNN-description`) or a release branch (`release/vYY.MM`) are both fine, and several unrelated fixes/issues can share the same branch. Commits go to `develop`/`master` only via review/merge (e.g. an MR), never directly.
 
+**Only push when explicitly told to**
+
+Never run `git push` in any of these repos unless the user explicitly says to push. Permission covers that one push only and does not carry over to later commits in the same session. Being asked to put changes on a branch means commit locally. After committing, say the commit is ready to push and wait.
+
 **Squashing/amending unpushed commits**
 
 If you need to correct or fold together commits you just made, it's fine to squash or amend them as long as none of them have been pushed to the remote yet (check with `git status`/`git log @{u}..HEAD`, or the fact that the branch was just created locally). Never do this to a commit that has already been pushed — that rewrites history other clones, MRs, or CI may already have fetched; add a new commit on top instead.
@@ -217,6 +221,8 @@ Closed source repositories are typically handled by a similar cxPrivateComponent
 - Use `const` wherever possible
 - No globals; no `delete` (use Qt/VTK/smart pointers)
 - No commented-out dead code
+- Keep code comments and docstrings short, usually one line. Don't write incident narratives in them
+- Don't name specific closed-source libraries or plugins in code comments or commit messages. Describe the problem in general terms instead (e.g. "a stale plugin binary")
 - Try to only use a single return point in functions
 - Keep function size small, usually not more than 30 lines
 - All commit messages should be tagged with issue reference (If the branch name starts with cx[number], the issue reference is usually CustusX#[number])
