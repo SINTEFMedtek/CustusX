@@ -16,7 +16,7 @@ workflow:
     - when: never
 
 default:
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02
+  image: $IMAGE_UBUNTU2404
   # Let a newer pipeline on the same branch/MR cancel this one's still-running
   # jobs instead of letting superseded work finish (requires "Auto-cancel
   # redundant, pending pipelines" enabled in Settings > CI/CD > General

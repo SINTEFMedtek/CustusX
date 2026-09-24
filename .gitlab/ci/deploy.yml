@@ -6,11 +6,11 @@
   interruptible: false
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
-    GIT_CLONE_PATH: /builds/Ubuntu2004/CX/CX
+    GIT_CLONE_PATH: /builds/deploy/CX/CX
   script:
     - echo "Deploying application..."
     - |
-      # No Ubuntu 20.04 installer any more (CustusX#51), although build-ubuntu20 still runs.
+      # No Ubuntu 20.04 installer any more (CustusX#51), and build-ubuntu20 is disabled.
       for OS in Ubuntu2204 Ubuntu2404; do
         cd $CI_PROJECT_DIR/$OS/package_artefacts
         INSTALLER_FILE=$(find CustusX*.tar.gz)
@@ -187,8 +187,8 @@ pages:
   environment: production
   interruptible: false
   variables:
-    OS: Ubuntu2004
-    GIT_CLONE_PATH: /builds/$OS/CX/CX
+    OS: Ubuntu2404
+    GIT_CLONE_PATH: /builds/pages/CX/CX
   script:
     - '[ -d $OS/package_artefacts/html_pure/ ] || exit 0'
     - mkdir -p public

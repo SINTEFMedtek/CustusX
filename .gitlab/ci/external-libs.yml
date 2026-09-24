@@ -148,13 +148,15 @@
     - when: manual
       allow_failure: true
 
-build-external-libs-ubuntu20:
+# Disabled (CustusX#51): remove the leading dot to enable again.
+.build-external-libs-ubuntu20:
   extends: .build-and-publish-libs
   image: $IMAGE_UBUNTU2004
   variables:
     OS: Ubuntu2004
 
-build-external-libs-ubuntu20-igstk:
+# Disabled (CustusX#51): remove the leading dot to enable again.
+.build-external-libs-ubuntu20-igstk:
   extends: .build-and-publish-libs
   image: $IMAGE_UBUNTU2004
   variables:

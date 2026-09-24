@@ -29,7 +29,8 @@
     reports:
       junit: test_results/*junit.xml
 
-test-ubuntu20:
+# Disabled (CustusX#51): remove the leading dot to enable again.
+.test-ubuntu20:
   extends: .test-job
   stage: test
   needs: ["build-ubuntu20"]
