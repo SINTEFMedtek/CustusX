@@ -109,7 +109,8 @@ class LibraryAssembly(object):
         custusx = cxComponents.CustusX()
         custusx.setControlData(self.controlData)
         target_name = os.path.basename(os.path.normpath(plugin_source_path)).replace('.', '_')
-        bin_path = os.path.join(custusx.buildPath(), 'bin')
+        # Runs before arguments are parsed, so the build folder is unknown: check all of them.
+        bin_path = os.path.join(custusx.path(), '*', 'bin')
         patterns = [os.path.join(bin_path, 'plugins', 'lib%s.*' % target_name),
                     os.path.join(bin_path, '%s.*' % target_name)]
         for pattern in patterns:

@@ -42,9 +42,6 @@ class _FakeControlData:
     def getRepoFolderName(self):
         return self.getCustusXRepositoryLocation()[2]
 
-    def getBuildFolder(self, component_name):
-        return 'build_Release'
-
 
 class _FakeComponent:
     '''Minimal stand-in implementing only what removeComponent() touches.'''
@@ -115,6 +112,7 @@ class RemoveComponentTest(unittest.TestCase):
     def test_plugin_component_deletes_its_stale_plugin_binaries(self):
         plugins_bin = os.path.join(self.tmp, 'CX', 'build_Release', 'bin', 'plugins')
         stale = self._makeFiles(plugins_bin, ['liborg_custusx_stale.so', 'liborg_custusx_stale.dylib'])
+        stale += self._makeFiles(os.path.join(self.tmp, 'CX', 'build_Debug', 'bin', 'plugins'), ['liborg_custusx_stale.so'])
         keep = self._makeFiles(plugins_bin, ['liborg_custusx_keep.so', 'liborg_custusx_stale_other.so'])
         shared_plugins_dir = os.path.join(self.tmp, 'CX', 'CX', 'source', 'plugins')
 
