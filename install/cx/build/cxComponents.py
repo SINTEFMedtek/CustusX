@@ -615,7 +615,9 @@ class CustusX(CppComponent):
                 append('CX_CMAKE_CXX_FLAGS:STRING', '-fpermissive')
         else:
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False)
-            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', False)
+            # NDI Aurora/Polaris tracking without IGSTK (CustusX#55). Never together with
+            # IGSTK: both plugins handle the same tool configurations.
+            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', True)
         #if(platform.system() == 'Linux'):
         #  add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)
