@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <boost/make_shared.hpp>
 #include "cxNdiTrackerManager.h"
+#include "cxNdiFrameRateEstimator.h"
 #include "cxtestNdiFakeDevice.h"
 
 namespace cxtest
@@ -155,6 +156,72 @@ TEST_CASE("NdiTrackerManager: tools are invisible while the reference is not vis
 
 	CHECK_FALSE(fixture.pointer()->isVisible());
 	CHECK(fixture.pointerTransforms.size() == 1); // no positions while the reference is missing
+}
+
+TEST_CASE("NdiTrackerManager: a brief dropout during tracking does not make the tool flicker", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	// The 2-frame miss tolerance from the first NDI plugin (CustusX#31) must still apply
+	// while tracking. Only stop/disconnect/lost device hide tools immediately.
+	ManagerFixture fixture;
+	fixture.startTracking();
+	fixture.device->setNextFrame(1, {createSample(ManagerFixture::kPointerHandle, true), createSample(ManagerFixture::kReferenceHandle, true)});
+	fixture.manager->poll();
+	REQUIRE(fixture.pointer()->isVisible());
+
+	int visibilityChanges = 0;
+	QObject::connect(fixture.pointer().get(), &cx::NdiTool::toolVisible, [&visibilityChanges](bool) { visibilityChanges++; });
+	for (unsigned long frame = 2; frame < 2 + cx::NdiTool::kMissTolerance; ++frame)
+	{
+		fixture.device->setNextFrame(frame, {createSample(ManagerFixture::kPointerHandle, false), createSample(ManagerFixture::kReferenceHandle, true)});
+		fixture.manager->poll();
+	}
+	fixture.device->setNextFrame(10, {createSample(ManagerFixture::kPointerHandle, true), createSample(ManagerFixture::kReferenceHandle, true)});
+	fixture.manager->poll();
+
+	CHECK(fixture.pointer()->isVisible());
+	CHECK(visibilityChanges == 0);
+}
+
+TEST_CASE("NdiFrameRateEstimator: waits until shortly before the next expected frame", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	cx::NdiFrameRateEstimator estimator;
+	double initialInterval = cx::NdiFrameRateEstimator::kInitialInterval_ms;
+	double lookAhead = cx::NdiFrameRateEstimator::kLookAhead_ms;
+	CHECK(estimator.getEstimatedInterval_ms() == Approx(initialInterval));
+
+	// Frames every 25 ms (40 Hz, Aurora): the estimate converges towards 25 ms
+	for (int i = 0; i < 50; ++i)
+	{
+		estimator.addFrame(1000.0 + 25.0 * i);
+	}
+	CHECK(estimator.getEstimatedInterval_ms() == Approx(25.0).epsilon(0.01));
+
+	double lastFrame = 1000.0 + 25.0 * 49;
+	CHECK(estimator.getWaitBeforeNextPoll_ms(lastFrame) == int(25.0 - lookAhead));
+	CHECK(estimator.getWaitBeforeNextPoll_ms(lastFrame + 22.0) == 0); // already close: poll fast
+}
+
+TEST_CASE("NdiFrameRateEstimator: ignores long gaps and clamps the estimate", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	cx::NdiFrameRateEstimator estimator;
+	double maxInterval = cx::NdiFrameRateEstimator::kMaxInterval_ms;
+	double minInterval = cx::NdiFrameRateEstimator::kMinInterval_ms;
+
+	estimator.addFrame(1000.0);
+	estimator.addFrame(3000.0); // 2 s gap, e.g. tools out of view: ignored
+	CHECK(estimator.getEstimatedInterval_ms() == Approx(cx::NdiFrameRateEstimator::kInitialInterval_ms));
+
+	for (int i = 1; i < 100; ++i)
+	{
+		estimator.addFrame(3000.0 + i * 400.0);
+	}
+	CHECK(estimator.getEstimatedInterval_ms() == Approx(maxInterval));
+
+	for (int i = 1; i < 200; ++i)
+	{
+		estimator.addFrame(50000.0 + i * 1.0);
+	}
+	CHECK(estimator.getEstimatedInterval_ms() == Approx(minInterval));
 }
 
 TEST_CASE("NdiTrackerManager: a repeated frame number is not distributed again", "[unit][org.custusx.core.tracking.system.ndi]")

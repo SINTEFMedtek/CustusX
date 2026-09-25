@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QMutex>
 
 #include "cxNdiDevice.h"
+#include "cxNdiFrameRateEstimator.h"
 #include "cxNdiTool.h"
 #include "cxNdiToolSetup.h"
 #include "cxToolFileParser.h"
@@ -53,7 +54,6 @@ public:
 	void setConnectionSettings(const NdiConnectionSettings& connection); ///< Thread-safe. Used by the next connect.
 
 	static NdiToolConfig createToolConfig(ToolFileParser::ToolInternalStructurePtr structure, TRACKING_SYSTEM trackerType);
-	static const int kPollInterval_ms = 5;
 	static const int kMaxConsecutiveReadFailures = 3;
 
 signals:
@@ -72,6 +72,8 @@ private:
 	bool setupTools();
 	void distributeFrame(const NdiFrame& frame, double timestamp);
 	void setAllToolsInvisible();
+	void startFastPoll();
+	void scheduleNextPoll(double now_ms);
 
 	NdiDevicePtr mDevice;
 	QMutex mConnectionMutex;
@@ -83,6 +85,8 @@ private:
 	NdiToolPtr mReferenceTool;
 	QTimer* mTimer;
 	unsigned long mLastFrameNumber;
+	NdiFrameRateEstimator mFrameRate;
+	bool mInFastPollMode;
 	int mConsecutiveReadFailures;
 	ToolFileParser::TrackerInternalStructure mTrackerStructure;
 	bool mInitialized;

@@ -166,6 +166,52 @@ TEST_CASE("NdiToolSetup: a 6DOF tool is not matched to the second channel of a s
 	CHECK(result.warnings.size() == 1);
 }
 
+TEST_CASE("NdiToolSetup: a wired tool whose port is empty uses a leftover sensor, as the previous NDI plugin did", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	// The previous NDI plugin matched wired tools by sorted order, so a tool file with
+	// port 0 also worked with the tool plugged into another port. Keep that working.
+	FakeNdiDevice device;
+	device.addWiredHandle(0x0B, 1);
+
+	cx::NdiToolSetupResult result = cx::setupNdiTools(device, {wiredTool("pointer", 0)});
+
+	CHECK(result.success());
+	REQUIRE(result.portHandleToUid.size() == 1);
+	CHECK(result.portHandleToUid[0x0B] == "pointer");
+	REQUIRE(result.warnings.size() == 1);
+	CHECK(result.warnings[0].contains("port 1"));
+}
+
+TEST_CASE("NdiToolSetup: tools with the wrong ports get the leftover sensors in port order", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	FakeNdiDevice device;
+	device.addWiredHandle(0x0C, 3);
+	device.addWiredHandle(0x0D, 2);
+	std::vector<cx::NdiToolConfig> tools = {wiredTool("second", 1), wiredTool("first", 0)};
+
+	cx::NdiToolSetupResult result = cx::setupNdiTools(device, tools);
+
+	REQUIRE(result.portHandleToUid.size() == 2);
+	CHECK(result.portHandleToUid[0x0D] == "first");  // port 0 -> lowest free port (2)
+	CHECK(result.portHandleToUid[0x0C] == "second"); // port 1 -> next free port (3)
+	CHECK(result.warnings.size() == 2);
+}
+
+TEST_CASE("NdiToolSetup: a sensor on the configured port is preferred over the fallback", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	FakeNdiDevice device;
+	device.addWiredHandle(0x0A, 0);
+	device.addWiredHandle(0x0C, 3);
+	std::vector<cx::NdiToolConfig> tools = {wiredTool("onPort0", 0), wiredTool("onPort1", 1)};
+
+	cx::NdiToolSetupResult result = cx::setupNdiTools(device, tools);
+
+	REQUIRE(result.portHandleToUid.size() == 2);
+	CHECK(result.portHandleToUid[0x0A] == "onPort0");
+	CHECK(result.portHandleToUid[0x0C] == "onPort1");
+	CHECK(result.warnings.size() == 1);
+}
+
 TEST_CASE("NdiToolSetup: a wired tool that is not plugged in gives a warning", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	FakeNdiDevice device;

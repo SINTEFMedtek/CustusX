@@ -44,6 +44,7 @@ set(PLUGIN_SRCS
     trackingSystemNDI/cxNdiCapiDevice.cpp
     trackingSystemNDI/cxNdiToolSetup.h
     trackingSystemNDI/cxNdiToolSetup.cpp
+    trackingSystemNDI/cxNdiFrameRateEstimator.h
     trackingSystemNDI/cxNdiTool.h
     trackingSystemNDI/cxNdiTool.cpp
     trackingSystemNDI/cxNdiTrackerManager.h

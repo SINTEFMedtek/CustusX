@@ -27,6 +27,7 @@ NdiTrackerManager::NdiTrackerManager(ToolFileParser::TrackerInternalStructure tr
 	mDevice(device),
 	mTimer(new QTimer(this)),
 	mLastFrameNumber(0),
+	mInFastPollMode(true),
 	mConsecutiveReadFailures(0),
 	mTrackerStructure(trackerStructure),
 	mInitialized(false),
@@ -48,7 +49,6 @@ NdiTrackerManager::NdiTrackerManager(ToolFileParser::TrackerInternalStructure tr
 		mTools[mReferenceTool->getUid()] = mReferenceTool;
 	}
 
-	mTimer->setInterval(kPollInterval_ms);
 	connect(mTimer, &QTimer::timeout, this, &NdiTrackerManager::poll);
 }
 
@@ -136,7 +136,8 @@ void NdiTrackerManager::trackSlot(bool on)
 			mTracking = true;
 			mLastFrameNumber = 0;
 			mConsecutiveReadFailures = 0;
-			mTimer->start();
+			mFrameRate.reset();
+			this->startFastPoll(); // switches to waiting for the next frame once the frame rate is known
 			emit tracking(true);
 		}
 		else
@@ -184,8 +185,37 @@ void NdiTrackerManager::poll()
 	bool newFrame = (frame.frameNumber == 0) || (frame.frameNumber != mLastFrameNumber);
 	if (newFrame)
 	{
+		double now = getMilliSecondsSinceEpoch();
 		mLastFrameNumber = frame.frameNumber;
-		this->distributeFrame(frame, getMilliSecondsSinceEpoch());
+		mFrameRate.addFrame(now);
+		this->scheduleNextPoll(now);
+		this->distributeFrame(frame, now);
+	}
+	else if (!mInFastPollMode)
+	{
+		this->startFastPoll(); // waited for the next frame, but it isn't there yet
+	}
+}
+
+void NdiTrackerManager::startFastPoll()
+{
+	mInFastPollMode = true;
+	mTimer->setSingleShot(false);
+	mTimer->start(NdiFrameRateEstimator::kFastPollInterval_ms);
+}
+
+void NdiTrackerManager::scheduleNextPoll(double now_ms)
+{
+	int wait = mFrameRate.getWaitBeforeNextPoll_ms(now_ms);
+	if (wait > 0)
+	{
+		mInFastPollMode = false;
+		mTimer->setSingleShot(true);
+		mTimer->start(wait);
+	}
+	else
+	{
+		this->startFastPoll();
 	}
 }
 

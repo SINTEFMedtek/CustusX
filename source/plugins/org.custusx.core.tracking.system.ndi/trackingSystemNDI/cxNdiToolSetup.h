@@ -50,7 +50,9 @@ struct org_custusx_core_tracking_system_ndi_EXPORT NdiToolSetupResult
  * 3. Initialize and enable port handles, repeated until there are no new ones, because
  *    the second sensor on a splitter only appears after the first one is enabled.
  * 4. Wired tools: match each enabled port handle to a tool by its physical port and
- *    channel (see NdiDevice::getPortLocation).
+ *    channel (see NdiDevice::getPortLocation). Tools whose configured port has no
+ *    sensor get the leftover sensors in port order, with a warning. That is how the
+ *    previous NDI plugin matched all wired tools, so such tool files keep working.
  *
  * \ingroup org_custusx_core_tracking_system_ndi
  */

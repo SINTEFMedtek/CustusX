@@ -11,7 +11,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxNdiToolSetup.h"
 
+#include <algorithm>
 #include <set>
+#include <tuple>
 #include <QFileInfo>
 
 namespace cx
@@ -114,6 +116,61 @@ bool matchesWiredTool(const NdiToolConfig& tool, const NdiPortLocation& location
 	return !tool.wireless && location.valid && !location.wireless && tool.port == location.port && channelMatches;
 }
 
+/** A 6DOF tool can't be the second sensor on a splitter. */
+bool canUseSensor(const NdiToolConfig& tool, const NdiPortLocation& location)
+{
+	return !tool.wireless && location.valid && !location.wireless && (tool.fiveDOF || location.channel == 0);
+}
+
+struct WiredSensor
+{
+	int portHandle;
+	NdiPortLocation location;
+};
+
+bool byPortAndChannel(const WiredSensor& a, const WiredSensor& b)
+{
+	return std::make_tuple(a.location.port, a.location.channel, a.portHandle) < std::make_tuple(b.location.port, b.location.channel, b.portHandle);
+}
+
+/** Fallback for tools whose configured port has no sensor: give them the leftover
+ *  sensors in port order. This is how the previous NDI plugin matched all wired
+ *  tools (by sorted order), so tool files with port numbers that don't match the
+ *  physical ports keep working.
+ */
+void assignLeftoverSensors(std::vector<WiredSensor>& sensors, const std::vector<NdiToolConfig>& tools,
+						   std::set<QString>& assigned, NdiToolSetupResult& result)
+{
+	std::vector<NdiToolConfig> leftoverTools;
+	for (const NdiToolConfig& tool : tools)
+	{
+		if (!tool.wireless && !assigned.count(tool.uid))
+		{
+			leftoverTools.push_back(tool);
+		}
+	}
+	std::sort(leftoverTools.begin(), leftoverTools.end(), [](const NdiToolConfig& a, const NdiToolConfig& b)
+	{
+		return std::make_tuple(a.port, a.channel) < std::make_tuple(b.port, b.channel);
+	});
+	std::sort(sensors.begin(), sensors.end(), byPortAndChannel);
+
+	for (const NdiToolConfig& tool : leftoverTools)
+	{
+		std::vector<WiredSensor>::iterator sensor = std::find_if(sensors.begin(), sensors.end(),
+			[&tool, &result](const WiredSensor& s) { return !result.portHandleToUid.count(s.portHandle) && canUseSensor(tool, s.location); });
+		if (sensor != sensors.end())
+		{
+			result.portHandleToUid[sensor->portHandle] = tool.uid;
+			assigned.insert(tool.uid);
+			result.warnings << QString("Tool %1: no sensor on its configured port %2, using the sensor on port %3%4 instead. "
+									   "Update the port number in the tool file if this is not the right tool.")
+							   .arg(tool.uid).arg(tool.port).arg(sensor->location.port)
+							   .arg(sensor->location.channel ? QString(", channel %1").arg(sensor->location.channel) : QString());
+		}
+	}
+}
+
 void matchWiredTools(NdiDevice& device, const std::vector<NdiToolConfig>& tools, NdiToolSetupResult& result)
 {
 	std::set<QString> assigned;
@@ -122,33 +179,36 @@ void matchWiredTools(NdiDevice& device, const std::vector<NdiToolConfig>& tools,
 		assigned.insert(entry.second);
 	}
 
+	// Sensors on the port (and channel) given in the tool file
+	std::vector<WiredSensor> sensors;
 	for (int portHandle : device.searchPortHandles(NdiPortHandleSearch::Enabled))
 	{
 		if (result.portHandleToUid.count(portHandle))
 		{
 			continue;
 		}
-		NdiPortLocation location = device.getPortLocation(portHandle);
-		QString uid;
+		WiredSensor sensor = {portHandle, device.getPortLocation(portHandle)};
+		sensors.push_back(sensor);
 		for (const NdiToolConfig& tool : tools)
 		{
-			if (uid.isEmpty() && !assigned.count(tool.uid) && matchesWiredTool(tool, location))
+			if (!result.portHandleToUid.count(portHandle) && !assigned.count(tool.uid) && matchesWiredTool(tool, sensor.location))
 			{
-				uid = tool.uid;
+				result.portHandleToUid[portHandle] = tool.uid;
+				assigned.insert(tool.uid);
 			}
-		}
-		if (uid.isEmpty())
-		{
-			result.messages << QString("Port handle %1 (port %2, channel %3) has no configured tool.")
-							   .arg(handleText(portHandle)).arg(location.port).arg(location.channel);
-		}
-		else
-		{
-			result.portHandleToUid[portHandle] = uid;
-			assigned.insert(uid);
 		}
 	}
 
+	assignLeftoverSensors(sensors, tools, assigned, result);
+
+	for (const WiredSensor& sensor : sensors)
+	{
+		if (!result.portHandleToUid.count(sensor.portHandle))
+		{
+			result.messages << QString("Port handle %1 (port %2, channel %3) has no configured tool.")
+							   .arg(handleText(sensor.portHandle)).arg(sensor.location.port).arg(sensor.location.channel);
+		}
+	}
 	for (const NdiToolConfig& tool : tools)
 	{
 		if (!tool.wireless && !assigned.count(tool.uid))
