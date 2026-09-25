@@ -376,7 +376,7 @@ cx_add_non_source_file("doc/org.custusx.filter.name.md")
 
 ## Qt Version Compatibility
 
-CustusX CI runs on Ubuntu 20.04 (Qt 5.12) and Ubuntu 22.04 (Qt 5.15). Several Qt APIs changed between these versions:
+The oldest Qt in CustusX CI is 5.15 (Ubuntu 22.04). The Ubuntu 20.04 (Qt 5.12) jobs are disabled, not removed (CustusX#51), and may be enabled again, so keep the code compatible with Qt 5.12 for now. Several Qt APIs changed between these versions:
 
 | Avoid | Use instead | Reason |
 |-------|-------------|--------|
