@@ -162,6 +162,12 @@ rm -rf CustusX_temp
 
 # ---------------------------------------------------------------------------
 # Shortcut to the (shared, family-level) Patients folder
+#
+# Type=Application + an absolute Exec path, not Type=Link -- Ubuntu's GNOME
+# Shell desktop-icons extension (which renders desktop icons, not Nautilus
+# itself) rejects Type=Link entries outright ("Broken Desktop File") and also
+# rejects a bare command name in Exec= (e.g. "xdg-open", relying on $PATH)
+# with the same error, needing the executable's absolute path instead.
 # ---------------------------------------------------------------------------
 # xdg-user-dirs localizes the Desktop folder's name (e.g. ~/Skrivebord on a
 # Norwegian install), so ~/Desktop doesn't reliably exist -- ask xdg-user-dir
@@ -172,13 +178,15 @@ if [ -z "$DESKTOP_DIR" ]; then
 fi
 
 mkdir -p ~/CustusX/Patients
+XDG_OPEN_PATH="$(command -v xdg-open || echo /usr/bin/xdg-open)"
 if [ -d "$DESKTOP_DIR" ]; then
     cat > "$DESKTOP_DIR/CustusX_Patients.desktop" <<EOF
 [Desktop Entry]
-Type=Link
+Type=Application
 Name=CustusX Patients
 Icon=folder
-URL=$HOME/CustusX/Patients
+Exec=$XDG_OPEN_PATH $HOME/CustusX/Patients
+Terminal=false
 EOF
     # chmod before gio set -- see the comment on the app shortcut below.
     chmod +x "$DESKTOP_DIR/CustusX_Patients.desktop"
