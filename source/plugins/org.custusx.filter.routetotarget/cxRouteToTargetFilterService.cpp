@@ -33,7 +33,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelServiceProxy.h"
 #include "cxViewService.h"
 #include "cxLog.h"
-#include "cxMetricManager.h"
 
 #include <vtkPolyData.h>
 
@@ -168,8 +167,7 @@ bool RouteToTargetFilter::execute()
 	std::map<QString, PointMetricPtr> extraAirwayPoints;
 	if(mUseExtraAirwayPoints)
 	{
-		MetricManagerPtr metricManager = MetricManagerPtr(new MetricManager(mServices->view(), mServices->patient(), mServices->tracking(), mServices->spaceProvider(), mServices->file()));
-		extraAirwayPoints = metricManager->getPointMetrics("AirwayPoint");
+		extraAirwayPoints = mServices->patient()->getDataOfTypeWithUidContaining<PointMetric>("AirwayPoint");
 	}
 
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();

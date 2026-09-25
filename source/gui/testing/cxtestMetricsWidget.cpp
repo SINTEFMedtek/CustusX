@@ -103,6 +103,36 @@ TEST_CASE("Save the patient and import metrics from the patient XML file", "[int
 	cx::LogicManager::shutdown();
 }
 
+TEST_CASE("MetricManager getPointMetrics returns only point metrics with matching uid", "[integration][metrics]")
+{
+	cx::LogicManager::initialize();
+
+	//scope here to delete the metric manager before shutting down the logic manager.
+	{
+		cx::PatientModelServicePtr patientModel = cx::logicManager()->getPatientModelService();
+		cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+		cx::MetricManager manager(cx::logicManager()->getViewService(), patientModel, cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider(), filemanager);
+
+		patientModel->insertData(patientModel->createSpecificData<cx::PointMetric>("AirwayPoint1"));
+		patientModel->insertData(patientModel->createSpecificData<cx::PointMetric>("AirwayPoint2"));
+		patientModel->insertData(patientModel->createSpecificData<cx::PointMetric>("targetPoint"));
+		patientModel->insertData(patientModel->createSpecificData<cx::DistanceMetric>("AirwayPointDistance"));
+
+		std::map<QString, cx::PointMetricPtr> airwayPoints = manager.getPointMetrics("AirwayPoint");
+		CHECK(airwayPoints.size() == 2);
+		CHECK(airwayPoints.count("AirwayPoint1") == 1);
+		CHECK(airwayPoints.count("AirwayPoint2") == 1);
+
+		CHECK(airwayPoints == patientModel->getDataOfTypeWithUidContaining<cx::PointMetric>("AirwayPoint"));
+		CHECK(patientModel->getDataOfTypeWithUidContaining<cx::DistanceMetric>("AirwayPoint").size() == 1);
+
+		CHECK(manager.getPointMetrics("NoSuchPoint").empty());
+		CHECK(manager.getPointMetrics("").size() == 3);
+	}
+
+	cx::LogicManager::shutdown();
+}
+
 TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widget]")
 {
 	//This test is a regression test of the format of the patient XML file and import of metrics.
