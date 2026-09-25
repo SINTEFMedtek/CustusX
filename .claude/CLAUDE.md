@@ -154,21 +154,22 @@ The private plugin (`org.custusx.fraxinus.private`) follows the standard CTK plu
 - CustusX's own installer (`root_dir/CX/CX/install/cxInstaller.py`) resets `CX/CX`'s `origin` to `https://gitlab.sintef.no/custusx/CustusX.git`
 - Fraxinus's public installer (`root_dir/FX/FX/script/cxFraxinusInstaller.py`, via `cxPublicComponentAssembly.py`) resets `FX/FX`'s `origin` to `https://gitlab.sintef.no/custusx/fraxinus.git`
 
-This is intentional — both are open source and https doesn't require an SSH key to clone — but it means `git push` from either repo will fail with an HTTP Basic auth error (read/fetch still works over https) any time after that repo's own build script has run. Switch to SSH, push, then switch back so the next build-script run doesn't fight with your remote:
+The build scripts do this on purpose: both repos are open source, and https doesn't need an SSH key to clone. Pushing over https fails with an HTTP Basic auth error, though fetch still works.
+
+When working on the code, keep the remotes on SSH. If you find one set to https, switch it back to SSH and leave it there:
 
 ```bash
 git -C CX/CX remote set-url origin git@gitlab.sintef.no:custusx/CustusX.git
-git -C CX/CX push origin <branch>
-git -C CX/CX remote set-url origin https://gitlab.sintef.no/custusx/CustusX.git
-
 git -C FX/FX remote set-url origin git@gitlab.sintef.no:custusx/Fraxinus.git
-git -C FX/FX push origin <branch>
-git -C FX/FX remote set-url origin https://gitlab.sintef.no/custusx/fraxinus.git
 ```
 
 **Never commit directly to `develop`/`master`**
 
 Always commit to a branch other than `develop`/`master` in any of these repos: CustusX, CustusS, Fraxinus (public or private), or any private plugin repo (`org.custusx.core.tracking.system.ndi`, etc) — a feature branch (`cxNN-description`) or a release branch (`release/vYY.MM`) are both fine, and several unrelated fixes/issues can share the same branch. Commits go to `develop`/`master` only via review/merge (e.g. an MR), never directly.
+
+**Only push when explicitly told to**
+
+Never run `git push` in any of these repos unless the user explicitly says to push. Permission covers that one push only and does not carry over to later commits in the same session. Being asked to put changes on a branch means commit locally. After committing, say the commit is ready to push and wait.
 
 **Squashing/amending unpushed commits**
 
@@ -217,6 +218,8 @@ Closed source repositories are typically handled by a similar cxPrivateComponent
 - Use `const` wherever possible
 - No globals; no `delete` (use Qt/VTK/smart pointers)
 - No commented-out dead code
+- Keep code comments and docstrings short, usually one line. Don't write incident narratives in them
+- Don't name specific closed-source libraries or plugins in code comments or commit messages. Describe the problem in general terms instead (e.g. "a stale plugin binary")
 - Try to only use a single return point in functions
 - Keep function size small, usually not more than 30 lines
 - All commit messages should be tagged with issue reference (If the branch name starts with cx[number], the issue reference is usually CustusX#[number])

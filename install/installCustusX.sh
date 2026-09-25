@@ -101,7 +101,11 @@ if [ -n "$CUSTUSX_VERSION" ]; then
         exit 1
     fi
 else
-    TARBALL=$(ls CustusX*.tar.gz 2>/dev/null | head -1)
+    # -t: if more than one matching tarball is sitting here (e.g. an old one
+    # left over from before an OS upgrade, or from a previous manual
+    # download), prefer the most recently modified one over an arbitrary
+    # alphabetical pick.
+    TARBALL=$(ls -t CustusX*.tar.gz 2>/dev/null | head -1)
     if [ -z "$TARBALL" ]; then
         echo "ERROR: No CustusX*.tar.gz found in the current directory."
         echo "Download the versioned installer from the releases page:"
@@ -158,6 +162,12 @@ rm -rf CustusX_temp
 
 # ---------------------------------------------------------------------------
 # Shortcut to the (shared, family-level) Patients folder
+#
+# Type=Application + an absolute Exec path, not Type=Link -- Ubuntu's GNOME
+# Shell desktop-icons extension (which renders desktop icons, not Nautilus
+# itself) rejects Type=Link entries outright ("Broken Desktop File") and also
+# rejects a bare command name in Exec= (e.g. "xdg-open", relying on $PATH)
+# with the same error, needing the executable's absolute path instead.
 # ---------------------------------------------------------------------------
 # xdg-user-dirs localizes the Desktop folder's name (e.g. ~/Skrivebord on a
 # Norwegian install), so ~/Desktop doesn't reliably exist -- ask xdg-user-dir
@@ -168,16 +178,19 @@ if [ -z "$DESKTOP_DIR" ]; then
 fi
 
 mkdir -p ~/CustusX/Patients
+XDG_OPEN_PATH="$(command -v xdg-open || echo /usr/bin/xdg-open)"
 if [ -d "$DESKTOP_DIR" ]; then
     cat > "$DESKTOP_DIR/CustusX_Patients.desktop" <<EOF
 [Desktop Entry]
-Type=Link
+Type=Application
 Name=CustusX Patients
 Icon=folder
-URL=$HOME/CustusX/Patients
+Exec="$XDG_OPEN_PATH" "$HOME/CustusX/Patients"
+Terminal=false
 EOF
-    gio set "$DESKTOP_DIR/CustusX_Patients.desktop" metadata::trusted true 2>/dev/null || true
+    # chmod before gio set -- see the comment on the app shortcut below.
     chmod +x "$DESKTOP_DIR/CustusX_Patients.desktop"
+    gio set "$DESKTOP_DIR/CustusX_Patients.desktop" metadata::trusted true 2>/dev/null || true
 fi
 
 # ---------------------------------------------------------------------------
@@ -191,8 +204,13 @@ if [ -f "CustusX.desktop" ] && [ -d "$DESKTOP_DIR" ]; then
     sed -i "s|Exec=.*|Exec=$EXEC_PATH|g" CustusX.desktop
     sed -i "s|Icon=.*|Icon=$ICON_PATH|g" CustusX.desktop
     cp CustusX.desktop "$DESKTOP_DIR/"
-    gio set "$DESKTOP_DIR/CustusX.desktop" metadata::trusted true 2>/dev/null || true
+    # chmod before gio set: GNOME's desktop trust check only takes the
+    # metadata::trusted flag into account for a file that's already
+    # executable, so setting it first (against a not-yet-executable
+    # freshly-copied file) doesn't stick -- Nautilus then renders it as
+    # an untrusted/invalid launcher (broken icon, raw filename as label).
     chmod +x "$DESKTOP_DIR/CustusX.desktop"
+    gio set "$DESKTOP_DIR/CustusX.desktop" metadata::trusted true 2>/dev/null || true
 fi
 
 echo ""
