@@ -154,6 +154,8 @@ The private plugin (`org.custusx.fraxinus.private`) follows the standard CTK plu
 - CustusX's own installer (`root_dir/CX/CX/install/cxInstaller.py`) resets `CX/CX`'s `origin` to `https://gitlab.sintef.no/custusx/CustusX.git`
 - Fraxinus's public installer (`root_dir/FX/FX/script/cxFraxinusInstaller.py`, via `cxPublicComponentAssembly.py`) resets `FX/FX`'s `origin` to `https://gitlab.sintef.no/custusx/fraxinus.git`
 
+The closed-source build scripts do *not* do this: CustusS's (`CS/CS/script/cxsetup/cxPrivateComponentAssembly.py`) and FraxinusExcelsior's (`org.custusx.fraxinus.private/script/cxPrivateComponentAssembly.py`) both override `gitrepo_main_site_base` with the SSH URL `git@gitlab.sintef.no:custusx`, so a root that is built with CustusS or FraxinusExcelsior keeps (or gets) SSH remotes on `CX/CX`, `FX/FX`, and the private repos. Check `git remote get-url origin` rather than assuming which script last ran.
+
 This is intentional — both are open source and https doesn't require an SSH key to clone — but it means `git push` from either repo will fail with an HTTP Basic auth error (read/fetch still works over https) any time after that repo's own build script has run. Switch to SSH, push, then switch back so the next build-script run doesn't fight with your remote:
 
 ```bash
