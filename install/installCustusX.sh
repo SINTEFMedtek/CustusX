@@ -180,8 +180,9 @@ Name=CustusX Patients
 Icon=folder
 URL=$HOME/CustusX/Patients
 EOF
-    gio set "$DESKTOP_DIR/CustusX_Patients.desktop" metadata::trusted true 2>/dev/null || true
+    # chmod before gio set -- see the comment on the app shortcut below.
     chmod +x "$DESKTOP_DIR/CustusX_Patients.desktop"
+    gio set "$DESKTOP_DIR/CustusX_Patients.desktop" metadata::trusted true 2>/dev/null || true
 fi
 
 # ---------------------------------------------------------------------------
@@ -195,8 +196,13 @@ if [ -f "CustusX.desktop" ] && [ -d "$DESKTOP_DIR" ]; then
     sed -i "s|Exec=.*|Exec=$EXEC_PATH|g" CustusX.desktop
     sed -i "s|Icon=.*|Icon=$ICON_PATH|g" CustusX.desktop
     cp CustusX.desktop "$DESKTOP_DIR/"
-    gio set "$DESKTOP_DIR/CustusX.desktop" metadata::trusted true 2>/dev/null || true
+    # chmod before gio set: GNOME's desktop trust check only takes the
+    # metadata::trusted flag into account for a file that's already
+    # executable, so setting it first (against a not-yet-executable
+    # freshly-copied file) doesn't stick -- Nautilus then renders it as
+    # an untrusted/invalid launcher (broken icon, raw filename as label).
     chmod +x "$DESKTOP_DIR/CustusX.desktop"
+    gio set "$DESKTOP_DIR/CustusX.desktop" metadata::trusted true 2>/dev/null || true
 fi
 
 echo ""
