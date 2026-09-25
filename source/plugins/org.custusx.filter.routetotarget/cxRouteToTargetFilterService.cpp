@@ -92,6 +92,38 @@ QString RouteToTargetFilter::getNameSuffixAirwayAndVesselRTT()
     return "_AirwaysAndVessel_RTT";
 }
 
+/** Point metrics whose uid contains this string are used as extra airway points
+ *  (via points) when setUseExtraAirwayPoints(true). Stored in saved patient
+ *  files, so changing it breaks existing sessions.
+ */
+QString RouteToTargetFilter::getExtraAirwayPointUidPrefix()
+{
+	return "AirwayPoint";
+}
+
+/** Return the uid of the most recently added extra airway point, i.e. the one with
+ *  the highest number after the prefix (AirwayPoint10 is newer than AirwayPoint9,
+ *  although it sorts before it as a string). Uids without a number count as 0.
+ *  Returns an empty string if there are no points.
+ */
+QString RouteToTargetFilter::getLastExtraAirwayPointUid(std::map<QString, PointMetricPtr> extraAirwayPoints)
+{
+	QString prefix = RouteToTargetFilter::getExtraAirwayPointUidPrefix();
+	QString lastUid;
+	int lastNumber = -1;
+	for (std::map<QString, PointMetricPtr>::iterator it = extraAirwayPoints.begin(); it != extraAirwayPoints.end(); ++it)
+	{
+		int prefixEnd = it->first.indexOf(prefix) + prefix.length();
+		int number = it->first.mid(prefixEnd).toInt();
+		if (number > lastNumber)
+		{
+			lastNumber = number;
+			lastUid = it->first;
+		}
+	}
+	return lastUid;
+}
+
 
 void RouteToTargetFilter::createOptions()
 {
@@ -167,7 +199,7 @@ bool RouteToTargetFilter::execute()
 	std::map<QString, PointMetricPtr> extraAirwayPoints;
 	if(mUseExtraAirwayPoints)
 	{
-		extraAirwayPoints = mServices->patient()->getDataOfTypeWithUidContaining<PointMetric>("AirwayPoint");
+		extraAirwayPoints = mServices->patient()->getDataOfTypeWithUidContaining<PointMetric>(RouteToTargetFilter::getExtraAirwayPointUidPrefix());
 	}
 
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
