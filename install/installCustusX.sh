@@ -185,7 +185,7 @@ if [ -d "$DESKTOP_DIR" ]; then
 Type=Application
 Name=CustusX Patients
 Icon=folder
-Exec=$XDG_OPEN_PATH $HOME/CustusX/Patients
+Exec="$XDG_OPEN_PATH" "$HOME/CustusX/Patients"
 Terminal=false
 EOF
     # chmod before gio set -- see the comment on the app shortcut below.
