@@ -350,6 +350,83 @@ class SyncToGitRefTest(unittest.TestCase):
         self.assertEqual(_git(['rev-parse', '--is-shallow-repository'], self.clone), 'false')
 
 
+class PluginMovedIntoRepoTest(unittest.TestCase):
+    '''
+    A plugin that used to be its own repo, cloned inside this one (e.g. the
+    closed org.custusx.core.tracking.system.ndi in CX/CX/source/plugins), and
+    is now tracked by the branch being checked out (CustusX#55). Without
+    handling, `git checkout` refuses: "untracked working tree files would be
+    overwritten".
+    '''
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix='cxRepoHandler_test_')
+        self.upstream = os.path.join(self.tmp, 'upstream')
+        self.plugin_upstream = os.path.join(self.tmp, 'plugin_upstream')
+        self.clone = os.path.join(self.tmp, 'clone')
+        self.nested = os.path.join(self.clone, 'plugins', 'p')
+
+        _init_repo(self.upstream)
+        _commit(self.upstream)
+        _git(['branch', '-m', 'develop'], self.upstream)
+        _git(['checkout', '-q', '-b', 'moved'], self.upstream)
+        os.makedirs(os.path.join(self.upstream, 'plugins', 'p'))
+        _commit(self.upstream, filename=os.path.join('plugins', 'p', 'plugin.txt'), content='now in the repo', message='move plugin in')
+        _git(['checkout', '-q', 'develop'], self.upstream)
+
+        _init_repo(self.plugin_upstream)
+        _commit(self.plugin_upstream, filename='plugin.txt', content='separate repo')
+
+        _git(['clone', '-q', self.upstream, self.clone], self.tmp)
+        _git(['clone', '-q', self.plugin_upstream, self.nested], self.tmp)
+        _git(['config', 'user.email', 'test@example.com'], self.nested)
+        _git(['config', 'user.name', 'Test'], self.nested)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_clean_pushed_nested_clone_is_replaced(self):
+        handler = _make_handler(self.clone, main_branch='moved')
+        handler.syncToGitRef()
+
+        self.assertEqual(_current_branch(self.clone), 'moved')
+        self.assertFalse(os.path.exists(os.path.join(self.nested, '.git')))
+        with open(os.path.join(self.nested, 'plugin.txt')) as f:
+            self.assertEqual(f.read(), 'now in the repo')
+
+    def test_clean_pushed_nested_clone_is_replaced_for_a_tag(self):
+        _git(['tag', 'v-moved', 'moved'], self.upstream)
+        _git(['fetch', '-q', '--tags'], self.clone)
+
+        handler = _make_handler(self.clone, git_tag='v-moved')
+        handler.syncToGitRef()
+
+        self.assertEqual(_head_sha(self.clone), _git(['rev-parse', 'v-moved^{commit}'], self.clone))
+        self.assertFalse(os.path.exists(os.path.join(self.nested, '.git')))
+
+    def test_nested_clone_with_uncommitted_changes_is_kept(self):
+        with open(os.path.join(self.nested, 'plugin.txt'), 'w') as f:
+            f.write('local work')
+
+        handler = _make_handler(self.clone, main_branch='moved')
+        with self.assertRaises(SystemExit):
+            handler.syncToGitRef()
+
+        self.assertEqual(_current_branch(self.clone), 'develop')
+        with open(os.path.join(self.nested, 'plugin.txt')) as f:
+            self.assertEqual(f.read(), 'local work')
+
+    def test_nested_clone_with_unpushed_commit_is_kept(self):
+        _commit(self.nested, filename='local.txt', content='unpushed', message='local commit')
+        local_sha = _head_sha(self.nested)
+
+        handler = _make_handler(self.clone, main_branch='moved')
+        with self.assertRaises(SystemExit):
+            handler.syncToGitRef()
+
+        self.assertEqual(_current_branch(self.clone), 'develop')
+        self.assertEqual(_head_sha(self.nested), local_sha)
+
+
 class CloneRepoWithPromptTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix='cxRepoHandler_test_')

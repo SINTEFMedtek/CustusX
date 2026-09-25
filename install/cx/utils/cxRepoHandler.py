@@ -152,7 +152,12 @@ class RepoHandler(object):
         tag = self.args.git_tag
         if tag:
             print('Checking out %s to tag=%s' % (self.getName(), tag))
-            if runShell('git checkout %s' % tag, self.repo_path) is None:
+            result = runShell('git checkout %s' % tag, self.repo_path)
+            if result is returnCode():
+                result = self._retryCheckoutAfterRemovingReplacedNestedRepos(tag, tag)
+            # returnCode() (untracked files in the way) is a failure too: it used to
+            # pass this check silently and leave the repo on the previous checkout.
+            if result is None or result is returnCode():
                 exit("tag checkout failed")
             return
         
@@ -184,6 +189,8 @@ class RepoHandler(object):
             if not (is_branch or is_tag):
                 continue
             result = runShell('git checkout %s' % branch, self.repo_path)
+            if result is returnCode():
+                result = self._retryCheckoutAfterRemovingReplacedNestedRepos(branch, 'origin/%s' % branch if is_branch else branch)
             self.checkSuccess(result)
             if result is localChangesCode():
                 # Warned already via checkSuccess(); this branch didn't work,
@@ -237,6 +244,54 @@ class RepoHandler(object):
                     print('auto-aborted, so the mid-merge state and any local changes are still there.')
                     sys.exit(1)
             break
+
+    def _retryCheckoutAfterRemovingReplacedNestedRepos(self, checkout_target, ref):
+        '''
+        A checkout refused with "untracked working tree files would be
+        overwritten" can be a plugin that used to be its own repo, cloned
+        inside this one, and is now part of this repo on the target branch
+        (e.g. org.custusx.core.tracking.system.ndi, CustusX#55). Such a clone
+        is removed when nothing would be lost (no uncommitted changes, no
+        stashes, no unpushed commits), and the checkout is retried. Anything
+        else is left alone, so checkSuccess() stops the build as before.
+        '''
+        removed = False
+        for nested in self._findNestedReposTrackedBy(ref):
+            full_path = os.path.join(self.repo_path, nested)
+            if self._isNestedRepoSafeToRemove(full_path):
+                print('Removing %s: it is a separate clone of what is now part of %s at %s,' % (full_path, self.getName(), ref))
+                print('with no local changes or unpushed commits.')
+                shutil.rmtree(full_path)
+                removed = True
+            else:
+                print('NOT removing %s: it has local changes or unpushed commits.' % full_path)
+                print('It is now part of %s at %s. Push or save its work, delete it, and re-run.' % (self.getName(), ref))
+        result = returnCode()
+        if removed:
+            result = runShell('git checkout %s' % checkout_target, self.repo_path)
+        return result
+
+    def _findNestedReposTrackedBy(self, ref):
+        '''Paths (relative) of git clones inside this repo that ref tracks as its own files.'''
+        retval = []
+        for dirpath, dirnames, filenames in os.walk(self.repo_path):
+            if dirpath != self.repo_path and ('.git' in dirnames or '.git' in filenames):
+                relative = os.path.relpath(dirpath, self.repo_path).replace(os.sep, '/')
+                tracked_by_ref = runShell('git ls-tree -d --name-only %s -- %s' % (ref, relative), self.repo_path)
+                tracked_now = runShell('git ls-tree -d --name-only HEAD -- %s' % relative, self.repo_path)
+                if tracked_by_ref and not tracked_now:
+                    retval.append(relative)
+                dirnames[:] = [] # don't look inside a nested repo
+            dirnames[:] = [d for d in dirnames if d != '.git']
+        return retval
+
+    def _isNestedRepoSafeToRemove(self, path):
+        '''True if removing the clone loses nothing: it can be cloned again from its remote.'''
+        clean = runShell('git status --porcelain', path) == ''
+        no_stash = runShell('git stash list', path) == ''
+        no_unpushed = runShell('git log --branches --not --remotes --oneline', path) == ''
+        head_on_remote = bool(runShell('git branch -r --contains HEAD', path))
+        return clean and no_stash and no_unpushed and head_on_remote
 
     def _ensureGitIdentityForMerge(self, path):
         '''
