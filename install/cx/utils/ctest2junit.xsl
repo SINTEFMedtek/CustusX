@@ -81,13 +81,9 @@
 
     <xsl:template match="Testing/Test">
         <xsl:variable name="testcasename"><xsl:value-of select= "Name"/></xsl:variable>
-		<xsl:variable name="exectime">
-			<xsl:for-each select="Results/NamedMeasurement">
-				<xsl:if test="@name = 'Execution Time'">
-					<xsl:value-of select="."/>
-				</xsl:if>
-			</xsl:for-each>
-		</xsl:variable>
+		<!-- normalize-space: current ctest puts the number in an indented <Value> child;
+		     without it the time attribute is the number wrapped in line breaks and tabs -->
+		<xsl:variable name="exectime" select="normalize-space(Results/NamedMeasurement[@name = 'Execution Time'])"/>
 		
 			<testcase name="{$testcasename}" classname="TestSuite" time="{$exectime}">
             <xsl:if test="@Status = 'passed'">
@@ -96,20 +92,8 @@
         	</system-out>
             </xsl:if>
             <xsl:if test="@Status = 'failed'">
-				<xsl:variable name="failtype">
-					<xsl:for-each select="Results/NamedMeasurement">
-						<xsl:if test="@name = 'Exit Code'">
-							<xsl:value-of select="."/>
-						</xsl:if>
-					</xsl:for-each>
-				</xsl:variable>
-				<xsl:variable name="failcode">
-					<xsl:for-each select="Results/NamedMeasurement">
-						<xsl:if test="@name = 'Exit Value'">
-							<xsl:value-of select="."/>
-						</xsl:if>
-					</xsl:for-each>
-				</xsl:variable>
+				<xsl:variable name="failtype" select="normalize-space(Results/NamedMeasurement[@name = 'Exit Code'])"/>
+				<xsl:variable name="failcode" select="normalize-space(Results/NamedMeasurement[@name = 'Exit Value'])"/>
                 <error type="error" message="{$failtype} ({$failcode})"><xsl:value-of select="Results/Measurement/Value/text()" /></error>
             </xsl:if>
             <xsl:if test="@Status = 'notrun'">
