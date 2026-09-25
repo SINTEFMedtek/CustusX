@@ -213,10 +213,15 @@ cleanup-old-external-libs:
           # Mirrors .lib-package-vars' `sed 's|.*/||' | tr ':' '_'`.
           return image.rsplit('/', 1)[-1].replace(':', '_')
 
-      # IMAGE_UBUNTU2004/2204/2404 are pipeline-level variables (.gitlab-ci.yml),
+      # IMAGE_UBUNTU2204/2404 are pipeline-level variables (.gitlab-ci.yml),
       # so they're available here unchanged even though this job never builds.
+      # IMAGE_UBUNTU2004 is deliberately excluded (CustusX#51): with
+      # build-ubuntu20/build-external-libs-ubuntu20[-igstk] disabled, no live
+      # job can ever produce or need a Ubuntu2004-tagged package again, so
+      # is_current_format() below must treat that prefix as abandoned --
+      # otherwise it would be kept forever by the keep-N rotation instead of
+      # being fully deleted, leaking registry storage indefinitely.
       valid_image_tags = {
-          sanitize_image_tag(os.environ['IMAGE_UBUNTU2004']),
           sanitize_image_tag(os.environ['IMAGE_UBUNTU2204']),
           sanitize_image_tag(os.environ['IMAGE_UBUNTU2404']),
       }
