@@ -68,6 +68,7 @@ void LogicManager::shutdown()
 	//CX_LOG_DEBUG() << "Skipping some shutdown procedures in LogicManager, because of CTK issues";
 	LogicManager::getInstance()->shutdownServicesLight();
 
+	// Full shutdown, kept until CustusX#59 decides whether it can be made safe again.
 	//Replacing these 3 lines with the above line seems to fix the test seg. faults on Ubuntu 20.04
 	//Now the same shutdown code is running on all platforms, and not only Ubuntu 20.04
 	//Old shutdown sequence cause seg. faults with new CTK - Qt combinations
@@ -76,6 +77,7 @@ void LogicManager::shutdown()
 	//mInstance = NULL;
 }
 
+// Currently unused; kept for CustusX#59.
 bool LogicManager::isUbuntu2004()
 {
 #ifdef CX_WINDOWS
