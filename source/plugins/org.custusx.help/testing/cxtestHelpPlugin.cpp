@@ -93,6 +93,8 @@ TEST_CASE("org.custusx.help: HelpWidget displays initial help text", "[unit][plu
 	cxtest::TestHelpFixture fixture;
 	fixture.setupHelpBrowserInsideMainWindow();
 
+	// The overview is index.html; its anchor name depends on the Doxygen version.
+	CHECK(fixture.browser->source().fileName() == "index.html");
 	// this can be a tricky test for overriding applications: they must have this string in the main page in order to
 	// succeed.
 	CHECK(fixture.browser->toPlainText().contains("CustusX"));

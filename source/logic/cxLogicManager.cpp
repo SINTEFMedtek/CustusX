@@ -199,6 +199,8 @@ void LogicManager::shutdownServices()
 	if (mComponent)
 		mComponent->destroy(); // this is the GUI - delete first
 
+	if (mTrackingService)
+		mTrackingService->setState(Tool::tsNONE); // stop hardware threads while the tracking plugin still runs
 	mPluginFramework->stop();
 
 	this->shutdownLegacyStoredServices();
@@ -226,6 +228,8 @@ void LogicManager::shutdownServicesLight()
 	if (mComponent)
 		mComponent->destroy(); // this is the GUI - delete first
 
+	if (mTrackingService)
+		mTrackingService->setState(Tool::tsNONE); // stop hardware threads while the tracking plugin still runs
 	mPluginFramework->stopPlugins(); // skips the framework stop, which used to crash
 
 	this->shutdownLegacyStoredServices();
@@ -243,8 +247,6 @@ void LogicManager::shutdownLegacyStoredServices()
 	this->shutdownService(mSpaceProvider, "SpaceProvider"); // remove before patmodel and track
 	this->shutdownService(mStateService, "StateService");
 	this->shutdownService(mViewService, "ViewService");
-	if (mTrackingService)
-		mTrackingService->setState(Tool::tsNONE); // stop hardware threads before teardown
 	this->shutdownService(mTrackingService, "TrackingService");
 	this->shutdownService(mPatientModelService, "PatientModelService");
 	this->shutdownService(mVideoService, "VideoService");

@@ -60,9 +60,11 @@ PluginFrameworkManager::PluginFrameworkManager() :
 
 PluginFrameworkManager::~PluginFrameworkManager()
 {
-	if(mFramework->getState() == ctkPlugin::ACTIVE)//LogicManager calls stop() before the destructor is called
+	// Expected after the light shutdown, which stops the plugins but leaves the CTK framework
+	// active, when LogicManager is initialized again (e.g. in tests).
+	if(mFramework->getState() == ctkPlugin::ACTIVE)
 	{
-		CX_LOG_CHANNEL_WARNING("plugin") << "This should not happen: PluginFrameworkManager destructor stopping plugin framework";
+		CX_LOG_CHANNEL_DEBUG("plugin") << "PluginFrameworkManager destructor stopping the CTK plugin framework";
 		this->stop();
 	}
 }
