@@ -130,7 +130,8 @@
 .serialize-platform-build:
   resource_group: cx-platform-build
 
-build-ubuntu20:
+# Disabled (CustusX#51): remove the leading dot to enable again.
+.build-ubuntu20:
   extends:
     - .reuse-build
     - .serialize-platform-build
