@@ -171,6 +171,10 @@ Always commit to a branch other than `develop`/`master` in any of these repos: C
 
 Never run `git push` in any of these repos unless the user explicitly says to push. Permission covers that one push only and does not carry over to later commits in the same session. Being asked to put changes on a branch means commit locally. After committing, say the commit is ready to push and wait.
 
+**Review before a merge request**
+
+Before a branch goes to a merge request, run a code review of its diff against the target branch (Claude Code's `code-review` skill). Check each finding against the code, and fix the real ones before the MR is created or reviewed. Say what the review found and what was fixed.
+
 **Squashing/amending unpushed commits**
 
 If you need to correct or fold together commits you just made, it's fine to squash or amend them as long as none of them have been pushed to the remote yet (check with `git status`/`git log @{u}..HEAD`, or the fact that the branch was just created locally). Never do this to a commit that has already been pushed — that rewrites history other clones, MRs, or CI may already have fetched; add a new commit on top instead.
