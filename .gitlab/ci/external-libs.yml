@@ -278,7 +278,7 @@ cleanup-old-external-libs:
       legacy_pkg_name = 'custusx-external-libs'
       mismatched = [p for p in packages if p.get('name') not in (pkg_name, legacy_pkg_name)]
       if mismatched:
-          print(f'ERROR: API returned {len(mismatched)} package(s) not named "{pkg_name}" -- aborting without deleting anything.', file=sys.stderr)
+          print(f'ERROR: API returned {len(mismatched)} package(s) named neither "{pkg_name}" nor "{legacy_pkg_name}" -- aborting without deleting anything.', file=sys.stderr)
           for p in mismatched:
               print(f'  unexpected: name={p.get("name")!r} version={p.get("version")!r} id={p.get("id")}', file=sys.stderr)
           sys.exit(1)
