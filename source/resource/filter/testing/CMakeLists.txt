@@ -17,6 +17,7 @@ if(BUILD_TESTING)
         cxtestBinaryThresholdImageFilter.cpp
         cxtestDilationFilter.cpp
         cxtestBinaryThinningImageFilter3DFilter.cpp
+        cxtestAirwayCenterlines.cpp
         cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
         cxtestScriptFilter.cpp
         cxtestColorVariationFilter.cpp
