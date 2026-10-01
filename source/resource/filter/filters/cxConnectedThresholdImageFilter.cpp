@@ -11,10 +11,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxConnectedThresholdImageFilter.h"
 
-#include "itkConnectedThresholdImageFilter.h"
+#include <vtkImageData.h>
+#include <vtkPoints.h>
+#include <vtkImageCast.h>
+#include <vtkImageThresholdConnectivity.h>
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
-#include "cxAlgorithmHelpers.h"
 #include "cxRegistrationTransform.h"
 #include "cxImage.h"
 #include "cxPatientModelService.h"
@@ -34,7 +36,7 @@ ConnectedThresholdImageFilter::~ConnectedThresholdImageFilter()
 {
 }
 
-void ConnectedThresholdImageFilter::setInput(ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed)
+void ConnectedThresholdImageFilter::setInput(ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, Eigen::Array3i seed)
 {
 	mInput = image;
 	mOutputBasePath = outputBasePath;
@@ -84,73 +86,46 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
 
 vtkImageDataPtr ConnectedThresholdImageFilter::calculate()
 {
-	//Connected Thresholding
-
-	//Documentation:
-	// http://www.na-mic.org/svn/Slicer3-lib-mirrors/trunk/Insight/Examples/Segmentation/ConnectedThresholdImageFilter.cxx
-
-	//  The ConnectedThresholdImageFilter has two main parameters to be
-	//  defined. They are the lower and upper thresholds of the interval in
-	//  which intensity values should fall in order to be included in the
-	//  region. Setting these two values too close will not allow enough
-	//  flexibility for the region to grow. Setting them too far apart will
-	//  result in a region that engulfs the image.
-
-	//  The output of this filter is a binary image with zero-value pixels
-	//  everywhere except on the extracted region. The intensity value set
-	//  inside the region is selected with the method SetReplaceValue()
-
-	//  The initialization of the algorithm requires the user to provide a seed
-	//  point. It is convenient to select this point to be placed in a
-	//  typical region of the anatomical structure to be segmented. The
-	//  seed is passed in the form of a IndexType to the SetSeed()
-	//  method.
-
-	//  Another option for segmenting regions is to take advantage of the
-	//  functionality provided by the ConnectedThresholdImageFilter for
-	//  managing multiple seeds. The seeds can be passed one by one to the
-	//  filter using the AddSeed() method. You could imagine a user
-	//  interface in which an operator clicks on multiple points of the object
-	//  to be segmented and each selected point is passed as a seed to this
-	//  filter.
-
-	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(mInput);
-
-	typedef itk::ConnectedThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
-	thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
-	thresholdFilter->SetInput(itkImage);
-
-	//set thresholds
-	thresholdFilter->SetLower(mLowerThreshold);
-	thresholdFilter->SetUpper(mUpperTheshold);
-	thresholdFilter->SetReplaceValue(mReplaceValue);
-
-	//set seeds
-	thresholdFilter->SetSeed(mSeed);
-
-	//calculate
-	try
+	vtkImageDataPtr retval = segment(mInput->getBaseVtkImageData(), mLowerThreshold, mUpperTheshold, mReplaceValue, mSeed);
+	if (!retval)
 	{
-		thresholdFilter->Update();
+		reportError(QString("Connected Threshold Image Filter: seed (%1, %2, %3) is outside the image.")
+					.arg(mSeed[0]).arg(mSeed[1]).arg(mSeed[2]));
 	}
-	catch( itk::ExceptionObject & excep )
+	return retval;
+}
+
+vtkImageDataPtr ConnectedThresholdImageFilter::segment(vtkImageDataPtr image, double lower, double upper, int replaceValue, Eigen::Array3i seed)
+{
+	vtkImageDataPtr retval;
+	const int* dims = image->GetDimensions();
+	const bool seedInside = (seed >= 0).all() && seed[0] < dims[0] && seed[1] < dims[1] && seed[2] < dims[2];
+	if (seedInside)
 	{
-		reportError("Error when setting seed for Connected Threshold Image Filter:");
-		reportError(qstring_cast(excep.GetDescription()));
+		const int* extent = image->GetExtent();
+		const double* origin = image->GetOrigin();
+		const double* spacing = image->GetSpacing();
+		vtkSmartPointer<vtkPoints> seedPoints = vtkSmartPointer<vtkPoints>::New();
+		seedPoints->InsertNextPoint(origin[0] + (extent[0]+seed[0])*spacing[0],
+									origin[1] + (extent[2]+seed[1])*spacing[1],
+									origin[2] + (extent[4]+seed[2])*spacing[2]);
+
+		vtkImageCastPtr cast = vtkImageCastPtr::New();
+		cast->SetInputData(image);
+		cast->SetOutputScalarTypeToShort();
+
+		vtkSmartPointer<vtkImageThresholdConnectivity> connectivity = vtkSmartPointer<vtkImageThresholdConnectivity>::New();
+		connectivity->SetInputConnection(cast->GetOutputPort());
+		connectivity->SetSeedPoints(seedPoints);
+		connectivity->ThresholdBetween(lower, upper);
+		connectivity->SetInValue(replaceValue);
+		connectivity->SetOutValue(0);
+		connectivity->ReplaceInOn();
+		connectivity->ReplaceOutOn();
+		connectivity->Update();
+		retval = connectivity->GetOutput();
 	}
-
-	itkImage = thresholdFilter->GetOutput();
-
-	//Convert ITK to VTK
-	itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
-	itkToVtkFilter->SetInput(itkImage);
-	itkToVtkFilter->Update();
-
-	vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-	rawResult->DeepCopy(itkToVtkFilter->GetOutput());
-	// TODO: possible memory problem here - check debug mem system of itk/vtk
-
-	return rawResult;
+	return retval;
 }
 
 }

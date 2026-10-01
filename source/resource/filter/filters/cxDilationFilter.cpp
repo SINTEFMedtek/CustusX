@@ -11,7 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxDilationFilter.h"
 
-#include <vtkImageCast.h>
+#include <vtkImageData.h>
+
 #include <vtkPolyData.h>
 
 #include "cxDoubleProperty.h"
@@ -20,9 +21,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStringProperty.h"
 #include "cxSelectDataStringProperty.h"
 
-#include <itkBinaryDilateImageFilter.h>
-#include <itkBinaryBallStructuringElement.h>
-#include "cxAlgorithmHelpers.h"
+#include <vtkImageThreshold.h>
+#include <vtkImageContinuousDilate3D.h>
 #include "cxUtilHelpers.h"
 #include "cxContourFilter.h"
 #include "cxMesh.h"
@@ -127,47 +127,7 @@ bool DilationFilter::execute() {
 
 	double radius = this->getDilationRadiusOption(mCopiedOptions)->getValue();
 
-	// Convert radius in mm to radius in voxels for the structuring element
-	Eigen::Array3d spacing = input->getSpacing();
-	itk::Size<3> radiusInVoxels;
-	radiusInVoxels[0] = radius/spacing(0);
-	radiusInVoxels[1] = radius/spacing(1);
-	radiusInVoxels[2] = radius/spacing(2);
-
-	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
-
-	// Create structuring element
-	typedef itk::BinaryBallStructuringElement<unsigned char,3> StructuringElementType;
-    StructuringElementType structuringElement;
-    structuringElement.SetRadius(radiusInVoxels);
-    structuringElement.CreateStructuringElement();
-
-	// Dilation
-	typedef itk::BinaryDilateImageFilter<itkImageType, itkImageType, StructuringElementType> dilateFilterType;
-	dilateFilterType::Pointer dilationFilter = dilateFilterType::New();
-	dilationFilter->SetInput(itkImage);
-	dilationFilter->SetKernel(structuringElement);
-	dilationFilter->SetDilateValue(1);
-	dilationFilter->Update();
-	itkImage = dilationFilter->GetOutput();
-
-	//Convert ITK to VTK
-	itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
-	itkToVtkFilter->SetInput(itkImage);
-	itkToVtkFilter->Update();
-
-	vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-	rawResult->DeepCopy(itkToVtkFilter->GetOutput());
-
-	vtkImageCastPtr imageCast = vtkImageCastPtr::New();
-	imageCast->SetInputData(rawResult);
-	imageCast->SetOutputScalarTypeToUnsignedChar();
-	imageCast->Update();
-	rawResult = imageCast->GetOutput();
-
-	// TODO: possible memory problem here - check debug mem system of itk/vtk
-
-	mRawResult =  rawResult;
+	mRawResult = dilate(input->getBaseVtkImageData(), radius);
 
 	BoolPropertyPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
 	if (generateSurface->getValue())
@@ -177,6 +137,31 @@ bool DilationFilter::execute() {
 	}
 
     return true;
+}
+
+vtkImageDataPtr DilationFilter::dilate(vtkImageDataPtr image, double radius)
+{
+	vtkSmartPointer<vtkImageThreshold> binary = vtkSmartPointer<vtkImageThreshold>::New();
+	binary->SetInputData(image);
+	binary->ThresholdBetween(1, 1);
+	binary->SetInValue(1);
+	binary->SetOutValue(0);
+	binary->ReplaceInOn();
+	binary->ReplaceOutOn();
+	binary->SetOutputScalarTypeToUnsignedChar();
+
+	const double* spacing = image->GetSpacing();
+	int kernelSize[3];
+	for (int i = 0; i < 3; ++i)
+	{
+		const int radiusInVoxels = static_cast<int>(radius/spacing[i]);
+		kernelSize[i] = 2*radiusInVoxels + 1;
+	}
+	vtkSmartPointer<vtkImageContinuousDilate3D> dilation = vtkSmartPointer<vtkImageContinuousDilate3D>::New();
+	dilation->SetInputConnection(binary->GetOutputPort());
+	dilation->SetKernelSize(kernelSize[0], kernelSize[1], kernelSize[2]);
+	dilation->Update();
+	return dilation->GetOutput();
 }
 
 bool DilationFilter::postProcess()

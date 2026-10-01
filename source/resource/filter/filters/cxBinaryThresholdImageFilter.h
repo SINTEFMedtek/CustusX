@@ -43,6 +43,8 @@ public:
 
 	bool preProcess();
 	virtual bool execute();
+	/** Voxels in [lower, upper] become 1, the rest 0, as unsigned char. */
+	static vtkImageDataPtr threshold(vtkImageDataPtr image, double lower, double upper);
 	virtual bool postProcess();
 
 	// extensions:
