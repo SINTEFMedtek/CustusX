@@ -223,16 +223,11 @@ cx_add_class(cxResource_SOURCE
   logger/internal/cxLogIOStreamRedirecter
   logger/internal/cxLogFile
 
-  algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
-  algorithms/ItkVtkGlue/itkImageToVTKImageFilter.txx
-  algorithms/ItkVtkGlue/itkVTKImageToImageFilter.h
-  algorithms/ItkVtkGlue/itkVTKImageToImageFilter.txx
   algorithms/cxBinaryThinning3D
   algorithms/cxImageAlgorithms
   algorithms/cxTimedAlgorithm
   algorithms/cxThreadedTimedAlgorithm
   algorithms/cxCompositeTimedAlgorithm
-  algorithms/cxAlgorithmHelpers
 
   settings/cxDataLocations
   settings/cxSettings
@@ -346,7 +341,6 @@ target_include_directories(cxResource
   ./Tool
   ./properties
   ./algorithms
-  ./algorithms/ItkVtkGlue
   ./settings
   ./utilities
   ./registration

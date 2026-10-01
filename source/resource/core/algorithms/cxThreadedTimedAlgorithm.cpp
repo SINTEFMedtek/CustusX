@@ -16,7 +16,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageData.h>
 
 #include "cxTimedAlgorithm.h"
-#include "itkImageFileReader.h"
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
 #include "cxUtilHelpers.h"

@@ -26,7 +26,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <sys/types.h>
 #endif //CX_WINDOWS
 
-#include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"

@@ -11,10 +11,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxRouteToTargetFilterService.h"
 
+#include <vtkImageData.h>
+
 #include <ctkPluginContext.h>
 #include <QDir>
 
-#include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
 
 #include "cxUtilHelpers.h"

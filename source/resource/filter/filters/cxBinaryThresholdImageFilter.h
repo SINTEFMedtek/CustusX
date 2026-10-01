@@ -22,7 +22,7 @@ namespace cx
  * @{
  */
 
-/** Filter wrapping a itk::BinaryThresholdImageFilter.
+/** Binary threshold filter.
  *
  * \ingroup cx_resource_filter
  * \date Nov 21, 2012
