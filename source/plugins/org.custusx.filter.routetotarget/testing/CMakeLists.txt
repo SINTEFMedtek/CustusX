@@ -9,40 +9,36 @@
 # See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 # =========================================================================
 
-if(BUILD_TESTING)
+###########################################################
+#               org.custusx.filter.routetotarget Tests
+###########################################################
 
-    set(CXTEST_SOURCES_TO_MOC
-    )
-    set(CXTEST_PLUGINALGORITHM_SOURCES
-        cxtestBinaryThresholdImageFilter.cpp
-        cxtestDilationFilter.cpp
-        cxtestBinaryThinningImageFilter3DFilter.cpp
-        cxtestAirwayCenterlines.cpp
+if(BUILD_TESTING)
+    cx_add_class(CXTEST_SOURCES ${CXTEST_SOURCES}
+        cxtestRouteToTarget.cpp
         cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
-        cxtestScriptFilter.cpp
-        cxtestColorVariationFilter.cpp
+    )
+    set(CXTEST_SOURCES_TO_MOC
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
-    add_library(cxtestFilter ${CXTEST_PLUGINALGORITHM_SOURCES} ${CXTEST_SOURCES_TO_MOC})
+    add_library(cxtest_org_custusx_filter_routetotarget ${CXTEST_SOURCES} ${CXTEST_SOURCES_TO_MOC})
     include(GenerateExportHeader)
-    generate_export_header(cxtestFilter)
-    target_include_directories(cxtestFilter
+    generate_export_header(cxtest_org_custusx_filter_routetotarget)
+    target_include_directories(cxtest_org_custusx_filter_routetotarget
         PUBLIC
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtestFilter
+    target_link_libraries(cxtest_org_custusx_filter_routetotarget
         PRIVATE
-        cxResource
-        cxtestResource
-        cxResourceFilter
-        cxResourceVisualization
-        cxCatch
+        org_custusx_filter_routetotarget
         cxtestUtilities
-        cxLogicManager
-        cxtest_org_custusx_core_patientmodel
+        cxCatch
+        cxResource
+        cxResourceFilter
+        cxtestResource
     )
-    cx_add_tests_to_catch(cxtestFilter)
+    cx_add_tests_to_catch(cxtest_org_custusx_filter_routetotarget)
 
 endif(BUILD_TESTING)

@@ -110,6 +110,8 @@ public:
 	// extended Data interface
 	template <class DATA>
 	std::map<QString, boost::shared_ptr<DATA> > getDataOfType(ORGAN_TYPE organtype = organtypeCOUNT) const;
+	template <class DATA>
+	std::map<QString, boost::shared_ptr<DATA> > getDataOfTypeWithUidContaining(QString uidPart) const;
 	DataPtr getData(const QString& uid) const;
 	template <class DATA>
 	boost::shared_ptr<DATA> getData(ORGAN_TYPE organtype) const;
@@ -192,6 +194,21 @@ std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfType(O
 		if (val)
 			if(organtype == organtypeCOUNT || organtype == val->getOrganType())
 				retval[val->getUid()] = val;
+	}
+	return retval;
+}
+
+template <class DATA>
+std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfTypeWithUidContaining(QString uidPart) const
+{
+	std::map<QString, boost::shared_ptr<DATA> > data = this->getDataOfType<DATA>();
+	std::map<QString, boost::shared_ptr<DATA> > retval;
+	for (typename std::map<QString, boost::shared_ptr<DATA> >::const_iterator i=data.begin(); i!=data.end(); ++i)
+	{
+		if (i->first.contains(uidPart))
+		{
+			retval[i->first] = i->second;
+		}
 	}
 	return retval;
 }

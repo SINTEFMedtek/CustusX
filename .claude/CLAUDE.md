@@ -156,6 +156,8 @@ The private plugin (`org.custusx.fraxinus.private`) follows the standard CTK plu
 
 The build scripts do this on purpose: both repos are open source, and https doesn't need an SSH key to clone. Pushing over https fails with an HTTP Basic auth error, though fetch still works.
 
+The closed-source build scripts (CustusS's and FraxinusExcelsior's `cxPrivateComponentAssembly.py`) use the SSH URL `git@gitlab.sintef.no:custusx` instead, so a root built with CustusS or FraxinusExcelsior keeps SSH remotes. Check `git remote get-url origin` rather than assuming which script last ran.
+
 When working on the code, keep the remotes on SSH. If you find one set to https, switch it back to SSH and leave it there:
 
 ```bash
@@ -176,6 +178,10 @@ Waiting also keeps GitLab runner load down, since every push to a branch can sta
 **One commit per repo for small fixes**
 
 For a small fix, keep all its changes in one commit per repo: until the user says to push, fold follow-up changes into that commit (`git commit --amend`, see below) and keep its message describing the whole change. GitLab uses the last commit's message for a new merge request, so one well-described commit makes the MR easy to create. Larger features may keep several commits.
+
+**Review before a merge request**
+
+Before a branch goes to a merge request, run a code review of its diff against the target branch (Claude Code's `code-review` skill). Check each finding against the code, and fix the real ones before the MR is created or reviewed. Say what the review found and what was fixed.
 
 **Squashing/amending unpushed commits**
 

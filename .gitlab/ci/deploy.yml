@@ -14,10 +14,10 @@
       for OS in Ubuntu2204 Ubuntu2404; do
         cd $CI_PROJECT_DIR/$OS/package_artefacts
         INSTALLER_FILE=$(find CustusX*.tar.gz)
-        curl \
+        curl --fail \
           --header "JOB-TOKEN: $CI_JOB_TOKEN" \
           --upload-file $INSTALLER_FILE \
-          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/CustusX-${OS}.tar.gz"
+          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/CustusX-${OS}-$VERSION.tar.gz"
       done
     # Upload install script with version baked in so users get a single-file installer
     - cd $CI_PROJECT_DIR
@@ -114,8 +114,8 @@ create-release:
       LINKS=$(jq -n --arg base "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}" \
                     --arg tag "${CI_COMMIT_TAG}" \
         '[
-          {name: "CustusX Ubuntu 22.04 installer", url: ($base + "/CustusX-Ubuntu2204.tar.gz"), link_type: "package"},
-          {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404.tar.gz"), link_type: "package"},
+          {name: "CustusX Ubuntu 22.04 installer", url: ($base + "/CustusX-Ubuntu2204-" + $tag + ".tar.gz"), link_type: "package", filepath: ("/CustusX-Ubuntu2204-" + $tag + ".tar.gz")},
+          {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404-" + $tag + ".tar.gz"), link_type: "package", filepath: ("/CustusX-Ubuntu2404-" + $tag + ".tar.gz")},
           {name: "CustusX installer script (all Ubuntu versions)", url: ($base + "/installCustusX.sh"), link_type: "package", filepath: "/installCustusX.sh"},
           {name: ("CustusX installer script, " + $tag + " (all Ubuntu versions)"), url: ($base + "/installCustusX-" + $tag + ".sh"), link_type: "package", filepath: ("/installCustusX-" + $tag + ".sh")}
         ]')

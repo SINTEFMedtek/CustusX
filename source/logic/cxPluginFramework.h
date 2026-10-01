@@ -61,6 +61,7 @@ public:
 	bool stop(const QString& symbolicName, ctkPlugin::StopOptions options = {});
 	bool start();
 	bool stop();
+	void stopPlugins(); ///< Save state and stop all plugins in the main thread, without stopping the framework. Only runs once.
 
 	ctkPluginContext* getPluginContext();
 	QSharedPointer<ctkPluginFramework> getPluginFramework();
@@ -101,6 +102,7 @@ private:
 
 	QStringList mPluginSearchPaths;
 	QStringList mPluginLibFilter;
+	bool mPluginsStopped;
 
 	QString mSettingsSearchPaths;
 	QString mSettingsBase;

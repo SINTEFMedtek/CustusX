@@ -68,6 +68,7 @@ void LogicManager::shutdown()
 	//CX_LOG_DEBUG() << "Skipping some shutdown procedures in LogicManager, because of CTK issues";
 	LogicManager::getInstance()->shutdownServicesLight();
 
+	// Full shutdown, kept until CustusX#59 decides whether it can be made safe again.
 	//Replacing these 3 lines with the above line seems to fix the test seg. faults on Ubuntu 20.04
 	//Now the same shutdown code is running on all platforms, and not only Ubuntu 20.04
 	//Old shutdown sequence cause seg. faults with new CTK - Qt combinations
@@ -76,6 +77,7 @@ void LogicManager::shutdown()
 	//mInstance = NULL;
 }
 
+// Currently unused; kept for CustusX#59.
 bool LogicManager::isUbuntu2004()
 {
 #ifdef CX_WINDOWS
@@ -199,6 +201,8 @@ void LogicManager::shutdownServices()
 	if (mComponent)
 		mComponent->destroy(); // this is the GUI - delete first
 
+	if (mTrackingService)
+		mTrackingService->setState(Tool::tsNONE); // stop hardware threads while the tracking plugin still runs
 	mPluginFramework->stop();
 
 	this->shutdownLegacyStoredServices();
@@ -226,6 +230,10 @@ void LogicManager::shutdownServicesLight()
 	if (mComponent)
 		mComponent->destroy(); // this is the GUI - delete first
 
+	if (mTrackingService)
+		mTrackingService->setState(Tool::tsNONE); // stop hardware threads while the tracking plugin still runs
+	mPluginFramework->stopPlugins(); // skips the framework stop, which used to crash
+
 	this->shutdownLegacyStoredServices();
 
 	GPUImageBufferRepository::shutdown();
@@ -241,8 +249,6 @@ void LogicManager::shutdownLegacyStoredServices()
 	this->shutdownService(mSpaceProvider, "SpaceProvider"); // remove before patmodel and track
 	this->shutdownService(mStateService, "StateService");
 	this->shutdownService(mViewService, "ViewService");
-	if (mTrackingService)
-		mTrackingService->setState(Tool::tsNONE); // stop hardware threads before teardown
 	this->shutdownService(mTrackingService, "TrackingService");
 	this->shutdownService(mPatientModelService, "PatientModelService");
 	this->shutdownService(mVideoService, "VideoService");
