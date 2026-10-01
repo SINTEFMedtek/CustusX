@@ -13,7 +13,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <algorithm>
 #include <cmath>
+#include <random>
 #include <vtkImageData.h>
+#include <vtkImageContinuousDilate3D.h>
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxDilationFilter.h"
 #include "cxConnectedThresholdImageFilter.h"
@@ -92,6 +94,31 @@ TEST_CASE("BinaryThresholdImageFilter: threshold includes both limits", "[unit][
 	CHECK(countNonZero(result) == 11*11*11 - 11 + 4);
 }
 
+TEST_CASE("BinaryThresholdImageFilter: limits outside the scalar range match nothing", "[unit][resource][filter]")
+{
+	vtkImageDataPtr image = createImage(5, VTK_UNSIGNED_CHAR, 1, 1, 1);
+
+	CHECK(countNonZero(cx::BinaryThresholdImageFilter::threshold(image, -1000, -500)) == 0);
+	CHECK(countNonZero(cx::BinaryThresholdImageFilter::threshold(image, 300, 400)) == 0);
+	CHECK(countNonZero(cx::BinaryThresholdImageFilter::threshold(image, -1000, 0)) == 5*5*5);
+}
+
+TEST_CASE("BinaryThresholdImageFilter: uses the first component", "[unit][resource][filter]")
+{
+	vtkImageDataPtr image = vtkImageDataPtr::New();
+	image->SetExtent(0, 4, 0, 4, 0, 4);
+	image->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
+	unsigned char* values = static_cast<unsigned char*>(image->GetScalarPointer());
+	std::fill_n(values, 5*5*5*3, 200);
+	values[0] = 10;
+
+	vtkImageDataPtr result = cx::BinaryThresholdImageFilter::threshold(image, 0, 50);
+
+	CHECK(result->GetNumberOfScalarComponents() == 1);
+	CHECK(countNonZero(result) == 1);
+	CHECK(valueAt(result, 0, 0, 0) == 1);
+}
+
 TEST_CASE("DilationFilter: a voxel dilates to a ball of the radius in voxels", "[unit][resource][filter]")
 {
 	vtkImageDataPtr image = createImage(11, VTK_UNSIGNED_CHAR, 1, 1, 1);
@@ -121,6 +148,44 @@ TEST_CASE("DilationFilter: the radius in voxels follows the spacing", "[unit][re
 	CHECK(valueAt(result, 5, 8, 5) == 0);
 	CHECK(valueAt(result, 5, 5, 6) == 1);
 	CHECK(valueAt(result, 5, 5, 7) == 0);
+}
+
+TEST_CASE("DilationFilter: gives the same result as a dilation with an ellipsoid kernel", "[unit][resource][filter]")
+{
+	std::mt19937 rng(11);
+	std::uniform_real_distribution<double> uniform(0, 1);
+	const double spacings[3][3] = {{1, 1, 1}, {0.7, 0.7, 1.25}, {0.5, 0.8, 2.0}};
+	const double radii[4] = {0.5, 1.0, 2.0, 3.3};
+	for (int s = 0; s < 3; ++s)
+	{
+		for (int r = 0; r < 4; ++r)
+		{
+			vtkImageDataPtr image = createImage(23, VTK_UNSIGNED_CHAR, spacings[s][0], spacings[s][1], spacings[s][2]);
+			unsigned char* values = static_cast<unsigned char*>(image->GetScalarPointer());
+			for (int i = 0; i < 23*23*23; ++i)
+			{
+				values[i] = uniform(rng) < 0.01 ? 1 : 0;
+			}
+			values[0] = 1;
+
+			vtkSmartPointer<vtkImageContinuousDilate3D> reference = vtkSmartPointer<vtkImageContinuousDilate3D>::New();
+			reference->SetInputData(image);
+			int kernelSize[3];
+			for (int i = 0; i < 3; ++i)
+			{
+				kernelSize[i] = 2*static_cast<int>(radii[r]/spacings[s][i]) + 1;
+			}
+			reference->SetKernelSize(kernelSize[0], kernelSize[1], kernelSize[2]);
+			reference->Update();
+
+			vtkImageDataPtr result = cx::DilationFilter::dilate(image, radii[r]);
+
+			const unsigned char* expected = static_cast<const unsigned char*>(reference->GetOutput()->GetScalarPointer());
+			const unsigned char* actual = static_cast<const unsigned char*>(result->GetScalarPointer());
+			INFO("Spacing " << s << ", radius " << radii[r]);
+			CHECK(std::equal(expected, expected + 23*23*23, actual));
+		}
+	}
 }
 
 TEST_CASE("DilationFilter: only voxels equal to 1 are dilated", "[unit][resource][filter]")

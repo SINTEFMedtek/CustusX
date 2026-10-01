@@ -70,7 +70,7 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
 	QString name = mInput->getName()+" seg%1";
 
 	//create a Image
-	ImagePtr result = createDerivedImage(mServices->patient(),
+	mOutput = createDerivedImage(mServices->patient(),
 										 uid, name,
 										 rawResult, mInput);
 	mOutput->resetTransferFunctions();

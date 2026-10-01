@@ -59,7 +59,7 @@ QString SmoothingImageFilter::getHelp() const
 DoublePropertyPtr SmoothingImageFilter::getSigma(QDomElement root)
 {
 	return DoubleProperty::initialize("Smoothing sigma", "",
-	                                             "Used for smoothing the segmented volume. Measured in units of image spacing.",
+	                                             "Standard deviation of the Gaussian kernel, in mm.",
 	                                             0.10, DoubleRange(0, 5, 0.01), 2, root);
 }
 

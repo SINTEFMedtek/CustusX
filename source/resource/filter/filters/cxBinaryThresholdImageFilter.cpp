@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageData.h>
 
 #include <vtkImageThreshold.h>
+#include <vtkImageExtractComponents.h>
 #include <vtkPolyData.h>
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"
@@ -181,9 +182,21 @@ bool BinaryThresholdImageFilter::execute()
 
 vtkImageDataPtr BinaryThresholdImageFilter::threshold(vtkImageDataPtr image, double lower, double upper)
 {
+	vtkSmartPointer<vtkImageExtractComponents> firstComponent = vtkSmartPointer<vtkImageExtractComponents>::New();
+	firstComponent->SetInputData(image);
+	firstComponent->SetComponents(0);
+
+	const bool outsideScalarRange = upper < image->GetScalarTypeMin() || lower > image->GetScalarTypeMax();
 	vtkSmartPointer<vtkImageThreshold> thresholdFilter = vtkSmartPointer<vtkImageThreshold>::New();
-	thresholdFilter->SetInputData(image);
-	thresholdFilter->ThresholdBetween(lower, upper);
+	thresholdFilter->SetInputConnection(firstComponent->GetOutputPort());
+	if (outsideScalarRange)
+	{
+		thresholdFilter->ThresholdBetween(1, 0);
+	}
+	else
+	{
+		thresholdFilter->ThresholdBetween(lower, upper);
+	}
 	thresholdFilter->SetInValue(1);
 	thresholdFilter->SetOutValue(0);
 	thresholdFilter->ReplaceInOn();
