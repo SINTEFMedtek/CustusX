@@ -46,7 +46,7 @@ chmod +x installCustusX.sh
 
 ## Structure
 
-CustusX is written in C++ using CMake, Qt, CTK, VTK, ITK, Eigen, OpenCV, OpenIGTLink and other libraries. The OSGi plugin framework implemented by CTK is used, and is the recommended way to extend CustusX yourself. The platform includes the CustusX application, but it is straightforward to build your own applications using the same platform.
+CustusX is written in C++ using CMake, Qt, CTK, VTK, Eigen, OpenCV, OpenIGTLink and other libraries. The OSGi plugin framework implemented by CTK is used, and is the recommended way to extend CustusX yourself. The platform includes the CustusX application, but it is straightforward to build your own applications using the same platform.
 
 ## Contributors
 
