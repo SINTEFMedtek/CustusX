@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxTypeConversions.h"
 #include <cmath>
+#include <random>
 
 typedef boost::shared_ptr<cx::CenterlineRegistration> CenterlineRegistrationPtr;
 
@@ -141,6 +142,77 @@ TEST_CASE("CenterlineRegistration: without points the initial transform is retur
 	registration.SetMovingPoints(vtkPointsPtr::New());
 	const cx::Transform3D init = cx::createTransformTranslate(cx::Vector3D(1, 2, 3)) * cx::createTransformRotateY(0.3);
 	CHECK(cx::similar(registration.FullRegisterMoving(init), init));
+}
+
+
+namespace
+{
+
+vtkPolyDataPtr toPolyData(vtkPointsPtr points)
+{
+	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
+	retval->SetPoints(points);
+	return retval;
+}
+
+/** Tracked tool positions prMt along the middle part of the centerline, with noise. */
+cx::TimedTransformMap trackPositions(vtkPointsPtr centerline_d, cx::Transform3D prMd, double noise)
+{
+	std::mt19937 rng(17);
+	std::normal_distribution<double> gaussian(0, noise);
+	cx::TimedTransformMap retval;
+	for (vtkIdType i = 40; i < centerline_d->GetNumberOfPoints() - 40; i += 2)
+	{
+		double p[3];
+		centerline_d->GetPoint(i, p);
+		cx::Vector3D position = prMd.coord(cx::Vector3D(p[0], p[1], p[2]));
+		position += cx::Vector3D(gaussian(rng), gaussian(rng), gaussian(rng));
+		retval[i*10.0] = cx::createTransformTranslate(position);
+	}
+	return retval;
+}
+
+double meanError(const cx::TimedTransformMap& prMt, cx::Transform3D rMpr, cx::Transform3D true_rMpr)
+{
+	double sum = 0;
+	for (cx::TimedTransformMap::const_iterator iter = prMt.begin(); iter != prMt.end(); ++iter)
+	{
+		const cx::Vector3D position = iter->second.translation();
+		sum += (rMpr.coord(position) - true_rMpr.coord(position)).norm();
+	}
+	return sum / prMt.size();
+}
+
+double registrationError(cx::Transform3D initialError, double noise)
+{
+	vtkPointsPtr centerline_d = createCurve();
+	const cx::Transform3D rMd = cx::createTransformTranslate(cx::Vector3D(-20, 35, 110)) * cx::createTransformRotateY(0.4);
+	const cx::Transform3D true_rMpr = cx::createTransformTranslate(cx::Vector3D(5, -8, 12)) * cx::createTransformRotateX(0.2);
+	const cx::TimedTransformMap prMt = trackPositions(centerline_d, true_rMpr.inv() * rMd, noise);
+	const cx::Transform3D old_rMpr = initialError * true_rMpr;
+
+	cx::CenterlineRegistration registration;
+	const cx::Transform3D delta = registration.runCenterlineRegistration(toPolyData(centerline_d), rMd, prMt, old_rMpr);
+	const cx::Transform3D new_rMpr = delta * old_rMpr;
+	return meanError(prMt, new_rMpr, true_rMpr);
+}
+
+} // namespace
+
+TEST_CASE("CenterlineRegistration: corrects the patient registration from noisy tracked positions", "[unit][org.custusx.registration.method.centerline]")
+{
+	const cx::Transform3D initialError = cx::createTransformTranslate(cx::Vector3D(4, -3, 2)) * cx::createTransformRotateZ(0.05);
+	const double error = registrationError(initialError, 0.5);
+	INFO("Mean error after registration: " << error << " mm");
+	CHECK(error < 0.3);
+}
+
+TEST_CASE("CenterlineRegistration: converges from 10 mm and 10 degrees off", "[unit][org.custusx.registration.method.centerline]")
+{
+	const cx::Transform3D initialError = cx::createTransformTranslate(cx::Vector3D(7, -5, 5)) * cx::createTransformRotateX(0.12) * cx::createTransformRotateZ(-0.12);
+	const double error = registrationError(initialError, 0.5);
+	INFO("Mean error after registration: " << error << " mm");
+	CHECK(error < 0.3);
 }
 
 }; // end cxtest namespace
