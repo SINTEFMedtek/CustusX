@@ -39,7 +39,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-PluginFrameworkManager::PluginFrameworkManager()
+PluginFrameworkManager::PluginFrameworkManager() :
+	mPluginsStopped(false)
 {
 	mSettingsBase = "pluginFramework";
 	mSettingsSearchPaths = mSettingsBase + "/searchPaths";
@@ -59,9 +60,11 @@ PluginFrameworkManager::PluginFrameworkManager()
 
 PluginFrameworkManager::~PluginFrameworkManager()
 {
-	if(mFramework->getState() == ctkPlugin::ACTIVE)//LogicManager calls stop() before the destructor is called
+	// Expected after the light shutdown, which stops the plugins but leaves the CTK framework
+	// active, when LogicManager is initialized again (e.g. in tests).
+	if(mFramework->getState() == ctkPlugin::ACTIVE)
 	{
-		CX_LOG_CHANNEL_WARNING("plugin") << "This should not happen: PluginFrameworkManager destructor stopping plugin framework";
+		CX_LOG_CHANNEL_DEBUG("plugin") << "PluginFrameworkManager destructor stopping the CTK plugin framework";
 		this->stop();
 	}
 }
@@ -293,22 +296,31 @@ bool PluginFrameworkManager::start()
 	return this->frameworkStarted();
 }
 
+void PluginFrameworkManager::stopPlugins()
+{
+	if (!mPluginsStopped)
+	{
+		this->saveState();
+
+		// give plugins time to clean up internal resources before different thread deletes them
+		// (obsolete because we have disabled the other-thread shutdown)
+		emit aboutToStop();
+
+		// Bypass CTK internal 'shutdown in another thread'-mechanism, activated if we
+		// call framework::stop(). It causes too much trouble regarding Qt objects created
+		// in main thread and deleted in another thread. openCV also has trouble.
+		QStringList plugins = getPluginSymbolicNames();
+		for (int i=0; i<plugins.size(); ++i)
+		{
+			this->stop(plugins[i]);
+		}
+		mPluginsStopped = true;
+	}
+}
+
 bool PluginFrameworkManager::stop()
 {
-    this->saveState();
-
-	// give plugins time to clean up internal resources before different thread deletes them
-	// (obsolete because we have disabled the other-thread shutdown)
-    emit aboutToStop();
-
-	// Bypass CTK internal 'shutdown in another thread'-mechanism, activated if we
-	// call framework::stop(). It causes too much trouble regarding Qt objects created
-	// in main thread and deleted in another thread. openCV also has trouble.
-	QStringList plugins = getPluginSymbolicNames();
-	for (int i=0; i<plugins.size(); ++i)
-	{
-		this->stop(plugins[i]);
-	}
+	this->stopPlugins();
 
 	// stop the framework
 	try

@@ -156,6 +156,8 @@ The private plugin (`org.custusx.fraxinus.private`) follows the standard CTK plu
 
 The build scripts do this on purpose: both repos are open source, and https doesn't need an SSH key to clone. Pushing over https fails with an HTTP Basic auth error, though fetch still works.
 
+The closed-source build scripts (CustusS's and FraxinusExcelsior's `cxPrivateComponentAssembly.py`) use the SSH URL `git@gitlab.sintef.no:custusx` instead, so a root built with CustusS or FraxinusExcelsior keeps SSH remotes. Check `git remote get-url origin` rather than assuming which script last ran.
+
 When working on the code, keep the remotes on SSH. If you find one set to https, switch it back to SSH and leave it there:
 
 ```bash
