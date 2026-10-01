@@ -16,6 +16,8 @@ if(BUILD_TESTING)
     set(CXTEST_PLUGINALGORITHM_SOURCES
         cxtestBinaryThresholdImageFilter.cpp
         cxtestDilationFilter.cpp
+        cxtestBinaryThinningImageFilter3DFilter.cpp
+        cxtestAirwayCenterlines.cpp
         cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
         cxtestScriptFilter.cpp
         cxtestColorVariationFilter.cpp
