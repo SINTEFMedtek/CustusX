@@ -113,6 +113,24 @@ TEST_CASE("ToolUsingNDI: forwards the position warning", "[unit][org.custusx.cor
 	CHECK(signalCount == 2);
 }
 
+TEST_CASE("ToolUsingNDI: the calibration is applied to the positions", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	cx::ToolFileParser::ToolInternalStructurePtr structure(new cx::ToolFileParser::ToolInternalStructure());
+	structure->mUid = "pointer";
+	structure->mIsPointer = true;
+	structure->mCalibration = cx::createTransformTranslate(cx::Vector3D(0, 0, 100));
+	cx::NdiToolPtr ndiTool(new cx::NdiTool(structure));
+	cx::ToolUsingNDI tool(ndiTool);
+	cx::Transform3D prMs = cx::createTransformTranslate(cx::Vector3D(10, 20, 30)) * cx::createTransformRotateX(M_PI / 2);
+
+	ndiTool->updateTransform(prMs, 1000.0, true);
+
+	CHECK(tool.isCalibrated());
+	CHECK(cx::similar(tool.get_prMt(), prMs * structure->mCalibration));
+	CHECK(cx::similar(tool.get_prMt().coord(cx::Vector3D(0, 0, 0)), cx::Vector3D(10, -80, 30)));
+	CHECK(tool.getTimestamp() == Approx(1000.0));
+}
+
 TEST_CASE("ToolUsingNDI: tracking rate from the position history", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	cx::TimedTransformMap history;
