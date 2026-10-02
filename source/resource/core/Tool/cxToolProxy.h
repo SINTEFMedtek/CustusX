@@ -40,6 +40,7 @@ public:
 
 	virtual bool getVisible() const;
 	virtual bool isInitialized() const;
+	virtual QString getPositionWarning() const;
 
 	virtual QString getUid() const;
 	virtual QString getName() const;

@@ -72,11 +72,29 @@ struct ManagerFixture
 	cx::NdiTrackerManagerPtr manager;
 	int errors = 0;
 	std::vector<cx::Transform3D> pointerTransforms;
+	unsigned long frameNumber = 0;
 };
 
 cx::Transform3D translation(double x, double y, double z)
 {
 	return cx::createTransformTranslate(cx::Vector3D(x, y, z));
+}
+
+cx::NdiToolSample createSampleWithStatus(int portHandle, int portStatus)
+{
+	cx::NdiToolSample retval = createSample(portHandle, true);
+	retval.portStatus = portStatus;
+	return retval;
+}
+
+/** Poll count new frames, each with the given pointer and reference samples. */
+void pollFrames(ManagerFixture& fixture, int count, cx::NdiToolSample pointer, cx::NdiToolSample reference)
+{
+	for (int i = 0; i < count; ++i)
+	{
+		fixture.device->setNextFrame(++fixture.frameNumber, {pointer, reference});
+		fixture.manager->poll();
+	}
 }
 
 } // namespace
@@ -307,6 +325,97 @@ TEST_CASE("NdiTrackerManager: Polaris tools are wireless, Aurora tools are wired
 	cx::NdiToolConfig polaris = cx::NdiTrackerManager::createToolConfig(structure, cx::tsPOLARIS_SPECTRA);
 	CHECK(polaris.wireless);
 	CHECK(polaris.sromFile == "tool.rom");
+}
+
+TEST_CASE("NdiTrackerManager: a tool partially out of the volume gets a position warning", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	QString warning;
+	ManagerFixture fixture;
+	QObject::connect(fixture.pointer().get(), &cx::NdiTool::positionWarning, [&warning](QString w) { warning = w; });
+	fixture.startTracking();
+	cx::NdiToolSample reference = createSample(ManagerFixture::kReferenceHandle, true);
+
+	pollFrames(fixture, 1, createSample(ManagerFixture::kPointerHandle, true), reference);
+	CHECK(warning.isEmpty());
+
+	pollFrames(fixture, cx::NdiPositionQuality::kFramesBeforeWarning,
+			   createSampleWithStatus(ManagerFixture::kPointerHandle, cx::NdiPortStatus::PartiallyInVolume), reference);
+	CHECK(warning == "partially out of the measurement volume");
+	CHECK(fixture.pointer()->isVisible());
+
+	pollFrames(fixture, cx::NdiPositionQuality::kFramesBeforeClearing, createSample(ManagerFixture::kPointerHandle, true), reference);
+	CHECK(warning.isEmpty());
+}
+
+TEST_CASE("NdiTrackerManager: a reference warning is also a warning for the other tools", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	QString pointerWarning;
+	QString referenceWarning;
+	ManagerFixture fixture;
+	QObject::connect(fixture.pointer().get(), &cx::NdiTool::positionWarning, [&pointerWarning](QString w) { pointerWarning = w; });
+	QObject::connect(fixture.manager->getReferenceTool().get(), &cx::NdiTool::positionWarning, [&referenceWarning](QString w) { referenceWarning = w; });
+	fixture.startTracking();
+
+	pollFrames(fixture, cx::NdiPositionQuality::kFramesBeforeWarning, createSample(ManagerFixture::kPointerHandle, true),
+			   createSampleWithStatus(ManagerFixture::kReferenceHandle, cx::NdiPortStatus::OutOfVolume));
+
+	CHECK(referenceWarning == "out of the measurement volume");
+	CHECK(pointerWarning == "Reference: out of the measurement volume");
+}
+
+TEST_CASE("NdiTrackerManager: stop tracking clears the position warning", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	QString warning;
+	ManagerFixture fixture;
+	QObject::connect(fixture.pointer().get(), &cx::NdiTool::positionWarning, [&warning](QString w) { warning = w; });
+	fixture.startTracking();
+	pollFrames(fixture, cx::NdiPositionQuality::kFramesBeforeWarning,
+			   createSampleWithStatus(ManagerFixture::kPointerHandle, cx::NdiPortStatus::OutOfVolume),
+			   createSample(ManagerFixture::kReferenceHandle, true));
+	REQUIRE_FALSE(warning.isEmpty());
+
+	fixture.manager->trackSlot(false);
+
+	CHECK(warning.isEmpty());
+}
+
+TEST_CASE("NdiTrackerManager: combine tool and reference warnings", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiTrackerManager::combinePositionWarnings("", "").isEmpty());
+	CHECK(cx::NdiTrackerManager::combinePositionWarnings("a", "") == "a");
+	CHECK(cx::NdiTrackerManager::combinePositionWarnings("", "b") == "Reference: b");
+	CHECK(cx::NdiTrackerManager::combinePositionWarnings("a", "b") == "a; reference: b");
+}
+
+TEST_CASE("NdiTrackerManager: marker information is requested from Polaris only", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	ManagerFixture aurora;
+	aurora.manager->initializeSlot(true);
+	CHECK_FALSE(aurora.device->lastConnection.requestMarkerInfo);
+
+	CHECK(cx::NdiTrackerManager::isPolaris(cx::tsPOLARIS));
+	CHECK(cx::NdiTrackerManager::isPolaris(cx::tsPOLARIS_SPECTRA));
+	CHECK(cx::NdiTrackerManager::isPolaris(cx::tsPOLARIS_VICRA));
+	CHECK_FALSE(cx::NdiTrackerManager::isPolaris(cx::tsAURORA));
+	CHECK(cx::NdiTrackerManager::getDefaultMaxErrorRMS(cx::tsAURORA) == Approx(cx::NdiPositionQuality::kDefaultMaxErrorRMSAurora_mm));
+	CHECK(cx::NdiTrackerManager::getDefaultMaxErrorRMS(cx::tsPOLARIS) == Approx(cx::NdiPositionQuality::kDefaultMaxErrorRMSPolaris_mm));
+}
+
+TEST_CASE("NdiTrackerManager: the RMS error limit from the settings is used", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	QString warning;
+	ManagerFixture fixture;
+	QObject::connect(fixture.pointer().get(), &cx::NdiTool::positionWarning, [&warning](QString w) { warning = w; });
+	cx::NdiConnectionSettings connection;
+	connection.maxErrorRMS_mm = 0.2;
+	fixture.manager->setConnectionSettings(connection);
+	fixture.startTracking();
+
+	cx::NdiToolSample pointer = createSample(ManagerFixture::kPointerHandle, true);
+	pointer.errorRMS_mm = 0.3;
+	pollFrames(fixture, cx::NdiPositionQuality::kFramesBeforeWarning, pointer, createSample(ManagerFixture::kReferenceHandle, true));
+
+	CHECK(warning == "RMS error 0.30 (limit 0.20)");
 }
 
 } // namespace cxtest

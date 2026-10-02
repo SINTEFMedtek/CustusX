@@ -7,6 +7,7 @@ if(BUILD_TESTING)
         cxtestNdiToolSetup.cpp
         cxtestNdiTrackerManager.cpp
         cxtestNdiCapiDevice.cpp
+        cxtestNdiPositionQuality.cpp
         cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
 

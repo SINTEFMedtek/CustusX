@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "ndicapi.h"
 #include "cxNdiTransformUtils.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -34,7 +35,9 @@ const int kToolDefinitionRetries = 3;
 NdiCapiDevice::NdiCapiDevice() :
 	mDevice(nullptr),
 	mNetwork(false),
-	mTracking(false)
+	mTracking(false),
+	mRequestMarkerInfo(false),
+	mMarkerInfoConfirmed(false)
 {
 }
 
@@ -46,6 +49,8 @@ NdiCapiDevice::~NdiCapiDevice()
 bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 {
 	this->close();
+	mRequestMarkerInfo = settings.requestMarkerInfo;
+	mMarkerInfoConfirmed = false;
 	if (!settings.communicationLogFile.isEmpty())
 	{
 		mLogFile.setFileName(settings.communicationLogFile);
@@ -377,28 +382,80 @@ bool NdiCapiDevice::stopTracking()
 
 bool NdiCapiDevice::readFrame(const std::vector<int>& portHandles, NdiFrame& frame)
 {
-	bool success = this->command("BX:%04X", NDI_XFORMS_AND_STATUS);
+	bool success = this->sendBX();
 	if (success)
 	{
 		frame.frameNumber = 0;
 		frame.samples.clear();
 		for (int portHandle : portHandles)
 		{
-			float values[8];
-			NdiToolSample sample;
-			sample.portHandle = portHandle;
-			sample.visible = (ndiGetBXTransform(mDevice, portHandle, values) == NDI_OKAY);
-			if (sample.visible)
-			{
-				sample.transform = ndiQuaternionToTransform3D(values[0], values[1], values[2], values[3],
-															  values[4], values[5], values[6]);
-				sample.errorRMS_mm = values[7];
-			}
 			frame.frameNumber = std::max(frame.frameNumber, ndiGetBXFrame(mDevice, portHandle));
-			frame.samples.push_back(sample);
+			frame.samples.push_back(this->getBXSample(portHandle));
 		}
 	}
 	return success;
+}
+
+bool NdiCapiDevice::sendBX()
+{
+	int replyOptions = NDI_XFORMS_AND_STATUS | (mRequestMarkerInfo ? NDI_ADDITIONAL_INFO : 0);
+	bool success = this->command("BX:%04X", replyOptions);
+	if (!success && mRequestMarkerInfo && !mMarkerInfoConfirmed)
+	{
+		reportWarning("NDI Tracker: The device doesn't report marker information, tracking without it: " + mLastError);
+		mRequestMarkerInfo = false;
+		success = this->command("BX:%04X", NDI_XFORMS_AND_STATUS);
+	}
+	mMarkerInfoConfirmed = mMarkerInfoConfirmed || (success && mRequestMarkerInfo);
+	return success;
+}
+
+NdiToolSample NdiCapiDevice::getBXSample(int portHandle)
+{
+	NdiToolSample sample;
+	sample.portHandle = portHandle;
+	float values[8];
+	sample.visible = (ndiGetBXTransform(mDevice, portHandle, values) == NDI_OKAY);
+	if (sample.visible)
+	{
+		sample.transform = ndiQuaternionToTransform3D(values[0], values[1], values[2], values[3],
+													  values[4], values[5], values[6]);
+		sample.errorRMS_mm = values[7];
+	}
+	sample.portStatus = ndiGetBXPortStatus(mDevice, portHandle);
+	const char* info = mRequestMarkerInfo ? this->findBXToolMarkerInformation(portHandle) : nullptr;
+	if (info)
+	{
+		sample.toolInfo = info[0] & 0xFF;
+		sample.markersUsed = countUsedMarkers(info + 1);
+	}
+	return sample;
+}
+
+const char* NdiCapiDevice::findBXToolMarkerInformation(int portHandle) const
+{
+	const char* retval = nullptr;
+	for (int i = 0; i < mDevice->BxHandleCount; ++i)
+	{
+		if (static_cast<unsigned char>(mDevice->BxHandles[i]) == portHandle && mDevice->BxHandlesStatus[i] != NDI_HANDLE_DISABLED)
+		{
+			retval = mDevice->BxToolMarkerInformation[i];
+		}
+	}
+	return retval;
+}
+
+int NdiCapiDevice::countUsedMarkers(const char markerInfo[10])
+{
+	const int kMarkerUsed = 3;
+	int retval = 0;
+	for (int i = 0; i < 10; ++i)
+	{
+		int lowMarker = markerInfo[i] & 0x0F;
+		int highMarker = (markerInfo[i] >> 4) & 0x0F;
+		retval += (lowMarker == kMarkerUsed ? 1 : 0) + (highMarker == kMarkerUsed ? 1 : 0);
+	}
+	return retval;
 }
 
 } // namespace cx

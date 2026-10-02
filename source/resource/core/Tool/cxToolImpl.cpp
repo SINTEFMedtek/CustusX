@@ -77,6 +77,20 @@ void ToolImpl::setTooltipOffset(double val)
 	emit tooltipOffset(mTooltipOffset);
 }
 
+QString ToolImpl::getPositionWarning() const
+{
+	return mPositionWarning;
+}
+
+void ToolImpl::setPositionWarning(QString warning)
+{
+	if (warning != mPositionWarning)
+	{
+		mPositionWarning = warning;
+		emit toolPositionWarning(mPositionWarning);
+	}
+}
+
 TimedTransformMapPtr ToolImpl::getPositionHistory()
 {
 	return mPositionHistory;

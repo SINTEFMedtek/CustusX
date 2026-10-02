@@ -77,7 +77,7 @@ void NdiTool::setPortHandle(int handle)
 	mPortHandle = handle;
 }
 
-void NdiTool::updateTransform(const Transform3D& transform, double timestamp, bool visible, double errorRMS_mm)
+void NdiTool::updateTransform(const Transform3D& transform, double timestamp, bool visible, const NdiToolSample& sample)
 {
 	if (!visible)
 		mMissedFrames++;
@@ -91,12 +91,18 @@ void NdiTool::updateTransform(const Transform3D& transform, double timestamp, bo
 	{
 		mVisible = reportVisible;
 		emit toolVisible(mVisible);
+		if (!mVisible)
+		{
+			mQuality.reset();
+			this->setPositionWarning(QString());
+		}
 	}
 
 	if (mVisible && visible)
 	{
 		ToolPositionMetadata metadata;
-		metadata.mData = QString("errorRMS_mm:%1").arg(errorRMS_mm);
+		metadata.mData = QString("errorRMS_mm:%1 portStatus:0x%2 markersUsed:%3")
+				.arg(sample.errorRMS_mm).arg(sample.portStatus, 0, 16).arg(sample.markersUsed);
 		emit toolTransformAndTimestamp(transform, timestamp, metadata);
 	}
 }
@@ -106,9 +112,30 @@ void NdiTool::setInitialized(bool on)
 	mInitialized = on;
 }
 
+QString NdiTool::updateQuality(const NdiToolSample& sample)
+{
+	return mQuality.update(sample);
+}
+
+void NdiTool::setPositionWarning(QString warning)
+{
+	if (warning != mPositionWarning)
+	{
+		mPositionWarning = warning;
+		emit positionWarning(mPositionWarning);
+	}
+}
+
+void NdiTool::setMaxErrorRMS(double maxErrorRMS_mm)
+{
+	mQuality.setMaxErrorRMS(maxErrorRMS_mm);
+}
+
 void NdiTool::setInvisible()
 {
 	mMissedFrames = kMissTolerance + 1;
+	mQuality.reset();
+	this->setPositionWarning(QString());
 	if (mVisible)
 	{
 		mVisible = false;

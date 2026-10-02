@@ -54,6 +54,9 @@ public:
 	void setConnectionSettings(const NdiConnectionSettings& connection); ///< Thread-safe. Used by the next connect.
 
 	static NdiToolConfig createToolConfig(ToolFileParser::ToolInternalStructurePtr structure, TRACKING_SYSTEM trackerType);
+	static QString combinePositionWarnings(QString toolWarning, QString referenceWarning);
+	static double getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType);
+	static bool isPolaris(TRACKING_SYSTEM trackerType);
 	static const int kMaxConsecutiveReadFailures = 3;
 
 signals:
@@ -72,6 +75,7 @@ private:
 	bool setupTools();
 	void distributeFrame(const NdiFrame& frame, double timestamp);
 	void setAllToolsInvisible();
+	void setMaxErrorRMS(double maxErrorRMS_mm);
 	void startFastPoll();
 	void scheduleNextPoll(double now_ms);
 

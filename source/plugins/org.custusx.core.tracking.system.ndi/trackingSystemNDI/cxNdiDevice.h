@@ -29,6 +29,8 @@ struct org_custusx_core_tracking_system_ndi_EXPORT NdiConnectionSettings
 	int networkPort = 8765; ///< Port for network connections (NDI default)
 	int baudRate = 115200; ///< Serial baud rate. 115200 is what the IGSTK plugin has always used.
 	QString communicationLogFile; ///< If not empty, log the commands and replies to this file.
+	bool requestMarkerInfo = false; ///< Request tool and marker information in BX (Polaris only). Set by NdiTrackerManager.
+	double maxErrorRMS_mm = 0.0; ///< Warn about the position above this RMS error. 0: default for the device type.
 };
 
 /** Which port handles to list, see the NDI PHSR command. */
@@ -51,12 +53,29 @@ struct org_custusx_core_tracking_system_ndi_EXPORT NdiPortLocation
 };
 
 /** Tracking data for one port handle in one frame. */
+/** BX port status bits used by the plugin */
+namespace NdiPortStatus
+{
+const int OutOfVolume = 0x40;
+const int PartiallyInVolume = 0x80;
+}
+
+/** BX tool information bits (Polaris) */
+namespace NdiToolInfo
+{
+const int BadTransformFit = 0x01;
+const int NotEnoughMarkers = 0x02;
+}
+
 struct org_custusx_core_tracking_system_ndi_EXPORT NdiToolSample
 {
 	int portHandle = -1;
 	bool visible = false;          ///< false if the transform is missing (out of view) or the port is disabled
 	Transform3D transform = Transform3D::Identity(); ///< camera/field generator to tool sensor, mm
 	double errorRMS_mm = 0.0;
+	int portStatus = 0;  ///< BX port status bits, see NdiPortStatus
+	int toolInfo = 0;    ///< BX tool information bits, see NdiToolInfo. Polaris only.
+	int markersUsed = -1; ///< Markers used to compute the transform, -1 if unknown. Polaris only.
 };
 
 /** Tracking data for all port handles in one frame. */

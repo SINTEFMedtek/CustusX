@@ -43,6 +43,8 @@ ToolUsingNDI::ToolUsingNDI(NdiToolPtr ndiTool) :
 			this, &ToolUsingNDI::toolVisibleSlot);
 	connect(mTool.get(), &NdiTool::toolVisible,
 			this, &ToolUsingNDI::toolVisible);
+	connect(mTool.get(), &NdiTool::positionWarning,
+			this, &ToolUsingNDI::setPositionWarning);
 	connect(&mTpsTimer, &QTimer::timeout, this, &ToolUsingNDI::calculateTpsSlot);
 
 	if (getToolFileToolStructure()->mIsProbe)

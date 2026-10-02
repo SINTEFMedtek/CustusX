@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "catch.hpp"
 
 #include "cxNdiCapiDevice.h"
+#include "cxNdiTool.h"
 #include "cxToolUsingNDI.h"
 
 namespace cxtest
@@ -73,6 +74,42 @@ TEST_CASE("NdiCapiDevice: a network device that refuses the connection fails cle
 
 	CHECK_FALSE(device.open(settings));
 	CHECK_FALSE(device.isOpen());
+}
+
+TEST_CASE("NdiCapiDevice: count the used markers in the BX marker information", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	char none[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	CHECK(cx::NdiCapiDevice::countUsedMarkers(none) == 0);
+
+	char fourUsed[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0x33, 0x33};
+	CHECK(cx::NdiCapiDevice::countUsedMarkers(fourUsed) == 4);
+
+	char threeUsedOneMissing[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0x03, 0x33};
+	CHECK(cx::NdiCapiDevice::countUsedMarkers(threeUsedOneMissing) == 3);
+
+	char exceeded[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0x12, 0x33};
+	CHECK(cx::NdiCapiDevice::countUsedMarkers(exceeded) == 2);
+
+	char allTwenty[10] = {0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33};
+	CHECK(cx::NdiCapiDevice::countUsedMarkers(allTwenty) == 20);
+}
+
+TEST_CASE("ToolUsingNDI: forwards the position warning", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	cx::ToolFileParser::ToolInternalStructurePtr structure(new cx::ToolFileParser::ToolInternalStructure());
+	structure->mUid = "pointer";
+	structure->mIsPointer = true;
+	cx::NdiToolPtr ndiTool(new cx::NdiTool(structure));
+	cx::ToolUsingNDI tool(ndiTool);
+	int signalCount = 0;
+	QObject::connect(&tool, &cx::Tool::toolPositionWarning, [&signalCount](QString) { signalCount++; });
+
+	ndiTool->setPositionWarning("out of the measurement volume");
+	CHECK(tool.getPositionWarning() == "out of the measurement volume");
+
+	ndiTool->setPositionWarning("");
+	CHECK(tool.getPositionWarning().isEmpty());
+	CHECK(signalCount == 2);
 }
 
 TEST_CASE("ToolUsingNDI: tracking rate from the position history", "[unit][org.custusx.core.tracking.system.ndi]")

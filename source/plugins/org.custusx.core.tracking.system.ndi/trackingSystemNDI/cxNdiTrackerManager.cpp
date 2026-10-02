@@ -87,7 +87,7 @@ NdiToolConfig NdiTrackerManager::createToolConfig(ToolFileParser::ToolInternalSt
 {
 	// Same rule as the IGSTK plugin: Polaris tools are wireless (passive, .rom file),
 	// Aurora tools are wired and identified by port (and channel for 5DOF sensors).
-	bool polaris = (trackerType == tsPOLARIS || trackerType == tsPOLARIS_SPECTRA || trackerType == tsPOLARIS_VICRA);
+	bool polaris = isPolaris(trackerType);
 	NdiToolConfig retval;
 	retval.uid = structure->mUid;
 	retval.reference = structure->mIsReference;
@@ -227,6 +227,7 @@ void NdiTrackerManager::distributeFrame(const NdiFrame& frame, double timestamp)
 	// While the reference is not visible, none of the tools are.
 	bool referenceVisible = !mReferenceTool;
 	Transform3D cMref = Transform3D::Identity();
+	QString referenceWarning;
 	for (const NdiToolSample& sample : frame.samples)
 	{
 		std::map<int, NdiToolPtr>::iterator it = mPortHandleToTool.find(sample.portHandle);
@@ -234,6 +235,7 @@ void NdiTrackerManager::distributeFrame(const NdiFrame& frame, double timestamp)
 		{
 			referenceVisible = true;
 			cMref = sample.transform;
+			referenceWarning = mReferenceTool->updateQuality(sample);
 		}
 	}
 
@@ -251,7 +253,45 @@ void NdiTrackerManager::distributeFrame(const NdiFrame& frame, double timestamp)
 		{
 			prMt = cMref.inverse() * sample.transform;
 		}
-		tool->updateTransform(prMt, timestamp, visible, sample.errorRMS_mm);
+		tool->updateTransform(prMt, timestamp, visible, sample);
+		if (visible && tool == mReferenceTool)
+		{
+			tool->setPositionWarning(referenceWarning);
+		}
+		else if (visible)
+		{
+			tool->setPositionWarning(combinePositionWarnings(tool->updateQuality(sample), referenceWarning));
+		}
+	}
+}
+
+QString NdiTrackerManager::combinePositionWarnings(QString toolWarning, QString referenceWarning)
+{
+	QString retval = toolWarning;
+	if (!referenceWarning.isEmpty())
+	{
+		retval = toolWarning.isEmpty() ? "Reference: " + referenceWarning : toolWarning + "; reference: " + referenceWarning;
+	}
+	return retval;
+}
+
+double NdiTrackerManager::getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType)
+{
+	bool aurora = (trackerType == tsAURORA);
+	return aurora ? NdiPositionQuality::kDefaultMaxErrorRMSAurora_mm : NdiPositionQuality::kDefaultMaxErrorRMSPolaris_mm;
+}
+
+bool NdiTrackerManager::isPolaris(TRACKING_SYSTEM trackerType)
+{
+	return (trackerType == tsPOLARIS || trackerType == tsPOLARIS_SPECTRA || trackerType == tsPOLARIS_VICRA);
+}
+
+void NdiTrackerManager::setMaxErrorRMS(double maxErrorRMS_mm)
+{
+	QMutexLocker locker(&mToolMutex);
+	for (std::pair<const QString, NdiToolPtr>& entry : mTools)
+	{
+		entry.second->setMaxErrorRMS(maxErrorRMS_mm);
 	}
 }
 
@@ -277,6 +317,8 @@ bool NdiTrackerManager::connectToDevice()
 		QMutexLocker locker(&mConnectionMutex);
 		connection = mConnection;
 	}
+	connection.requestMarkerInfo = isPolaris(mTrackerStructure.mType);
+	this->setMaxErrorRMS(connection.maxErrorRMS_mm > 0.0 ? connection.maxErrorRMS_mm : getDefaultMaxErrorRMS(mTrackerStructure.mType));
 	QString where = connection.hostname.isEmpty() ? QString("(searching serial ports)") : connection.hostname;
 	report("NDI Tracker: Connecting to device " + where + "...");
 	bool success = mDevice->open(connection);

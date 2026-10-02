@@ -57,6 +57,7 @@ public:
 	static QStringList getSerialPortCandidates();
 	static NdiPortLocation parsePortLocation(const char location[14]);
 	static int baudRateToNdiCode(int baudRate);
+	static int countUsedMarkers(const char markerInfo[10]); ///< From the 10 marker bytes in a BX reply, 4 bits per marker
 
 private:
 	bool openSerial(QString device, int baudRate);
@@ -66,10 +67,15 @@ private:
 	bool command(const char* format, ...);
 	void log(const QString& text);
 	bool isSerial() const;
+	bool sendBX();
+	NdiToolSample getBXSample(int portHandle);
+	const char* findBXToolMarkerInformation(int portHandle) const; ///< Tool info byte + 10 marker bytes, or null
 
 	ndicapi* mDevice;
 	bool mNetwork;
 	bool mTracking;
+	bool mRequestMarkerInfo;
+	bool mMarkerInfoConfirmed; ///< BX with marker information has worked at least once
 	QString mLastError;
 	QString mLastReply; ///< Reply to the last text (non-binary) command
 	QString mDescription;

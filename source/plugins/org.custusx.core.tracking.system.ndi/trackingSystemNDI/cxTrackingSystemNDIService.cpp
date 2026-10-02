@@ -299,6 +299,7 @@ NdiConnectionSettings TrackingSystemNDIService::readConnectionSettings() const
 	NdiConnectionSettings retval;
 	retval.hostname = settings()->value("ndiTrackingHostname", "").toString();
 	retval.baudRate = settings()->value("ndiTrackingBaudRate", 115200).toInt();
+	retval.maxErrorRMS_mm = settings()->value("ndiTrackingMaxErrorRMS", 0.0).toDouble();
 	if (settings()->value("ndiTrackingDebugLogging", false).toBool() && !mLoggingFolder.isEmpty())
 	{
 		QDir().mkpath(mLoggingFolder);

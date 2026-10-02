@@ -97,6 +97,11 @@ bool ToolProxy::isInitialized() const
 	return mTool->isInitialized();
 }
 
+QString ToolProxy::getPositionWarning() const
+{
+	return mTool->getPositionWarning();
+}
+
 QString ToolProxy::getUid() const
 {
 	return mTool->getUid();
