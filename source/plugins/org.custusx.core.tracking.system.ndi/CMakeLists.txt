@@ -110,6 +110,10 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+if(CX_PLUGIN_org.custusx.core.tracking.system.igstk)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE CX_NDI_WITH_IGSTK_PLUGIN)
+endif()
+
 vtk_module_autoinit(
   TARGETS ${PROJECT_NAME}
   MODULES VTK::CommonCore

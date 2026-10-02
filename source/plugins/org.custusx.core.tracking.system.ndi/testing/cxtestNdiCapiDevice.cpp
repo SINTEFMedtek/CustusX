@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxNdiCapiDevice.h"
 #include "cxNdiTool.h"
 #include "cxToolUsingNDI.h"
+#include "cxTrackingSystemNDIService.h"
 
 namespace cxtest
 {
@@ -133,6 +134,15 @@ TEST_CASE("ToolUsingNDI: tracking rate from the position history", "[unit][org.c
 		history[2000 + 50 * i] = cx::Transform3D::Identity();
 	}
 	CHECK(cx::ToolUsingNDI::calculateTrackingRate(history) == 20);
+}
+
+TEST_CASE("TrackingSystemNDIService: handles ndi configurations, and igstk ones unless the IGSTK plugin is built", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::TrackingSystemNDIService::handlesImplementation("ndi", false));
+	CHECK(cx::TrackingSystemNDIService::handlesImplementation("ndi", true));
+	CHECK(cx::TrackingSystemNDIService::handlesImplementation("igstk", false));
+	CHECK_FALSE(cx::TrackingSystemNDIService::handlesImplementation("igstk", true));
+	CHECK_FALSE(cx::TrackingSystemNDIService::handlesImplementation("openigtlink", false));
 }
 
 } // namespace cxtest

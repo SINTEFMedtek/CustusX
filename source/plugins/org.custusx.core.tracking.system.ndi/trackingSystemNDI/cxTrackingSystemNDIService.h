@@ -52,6 +52,10 @@ class org_custusx_core_tracking_system_ndi_EXPORT TrackingSystemNDIService : pub
 	Q_OBJECT
 
 public:
+	/** NDI handles ndi configurations, and igstk configurations unless the IGSTK plugin is built too. */
+	static bool handlesImplementation(QString implementation, bool igstkPluginBuilt);
+	static bool isIgstkPluginBuilt();
+
 	TrackingSystemNDIService();
 	virtual ~TrackingSystemNDIService();
 

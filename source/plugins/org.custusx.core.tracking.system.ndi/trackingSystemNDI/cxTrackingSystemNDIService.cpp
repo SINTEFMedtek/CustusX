@@ -60,9 +60,8 @@ void TrackingSystemNDIService::configure()
 	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
 
 	QString implementation = configParser.getTrackingSystemImplementation();
-	bool isNdi = implementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_NDI, Qt::CaseInsensitive);
 	bool isLegacyIgstk = implementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_IGSTK, Qt::CaseInsensitive);
-	if (!isNdi && !isLegacyIgstk)
+	if (!handlesImplementation(implementation, isIgstkPluginBuilt()))
 	{
 		CX_LOG_DEBUG() << "TrackingSystemNDIService::configure(): Not using NDI tracking.";
 		return;
@@ -104,6 +103,22 @@ void TrackingSystemNDIService::configure()
 	connect(mTrackerThread.get(), &NdiTrackerThread::error, this, &TrackingSystemNDIService::trackerErrorSlot);
 
 	mTrackerThread->start();
+}
+
+bool TrackingSystemNDIService::handlesImplementation(QString implementation, bool igstkPluginBuilt)
+{
+	bool isNdi = implementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_NDI, Qt::CaseInsensitive);
+	bool isLegacyIgstk = implementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_IGSTK, Qt::CaseInsensitive);
+	return isNdi || (isLegacyIgstk && !igstkPluginBuilt);
+}
+
+bool TrackingSystemNDIService::isIgstkPluginBuilt()
+{
+#ifdef CX_NDI_WITH_IGSTK_PLUGIN
+	return true;
+#else
+	return false;
+#endif
 }
 
 void TrackingSystemNDIService::trackerConfiguredSlot(bool on)
