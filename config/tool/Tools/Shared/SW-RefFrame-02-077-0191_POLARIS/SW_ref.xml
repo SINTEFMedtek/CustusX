@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<!-- Tool -->
+<!-- ==== -->
+<tool>
+  <type>reference</type>
+  <id>02-077-0191_Sterile-RefFrame</id>
+  <name>SW Sterile RefFrame</name>
+  <description>Sonowand sterile reference frame</description>
+  <manufacturer>Sonowand</manufacturer>
+  <clinical_app>Laboratory</clinical_app>
+  <geo_file></geo_file>
+  <pic_file></pic_file>
+  <doc_file></doc_file>
+  <openigtlinktransformid>SWRef</openigtlinktransformid>
+
+  <!-- Instrument -->
+  <instrument>
+    <type></type>
+    <id></id>
+    <name></name>
+    <manufacturer></manufacturer>
+    <description></description>
+  </instrument>
+
+  <!-- Sensor -->
+  <sensor>
+    <type>Polaris</type>
+    <id>02-077-0191_Sterile-RefFrame</id>
+    <name>02-077-0191_Sterile-RefFrame</name>
+    <wireless>yes</wireless>
+    <DOF></DOF>
+    <portnumber></portnumber>
+    <channelnumber></channelnumber>
+    <manufacturer>NDI</manufacturer>
+    <description></description>
+    <rom_file>02-077-0191_Sterile-RefFrame.rom</rom_file>
+  </sensor>
+
+  <!-- Calibration -->
+  <calibration>
+    <cal_file></cal_file>
+  </calibration>
+</tool>
