@@ -37,6 +37,7 @@ if(BUILD_TESTING)
         cxtestVisServices.cpp
         cxtestActiveData.cpp
         cxtestStreamedTimestampSynchronizer.cpp
+        cxtestToolPositionRecorder.cpp
         cxtestTestDataStructures.h
         cxtestTestDataStructures.cpp
         cxtestDataLocations.cpp

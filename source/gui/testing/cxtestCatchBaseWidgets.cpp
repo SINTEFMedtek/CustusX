@@ -32,6 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxShadingWidget.h"
 //#include "cxSimulateUSWidget.h"
 #include "cxToolPropertiesWidget.h"
+#include "cxTrackingTestWidget.h"
 #include "cxTrackPadWidget.h"
 #include "cxTransferFunction2DColorWidget.h"
 #include "cxTransferFunction2DOpacityWidget.h"
@@ -150,6 +151,7 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	testAndDeleteBaseWidgetChild(new cx::ShadingWidget(patientModelService->getActiveData(), testParent));
 //	testAndDeleteBaseWidgetChild(new cx::SimulateUSWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolPropertiesWidget(trackingService, spaceProvider, testParent));
+	testAndDeleteBaseWidgetChild(new cx::TrackingTestWidget(trackingService, services->video(), testParent));
 	testAndDeleteBaseWidgetChild(new cx::TrackPadWidget(viewService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::Transform3DWidget(testParent));
 

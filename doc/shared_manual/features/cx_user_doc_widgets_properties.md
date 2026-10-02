@@ -133,13 +133,41 @@ Change the matrix to move and/or orient the tool. Tool offset is not applied to 
 See \ref coordinate_systems_specific_spaces for more information on coordinate systems.
 
 
+\addindex tracking_test_widget
 \addindex tool_manager_widget
-Tool Manager Widget
+\addindex tool_position_recorder_widget
+\addindex tracking_comparison_widget
+Tracking Test Widget {#property_widgets_tracking_test}
 ===========================================================
 
-ToolManager debugging utilities.
+Tools for testing the tracking, in the Debugging group of the Window menu.
 
-Lets you test different aspects of the toolmanager.
+Tracking state
+-------------------
+Configure, initialize, start and stop tracking, and the reverse, one step at a time.
+
+Record positions
+-------------------
+Records the tool positions to a CSV file while you press Start/Stop recording, e.g. while moving a tool
+in and out of the measurement volume. Each row has a label, the tool, the event (position, visible, hidden
+or warning), the tool and receive timestamps (ms), whether the tool is visible, the tool tip position and
+rotation in the patient reference space (mm), the position warning, and the tracking system's metadata
+(e.g. the NDI RMS error). The widget shows the number of positions, the rate, and the mean position and
+spread of each tool.
+
+Compare systems
+-------------------
+Tracks the same tools with several tracking systems, one after the other: IGSTK, NDI, and OpenIGTLink.
+For each system, the tool configuration is copied with that tracking system, tracking is started, the
+positions are recorded for the given time, and tracking is stopped. For OpenIGTLink, an OpenIGTLink tracking
+server can be started first, e.g. the ndistreamer application from bkinterface, with the given arguments.
+The OpenIGTLink tools are matched by the OpenIGTLink transform id in the tool files. Apply the reference to the
+OpenIGTLink tools if the server sends the positions in tracker space (e.g. bkinterface), so that the positions
+can be compared with the other systems.
+
+The output folder gets one CSV file per system (same format as above), the tool configurations and server logs
+that were used, and summary.txt with the rate, mean position and spread of each tool for each system.
+Keep the tools still during a comparison, to compare the positions between the systems.
 
 
 Mesh Properties {#property_widgets_mesh}
