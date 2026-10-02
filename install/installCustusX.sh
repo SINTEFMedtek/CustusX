@@ -81,7 +81,7 @@ sudo apt-get -y install libglew-dev libpcre2-16-0 libdouble-conversion3 git wget
 # Find or download the CustusX release tarball
 # ---------------------------------------------------------------------------
 if [ -n "$CUSTUSX_VERSION" ]; then
-    TARBALL="CustusX-${OS}.tar.gz"
+    TARBALL="CustusX-${OS}-${CUSTUSX_VERSION}.tar.gz"
     DOWNLOAD_URL="${GITLAB_PROJECT_URL}/packages/generic/CustusX/${CUSTUSX_VERSION}/${TARBALL}"
 
     echo "Downloading CustusX ${CUSTUSX_VERSION} for Ubuntu ${UBUNTU_VERSION}..."
@@ -101,27 +101,21 @@ if [ -n "$CUSTUSX_VERSION" ]; then
         exit 1
     fi
 else
-    TARBALL=$(ls CustusX*.tar.gz 2>/dev/null | head -1)
+    # Local dev/CI builds encode the OS as e.g. "_Ubuntu22.04"; pick the newest
+    # one built for this Ubuntu version, since a build for another version
+    # installs fine but fails at runtime with missing .so errors.
+    TARBALL=$(ls -t CustusX*.tar.gz 2>/dev/null | grep -F -e "$OS" -e "Ubuntu${UBUNTU_VERSION}" | head -1)
     if [ -z "$TARBALL" ]; then
-        echo "ERROR: No CustusX*.tar.gz found in the current directory."
-        echo "Download the versioned installer from the releases page:"
-        echo "  https://gitlab.sintef.no/custusx/CustusX/-/releases"
+        if ls CustusX*.tar.gz >/dev/null 2>&1; then
+            echo "ERROR: No CustusX*.tar.gz here was built for Ubuntu $UBUNTU_VERSION."
+            echo "Remove it and place a CustusX*${OS}*.tar.gz build here instead, then re-run."
+        else
+            echo "ERROR: No CustusX*.tar.gz found in the current directory."
+            echo "Download the versioned installer from the releases page:"
+            echo "  https://gitlab.sintef.no/custusx/CustusX/-/releases"
+        fi
         exit 1
     fi
-    # Local dev/CI builds encode the OS as e.g. "_Ubuntu22.04" (with a dot);
-    # tagged releases encode it as "-Ubuntu2204" (no dot, matching $OS above).
-    # Refuse a tarball built for a different Ubuntu version outright -- used
-    # silently, it installs fine but fails at runtime with a confusing
-    # missing-.so error (e.g. a 20.04 build's libGLEW.so.2.1 vs 22.04's
-    # libGLEW.so.2.2), long after a clear error here would have helped.
-    case "$TARBALL" in
-        *"$OS"*|*"Ubuntu${UBUNTU_VERSION}"*) ;;
-        *)
-            echo "ERROR: $TARBALL does not look like it was built for Ubuntu $UBUNTU_VERSION."
-            echo "Remove it and place a CustusX*${OS}*.tar.gz build here instead, then re-run."
-            exit 1
-            ;;
-    esac
     echo "Using local tarball: $TARBALL"
 fi
 
@@ -158,6 +152,12 @@ rm -rf CustusX_temp
 
 # ---------------------------------------------------------------------------
 # Shortcut to the (shared, family-level) Patients folder
+#
+# Type=Application + an absolute Exec path, not Type=Link -- Ubuntu's GNOME
+# Shell desktop-icons extension (which renders desktop icons, not Nautilus
+# itself) rejects Type=Link entries outright ("Broken Desktop File") and also
+# rejects a bare command name in Exec= (e.g. "xdg-open", relying on $PATH)
+# with the same error, needing the executable's absolute path instead.
 # ---------------------------------------------------------------------------
 # xdg-user-dirs localizes the Desktop folder's name (e.g. ~/Skrivebord on a
 # Norwegian install), so ~/Desktop doesn't reliably exist -- ask xdg-user-dir
@@ -168,16 +168,19 @@ if [ -z "$DESKTOP_DIR" ]; then
 fi
 
 mkdir -p ~/CustusX/Patients
+XDG_OPEN_PATH="$(command -v xdg-open || echo /usr/bin/xdg-open)"
 if [ -d "$DESKTOP_DIR" ]; then
     cat > "$DESKTOP_DIR/CustusX_Patients.desktop" <<EOF
 [Desktop Entry]
-Type=Link
+Type=Application
 Name=CustusX Patients
 Icon=folder
-URL=$HOME/CustusX/Patients
+Exec="$XDG_OPEN_PATH" "$HOME/CustusX/Patients"
+Terminal=false
 EOF
-    gio set "$DESKTOP_DIR/CustusX_Patients.desktop" metadata::trusted true 2>/dev/null || true
+    # chmod before gio set -- see the comment on the app shortcut below.
     chmod +x "$DESKTOP_DIR/CustusX_Patients.desktop"
+    gio set "$DESKTOP_DIR/CustusX_Patients.desktop" metadata::trusted true 2>/dev/null || true
 fi
 
 # ---------------------------------------------------------------------------
@@ -191,8 +194,13 @@ if [ -f "CustusX.desktop" ] && [ -d "$DESKTOP_DIR" ]; then
     sed -i "s|Exec=.*|Exec=$EXEC_PATH|g" CustusX.desktop
     sed -i "s|Icon=.*|Icon=$ICON_PATH|g" CustusX.desktop
     cp CustusX.desktop "$DESKTOP_DIR/"
-    gio set "$DESKTOP_DIR/CustusX.desktop" metadata::trusted true 2>/dev/null || true
+    # chmod before gio set: GNOME's desktop trust check only takes the
+    # metadata::trusted flag into account for a file that's already
+    # executable, so setting it first (against a not-yet-executable
+    # freshly-copied file) doesn't stick -- Nautilus then renders it as
+    # an untrusted/invalid launcher (broken icon, raw filename as label).
     chmod +x "$DESKTOP_DIR/CustusX.desktop"
+    gio set "$DESKTOP_DIR/CustusX.desktop" metadata::trusted true 2>/dev/null || true
 fi
 
 echo ""

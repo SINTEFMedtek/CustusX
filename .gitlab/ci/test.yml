@@ -29,7 +29,13 @@
     reports:
       junit: test_results/*junit.xml
 
-test-ubuntu20:
+# Disabled (CustusX#51): remove the leading dot to enable again -- and
+# also remove the leading dot from .build-ubuntu20 in build.yml at the
+# same time. needs: below refers to that job by its un-dotted name
+# (correct once both are re-enabled together); re-enabling only this job
+# leaves needs: pointing at a job that doesn't exist yet and GitLab CI
+# will reject the pipeline config.
+.test-ubuntu20:
   extends: .test-job
   stage: test
   needs: ["build-ubuntu20"]

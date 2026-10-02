@@ -27,7 +27,7 @@ Nothing is moved or deleted automatically. Your old folders are left as they wer
 | Key | Summary | Release Note |
 |---|---|---|
 | [CustusX#45](https://gitlab.sintef.no/custusx/custusx/-/issues/45) | Liver segmentation | Added a new Liver plugin using TotalSegmentator to segment the liver, pancreas, liver vessels, liver lesions and the 8 Couinaud liver segments from CT/MR, with a combined widget to run and toggle visibility of each structure. Segmentation runs in the background so the UI no longer freezes while it works. |
-| [CustusX#44](https://gitlab.sintef.no/custusx/custusx/-/issues/44) | Single-file Ubuntu installer | Added a single-file Ubuntu installer script (`installCustusX.sh`) that downloads and sets up CustusX automatically, plus a `curl` one-liner that always fetches the latest release. Also added a desktop launcher. |
+| [CustusX#44](https://gitlab.sintef.no/custusx/custusx/-/issues/44) | Single-file Ubuntu installer | Added a single-file Ubuntu installer script (`installCustusX.sh`) that downloads and sets up CustusX automatically, plus a `curl` one-liner that always fetches the latest release. Also added desktop shortcuts for starting CustusX and for opening the shared `~/CustusX/Patients` folder. |
 
 ## Bugfixes
 

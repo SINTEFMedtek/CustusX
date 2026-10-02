@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include "catch.hpp"
 
+#include <QCoreApplication>
 #include <QEventLoop>
 #include <boost/make_shared.hpp>
 #include "vtkTimerLog.h"
@@ -31,6 +32,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestPlusReceiver.h"
 #include "cxtestIOReceiver.h"
 #include "cxtestVideoGraphicsFixture.h"
+#include <chrono>
+#include <functional>
+#include <future>
+#include <memory>
+#include <thread>
 
 namespace
 {
@@ -55,7 +61,46 @@ public:
 		REQUIRE(server);
 		REQUIRE(client);
 	}
+
+	void startServerAndClientAndConnect(int port)
+	{
+		logic = igtlioLogicPointer::New();
+		server = logic->StartServer(port);
+		client = logic->ConnectToServer("localhost", port);
+		REQUIRE(server);
+		REQUIRE(client);
+	}
 };
+
+namespace
+{
+bool waitFor(std::function<bool()> condition, int timeout_ms)
+{
+	bool done = condition();
+	for (int elapsed_ms = 0; !done && elapsed_ms < timeout_ms; elapsed_ms += 10)
+	{
+		cx::sleep_ms(10);
+		done = condition();
+	}
+	return done;
+}
+
+// Tests that stop a server with a connected client can't reuse its port for up to a minute
+// (TIME_WAIT, OpenIGTLink only sets SO_REUSEADDR on Windows), so give each test and process its own port.
+int getUniqueTestPort(int testIndex)
+{
+	return 19000 + 10 * (QCoreApplication::applicationPid() % 100) + testIndex;
+}
+
+// Run Stop() on its own thread, so that a hang fails the test instead of blocking it forever.
+bool stopsWithin(igtlioConnectorPointer connector, int timeout_ms)
+{
+	std::shared_ptr<std::promise<void>> stopped = std::make_shared<std::promise<void>>();
+	std::future<void> future = stopped->get_future();
+	std::thread([connector, stopped]() { connector->Stop(); stopped->set_value(); }).detach();
+	return future.wait_for(std::chrono::milliseconds(timeout_ms)) == std::future_status::ready;
+}
+}
 
 class NetworkHandlerTester : public cx::NetworkHandler
 {
@@ -234,6 +279,36 @@ TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.c
 
 	REQUIRE(fixture.logic->RemoveConnector(fixture.server->GetConnector()));
 	REQUIRE_FALSE(fixture.logic->RemoveConnector(fixture.server->GetConnector()));
+}
+
+TEST_CASE("Stop server connector while a client is connected", "[plugins][org.custusx.core.openigtlink3][integration][not_win64]")
+{
+	igtlioServerClientFixture fixture;
+	fixture.startServerAndClientAndConnect(getUniqueTestPort(0));
+	igtlioConnectorPointer server = fixture.server->GetConnector();
+	REQUIRE(waitFor([server]() { return !server->GetClientIds().empty(); }, 5000));
+
+	REQUIRE(stopsWithin(server, 10000));
+	CHECK(server->GetState() == igtlioConnector::STATE_OFF);
+	REQUIRE(stopsWithin(fixture.client->GetConnector(), 10000));
+}
+
+TEST_CASE("Stop and restart client connector repeatedly", "[plugins][org.custusx.core.openigtlink3][integration][not_win64]")
+{
+	igtlioServerClientFixture fixture;
+	fixture.startServerAndClientAndConnect(getUniqueTestPort(1));
+	igtlioConnectorPointer client = fixture.client->GetConnector();
+
+	for (int i = 0; i < 10; ++i)
+	{
+		INFO("Iteration " << i);
+		REQUIRE(waitFor([client]() { return client->IsConnected(); }, 5000));
+		REQUIRE(stopsWithin(client, 10000));
+		REQUIRE_FALSE(client->IsConnected());
+		REQUIRE(client->Start());
+	}
+	REQUIRE(stopsWithin(client, 10000));
+	REQUIRE(stopsWithin(fixture.server->GetConnector(), 10000));
 }
 
 TEST_CASE("Connect/disconnect using NetworkHandler, use default network port", "[plugins][org.custusx.core.openigtlink3][integration]")

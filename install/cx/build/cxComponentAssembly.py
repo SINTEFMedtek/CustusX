@@ -16,6 +16,7 @@ import argparse
 import re
 import sys
 import os.path
+import glob
 import shutil
 import stat
 import urllib.request, urllib.parse, urllib.error
@@ -100,6 +101,25 @@ class LibraryAssembly(object):
         if os.path.isdir(target):
             PrintFormatter.printHeader('Removing leftover checkout of removed component %s: %s' % (component.name(), target))
             shutil.rmtree(target, onerror=self._forceRemoveReadonly)
+        if component.pluginPath():
+            self._removeStalePluginBinaries(target)
+
+    def _removeStalePluginBinaries(self, plugin_source_path):
+        'A stale plugin binary would otherwise still be packaged by CPack.'
+        custusx = cxComponents.CustusX()
+        custusx.setControlData(self.controlData)
+        target_name = os.path.basename(os.path.normpath(plugin_source_path)).replace('.', '_')
+        # Runs before arguments are parsed, so the build folder is unknown: check all of them.
+        bin_path = os.path.join(custusx.path(), '*', 'bin')
+        patterns = [os.path.join(bin_path, 'plugins', 'lib%s.*' % target_name),
+                    os.path.join(bin_path, '%s.*' % target_name)]
+        for pattern in patterns:
+            for stale in glob.glob(pattern):
+                PrintFormatter.printHeader('Removing leftover plugin binary of removed component: %s' % stale)
+                if os.path.isdir(stale) and not os.path.islink(stale):
+                    shutil.rmtree(stale, onerror=self._forceRemoveReadonly)
+                else:
+                    os.remove(stale)
 
     @staticmethod
     def _forceRemoveReadonly(func, path, exc_info):

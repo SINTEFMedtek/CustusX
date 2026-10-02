@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSessionStorageService.h"
 #include "cxErrorObserver.h"
 #include "cxtestMetricManager.h"
+#include "cxtestVisServices.h"
 #include "cxFileManagerServiceProxy.h"
 
 namespace cxtest
@@ -101,6 +102,29 @@ TEST_CASE("Save the patient and import metrics from the patient XML file", "[int
 	}
 
 	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("MetricManager getPointMetrics returns only point metrics with matching uid", "[unit][metrics]")
+{
+	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
+	cx::PatientModelServicePtr patientModel = services->patient();
+	cx::MetricManager manager(services->view(), patientModel, services->tracking(), services->spaceProvider(), services->file());
+
+	patientModel->insertData(patientModel->createSpecificData<cx::PointMetric>("AirwayPoint1"));
+	patientModel->insertData(patientModel->createSpecificData<cx::PointMetric>("AirwayPoint2"));
+	patientModel->insertData(patientModel->createSpecificData<cx::PointMetric>("targetPoint"));
+	patientModel->insertData(patientModel->createSpecificData<cx::DistanceMetric>("AirwayPointDistance"));
+
+	std::map<QString, cx::PointMetricPtr> airwayPoints = manager.getPointMetrics("AirwayPoint");
+	CHECK(airwayPoints.size() == 2);
+	CHECK(airwayPoints.count("AirwayPoint1") == 1);
+	CHECK(airwayPoints.count("AirwayPoint2") == 1);
+
+	CHECK(airwayPoints == patientModel->getDataOfTypeWithUidContaining<cx::PointMetric>("AirwayPoint"));
+	CHECK(patientModel->getDataOfTypeWithUidContaining<cx::DistanceMetric>("AirwayPoint").size() == 1);
+
+	CHECK(manager.getPointMetrics("NoSuchPoint").empty());
+	CHECK(manager.getPointMetrics("").size() == 3);
 }
 
 TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widget]")

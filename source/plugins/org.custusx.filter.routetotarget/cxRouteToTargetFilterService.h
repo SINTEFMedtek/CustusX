@@ -49,6 +49,8 @@ public:
 	static QString getNameSuffixBloodVessel();
 	static QString getNameSuffixAirwayModel();
 	static QString getNameSuffixAirwayAndVesselRTT();
+	static QString getExtraAirwayPointUidPrefix();
+	static QString getLastExtraAirwayPointUid(std::map<QString, PointMetricPtr> extraAirwayPoints);
 
 	std::vector< Eigen::Vector3d > getRoutePositions(bool extendedRoute = true);
 	std::vector<BranchPtr> getRouteBranches();
