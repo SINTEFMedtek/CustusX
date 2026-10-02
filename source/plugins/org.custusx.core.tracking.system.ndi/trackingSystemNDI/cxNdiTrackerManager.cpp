@@ -253,7 +253,6 @@ void NdiTrackerManager::distributeFrame(const NdiFrame& frame, double timestamp)
 		{
 			prMt = cMref.inverse() * sample.transform;
 		}
-		tool->updateTransform(prMt, timestamp, visible, sample);
 		if (visible && tool == mReferenceTool)
 		{
 			tool->setPositionWarning(referenceWarning);
@@ -262,6 +261,7 @@ void NdiTrackerManager::distributeFrame(const NdiFrame& frame, double timestamp)
 		{
 			tool->setPositionWarning(combinePositionWarnings(tool->updateQuality(sample), referenceWarning));
 		}
+		tool->updateTransform(prMt, timestamp, visible, sample);
 	}
 }
 

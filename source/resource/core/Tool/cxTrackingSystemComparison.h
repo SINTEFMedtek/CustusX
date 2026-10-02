@@ -89,6 +89,8 @@ public:
 	static std::map<QString, double> getMeanDifferences(const ToolPositionStatisticsMap& first, const ToolPositionStatisticsMap& other);
 	static QStringList compareRuns(const std::vector<TrackingComparisonResult>& results); ///< Summary lines, each run against the first
 	double getMaxMeanDifference_mm() const; ///< Largest difference from the first run, for any tool
+	int getComparedToolCount() const; ///< Number of tool positions compared with the first run, over all runs
+	static bool hasTrackedTool(const ToolPositionStatisticsMap& statistics); ///< True if a tool other than the reference got positions
 
 signals:
 	void progress(QString message);
@@ -108,6 +110,8 @@ private:
 	bool writeConfiguration(QString filename, QString implementation);
 	void startCommand(const TrackingComparisonRun& run);
 	void stopCommand();
+	bool checkCommandStopped(double elapsed_ms);
+	void killCommand();
 	void openOpenIGTLinkConnection();
 	void closeOpenIGTLinkConnection();
 	void setOpenIGTLinkOption(QString uid, QString value); ///< Remembers the original value, restored when closing
@@ -123,6 +127,7 @@ private:
 	QProcess* mProcess;
 	Step mStep;
 	double mStepDeadline_ms;
+	double mStepStart_ms;
 	int mRunIndex;
 	bool mSuccess;
 	bool mOpenIGTLinkOpened;

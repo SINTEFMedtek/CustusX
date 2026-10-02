@@ -53,12 +53,12 @@ TEST_CASE("TrackingComparisonWidget: finds each tool configuration once, sorted 
 TEST_CASE("TrackingComparisonWidget: only the OpenIGTLink run starts the server command", "[unit][gui]")
 {
 	std::vector<cx::TrackingComparisonRun> runs = cx::TrackingComparisonWidget::createRuns(
-				{cx::TRACKING_SYSTEM_IMPLEMENTATION_IGSTK, cx::TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK}, " /opt/ndistreamer ", "-o --tools=a.rom");
+				{cx::TRACKING_SYSTEM_IMPLEMENTATION_IGSTK, cx::TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK}, " /opt/tracking_server ", "-o --tools=a.rom");
 
 	REQUIRE(runs.size() == 2);
 	CHECK(runs[0].implementation == cx::TRACKING_SYSTEM_IMPLEMENTATION_IGSTK);
 	CHECK(runs[0].command.isEmpty());
-	CHECK(runs[1].command == "/opt/ndistreamer");
+	CHECK(runs[1].command == "/opt/tracking_server");
 	CHECK(runs[1].arguments == QStringList({"-o", "--tools=a.rom"}));
 }
 

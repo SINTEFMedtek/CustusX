@@ -80,13 +80,14 @@ the next system starts.
 3. Select the tracking systems to compare: igstk, ndi and/or openigtlink. Only the systems that are
    built into this CustusX are available: usually either IGSTK or NDI.
 4. For openigtlink, either start an OpenIGTLink tracking server yourself, or enter the server
-   application and its arguments to have it started and stopped for you. Example with the ndistreamer
-   application from bkinterface:
-   * OpenIGTLink server: /path/to/bkinterface/build/apps/ndistreamer
+   application and its arguments to have it started and stopped for you, for example:
+   * OpenIGTLink server: /path/to/openigtlink_tracking_server
    * Server arguments: --hostname=/dev/ttyUSB0 --tools=ref.rom,pointer.rom
+   When the server is stopped, it first gets a newline on its standard input, then a terminate signal,
+   and finally it is killed.
    The OpenIGTLink tools are found by the OpenIGTLink transform id in each tool file, which must match
    the device names the server sends. Keep "Apply the reference to the OpenIGTLink tools" on for servers
-   that send the positions in tracker space (like ndistreamer), so that the positions are relative to the
+   that send the positions in tracker space, so that the positions are relative to the
    reference as for the other systems. Turn it off if the server applies the reference itself.
 5. Select how long to record with each system, and the output folder.
 6. Press Start comparison. The progress is shown below, and the summary when it is done. Press Cancel to

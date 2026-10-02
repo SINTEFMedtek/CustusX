@@ -49,9 +49,9 @@ TrackingComparisonWidget::TrackingComparisonWidget(TrackingServicePtr trackingSe
 	mLog(new QPlainTextEdit())
 {
 	this->setToolTip("Track the same tools with several tracking systems in turn, and record the positions");
-	mOpenIGTLinkCommand->setToolTip("OpenIGTLink tracking server to start for the openigtlink run, e.g. bkinterface's ndistreamer");
+	mOpenIGTLinkCommand->setToolTip("OpenIGTLink tracking server application to start for the openigtlink run. Empty: start the server yourself.");
 	mOpenIGTLinkArguments->setToolTip("e.g. --hostname=/dev/ttyUSB0 --tools=a.rom,b.rom");
-	mOpenIGTLinkApplyReference->setToolTip("On for servers that send positions in tracker space (e.g. bkinterface), off if the server applies the reference");
+	mOpenIGTLinkApplyReference->setToolTip("On for servers that send positions in tracker space, off if the server applies the reference");
 	mOpenIGTLinkApplyReference->setChecked(settings()->value("TrackingTest/openIGTLinkApplyReference", true).toBool());
 	mDuration->setRange(1, 7200);
 	mDuration->setSuffix(" s");
@@ -76,6 +76,9 @@ TrackingComparisonWidget::TrackingComparisonWidget(TrackingServicePtr trackingSe
 
 TrackingComparisonWidget::~TrackingComparisonWidget()
 {
+	disconnect(&mComparison, nullptr, this, nullptr);
+	disconnect(&mComparison, nullptr, mLog, nullptr);
+	mComparison.cancel();
 }
 
 void TrackingComparisonWidget::addLine(QGridLayout* layout, QString label, QWidget* widget)

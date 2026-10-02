@@ -174,7 +174,9 @@ void StatusBar::updateToolButtons()
 		if (!tool->isInitialized())
 			current.mAction->setToolTip("Tool is not Initialized");
 		else if (tool->getVisible() && !warning.isEmpty())
+		{
 			current.mAction->setToolTip("Position may be inaccurate: " + warning);
+		}
 		else if (activeTool == tool)
 			current.mAction->setToolTip("Active Tool");
 		else if (!tool->getVisible())
@@ -197,9 +199,10 @@ QString StatusBar::getToolStyle(bool visible, bool initialized, bool active, boo
 	if (visible && positionWarning)
 	{
 		if (active)
+		{
 			return QString("background-color: #ffc04d");
-		else
-			return QString("background-color: orange");
+		}
+		return QString("background-color: orange");
 	}
 
 	if (visible)

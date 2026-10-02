@@ -72,6 +72,7 @@ public:
 	void setTools(std::vector<ToolPtr> tools); ///< Record these tools instead of the tracking service's
 	bool start(QString filename, QString label); ///< label is written in the first column, e.g. the tracking system
 	void stop();
+	void clear(); ///< Stop, and forget the statistics of the previous recording
 	bool isRecording() const;
 	QString getFilename() const;
 	int getRowCount() const;

@@ -25,8 +25,7 @@ The Laboratory profile has two tool configurations for these tests:
 
 * LabPolarisSWTools.xml: Polaris with the SW reference frame, the SW pointer, and the two
   ultrasound probe tracking frames (03-215-1006 and 32-105-0289) as plain tools without a probe
-  calibration. The OpenIGTLink transform ids are the device names in bkinterface's configuration
-  (SWRef, SWPointer, SWProbe1, SWProbe2).
+  calibration. The OpenIGTLink transform ids are SWRef, SWPointer, SWProbe1 and SWProbe2.
 * LabAuroraTools.xml: Aurora with the reference on port 1, a pointer on port 2, and a sensor
   without calibration on ports 3 and 4.
 
@@ -42,12 +41,11 @@ With both plugins, tool configurations with the igstk tracking system go to IGST
 with ndi go to the NDI plugin. Without the IGSTK plugin, the NDI plugin also handles igstk
 configurations.
 
-For OpenIGTLink, build bkinterface (holosurge) next to CustusX, and use its ndistreamer
-application as the OpenIGTLink tracking server. ndistreamer streams the positions in tracker
-space, so the comparison applies the reference tool in CustusX (openigtlinkApplyRefToTools).
+For OpenIGTLink, use an OpenIGTLink tracking server application that reads the same NDI device
+and sends one TRANSFORM message per tool. If the server sends the positions in tracker space,
+the comparison applies the reference tool in CustusX (openigtlinkApplyRefToTools, on by default).
 The OpenIGTLink tools are found by the OpenIGTLink transform id in the tool files, which must
-match the device names that ndistreamer sends (the names in its configuration file, or port_N
-for Aurora).
+match the device names that the server sends (port_N also works for Aurora tools on port N).
 
 Command line
 -----------------------------------------------------------
@@ -56,7 +54,7 @@ Set the environment variables, then run the tests with Catch from the build fold
 
     export CX_TRACKING_TEST_CONFIG=/path/to/tool/configuration.xml
     export CX_TRACKING_TEST_SYSTEMS=igstk,ndi,openigtlink
-    export CX_TRACKING_TEST_IGTL_COMMAND=/path/to/bkinterface/build/apps/ndistreamer
+    export CX_TRACKING_TEST_IGTL_COMMAND=/path/to/openigtlink_tracking_server
     export CX_TRACKING_TEST_IGTL_ARGS="--hostname=/dev/ttyUSB0 --tools=ref.rom,pointer.rom"
     cd build_Release/bin
     ./Catch "[tracking_hardware]"

@@ -30,6 +30,7 @@ namespace
 const int kFirstInitTimeout_ms = 5000; ///< The first INIT on a network device can take several seconds
 const int kCommandTimeout_ms = 1000;
 const int kToolDefinitionRetries = 3;
+const int kMarkerInfoAttempts = 3; ///< BX with marker information fails this many times while BX without works: the device doesn't support it
 }
 
 NdiCapiDevice::NdiCapiDevice() :
@@ -37,7 +38,9 @@ NdiCapiDevice::NdiCapiDevice() :
 	mNetwork(false),
 	mTracking(false),
 	mRequestMarkerInfo(false),
-	mMarkerInfoConfirmed(false)
+	mMarkerInfoConfirmed(false),
+	mLastBXHasMarkerInfo(false),
+	mMarkerInfoFailures(0)
 {
 }
 
@@ -51,6 +54,7 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 	this->close();
 	mRequestMarkerInfo = settings.requestMarkerInfo;
 	mMarkerInfoConfirmed = false;
+	mMarkerInfoFailures = 0;
 	if (!settings.communicationLogFile.isEmpty())
 	{
 		mLogFile.setFileName(settings.communicationLogFile);
@@ -398,15 +402,21 @@ bool NdiCapiDevice::readFrame(const std::vector<int>& portHandles, NdiFrame& fra
 
 bool NdiCapiDevice::sendBX()
 {
-	int replyOptions = NDI_XFORMS_AND_STATUS | (mRequestMarkerInfo ? NDI_ADDITIONAL_INFO : 0);
-	bool success = this->command("BX:%04X", replyOptions);
+	mLastBXHasMarkerInfo = mRequestMarkerInfo;
+	bool success = this->command("BX:%04X", NDI_XFORMS_AND_STATUS | (mRequestMarkerInfo ? NDI_ADDITIONAL_INFO : 0));
 	if (!success && mRequestMarkerInfo && !mMarkerInfoConfirmed)
 	{
-		reportWarning("NDI Tracker: The device doesn't report marker information, tracking without it: " + mLastError);
-		mRequestMarkerInfo = false;
+		QString markerInfoError = mLastError;
+		mLastBXHasMarkerInfo = false;
 		success = this->command("BX:%04X", NDI_XFORMS_AND_STATUS);
+		mMarkerInfoFailures = success ? mMarkerInfoFailures + 1 : 0;
+		if (mMarkerInfoFailures >= kMarkerInfoAttempts)
+		{
+			reportWarning("NDI Tracker: The device doesn't report marker information, tracking without it: " + markerInfoError);
+			mRequestMarkerInfo = false;
+		}
 	}
-	mMarkerInfoConfirmed = mMarkerInfoConfirmed || (success && mRequestMarkerInfo);
+	mMarkerInfoConfirmed = mMarkerInfoConfirmed || (success && mLastBXHasMarkerInfo);
 	return success;
 }
 
@@ -423,7 +433,7 @@ NdiToolSample NdiCapiDevice::getBXSample(int portHandle)
 		sample.errorRMS_mm = values[7];
 	}
 	sample.portStatus = ndiGetBXPortStatus(mDevice, portHandle);
-	const char* info = mRequestMarkerInfo ? this->findBXToolMarkerInformation(portHandle) : nullptr;
+	const char* info = mLastBXHasMarkerInfo ? this->findBXToolMarkerInformation(portHandle) : nullptr;
 	if (info)
 	{
 		sample.toolInfo = info[0] & 0xFF;

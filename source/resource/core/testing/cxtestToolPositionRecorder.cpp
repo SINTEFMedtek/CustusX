@@ -185,9 +185,24 @@ TEST_CASE("TrackingSystemComparison: compares the mean positions of the tools be
 	CHECK(differences["pointer"] == Approx(5.0));
 
 	QStringList lines = cx::TrackingSystemComparison::compareRuns({first, second});
-	REQUIRE(lines.size() == 1);
+	REQUIRE(lines.size() == 2);
 	CHECK(lines[0] == "2_ndi pointer: mean position 5.000 mm from 1_igstk");
+	CHECK(lines[1] == "2_ndi probe: no positions, not compared with 1_igstk");
 	CHECK(cx::TrackingSystemComparison::compareRuns({first}).isEmpty());
+}
+
+TEST_CASE("TrackingSystemComparison: a run needs positions from a tool other than the reference", "[unit][tool]")
+{
+	cx::ToolPositionStatistics reference;
+	reference.reference = true;
+	reference.addPosition(cx::Vector3D(0, 0, 0), 0, false);
+	cx::ToolPositionStatistics hiddenPointer;
+	cx::ToolPositionStatistics pointer;
+	pointer.addPosition(cx::Vector3D(1, 0, 0), 0, false);
+
+	CHECK_FALSE(cx::TrackingSystemComparison::hasTrackedTool({}));
+	CHECK_FALSE(cx::TrackingSystemComparison::hasTrackedTool({{"reference", reference}, {"pointer", hiddenPointer}}));
+	CHECK(cx::TrackingSystemComparison::hasTrackedTool({{"reference", reference}, {"pointer", pointer}}));
 }
 
 TEST_CASE("TrackingSystemComparison: split command arguments", "[unit][tool]")

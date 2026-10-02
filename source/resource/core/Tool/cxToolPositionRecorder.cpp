@@ -141,6 +141,14 @@ void ToolPositionRecorder::stop()
 	}
 }
 
+void ToolPositionRecorder::clear()
+{
+	this->stop();
+	mStatistics.clear();
+	mRowCount = 0;
+	mLabel.clear();
+}
+
 bool ToolPositionRecorder::isRecording() const
 {
 	return mFile.isOpen();

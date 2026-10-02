@@ -31,7 +31,8 @@ namespace cx
 namespace
 {
 const int kTimerInterval_ms = 100;
-const int kCommandStopTimeout_ms = 3000;
+const int kCommandTerminateAfter_ms = 3000;
+const int kCommandKillAfter_ms = 6000;
 const int kStopTimeout_ms = 15000;
 const char* kOpenIGTLinkStreamer = "openigtlink3_streamer";
 const char* kOpenIGTLinkStartTrackingOption = "start_tracking";
@@ -46,6 +47,7 @@ TrackingSystemComparison::TrackingSystemComparison(TrackingServicePtr trackingSe
 	mProcess(nullptr),
 	mStep(sIDLE),
 	mStepDeadline_ms(0.0),
+	mStepStart_ms(0.0),
 	mRunIndex(0),
 	mSuccess(false),
 	mOpenIGTLinkOpened(false)
@@ -80,9 +82,15 @@ void TrackingSystemComparison::cancel()
 {
 	if (this->isRunning())
 	{
+		bool runActive = (mStep != sWAIT_FOR_STOP && mStep != sPAUSE);
+		bool runsLeft = (mRunIndex + 1 < static_cast<int>(mSettings.runs.size()));
 		mRecorder.stop();
-		this->stopRun("cancelled");
-		mSuccess = false;
+		if (runActive)
+		{
+			this->stopRun("cancelled");
+		}
+		mSuccess = mSuccess && !runActive && !runsLeft;
+		this->killCommand();
 		this->finish();
 	}
 }
@@ -147,11 +155,40 @@ QStringList TrackingSystemComparison::compareRuns(const std::vector<TrackingComp
 	QStringList retval;
 	for (unsigned i = 1; i < results.size(); ++i)
 	{
-		for (const std::pair<const QString, double>& entry : getMeanDifferences(results[0].statistics, results[i].statistics))
+		std::map<QString, double> differences = getMeanDifferences(results[0].statistics, results[i].statistics);
+		for (const std::pair<const QString, ToolPositionStatistics>& entry : results[0].statistics)
 		{
-			retval << QString("%1 %2: mean position %3 mm from %4").arg(results[i].label).arg(entry.first)
-					  .arg(entry.second, 0, 'f', 3).arg(results[0].label);
+			bool comparable = !entry.second.reference && entry.second.positions > 0;
+			if (comparable && differences.count(entry.first))
+			{
+				retval << QString("%1 %2: mean position %3 mm from %4").arg(results[i].label).arg(entry.first)
+						  .arg(differences[entry.first], 0, 'f', 3).arg(results[0].label);
+			}
+			else if (comparable)
+			{
+				retval << QString("%1 %2: no positions, not compared with %3").arg(results[i].label).arg(entry.first).arg(results[0].label);
+			}
 		}
+	}
+	return retval;
+}
+
+int TrackingSystemComparison::getComparedToolCount() const
+{
+	int retval = 0;
+	for (unsigned i = 1; i < mResults.size(); ++i)
+	{
+		retval += static_cast<int>(getMeanDifferences(mResults[0].statistics, mResults[i].statistics).size());
+	}
+	return retval;
+}
+
+bool TrackingSystemComparison::hasTrackedTool(const ToolPositionStatisticsMap& statistics)
+{
+	bool retval = false;
+	for (const std::pair<const QString, ToolPositionStatistics>& entry : statistics)
+	{
+		retval = retval || (!entry.second.reference && entry.second.positions > 0);
 	}
 	return retval;
 }
@@ -223,12 +260,7 @@ void TrackingSystemComparison::onTimer()
 	else if (mStep == sRECORD && deadlinePassed)
 	{
 		mRecorder.stop();
-		bool gotPositions = false;
-		for (const std::pair<const QString, ToolPositionStatistics>& entry : mRecorder.getStatistics())
-		{
-			gotPositions = gotPositions || (entry.second.positions > 0);
-		}
-		this->stopRun(gotPositions ? "OK" : "FAILED: no positions recorded");
+		this->stopRun(hasTrackedTool(mRecorder.getStatistics()) ? "OK" : "FAILED: no positions recorded from any tool other than the reference");
 	}
 	else if (mStep == sWAIT_FOR_STOP)
 	{
@@ -250,6 +282,7 @@ void TrackingSystemComparison::startRun()
 	}
 	TrackingComparisonRun run = this->currentRun();
 	QString label = getRunLabel(mRunIndex, run.implementation);
+	mRecorder.clear();
 	this->log(QString("Run %1: %2").arg(label).arg(run.command.isEmpty() ? run.implementation : run.implementation + " via " + run.command));
 	QString configFile = mSettings.outputFolder + "/" + label + "_toolconfig.xml";
 	if (!this->writeConfiguration(configFile, run.implementation))
@@ -328,13 +361,16 @@ void TrackingSystemComparison::stopRun(QString result)
 
 void TrackingSystemComparison::checkTrackingStopped()
 {
-	bool stopped = (mTrackingService->getState() == Tool::tsNONE);
-	if (stopped || getMilliSecondsSinceEpoch() >= mStepDeadline_ms)
+	double now = getMilliSecondsSinceEpoch();
+	bool commandStopped = this->checkCommandStopped(now - mStepStart_ms);
+	bool stopped = commandStopped && (mTrackingService->getState() == Tool::tsNONE);
+	if (stopped || now >= mStepDeadline_ms)
 	{
 		if (!stopped)
 		{
 			this->log(QString("Tracking did not stop within %1 s, continuing anyway").arg(kStopTimeout_ms / 1000));
 			mSuccess = false;
+			this->killCommand();
 		}
 		this->wait(sPAUSE, mSettings.pauseBetweenRuns_ms);
 	}
@@ -398,16 +434,38 @@ void TrackingSystemComparison::stopCommand()
 	{
 		mProcess->write("\n");
 		mProcess->closeWriteChannel();
-		if (!mProcess->waitForFinished(kCommandStopTimeout_ms))
+	}
+}
+
+bool TrackingSystemComparison::checkCommandStopped(double elapsed_ms)
+{
+	if (mProcess && mProcess->state() != QProcess::NotRunning)
+	{
+		if (elapsed_ms >= kCommandKillAfter_ms)
+		{
+			mProcess->kill();
+		}
+		else if (elapsed_ms >= kCommandTerminateAfter_ms)
 		{
 			mProcess->terminate();
-			if (!mProcess->waitForFinished(kCommandStopTimeout_ms))
-			{
-				mProcess->kill();
-				mProcess->waitForFinished(kCommandStopTimeout_ms);
-			}
 		}
+	}
+	else if (mProcess)
+	{
 		this->log(QString("Stopped %1, exit code %2").arg(mProcess->program()).arg(mProcess->exitCode()));
+		mProcess->deleteLater();
+		mProcess = nullptr;
+	}
+	return !mProcess;
+}
+
+void TrackingSystemComparison::killCommand()
+{
+	if (mProcess)
+	{
+		mProcess->kill();
+		mProcess->waitForFinished(1000);
+		this->log(QString("Killed %1").arg(mProcess->program()));
 		mProcess->deleteLater();
 		mProcess = nullptr;
 	}
@@ -458,7 +516,8 @@ void TrackingSystemComparison::setOpenIGTLinkOption(QString uid, QString value)
 void TrackingSystemComparison::wait(Step step, int duration_ms)
 {
 	mStep = step;
-	mStepDeadline_ms = getMilliSecondsSinceEpoch() + duration_ms;
+	mStepStart_ms = getMilliSecondsSinceEpoch();
+	mStepDeadline_ms = mStepStart_ms + duration_ms;
 }
 
 void TrackingSystemComparison::log(QString message)

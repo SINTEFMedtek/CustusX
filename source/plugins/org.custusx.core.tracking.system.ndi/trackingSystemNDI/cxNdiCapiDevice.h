@@ -76,6 +76,8 @@ private:
 	bool mTracking;
 	bool mRequestMarkerInfo;
 	bool mMarkerInfoConfirmed; ///< BX with marker information has worked at least once
+	bool mLastBXHasMarkerInfo;
+	int mMarkerInfoFailures;
 	QString mLastError;
 	QString mLastReply; ///< Reply to the last text (non-binary) command
 	QString mDescription;
