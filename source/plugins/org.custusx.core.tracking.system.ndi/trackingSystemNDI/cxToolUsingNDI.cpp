@@ -175,27 +175,6 @@ void ToolUsingNDI::calculateTpsSlot()
 	emit tps(calculateTrackingRate(*mPositionHistory));
 }
 
-int ToolUsingNDI::calculateTrackingRate(const TimedTransformMap& history)
-{
-	// Rate over the last (up to) 10 positions: N positions span N-1 intervals.
-	// (The version inherited from the IGSTK tool stepped one position too far,
-	// past the start of the history when it had 10 or fewer positions.)
-	int retval = 0;
-	size_t numberOfPositions = std::min<size_t>(history.size(), 10);
-	if (numberOfPositions >= 2)
-	{
-		TimedTransformMap::const_reverse_iterator last = history.rbegin();
-		TimedTransformMap::const_reverse_iterator first = last;
-		std::advance(first, numberOfPositions - 1);
-		double secondsPassed = (last->first - first->first) / 1000.0;
-		if (!similar(secondsPassed, 0))
-		{
-			retval = int((numberOfPositions - 1) / secondsPassed + 0.5);
-		}
-	}
-	return retval;
-}
-
 void ToolUsingNDI::toolVisibleSlot(bool on)
 {
 	if (on)

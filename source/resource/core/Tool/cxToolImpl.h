@@ -46,6 +46,8 @@ public:
 	virtual void setTooltipOffset(double val);
 	virtual QString getPositionWarning() const;
 
+	static int calculateTrackingRate(const TimedTransformMap& history); ///< Positions per second over the last (up to) 10 positions
+
 	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
 	virtual bool isNull() { return false; }
 

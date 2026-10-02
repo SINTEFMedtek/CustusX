@@ -44,7 +44,6 @@ class org_custusx_core_tracking_system_ndi_EXPORT ToolUsingNDI : public ToolImpl
 	Q_OBJECT
 
 public:
-	static int calculateTrackingRate(const TimedTransformMap& history); ///< positions per second
 	explicit ToolUsingNDI(NdiToolPtr ndiTool);
 	virtual ~ToolUsingNDI();
 
