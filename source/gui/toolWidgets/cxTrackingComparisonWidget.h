@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTrackingSystemComparison.h"
 
 class QCheckBox;
+class QComboBox;
 class QLineEdit;
 class QPlainTextEdit;
 class QPushButton;
@@ -39,16 +40,23 @@ public:
 	virtual ~TrackingComparisonWidget();
 
 	static std::vector<TrackingComparisonRun> createRuns(QStringList implementations, QString openIGTLinkCommand, QString openIGTLinkArguments);
+	static QStringList findToolConfigurations(QStringList folders); ///< The .xml files in the folders, each file name once, sorted
+	static QString getTrackingSystemUid(QString implementation); ///< The uid of the TrackingSystemService for a tracking system implementation
 
 private:
 	void startOrCancel();
+	void browseToolConfiguration();
+	void addToolConfiguration(QString path, QString name);
+	QWidget* createToolConfigurationSelector();
+	QWidget* createTrackingSystemSelector(TrackingServicePtr trackingService);
+	static QStringList getToolConfigurationFolders();
 	void onFinished(bool success);
 	static void addLine(class QGridLayout* layout, QString label, QWidget* widget);
 	QStringList getSelectedImplementations() const;
 	void saveSettings();
 
 	TrackingSystemComparison mComparison;
-	QLineEdit* mToolConfigFile;
+	QComboBox* mToolConfigFile;
 	std::map<QString, QCheckBox*> mImplementations;
 	QLineEdit* mOpenIGTLinkCommand;
 	QLineEdit* mOpenIGTLinkArguments;

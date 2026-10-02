@@ -11,7 +11,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTrackingComparisonWidget.h"
 
+#include <algorithm>
 #include <QCheckBox>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QSet>
 #include <QDateTime>
 #include <QDir>
 #include <QGridLayout>
@@ -21,9 +26,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSpinBox>
+#include "cxDataLocations.h"
 #include "cxDefinitions.h"
 #include "cxProfile.h"
 #include "cxSettings.h"
+#include "cxTrackingService.h"
+#include "cxTrackingSystemService.h"
 
 namespace cx
 {
@@ -31,7 +39,7 @@ namespace cx
 TrackingComparisonWidget::TrackingComparisonWidget(TrackingServicePtr trackingService, VideoServicePtr videoService, QWidget* parent) :
 	BaseWidget(parent, "tracking_comparison_widget", "Compare Tracking Systems"),
 	mComparison(trackingService, videoService),
-	mToolConfigFile(new QLineEdit(profile()->getToolConfigFilePath())),
+	mToolConfigFile(new QComboBox()),
 	mOpenIGTLinkCommand(new QLineEdit(settings()->value("TrackingTest/openIGTLinkCommand", "").toString())),
 	mOpenIGTLinkArguments(new QLineEdit(settings()->value("TrackingTest/openIGTLinkArguments", "").toString())),
 	mOpenIGTLinkApplyReference(new QCheckBox("Apply the reference to the OpenIGTLink tools")),
@@ -50,21 +58,9 @@ TrackingComparisonWidget::TrackingComparisonWidget(TrackingServicePtr trackingSe
 	mDuration->setValue(settings()->value("TrackingTest/duration_s", 10).toInt());
 	mLog->setReadOnly(true);
 
-	QHBoxLayout* systems = new QHBoxLayout();
-	QStringList implementations = {TRACKING_SYSTEM_IMPLEMENTATION_IGSTK, TRACKING_SYSTEM_IMPLEMENTATION_NDI, TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK};
-	QStringList selected = settings()->value("TrackingTest/implementations", implementations).toStringList();
-	for (const QString& implementation : implementations)
-	{
-		mImplementations[implementation] = new QCheckBox(implementation);
-		mImplementations[implementation]->setChecked(selected.contains(implementation));
-		systems->addWidget(mImplementations[implementation]);
-	}
-	QWidget* systemsWidget = new QWidget();
-	systemsWidget->setLayout(systems);
-
 	QGridLayout* layout = new QGridLayout(this);
-	addLine(layout, "Tool configuration", mToolConfigFile);
-	addLine(layout, "Tracking systems", systemsWidget);
+	addLine(layout, "Tool configuration", this->createToolConfigurationSelector());
+	addLine(layout, "Tracking systems", this->createTrackingSystemSelector(trackingService));
 	addLine(layout, "OpenIGTLink server", mOpenIGTLinkCommand);
 	addLine(layout, "Server arguments", mOpenIGTLinkArguments);
 	addLine(layout, "", mOpenIGTLinkApplyReference);
@@ -87,6 +83,121 @@ void TrackingComparisonWidget::addLine(QGridLayout* layout, QString label, QWidg
 	int row = layout->rowCount();
 	layout->addWidget(new QLabel(label), row, 0);
 	layout->addWidget(widget, row, 1);
+}
+
+QString TrackingComparisonWidget::getTrackingSystemUid(QString implementation)
+{
+	QString retval;
+	if (implementation == TRACKING_SYSTEM_IMPLEMENTATION_IGSTK)
+	{
+		retval = "org.custusx.core.tracking.system.igstk";
+	}
+	else if (implementation == TRACKING_SYSTEM_IMPLEMENTATION_NDI)
+	{
+		retval = "org.custusx.core.tracking.system.ndi";
+	}
+	else if (implementation == TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK)
+	{
+		retval = "org.custusx.core.openigtlink3";
+	}
+	return retval;
+}
+
+QWidget* TrackingComparisonWidget::createTrackingSystemSelector(TrackingServicePtr trackingService)
+{
+	QStringList available;
+	for (TrackingSystemServicePtr system : trackingService->getTrackingSystems())
+	{
+		available << system->getUid();
+	}
+	QStringList implementations = {TRACKING_SYSTEM_IMPLEMENTATION_IGSTK, TRACKING_SYSTEM_IMPLEMENTATION_NDI, TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK};
+	QStringList selected = settings()->value("TrackingTest/implementations", implementations).toStringList();
+	QWidget* retval = new QWidget();
+	QHBoxLayout* layout = new QHBoxLayout(retval);
+	layout->setContentsMargins(0, 0, 0, 0);
+	for (const QString& implementation : implementations)
+	{
+		bool isAvailable = available.contains(getTrackingSystemUid(implementation));
+		QCheckBox* checkBox = new QCheckBox(implementation);
+		checkBox->setEnabled(isAvailable);
+		checkBox->setChecked(isAvailable && selected.contains(implementation));
+		checkBox->setToolTip(isAvailable ? QString("Track with %1").arg(implementation) : QString("%1 is not built into this application").arg(implementation));
+		mImplementations[implementation] = checkBox;
+		layout->addWidget(checkBox);
+	}
+	layout->addStretch();
+	return retval;
+}
+
+QWidget* TrackingComparisonWidget::createToolConfigurationSelector()
+{
+	mToolConfigFile->setToolTip("The tools to track. The tracking system in the configuration is replaced for each system that is compared.");
+	QString current = profile()->getToolConfigFilePath();
+	if (!current.isEmpty())
+	{
+		this->addToolConfiguration(current, QFileInfo(current).fileName() + " (current)");
+	}
+	for (const QString& path : findToolConfigurations(getToolConfigurationFolders()))
+	{
+		if (QFileInfo(path).fileName() != QFileInfo(current).fileName())
+		{
+			this->addToolConfiguration(path, QFileInfo(path).fileName());
+		}
+	}
+	QPushButton* browseButton = new QPushButton("Browse...");
+	connect(browseButton, &QPushButton::clicked, this, &TrackingComparisonWidget::browseToolConfiguration);
+	QWidget* retval = new QWidget();
+	QHBoxLayout* layout = new QHBoxLayout(retval);
+	layout->setContentsMargins(0, 0, 0, 0);
+	layout->addWidget(mToolConfigFile, 1);
+	layout->addWidget(browseButton);
+	return retval;
+}
+
+void TrackingComparisonWidget::addToolConfiguration(QString path, QString name)
+{
+	mToolConfigFile->addItem(name, path);
+	mToolConfigFile->setItemData(mToolConfigFile->count() - 1, path, Qt::ToolTipRole);
+}
+
+void TrackingComparisonWidget::browseToolConfiguration()
+{
+	QString path = QFileDialog::getOpenFileName(this, "Tool configuration", mToolConfigFile->currentData().toString(), "Tool configurations (*.xml)");
+	if (!path.isEmpty())
+	{
+		this->addToolConfiguration(path, QFileInfo(path).fileName());
+		mToolConfigFile->setCurrentIndex(mToolConfigFile->count() - 1);
+	}
+}
+
+QStringList TrackingComparisonWidget::getToolConfigurationFolders()
+{
+	QStringList retval = profile()->getApplicationToolConfigPaths();
+	for (const QString& root : DataLocations::getRootConfigPaths())
+	{
+		retval << root + "/profiles/" + profile()->getUid() + "/tool";
+		retval << root + "/profiles/Laboratory/tool";
+	}
+	return retval;
+}
+
+QStringList TrackingComparisonWidget::findToolConfigurations(QStringList folders)
+{
+	QStringList retval;
+	QSet<QString> names;
+	for (const QString& folder : folders)
+	{
+		for (const QFileInfo& file : QDir(folder).entryInfoList(QStringList() << "*.xml", QDir::Files, QDir::Name))
+		{
+			if (!names.contains(file.fileName()))
+			{
+				names.insert(file.fileName());
+				retval << file.absoluteFilePath();
+			}
+		}
+	}
+	std::sort(retval.begin(), retval.end(), [](const QString& a, const QString& b) { return QFileInfo(a).fileName() < QFileInfo(b).fileName(); });
+	return retval;
 }
 
 std::vector<TrackingComparisonRun> TrackingComparisonWidget::createRuns(QStringList implementations, QString openIGTLinkCommand, QString openIGTLinkArguments)
@@ -128,7 +239,7 @@ void TrackingComparisonWidget::startOrCancel()
 	}
 	this->saveSettings();
 	TrackingComparisonSettings comparisonSettings;
-	comparisonSettings.toolConfigFile = mToolConfigFile->text();
+	comparisonSettings.toolConfigFile = mToolConfigFile->currentData().toString();
 	comparisonSettings.outputFolder = mOutputFolder->text() + "/tracking_comparison_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
 	comparisonSettings.recordDuration_ms = mDuration->value() * 1000;
 	comparisonSettings.openIGTLinkApplyReference = mOpenIGTLinkApplyReference->isChecked();

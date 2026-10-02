@@ -22,9 +22,9 @@ TrackingTestWidget::TrackingTestWidget(TrackingServicePtr trackingService, Video
 	TabbedWidget(parent, "tracking_test_widget", "Tracking Test")
 {
 	this->setToolTip("Test tracking: tracking state, record tool positions, compare tracking systems");
-	this->addTab(new ToolManagerWidget(trackingService, this), "Tracking state");
 	this->addTab(new ToolPositionRecorderWidget(trackingService, this), "Record positions");
 	this->addTab(new TrackingComparisonWidget(trackingService, videoService, this), "Compare systems");
+	this->addTab(new ToolManagerWidget(trackingService, this), "Tracking state");
 }
 
 TrackingTestWidget::~TrackingTestWidget()
