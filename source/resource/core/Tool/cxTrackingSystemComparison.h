@@ -35,6 +35,12 @@ struct cxResource_EXPORT TrackingComparisonRun
 	QStringList arguments;
 };
 
+struct cxResource_EXPORT TrackingComparisonResult
+{
+	QString label;
+	ToolPositionStatisticsMap statistics;
+};
+
 struct cxResource_EXPORT TrackingComparisonSettings
 {
 	QString toolConfigFile; ///< The tool configuration to use. Its tracking system implementation is replaced for each run.
@@ -79,13 +85,17 @@ public:
 	static QString setTrackingSystemImplementation(QString configXml, QString implementation, bool applyReference = false);
 	static QString getRunLabel(int index, QString implementation);
 	static QStringList splitArguments(QString arguments); ///< Split on spaces, except inside double quotes
+	/** Distance between the mean positions of each tool in two runs, mm. Reference tools are left out. */
+	static std::map<QString, double> getMeanDifferences(const ToolPositionStatisticsMap& first, const ToolPositionStatisticsMap& other);
+	static QStringList compareRuns(const std::vector<TrackingComparisonResult>& results); ///< Summary lines, each run against the first
+	double getMaxMeanDifference_mm() const; ///< Largest difference from the first run, for any tool
 
 signals:
 	void progress(QString message);
 	void finished(bool success);
 
 private:
-	enum Step { sIDLE, sWAIT_FOR_COMMAND, sWAIT_FOR_TRACKING, sSETTLE, sRECORD, sPAUSE };
+	enum Step { sIDLE, sWAIT_FOR_COMMAND, sWAIT_FOR_TRACKING, sSETTLE, sRECORD, sWAIT_FOR_STOP, sPAUSE };
 
 	void onTimer();
 	void startRun();
@@ -93,6 +103,7 @@ private:
 	void checkTrackingStarted();
 	void startRecording();
 	void stopRun(QString result);
+	void checkTrackingStopped();
 	void finish();
 	bool writeConfiguration(QString filename, QString implementation);
 	void startCommand(const TrackingComparisonRun& run);
@@ -119,6 +130,7 @@ private:
 	QString mOriginalConnectionMethod;
 	std::map<QString, QString> mOriginalOpenIGTLinkOptions;
 	QStringList mSummary;
+	std::vector<TrackingComparisonResult> mResults;
 };
 
 } // namespace cx

@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
+#include <deque>
 #include <map>
 #include <vector>
 #include <QFile>
@@ -34,14 +35,21 @@ struct cxResource_EXPORT ToolPositionStatistics
 	int positions = 0;
 	int positionsWithWarning = 0;
 	int visibilityChanges = 0;
+	bool reference = false;
 	double firstTimestamp_ms = 0.0;
 	double lastTimestamp_ms = 0.0;
 	Vector3D mean = Vector3D::Zero();
 	Vector3D sumSquaredDeviations = Vector3D::Zero();
+	Vector3D firstWindowSum = Vector3D::Zero();
+	int firstWindowPositions = 0;
+	std::deque<std::pair<double, Vector3D> > lastWindow;
+
+	static constexpr double kDriftWindow_ms = 1000.0;
 
 	void addPosition(const Vector3D& position, double timestamp_ms, bool warning);
-	Vector3D getStandardDeviation() const;
+	Vector3D getStandardDeviation() const; ///< The jitter of a tool that is kept still
 	double getRate_Hz() const;
+	double getDrift_mm() const; ///< Distance between the mean positions of the first and last kDriftWindow_ms
 	QString toString() const;
 };
 
@@ -96,6 +104,7 @@ private:
 	std::map<QString, ToolPositionStatistics> mStatistics;
 };
 typedef boost::shared_ptr<ToolPositionRecorder> ToolPositionRecorderPtr;
+typedef std::map<QString, ToolPositionStatistics> ToolPositionStatisticsMap;
 
 } // namespace cx
 

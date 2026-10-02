@@ -57,6 +57,25 @@ TEST_CASE("ToolPositionStatistics: mean, standard deviation and rate", "[unit][t
 	CHECK(statistics.getRate_Hz() == Approx(20.0));
 }
 
+TEST_CASE("ToolPositionStatistics: drift between the first and the last second", "[unit][tool]")
+{
+	cx::ToolPositionStatistics statistics;
+	for (int i = 0; i <= 100; ++i)
+	{
+		double time_ms = 1000.0 + 50.0 * i;
+		statistics.addPosition(cx::Vector3D(time_ms / 1000.0, 0, 0), time_ms, false);
+	}
+	// first second: mean x 1.5, last second: mean x 5.5
+	CHECK(statistics.getDrift_mm() == Approx(4.0));
+
+	cx::ToolPositionStatistics still;
+	for (int i = 0; i < 100; ++i)
+	{
+		still.addPosition(cx::Vector3D(1, 2, 3), 50.0 * i, false);
+	}
+	CHECK(still.getDrift_mm() == Approx(0.0));
+}
+
 TEST_CASE("ToolPositionStatistics: no rate or spread from a single position", "[unit][tool]")
 {
 	cx::ToolPositionStatistics statistics;
@@ -140,6 +159,35 @@ TEST_CASE("TrackingSystemComparison: replaces the tracking system implementation
 	CHECK(cx::TrackingSystemComparison::setTrackingSystemImplementation("<configuration/>", "ndi").isEmpty());
 	CHECK(cx::TrackingSystemComparison::setTrackingSystemImplementation("not xml", "ndi").isEmpty());
 	CHECK(cx::TrackingSystemComparison::getRunLabel(0, "igstk") == "1_igstk");
+}
+
+TEST_CASE("TrackingSystemComparison: compares the mean positions of the tools between runs", "[unit][tool]")
+{
+	cx::ToolPositionStatistics pointer;
+	pointer.addPosition(cx::Vector3D(10, 0, 0), 0, false);
+	cx::ToolPositionStatistics movedPointer;
+	movedPointer.addPosition(cx::Vector3D(10, 3, 4), 0, false);
+	cx::ToolPositionStatistics reference;
+	reference.reference = true;
+	reference.addPosition(cx::Vector3D(0, 0, 0), 0, false);
+	cx::ToolPositionStatistics movedReference = reference;
+	movedReference.mean = cx::Vector3D(100, 0, 0);
+
+	cx::TrackingComparisonResult first;
+	first.label = "1_igstk";
+	first.statistics = {{"pointer", pointer}, {"reference", reference}, {"probe", pointer}};
+	cx::TrackingComparisonResult second;
+	second.label = "2_ndi";
+	second.statistics = {{"pointer", movedPointer}, {"reference", movedReference}};
+
+	std::map<QString, double> differences = cx::TrackingSystemComparison::getMeanDifferences(first.statistics, second.statistics);
+	REQUIRE(differences.size() == 1);
+	CHECK(differences["pointer"] == Approx(5.0));
+
+	QStringList lines = cx::TrackingSystemComparison::compareRuns({first, second});
+	REQUIRE(lines.size() == 1);
+	CHECK(lines[0] == "2_ndi pointer: mean position 5.000 mm from 1_igstk");
+	CHECK(cx::TrackingSystemComparison::compareRuns({first}).isEmpty());
 }
 
 TEST_CASE("TrackingSystemComparison: split command arguments", "[unit][tool]")

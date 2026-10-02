@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTrackingSystemComparison.h"
 
+#include <algorithm>
 #include <QDir>
 #include <QDomDocument>
 #include <QFile>
@@ -31,6 +32,7 @@ namespace
 {
 const int kTimerInterval_ms = 100;
 const int kCommandStopTimeout_ms = 3000;
+const int kStopTimeout_ms = 15000;
 const char* kOpenIGTLinkStreamer = "openigtlink3_streamer";
 const char* kOpenIGTLinkStartTrackingOption = "start_tracking";
 const char* kOpenIGTLinkHostOption = "ip_scanner_openigtlink";
@@ -64,6 +66,7 @@ void TrackingSystemComparison::start(TrackingComparisonSettings settings)
 	mRunIndex = 0;
 	mSuccess = true;
 	mSummary.clear();
+	mResults.clear();
 	mOriginalToolConfigFile = profile()->getToolConfigFilePath();
 	mOriginalConnectionMethod = mVideoService ? mVideoService->getConnectionMethod() : QString();
 	QDir().mkpath(mSettings.outputFolder);
@@ -122,6 +125,48 @@ QString TrackingSystemComparison::setTrackingSystemImplementation(QString config
 QString TrackingSystemComparison::getRunLabel(int index, QString implementation)
 {
 	return QString("%1_%2").arg(index + 1).arg(implementation);
+}
+
+std::map<QString, double> TrackingSystemComparison::getMeanDifferences(const ToolPositionStatisticsMap& first, const ToolPositionStatisticsMap& other)
+{
+	std::map<QString, double> retval;
+	for (const std::pair<const QString, ToolPositionStatistics>& entry : first)
+	{
+		ToolPositionStatisticsMap::const_iterator match = other.find(entry.first);
+		bool comparable = !entry.second.reference && entry.second.positions > 0 && match != other.end() && match->second.positions > 0;
+		if (comparable)
+		{
+			retval[entry.first] = (match->second.mean - entry.second.mean).norm();
+		}
+	}
+	return retval;
+}
+
+QStringList TrackingSystemComparison::compareRuns(const std::vector<TrackingComparisonResult>& results)
+{
+	QStringList retval;
+	for (unsigned i = 1; i < results.size(); ++i)
+	{
+		for (const std::pair<const QString, double>& entry : getMeanDifferences(results[0].statistics, results[i].statistics))
+		{
+			retval << QString("%1 %2: mean position %3 mm from %4").arg(results[i].label).arg(entry.first)
+					  .arg(entry.second, 0, 'f', 3).arg(results[0].label);
+		}
+	}
+	return retval;
+}
+
+double TrackingSystemComparison::getMaxMeanDifference_mm() const
+{
+	double retval = 0.0;
+	for (unsigned i = 1; i < mResults.size(); ++i)
+	{
+		for (const std::pair<const QString, double>& entry : getMeanDifferences(mResults[0].statistics, mResults[i].statistics))
+		{
+			retval = std::max(retval, entry.second);
+		}
+	}
+	return retval;
 }
 
 QStringList TrackingSystemComparison::splitArguments(QString arguments)
@@ -184,6 +229,10 @@ void TrackingSystemComparison::onTimer()
 			gotPositions = gotPositions || (entry.second.positions > 0);
 		}
 		this->stopRun(gotPositions ? "OK" : "FAILED: no positions recorded");
+	}
+	else if (mStep == sWAIT_FOR_STOP)
+	{
+		this->checkTrackingStopped();
 	}
 	else if (mStep == sPAUSE && deadlinePassed)
 	{
@@ -258,6 +307,13 @@ void TrackingSystemComparison::stopRun(QString result)
 	QString label = getRunLabel(mRunIndex, this->currentRun().implementation);
 	mSuccess = mSuccess && (result == "OK");
 	mSummary << QString("%1: %2").arg(label).arg(result);
+	if (result == "OK")
+	{
+		TrackingComparisonResult runResult;
+		runResult.label = label;
+		runResult.statistics = mRecorder.getStatistics();
+		mResults.push_back(runResult);
+	}
 	QString statistics = mRecorder.getSummary();
 	if (!statistics.isEmpty())
 	{
@@ -267,13 +323,32 @@ void TrackingSystemComparison::stopRun(QString result)
 	this->closeOpenIGTLinkConnection();
 	mTrackingService->setState(Tool::tsNONE);
 	this->stopCommand();
-	this->wait(sPAUSE, mSettings.pauseBetweenRuns_ms);
+	this->wait(sWAIT_FOR_STOP, kStopTimeout_ms);
+}
+
+void TrackingSystemComparison::checkTrackingStopped()
+{
+	bool stopped = (mTrackingService->getState() == Tool::tsNONE);
+	if (stopped || getMilliSecondsSinceEpoch() >= mStepDeadline_ms)
+	{
+		if (!stopped)
+		{
+			this->log(QString("Tracking did not stop within %1 s, continuing anyway").arg(kStopTimeout_ms / 1000));
+			mSuccess = false;
+		}
+		this->wait(sPAUSE, mSettings.pauseBetweenRuns_ms);
+	}
 }
 
 void TrackingSystemComparison::finish()
 {
 	mTimer.stop();
 	mStep = sIDLE;
+	QStringList comparison = compareRuns(mResults);
+	if (!comparison.isEmpty())
+	{
+		mSummary << "" << comparison;
+	}
 	profile()->setToolConfigFilePath(mOriginalToolConfigFile);
 	if (mVideoService && !mOriginalConnectionMethod.isEmpty())
 	{

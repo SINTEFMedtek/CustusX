@@ -166,8 +166,10 @@ OpenIGTLink tools if the server sends the positions in tracker space (e.g. bkint
 can be compared with the other systems.
 
 The output folder gets one CSV file per system (same format as above), the tool configurations and server logs
-that were used, and summary.txt with the rate, mean position and spread of each tool for each system.
-Keep the tools still during a comparison, to compare the positions between the systems.
+that were used, and summary.txt with the rate, mean position, jitter (standard deviation) and drift of
+each tool for each system, and how far the mean position of each tool is from the first system. Keep the
+tools still during a comparison, to compare the positions between the systems. The systems are run one at
+a time, as they share the tracking device.
 
 
 Mesh Properties {#property_widgets_mesh}

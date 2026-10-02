@@ -12,8 +12,23 @@ There are two ways to run them:
 * From the command line: the Catch tests tagged [tracking_hardware], configured with
   environment variables. These use a fixed tool configuration, given as a file.
 
-Both record the tool positions to CSV files, and write a summary with the rate, mean position
-and spread of each tool.
+Both record the tool positions to CSV files, and write a summary with the rate, mean position,
+jitter (standard deviation) and drift of each tool. The GUI shows the progress and the summary,
+the command line tests print the summary. The tracking systems are run one at a time: tracking
+is stopped (and the OpenIGTLink server closed) before the next one starts, as they share the
+device.
+
+Tool configurations
+-----------------------------------------------------------
+
+The Laboratory profile has two tool configurations for these tests:
+
+* LabPolarisSWTools.xml: Polaris with the SW reference frame, the SW pointer, and the two
+  ultrasound probe tracking frames (03-215-1006 and 32-105-0289) as plain tools without a probe
+  calibration. The OpenIGTLink transform ids are the device names in bkinterface's configuration
+  (SWRef, SWPointer, SWProbe1, SWProbe2).
+* LabAuroraTools.xml: Aurora with the reference on port 1, a pointer on port 2, and a sensor
+  without calibration on ports 3 and 4.
 
 Build
 -----------------------------------------------------------
@@ -61,13 +76,17 @@ Environment variables:
 * CX_TRACKING_TEST_IGTL_HOST and CX_TRACKING_TEST_IGTL_PORT: default 127.0.0.1 and 18944.
 * CX_TRACKING_TEST_IGTL_APPLY_REF: 1 (default) applies the reference tool to the OpenIGTLink
   tools in CustusX. Use 0 for a server that sends positions relative to the reference.
+* CX_TRACKING_TEST_MAX_DIFF_MM: the largest allowed difference between the mean positions of a
+  tool in the first and the other systems in the comparison test, default 1.0.
 * CX_TRACKING_TEST_REPEATS: the number of start/stop cycles in the restart test, default 5.
 * CX_TRACKING_TEST_LONG_DURATION_S: the length of the long run, default 3600.
 
 The tests:
 
 * Compare tracking systems on the same tools: each system in turn (default igstk, ndi,
-  openigtlink). Keep the tools still, and compare the mean positions in summary.txt.
+  openigtlink). Keep the tools still: the mean position of each tool (except the reference) in
+  each system is compared with the first system, and must be within CX_TRACKING_TEST_MAX_DIFF_MM.
+  The jitter and drift of each system are in summary.txt.
 * Start and stop tracking several times: connects, tracks for 3 s and disconnects, several
   times (default ndi).
 * Long run: tracks for an hour (default ndi). Watch the memory use while it runs.
@@ -86,7 +105,8 @@ One folder per test run, with:
   port status and number of markers used).
 * N_system_toolconfig.xml: the tool configuration used.
 * N_system_command.log: the output of the OpenIGTLink server.
-* summary.txt: OK or FAILED for each run, and the statistics of each tool.
+* summary.txt: OK or FAILED for each run, the statistics of each tool, and the differences in
+  mean position from the first run.
 
 Hardware checklist
 -----------------------------------------------------------

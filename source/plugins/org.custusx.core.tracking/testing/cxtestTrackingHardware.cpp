@@ -82,7 +82,7 @@ int getMaxDuration_ms(const cx::TrackingComparisonSettings& settings)
 }
 
 /** Run the comparison with the LogicManager's services, return true if all runs got positions. */
-bool runComparison(cx::TrackingComparisonSettings settings)
+bool runComparison(cx::TrackingComparisonSettings settings, double* maxMeanDifference_mm = nullptr)
 {
 	INFO("Set CX_TRACKING_TEST_CONFIG to the tool configuration file");
 	REQUIRE(QFile::exists(settings.toolConfigFile));
@@ -95,6 +95,10 @@ bool runComparison(cx::TrackingComparisonSettings settings)
 	loop.exec();
 	comparison.cancel();
 
+	if (maxMeanDifference_mm)
+	{
+		*maxMeanDifference_mm = comparison.getMaxMeanDifference_mm();
+	}
 	INFO(comparison.getSummary().toStdString());
 	WARN("Results in " << settings.outputFolder.toStdString() << ":\n" << comparison.getSummary().toStdString());
 	return comparison.wasSuccessful();
@@ -129,7 +133,11 @@ TEST_CASE("Tracking hardware: compare tracking systems on the same tools", "[man
 	{
 		settings.runs.push_back(createRun(system));
 	}
-	CHECK(runComparison(settings));
+	double maxDifference_mm = 0.0;
+	CHECK(runComparison(settings, &maxDifference_mm));
+	double limit_mm = getEnvironment("CX_TRACKING_TEST_MAX_DIFF_MM", "1.0").toDouble();
+	INFO("The tools must be kept still during the comparison");
+	CHECK(maxDifference_mm <= limit_mm);
 
 	cx::LogicManager::shutdown();
 }

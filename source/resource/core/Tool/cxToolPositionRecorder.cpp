@@ -32,6 +32,34 @@ void ToolPositionStatistics::addPosition(const Vector3D& position, double timest
 	Vector3D delta = position - mean;
 	mean += delta / positions;
 	sumSquaredDeviations += delta.cwiseProduct(position - mean);
+
+	if (timestamp_ms <= firstTimestamp_ms + kDriftWindow_ms)
+	{
+		firstWindowSum += position;
+		firstWindowPositions++;
+	}
+	lastWindow.push_back(std::make_pair(timestamp_ms, position));
+	while (lastWindow.front().first < timestamp_ms - kDriftWindow_ms)
+	{
+		lastWindow.pop_front();
+	}
+}
+
+double ToolPositionStatistics::getDrift_mm() const
+{
+	double retval = 0.0;
+	if (positions > 1)
+	{
+		Vector3D lastWindowSum = Vector3D::Zero();
+		for (const std::pair<double, Vector3D>& entry : lastWindow)
+		{
+			lastWindowSum += entry.second;
+		}
+		Vector3D firstMean = firstWindowSum / firstWindowPositions;
+		Vector3D lastMean = lastWindowSum / static_cast<double>(lastWindow.size());
+		retval = (lastMean - firstMean).norm();
+	}
+	return retval;
 }
 
 Vector3D ToolPositionStatistics::getStandardDeviation() const
@@ -53,10 +81,10 @@ double ToolPositionStatistics::getRate_Hz() const
 QString ToolPositionStatistics::toString() const
 {
 	Vector3D sd = this->getStandardDeviation();
-	return QString("%1 positions, %2 Hz, %3 with warning, %4 visibility changes, mean (%5, %6, %7) mm, sd (%8, %9, %10) mm")
+	return QString("%1 positions, %2 Hz, %3 with warning, %4 visibility changes, mean (%5, %6, %7) mm, jitter sd (%8, %9, %10) mm, drift %11 mm")
 			.arg(positions).arg(this->getRate_Hz(), 0, 'f', 1).arg(positionsWithWarning).arg(visibilityChanges)
 			.arg(mean[0], 0, 'f', 2).arg(mean[1], 0, 'f', 2).arg(mean[2], 0, 'f', 2)
-			.arg(sd[0], 0, 'f', 3).arg(sd[1], 0, 'f', 3).arg(sd[2], 0, 'f', 3);
+			.arg(sd[0], 0, 'f', 3).arg(sd[1], 0, 'f', 3).arg(sd[2], 0, 'f', 3).arg(this->getDrift_mm(), 0, 'f', 3);
 }
 
 ToolPositionRecorder::ToolPositionRecorder(TrackingServicePtr trackingService) :
@@ -222,7 +250,9 @@ void ToolPositionRecorder::disconnectFromTools()
 void ToolPositionRecorder::onTransform(ToolPtr tool, const Transform3D& prMt, double timestamp_ms)
 {
 	QString warning = tool->getPositionWarning();
-	mStatistics[tool->getUid()].addPosition(prMt.translation(), timestamp_ms, !warning.isEmpty());
+	ToolPositionStatistics& statistics = mStatistics[tool->getUid()];
+	statistics.reference = tool->hasType(Tool::TOOL_REFERENCE);
+	statistics.addPosition(prMt.translation(), timestamp_ms, !warning.isEmpty());
 	this->writeRow(formatRow(mLabel, tool->getUid(), "position", timestamp_ms, getMilliSecondsSinceEpoch(),
 							 tool->getVisible(), prMt, warning, tool->getMetadata().mData));
 }
