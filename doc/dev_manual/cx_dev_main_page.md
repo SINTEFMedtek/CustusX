@@ -13,6 +13,7 @@ topics, then use the doxygen generated source code documentation to get into det
 * \ref coordinate_systems
 * \ref code_style
 * \ref customize_applications
+* \ref dev_tracking_hardware_tests
 
 From the user documentation:
 
