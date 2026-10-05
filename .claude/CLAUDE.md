@@ -173,6 +173,12 @@ Always commit to a branch other than `develop`/`master` in any of these repos: C
 
 Never run `git push` in any of these repos unless the user explicitly says to push. Permission covers that one push only and does not carry over to later commits in the same session. Being asked to put changes on a branch means commit locally. After committing, say the commit is ready to push and wait.
 
+Waiting also keeps GitLab runner load down, since every push to a branch can start a pipeline.
+
+**One commit per repo for small fixes**
+
+For a small fix, keep all its changes in one commit per repo: until the user says to push, fold follow-up changes into that commit (`git commit --amend`, see below) and keep its message describing the whole change. GitLab uses the last commit's message for a new merge request, so one well-described commit makes the MR easy to create. Larger features may keep several commits.
+
 **Review before a merge request**
 
 Before a branch goes to a merge request, run a code review of its diff against the target branch (Claude Code's `code-review` skill). Check each finding against the code, and fix the real ones before the MR is created or reviewed. Say what the review found and what was fixed.
