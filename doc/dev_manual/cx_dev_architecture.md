@@ -14,9 +14,10 @@ External libraries {#architecture_external_libraries}
 -----------------------------------------------------------
 The Qt framework is used throughout the application, at the same level as the 
 C++ libraries. Qt greatly simplifies C++ development through its signals and 
-slots mechanism and extensive libraries. VTK and ITK are used for visualization 
+slots mechanism and extensive libraries. VTK is used for visualization 
 and image processing, CTK for plugins and DICOM, Eigen for basic math, while 
 DCMTK, OpenCV, OpenIGTLink and IGSTK are used for specialized operations.
+ITK is only used by IGSTK.
 
 CustusX uses a \ref dev_superbuild for handling many of the external libraries.
 
