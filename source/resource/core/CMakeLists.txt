@@ -227,8 +227,7 @@ cx_add_class(cxResource_SOURCE
   algorithms/ItkVtkGlue/itkImageToVTKImageFilter.txx
   algorithms/ItkVtkGlue/itkVTKImageToImageFilter.h
   algorithms/ItkVtkGlue/itkVTKImageToImageFilter.txx
-  algorithms/itkBinaryThinningImageFilter3D.h
-  algorithms/itkBinaryThinningImageFilter3D.txx
+  algorithms/cxBinaryThinning3D
   algorithms/cxImageAlgorithms
   algorithms/cxTimedAlgorithm
   algorithms/cxThreadedTimedAlgorithm

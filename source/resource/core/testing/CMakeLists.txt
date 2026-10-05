@@ -16,6 +16,7 @@ if(BUILD_TESTING)
         cxtestCatchVector3D.cpp
         cxtestImageParameters.cpp
         cxtestCatchImageAlgorithms.cpp
+        cxtestBinaryThinning3D.cpp
         cxtestCatchProcessWrapper.cpp
         cxtestProcessWrapperFixture.h
         cxtestProcessWrapperFixture.cpp
