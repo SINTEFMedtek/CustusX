@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxConsoleWidgetCollection.h"
 #include "cxDataLocations.h"
 #include "cxLogFileWatcher.h"
+#include "cxFileDialogOptions.h"
 
 namespace cx
 {
@@ -95,7 +96,7 @@ void LogConsole::onSelectFolder()
 {
 	QString folder = mLog->getLoggingFolder() + "/..";
 
-	folder = QFileDialog::getExistingDirectory(this, "Open log folder", folder);
+	folder = QFileDialog::getExistingDirectory(this, "Open log folder", folder, fileDialogOptions(QFileDialog::ShowDirsOnly));
 	if (folder.isEmpty())
 	{
 		return;
