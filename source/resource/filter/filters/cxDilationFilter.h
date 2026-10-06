@@ -29,6 +29,8 @@ public:
 
 	bool preProcess();
 	virtual bool execute();
+	/** Dilate the voxels equal to 1 with a ball of the given radius in mm. Output is 0/1 unsigned char. */
+	static vtkImageDataPtr dilate(vtkImageDataPtr image, double radius);
 	virtual bool postProcess();
 
 	// extensions:

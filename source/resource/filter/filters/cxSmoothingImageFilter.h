@@ -36,6 +36,8 @@ public:
 	virtual QString getHelp() const;
 
 	virtual bool execute();
+	/** Gaussian smoothing with standard deviation sigma in mm. Output is short, as before. */
+	static vtkImageDataPtr smooth(vtkImageDataPtr image, double sigma);
 	virtual bool postProcess();
 
 	// extensions:

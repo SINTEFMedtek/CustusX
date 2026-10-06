@@ -11,9 +11,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxBinaryThresholdImageFilter.h"
 
-#include "cxAlgorithmHelpers.h"
-#include <itkBinaryThresholdImageFilter.h>
-#include <vtkImageCast.h>
+#include <vtkImageData.h>
+
+#include <vtkImageThreshold.h>
+#include <vtkImageExtractComponents.h>
 #include <vtkPolyData.h>
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"
@@ -168,36 +169,7 @@ bool BinaryThresholdImageFilter::execute()
 	DoublePairPropertyPtr thresholds = this->getThresholdOption(mCopiedOptions);
 	BoolPropertyPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
 
-	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
-
-	//Binary Thresholding
-	typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
-	thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
-	thresholdFilter->SetInput(itkImage);
-	thresholdFilter->SetOutsideValue(0);
-	thresholdFilter->SetInsideValue(1);
-	thresholdFilter->SetLowerThreshold(thresholds->getValue()[0]);
-	thresholdFilter->SetUpperThreshold(thresholds->getValue()[1]);
-	thresholdFilter->Update();
-	itkImage = thresholdFilter->GetOutput();
-
-	//Convert ITK to VTK
-	itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
-	itkToVtkFilter->SetInput(itkImage);
-	itkToVtkFilter->Update();
-
-	vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-	rawResult->DeepCopy(itkToVtkFilter->GetOutput());
-
-	vtkImageCastPtr imageCast = vtkImageCastPtr::New();
-	imageCast->SetInputData(rawResult);
-	imageCast->SetOutputScalarTypeToUnsignedChar();
-	imageCast->Update();
-	rawResult = imageCast->GetOutput();
-
-	// TODO: possible memory problem here - check debug mem system of itk/vtk
-
-	mRawResult =  rawResult;
+	mRawResult = threshold(input->getBaseVtkImageData(), thresholds->getValue()[0], thresholds->getValue()[1]);
 
 	if (generateSurface->getValue())
 	{
@@ -206,6 +178,32 @@ bool BinaryThresholdImageFilter::execute()
 	}
 
 	return true;
+}
+
+vtkImageDataPtr BinaryThresholdImageFilter::threshold(vtkImageDataPtr image, double lower, double upper)
+{
+	vtkSmartPointer<vtkImageExtractComponents> firstComponent = vtkSmartPointer<vtkImageExtractComponents>::New();
+	firstComponent->SetInputData(image);
+	firstComponent->SetComponents(0);
+
+	const bool outsideScalarRange = upper < image->GetScalarTypeMin() || lower > image->GetScalarTypeMax();
+	vtkSmartPointer<vtkImageThreshold> thresholdFilter = vtkSmartPointer<vtkImageThreshold>::New();
+	thresholdFilter->SetInputConnection(firstComponent->GetOutputPort());
+	if (outsideScalarRange)
+	{
+		thresholdFilter->ThresholdBetween(1, 0);
+	}
+	else
+	{
+		thresholdFilter->ThresholdBetween(lower, upper);
+	}
+	thresholdFilter->SetInValue(1);
+	thresholdFilter->SetOutValue(0);
+	thresholdFilter->ReplaceInOn();
+	thresholdFilter->ReplaceOutOn();
+	thresholdFilter->SetOutputScalarTypeToUnsignedChar();
+	thresholdFilter->Update();
+	return thresholdFilter->GetOutput();
 }
 
 bool BinaryThresholdImageFilter::postProcess()

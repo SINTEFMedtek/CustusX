@@ -11,9 +11,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxAirwaysFromCenterlineFilterService.h"
 
+#include <vtkImageData.h>
+
 #include <ctkPluginContext.h>
 
-#include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
 
 #include "cxUtilHelpers.h"

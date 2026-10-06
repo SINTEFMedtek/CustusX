@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXLANDMARKTRANSLATIONREGISTRATION_H_
 #define CXLANDMARKTRANSLATIONREGISTRATION_H_
 
+#include "org_custusx_registration_Export.h"
 #include <vector>
 #include "cxTransform3D.h"
 
@@ -22,12 +23,12 @@ namespace cx
  * @{
  */
 
-/** Use ITK to perform a landmark registration in 3D with translation only.
+/** Landmark registration in 3D with translation only.
  *
- * Code is based on  itk/Examples/Registration/IterativeClosestPoint1.cxx
- *
+ * The translation is the mean of ref - target over the point pairs, which
+ * minimizes the sum of squared distances between the pairs.
  */
-class LandmarkTranslationRegistration
+class org_custusx_registration_EXPORT LandmarkTranslationRegistration
 {
 public:
   Transform3D registerPoints(std::vector<Vector3D> ref, std::vector<Vector3D> target, bool* ok);

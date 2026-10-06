@@ -10,7 +10,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxGenericScriptFilter.h"
-#include <itkSmoothingRecursiveGaussianImageFilter.h>
 #include <QTimer>
 #include <QFileInfo>
 #include <QDir>
@@ -27,7 +26,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <sys/types.h>
 #endif //CX_WINDOWS
 
-#include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
