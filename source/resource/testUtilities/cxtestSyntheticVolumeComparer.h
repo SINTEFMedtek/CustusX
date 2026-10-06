@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class SyntheticVolumeComparer> SyntheticVolumeComparerPtr;
+typedef std::shared_ptr<class SyntheticVolumeComparer> SyntheticVolumeComparerPtr;
 
 /** Compares nominal and real versions of a test volume.
  *

@@ -23,8 +23,8 @@ class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
 * \file
@@ -72,7 +72,7 @@ private:
 	VisServicesPtr mServices;
 	UsReconstructionServicePtr mReconstructer;
 };
-typedef boost::shared_ptr<AcquisitionData> AcquisitionDataPtr;
+typedef std::shared_ptr<AcquisitionData> AcquisitionDataPtr;
 
 
 
@@ -157,7 +157,7 @@ private:
 	void checkIfReadySlot();
 	VisServicesPtr getServices();
 };
-typedef boost::shared_ptr<Acquisition> AcquisitionPtr;
+typedef std::shared_ptr<Acquisition> AcquisitionPtr;
 
 
 /**

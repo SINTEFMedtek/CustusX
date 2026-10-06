@@ -48,7 +48,7 @@ public slots:
 
 private:
 	typedef cx::MainWindowApplicationComponent<cx::MainWindow> MainWindowComponent;
-	boost::shared_ptr<MainWindowComponent> mApplicationComponent;
+	std::shared_ptr<MainWindowComponent> mApplicationComponent;
 
     int mNumInitialRenders;
 };

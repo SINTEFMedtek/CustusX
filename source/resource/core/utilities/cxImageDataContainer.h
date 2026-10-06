@@ -54,7 +54,7 @@ private:
 	QString mFilename;
 	vtkImageDataPtr mImageData;
 };
-typedef boost::shared_ptr<CachedImageData> CachedImageDataPtr;
+typedef std::shared_ptr<CachedImageData> CachedImageDataPtr;
 
 /** Container inteface for managing a list of vtkImageData.
   * Subclasses implement storage of vtkImageData in various ways.
@@ -72,7 +72,7 @@ public:
 	virtual bool purge(unsigned index) { return false; }
 	virtual void purgeAll();
 };
-typedef boost::shared_ptr<ImageDataContainer> ImageDataContainerPtr;
+typedef std::shared_ptr<ImageDataContainer> ImageDataContainerPtr;
 
 /** Container class for delayed loading of images.
   * The images will also not be stored by this container.
@@ -104,7 +104,7 @@ private:
 	FileManagerServicePtr mFileManagerService;
 	CachedImageDataContainer(){};
 };
-typedef boost::shared_ptr<CachedImageDataContainer> CachedImageDataContainerPtr;
+typedef std::shared_ptr<CachedImageDataContainer> CachedImageDataContainerPtr;
 
 /** Container class for extracting 2D vtkImageData from a 3D base image.
  *

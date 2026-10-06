@@ -612,7 +612,7 @@ void TrackingImplService::addXml(QDomNode& parentNode)
 	ToolMap::iterator toolIt = tools.begin();
 	for (; toolIt != tools.end(); ++toolIt)
 	{
-		cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(toolIt->second);
+		cxToolPtr tool = std::dynamic_pointer_cast<ToolImpl>(toolIt->second);
 		if (tool)
 		{
 			toolsNode.addObjectToElement("tool", tool);
@@ -645,7 +645,7 @@ void TrackingImplService::parseXml(QDomNode& dataNode)
 		QString tool_uid = toolNode.attribute("uid");
 		if (tools.find(tool_uid) != tools.end())
 		{
-			cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(tools.find(tool_uid)->second);
+			cxToolPtr tool = std::dynamic_pointer_cast<ToolImpl>(tools.find(tool_uid)->second);
 			tool->parseXml(toolNode);
 		}
 	}

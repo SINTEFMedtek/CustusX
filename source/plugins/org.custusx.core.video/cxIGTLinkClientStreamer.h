@@ -72,13 +72,13 @@ private:
 	QString mAddress;
 	int mPort;
     StreamedTimestampSynchronizer mStreamSynchronizer;
-    boost::shared_ptr<QTcpSocket> mSocket;
+    std::shared_ptr<QTcpSocket> mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;
 	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 
 
 };
-typedef boost::shared_ptr<class IGTLinkClientStreamer> IGTLinkClientStreamerPtr;
+typedef std::shared_ptr<class IGTLinkClientStreamer> IGTLinkClientStreamerPtr;
 
 } // namespace cx
 

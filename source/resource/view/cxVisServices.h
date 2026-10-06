@@ -18,8 +18,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class ViewService> ViewServicePtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class ViewService> ViewServicePtr;
 
 /**
  * Convenience class combining all services used by visualization.

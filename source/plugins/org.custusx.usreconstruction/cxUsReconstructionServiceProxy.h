@@ -63,7 +63,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	UsReconstructionServicePtr mUsReconstructionService;
-	boost::shared_ptr<ServiceTrackerListener<UsReconstructionService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<UsReconstructionService> > mServiceListener;
 };
 
 } //cx

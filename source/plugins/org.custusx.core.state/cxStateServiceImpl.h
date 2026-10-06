@@ -17,8 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ApplicationStateMachine> ApplicationStateMachinePtr;
-typedef boost::shared_ptr<class WorkflowStateMachine> WorkflowStateMachinePtr;
+typedef std::shared_ptr<class ApplicationStateMachine> ApplicationStateMachinePtr;
+typedef std::shared_ptr<class WorkflowStateMachine> WorkflowStateMachinePtr;
 
 
 /**

@@ -29,7 +29,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
+typedef std::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
 
 /**
  * \brief Manager for interfacing to the ElastiX registration package.
@@ -78,7 +78,7 @@ private:
 	QString mDesc;
 	ImagePtr mLastNonLonearImage;
 };
-typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;
+typedef std::shared_ptr<ElastixManager> ElastixManagerPtr;
 
 /**
  * @}

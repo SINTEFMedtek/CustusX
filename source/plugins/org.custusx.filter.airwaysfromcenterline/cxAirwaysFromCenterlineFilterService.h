@@ -29,7 +29,7 @@ namespace cx
  */
 
 
-typedef boost::shared_ptr<class AirwaysFromCenterline> AirwaysFromCenterlinePtr;
+typedef std::shared_ptr<class AirwaysFromCenterline> AirwaysFromCenterlinePtr;
 
 class org_custusx_filter_airwaysfromcenterline_EXPORT AirwaysFromCenterlineFilter : public FilterImpl
 {
@@ -65,7 +65,7 @@ private:
 	vtkPolyDataPtr mOutputAirwayMesh;
 	vtkPolyDataPtr mOutputSmoothedCenterline;
 };
-typedef boost::shared_ptr<class AirwaysFromCenterlineFilter> AirwaysFromCenterlineFilterPtr;
+typedef std::shared_ptr<class AirwaysFromCenterlineFilter> AirwaysFromCenterlineFilterPtr;
 
 
 } // namespace cx

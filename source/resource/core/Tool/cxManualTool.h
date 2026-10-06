@@ -68,7 +68,7 @@ private:
 	void update3DCrossHair(double toolTipOffset) const;
 };
 
-typedef boost::shared_ptr<ManualTool> ManualToolPtr;
+typedef std::shared_ptr<ManualTool> ManualToolPtr;
 
 }// end namespace
 

@@ -77,7 +77,7 @@ private:
 	std::mt19937 m_gen{m_rd()};
 };
 
-typedef boost::shared_ptr<ColorVariationFilter> ColorVariationFilterPtr;
+typedef std::shared_ptr<ColorVariationFilter> ColorVariationFilterPtr;
 
 } // namespace cx
 

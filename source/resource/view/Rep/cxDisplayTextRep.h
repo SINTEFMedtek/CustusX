@@ -24,9 +24,9 @@ class QColor;
 
 namespace cx
 {
-typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
+typedef std::shared_ptr<class TextDisplay> TextDisplayPtr;
 
-typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
+typedef std::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
 
 /**\brief Display a number of text strings.
  *

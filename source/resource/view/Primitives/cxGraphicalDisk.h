@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceVisualizationExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "vtkForwardDeclarations.h"
 #include "cxVector3D.h"
 #include <QColor>
@@ -76,7 +76,7 @@ private:
 	bool mFillVisible;
 	bool mUseLighting;
 };
-typedef boost::shared_ptr<GraphicalDisk> GraphicalDiskPtr;
+typedef std::shared_ptr<GraphicalDisk> GraphicalDiskPtr;
 
 
 

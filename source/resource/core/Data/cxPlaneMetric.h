@@ -31,7 +31,7 @@ typedef Eigen::Hyperplane<double, 3> Plane3D;
  * @{
  */
 
-typedef boost::shared_ptr<class PlaneMetric> PlaneMetricPtr;
+typedef std::shared_ptr<class PlaneMetric> PlaneMetricPtr;
 
 /**
  * \brief Data class representing a plane.

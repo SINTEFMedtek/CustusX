@@ -23,8 +23,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
-typedef boost::shared_ptr<class PointMetricRep2D> PointMetricRep2DPtr;
+typedef std::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
+typedef std::shared_ptr<class PointMetricRep2D> PointMetricRep2DPtr;
 
 /**Rep for visualizing a PointMetric in 2D views.
  *

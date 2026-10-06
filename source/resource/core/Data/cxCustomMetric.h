@@ -26,7 +26,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class CustomMetric> CustomMetricPtr;
+typedef std::shared_ptr<class CustomMetric> CustomMetricPtr;
 
 /** \brief Data class that represents a custom.
  *

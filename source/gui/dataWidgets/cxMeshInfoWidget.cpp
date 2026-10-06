@@ -103,7 +103,7 @@ void MeshInfoWidget::meshSelectedSlot()
 		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
 	}
 
-	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+	mMesh = std::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
 	if (!mMesh)
 	{
@@ -166,7 +166,7 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
 
 void MeshInfoWidget::addWidgets()
 {
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+	MeshPtr mesh = std::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
 	QPushButton* importTransformButton = new QPushButton("Import Transform from Parent", this);
 	importTransformButton->setToolTip("Replace data transform with that of the parent data.");

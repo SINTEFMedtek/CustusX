@@ -23,8 +23,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class Image> ImagePtr;
-typedef boost::shared_ptr<class Data> DataPtr;
+typedef std::shared_ptr<class Image> ImagePtr;
+typedef std::shared_ptr<class Data> DataPtr;
 
 /**
  * \addtogroup cx_resource_core_utilities

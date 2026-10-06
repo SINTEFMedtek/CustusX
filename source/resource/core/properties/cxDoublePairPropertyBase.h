@@ -83,7 +83,7 @@ public:
 	} ///< number of relevant decimals in value
 
 };
-typedef boost::shared_ptr<DoublePairPropertyBase> DoublePairPropertyBasePtr;
+typedef std::shared_ptr<DoublePairPropertyBase> DoublePairPropertyBasePtr;
 
 /** Dummy implementation */
 class cxResource_EXPORT DoubleSpanSliderAdapterNull: public DoublePairPropertyBase

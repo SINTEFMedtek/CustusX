@@ -25,8 +25,8 @@ typedef vtkSmartPointer<vtkTextActor> vtkTextActorPtr;
 namespace cx
 {
 
-typedef boost::shared_ptr<class RegionOfInterestMetricRep> RegionOfInterestMetricRepPtr;
-typedef boost::shared_ptr<class GraphicalBox> GraphicalBoxPtr;
+typedef std::shared_ptr<class RegionOfInterestMetricRep> RegionOfInterestMetricRepPtr;
+typedef std::shared_ptr<class GraphicalBox> GraphicalBoxPtr;
 
 /** \brief Rep for visualizing a RegionOfInterestMetric.
  *

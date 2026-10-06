@@ -50,7 +50,7 @@ private slots:
 private:
 	ImagePtr mRawResult;
 };
-typedef boost::shared_ptr<class ResampleImageFilter> ResampleImageFilterPtr;
+typedef std::shared_ptr<class ResampleImageFilter> ResampleImageFilterPtr;
 
 
 } // namespace cx

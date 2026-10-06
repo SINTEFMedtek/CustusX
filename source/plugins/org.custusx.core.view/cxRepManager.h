@@ -21,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class Rep> RepPtr;
+typedef std::shared_ptr<class Rep> RepPtr;
 }
 
 namespace cx
@@ -69,7 +69,7 @@ public:
 	 * Otherwise, a new rep will be created and returned.
 	 */
 	template<class REP>
-	boost::shared_ptr<REP> getCachedRep(QString uid = "")
+	std::shared_ptr<REP> getCachedRep(QString uid = "")
 	{
 		// look for existing value:
 		for (RepMultiMap::iterator iter = mRepCache.begin(); iter != mRepCache.end(); ++iter)
@@ -83,7 +83,7 @@ public:
 				continue;
 			}
 
-			boost::shared_ptr<REP> retval = boost::dynamic_pointer_cast<REP>(iter->second);
+			std::shared_ptr<REP> retval = std::dynamic_pointer_cast<REP>(iter->second);
 			if (retval)
 			{
 //				std::cout << "reusing cached rep: " << uid.toStdString() << ", use count: " << uc << std::endl;
@@ -92,7 +92,7 @@ public:
 		}
 
 		// create new value, store and return:
-		boost::shared_ptr<REP> retval = REP::New(uid);
+		std::shared_ptr<REP> retval = REP::New(uid);
 		mRepCache.insert(std::make_pair(uid, retval));
 
 		return retval;

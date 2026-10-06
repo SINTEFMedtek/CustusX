@@ -52,7 +52,7 @@ void ToolMetricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 
 ToolMetricPtr ToolMetricRep::getToolMetric()
 {
-	return boost::dynamic_pointer_cast<ToolMetric>(mMetric);
+	return std::dynamic_pointer_cast<ToolMetric>(mMetric);
 }
 
 void ToolMetricRep::onModifiedStartRender()

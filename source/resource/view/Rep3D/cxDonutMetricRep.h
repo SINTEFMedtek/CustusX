@@ -21,10 +21,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class GraphicalTorus3D> GraphicalTorus3DPtr;
-typedef boost::shared_ptr<class DonutMetricRep> DonutMetricRepPtr;
-typedef boost::shared_ptr<class DonutMetric> DonutMetricPtr;
-typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
+typedef std::shared_ptr<class GraphicalTorus3D> GraphicalTorus3DPtr;
+typedef std::shared_ptr<class DonutMetricRep> DonutMetricRepPtr;
+typedef std::shared_ptr<class DonutMetric> DonutMetricPtr;
+typedef std::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
 
 /**Rep for visualizing a DonutMetric.
  *

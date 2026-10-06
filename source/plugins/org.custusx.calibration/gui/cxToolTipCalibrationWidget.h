@@ -27,7 +27,7 @@ class QLineEdit;
 namespace cx
 {
 class LabeledComboBoxWidget;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \file

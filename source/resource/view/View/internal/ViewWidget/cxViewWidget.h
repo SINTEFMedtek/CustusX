@@ -73,7 +73,7 @@ private:
 	virtual void paintEvent(QPaintEvent *event);
 
 	double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
-	boost::shared_ptr<class ViewRepCollection> mView;
+	std::shared_ptr<class ViewRepCollection> mView;
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
 };
 

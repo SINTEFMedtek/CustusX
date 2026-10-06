@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include <boost/function.hpp>
+#include <functional>
 #include "vtkForwardDeclarations.h"
 #include "cxVector3D.h"
 
@@ -38,7 +38,7 @@ public:
 		void stopListen();
 		bool isListening() const;
 
-		void setCallback(boost::function<void ()> func);
+		void setCallback(std::function<void ()> func);
 
 		virtual void callback();
 		double getVpnZoom();
@@ -51,7 +51,7 @@ protected:
 		ViewportObserverPrivatePtr mObserver;
 		vtkRendererPtr mRenderer;
 private:
-		boost::function<void ()> mCallback;
+		std::function<void ()> mCallback;
 };
 
 /** \brief Listens to changes in viewport and camera matrix.
@@ -76,7 +76,7 @@ protected:
 		virtual void removeObservers();
 };
 
-typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
+typedef std::shared_ptr<class ViewportListener> ViewportListenerPtr;
 
 /** \brief Listens to the start render event in a vtkRenderer
  *
@@ -103,7 +103,7 @@ private:
 		bool mModified;
 };
 
-typedef boost::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
+typedef std::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
 
 }
 

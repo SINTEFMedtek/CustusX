@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFileInfo>
 
 namespace {
-typedef boost::shared_ptr<class TestNetworkHandler> cxtestNetworkHandlerPtr;
+typedef std::shared_ptr<class TestNetworkHandler> cxtestNetworkHandlerPtr;
 
 class TestNetworkHandler : public cx::NetworkHandler
 {
@@ -89,7 +89,7 @@ double OpenIGTLinkTrackingSystemServiceMoc::getNetworkHandlerTimestampOffset()
 	return mTestNetworkHandler->getTimestampOffset();
 }
 
-typedef boost::shared_ptr<OpenIGTLinkTrackingSystemServiceMoc> OpenIGTLinkTrackingSystemServiceMocPtr;
+typedef std::shared_ptr<OpenIGTLinkTrackingSystemServiceMoc> OpenIGTLinkTrackingSystemServiceMocPtr;
 
 class PositionReceiver : public QObject
 {
@@ -115,7 +115,7 @@ public slots:
 	}
 };
 
-typedef boost::shared_ptr<PositionReceiver> PositionReceiverPtr;
+typedef std::shared_ptr<PositionReceiver> PositionReceiverPtr;
 
 bool findConfigFileNumberInList(QStringList configurations, QString startsWith, int& numberInList)
 {

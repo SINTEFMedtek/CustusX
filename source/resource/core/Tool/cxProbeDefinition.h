@@ -174,7 +174,7 @@ private:
 	QMap<QString, QVariant> mAdditionalVariables;
 };
 
-typedef boost::shared_ptr<ProbeDefinition> ProbeDefinitionPtr;
+typedef std::shared_ptr<ProbeDefinition> ProbeDefinitionPtr;
 
 } // namespace cx
 

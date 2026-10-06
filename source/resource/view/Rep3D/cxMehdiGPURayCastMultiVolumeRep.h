@@ -29,10 +29,10 @@ namespace cx
 {
 
 
-typedef boost::shared_ptr<class ImageEnveloper> ImageEnveloperPtr;
-typedef boost::shared_ptr<class MehdiGPURayCastMultiVolumeRep> MehdiGPURayCastMultiVolumeRepPtr;
-typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
-typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
+typedef std::shared_ptr<class ImageEnveloper> ImageEnveloperPtr;
+typedef std::shared_ptr<class MehdiGPURayCastMultiVolumeRep> MehdiGPURayCastMultiVolumeRepPtr;
+typedef std::shared_ptr<class VolumeProperty> VolumePropertyPtr;
+typedef std::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 
 class cxResourceVisualization_EXPORT MehdiGPURayCastMultiVolumeRepImageMapperMonitor : public ImageMapperMonitor
 {

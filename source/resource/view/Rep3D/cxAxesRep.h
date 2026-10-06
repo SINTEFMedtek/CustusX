@@ -22,9 +22,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class AxesRep> AxesRepPtr;
-typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
-typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
+typedef std::shared_ptr<class AxesRep> AxesRepPtr;
+typedef std::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
+typedef std::shared_ptr<class ViewportListener> ViewportListenerPtr;
 
 /** \brief Representation for one 3D coordinate axis triplet.
  *

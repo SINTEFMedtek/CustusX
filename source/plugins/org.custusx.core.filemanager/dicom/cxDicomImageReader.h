@@ -28,11 +28,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <string.h>
 #include "cxForwardDeclarations.h"
 
-typedef boost::shared_ptr<class ctkDICOMItem> ctkDICOMItemPtr;
+typedef std::shared_ptr<class ctkDICOMItem> ctkDICOMItemPtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
+typedef std::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
 
 /** Utility for reading dicom images
  *

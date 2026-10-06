@@ -49,7 +49,7 @@ void MeshTextureWidget::meshSelectedSlot()
 	if (mMesh == mMeshSelector->getData())
 		return;
 
-	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+	mMesh = std::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
 	this->setupUI();
 	mOptionsWidget->rebuild();

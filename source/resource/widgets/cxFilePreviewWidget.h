@@ -22,7 +22,7 @@ class QPushButton;
 
 namespace cx
 {
-typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
+typedef std::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
 
 /**
  *
@@ -71,7 +71,7 @@ private:
 	QPushButton* 							mSaveButton;
 
 	//QFileSystemWatcher*				mFileSystemWatcher;
-	//boost::shared_ptr<QFile>	mCurrentFile;
+	//std::shared_ptr<QFile>	mCurrentFile;
 };
 
 }

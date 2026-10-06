@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QMutex>
 #include <QDateTime>
 #include <QFile>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxDefinitions.h"
 #include "cxAudio.h"
 #include <sstream>
@@ -41,11 +41,11 @@ class QTextStream;
 
 namespace cx
 {
-typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
-typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
-typedef boost::shared_ptr<class LogThread> LogThreadPtr;
-typedef boost::shared_ptr<class ReporterThread> ReporterThreadPtr;
-typedef boost::shared_ptr<class Log> LogPtr;
+typedef std::shared_ptr<class MessageObserver> MessageObserverPtr;
+typedef std::shared_ptr<class MessageListener> MessageListenerPtr;
+typedef std::shared_ptr<class LogThread> LogThreadPtr;
+typedef std::shared_ptr<class ReporterThread> ReporterThreadPtr;
+typedef std::shared_ptr<class Log> LogPtr;
 
 /**
  * \author Christian Askeland, SINTEF
@@ -86,7 +86,7 @@ protected:
 
   QString getDefaultLogPath() const;
   QString mLogPath;
-  boost::shared_ptr<class QThread> mThread;
+  std::shared_ptr<class QThread> mThread;
   LogThreadPtr mWorker;
 private:
   Log(const Log&);

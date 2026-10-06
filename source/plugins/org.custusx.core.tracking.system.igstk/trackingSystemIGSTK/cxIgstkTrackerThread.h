@@ -77,7 +77,7 @@ private:
 
 	IgstkToolManagerPtr mManager;
 };
-typedef boost::shared_ptr<IgstkTrackerThread> IgstkTrackerThreadPtr;
+typedef std::shared_ptr<IgstkTrackerThread> IgstkTrackerThreadPtr;
 
 /**
  * @}

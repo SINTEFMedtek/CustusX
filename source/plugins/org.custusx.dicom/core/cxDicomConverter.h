@@ -18,7 +18,7 @@ class ctkDICOMDatabase;
 
 namespace cx
 {
-typedef boost::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
+typedef std::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
 
 /**
  * Import dicom series into cx Image.

@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QString>
 #include <QFile>
 #include <QDataStream>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 #include "cxTransform3D.h"
 
@@ -73,7 +73,7 @@ private:
 	class Frame3D frameFromStream();
 };
 
-typedef boost::shared_ptr<PositionStorageReader> PositionStorageReaderPtr;
+typedef std::shared_ptr<PositionStorageReader> PositionStorageReaderPtr;
 
 /**\brief Writer class for the position file.
  * 

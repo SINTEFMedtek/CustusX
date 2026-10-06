@@ -18,7 +18,7 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrainingEngine> TrainingEnginePtr;
+typedef std::shared_ptr<class TrainingEngine> TrainingEnginePtr;
 
 /**
  * Implementation of Training service.
@@ -40,7 +40,7 @@ public:
 private:
   ctkPluginContext* mContext;
 };
-typedef boost::shared_ptr<TrainingGUIExtenderService> TrainingGUIExtenderServicePtr;
+typedef std::shared_ptr<TrainingGUIExtenderService> TrainingGUIExtenderServicePtr;
 
 } /* namespace cx */
 

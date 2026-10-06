@@ -66,7 +66,7 @@ private:
 
 };
 
-typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
+typedef std::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
 
 
 } // namespace cx

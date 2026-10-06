@@ -139,7 +139,7 @@ public:
 	}
 };
 
-typedef boost::shared_ptr<class DicomWidgetFixture> DicomWidgetFixturePtr;
+typedef std::shared_ptr<class DicomWidgetFixture> DicomWidgetFixturePtr;
 class DicomWidgetFixture : public cx::DicomWidget
 {
 public:

@@ -250,7 +250,7 @@ void ClipperWidget::createNewCheckboxesBasedOnData()
 		QTableWidgetItem *descriptionItem = new QTableWidgetItem(data->getName());
 		mDataTableWidget->setItem(row++, 1, descriptionItem);
 
-		boost::function<void()> func = boost::bind(&ClipperWidget::dataSelectorClicked, this, checkbox, data);
+		std::function<void()> func = boost::bind(&ClipperWidget::dataSelectorClicked, this, checkbox, data);
 		connect(checkbox, &QCheckBox::clicked, this, func);
 		this->updateCheckBoxFromClipper(checkbox, data);
 	}

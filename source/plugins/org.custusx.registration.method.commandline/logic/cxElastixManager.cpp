@@ -207,7 +207,7 @@ void ElastixManager::addNonlinearData()
 		return;
 
 	ImagePtr baseImage = getNonLinearBaseImage();
-	ImagePtr raw = boost::dynamic_pointer_cast<Image>(mServices->file()->load(nonlinearVolumeFilename, nonlinearVolumeFilename));
+	ImagePtr raw = std::dynamic_pointer_cast<Image>(mServices->file()->load(nonlinearVolumeFilename, nonlinearVolumeFilename));
 
 	if (!raw)
 	{
@@ -243,7 +243,7 @@ ImagePtr ElastixManager::getNonLinearBaseImage()
 		ImagePtr deformImage = mServices->patient()->getData<Image>(mParameters->getDeformImage());
 		return deformImage;
 	}
-	ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
+	ImagePtr movingImage = std::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
 	return movingImage;
 }
 

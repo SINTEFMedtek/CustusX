@@ -25,7 +25,7 @@ class QActionGroup;
 namespace cx
 {
 
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * \file
@@ -62,7 +62,7 @@ private:
 	ViewGroupDataPtr mGroup;
 	CoreServicesPtr mBackend;
 };
-typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
+typedef std::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 
 /**
  * @}

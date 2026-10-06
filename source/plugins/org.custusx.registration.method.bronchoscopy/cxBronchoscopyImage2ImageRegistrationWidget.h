@@ -11,8 +11,8 @@
 namespace cx
 {
 class WidgetObscuredListener;
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
+typedef std::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef std::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 
 /**
  * BronchoscopyImage2ImageRegistrationWidget

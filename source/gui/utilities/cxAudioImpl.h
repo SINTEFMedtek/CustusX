@@ -73,7 +73,7 @@ public:
   virtual void playSampleSound();
 
 private:
-  boost::shared_ptr<AudioInternal> mInternal;
+  std::shared_ptr<AudioInternal> mInternal;
 };
 
 }//namespace cx

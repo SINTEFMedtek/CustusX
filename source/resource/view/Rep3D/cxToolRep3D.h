@@ -26,9 +26,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
-typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
+typedef std::shared_ptr<class ToolTracer> ToolTracerPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 
 /**\brief Display a Tool in 3D.

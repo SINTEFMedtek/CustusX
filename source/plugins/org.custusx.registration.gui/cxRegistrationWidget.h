@@ -24,7 +24,7 @@ class QStackedWidget;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef std::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
 
 
 /**
@@ -87,7 +87,7 @@ private:
 	void onServiceRemoved(RegistrationMethodService *service);
 
 	ctkPluginContext* mPluginContext;
-	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
 
 	StringPropertyPtr mTypeSelector;
 	std::map<QString, RegistrationTypeWidget*> mRegistrationTypeMap;

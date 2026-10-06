@@ -582,7 +582,7 @@ void DataManagerImpl::deleteFiles(DataPtr data, QString basePath)
 {
 	if (!data)
 		return;
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 	QStringList files;
 	if (!data->getFilename().isEmpty())
 	{

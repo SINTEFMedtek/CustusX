@@ -34,17 +34,17 @@ PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() const
 
 ImagePtr DataManager::getImage(const QString &uid) const
 {
-	return boost::dynamic_pointer_cast<Image>(this->getData(uid));
+	return std::dynamic_pointer_cast<Image>(this->getData(uid));
 }
 
 MeshPtr DataManager::getMesh(const QString &uid) const
 {
-	return boost::dynamic_pointer_cast<Mesh>(this->getData(uid));
+	return std::dynamic_pointer_cast<Mesh>(this->getData(uid));
 }
 
 TrackedStreamPtr DataManager::getTrackedStream(const QString &uid) const
 {
-	return boost::dynamic_pointer_cast<TrackedStream>(this->getData(uid));
+	return std::dynamic_pointer_cast<TrackedStream>(this->getData(uid));
 }
 
 } // namespace cx

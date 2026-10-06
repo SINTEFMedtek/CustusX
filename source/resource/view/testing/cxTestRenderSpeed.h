@@ -75,7 +75,7 @@ public:
 	void createViews(int num);
 
 	std::vector<cx::ViewPtr> mViews;
-	boost::shared_ptr<cx::ViewCollectionWidget> mMainWidget;
+	std::shared_ptr<cx::ViewCollectionWidget> mMainWidget;
 	RenderSpeedCounter mCounter;
 };
 

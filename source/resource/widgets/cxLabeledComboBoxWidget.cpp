@@ -100,7 +100,7 @@ void LabeledComboBoxWidget::prePaintEvent()
 
 QIcon LabeledComboBoxWidget::getIcon(QString uid)
 {
-	SelectDataStringPropertyBasePtr dataProperty = boost::dynamic_pointer_cast<SelectDataStringPropertyBase>(mData);
+	SelectDataStringPropertyBasePtr dataProperty = std::dynamic_pointer_cast<SelectDataStringPropertyBase>(mData);
 	if(!dataProperty)
 		return QIcon();
 

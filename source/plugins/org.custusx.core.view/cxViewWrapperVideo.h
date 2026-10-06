@@ -69,7 +69,7 @@ private:
 	ViewPtr mView;
 	ToolPtr mTool;
 };
-typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
+typedef std::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 
 /**
 * @}

@@ -23,8 +23,8 @@ class QDomElement;
 
 namespace cx
 {
-typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
-typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
+typedef std::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
+typedef std::shared_ptr<class MetricManager> MetricManagerPtr;
 
 /** 
  *

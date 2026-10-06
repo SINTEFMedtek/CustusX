@@ -24,9 +24,9 @@ struct USReconstructInputData;
 }
 namespace cx
 {
-typedef boost::shared_ptr<class UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
-typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
-typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+typedef std::shared_ptr<class UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
+typedef std::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
+typedef std::shared_ptr<class RecordSession> RecordSessionPtr;
 
 /**
  * \file
@@ -100,7 +100,7 @@ private:
 	bool mDoWriteColor;
 	Transform3D m_rMpr;
 };
-typedef boost::shared_ptr<USSavingRecorder> USSavingRecorderPtr;
+typedef std::shared_ptr<USSavingRecorder> USSavingRecorderPtr;
 
 /**
 * @}

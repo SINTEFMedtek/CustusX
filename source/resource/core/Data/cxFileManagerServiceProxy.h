@@ -53,7 +53,7 @@ private:
 	void onServiceAdded(FileManagerService *service);
 	void onServiceRemoved(FileManagerService *service);
 
-	boost::shared_ptr<ServiceTrackerListener<FileManagerService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<FileManagerService> > mServiceListener;
 
 	ctkPluginContext *mPluginContext;
 	FileManagerServicePtr mService;

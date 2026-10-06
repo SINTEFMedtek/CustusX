@@ -15,8 +15,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
-#include <boost/function.hpp>
+#include <memory>
+#include <functional>
 #include <boost/bind/bind.hpp>
 
 class QDomElement;
@@ -24,8 +24,8 @@ class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class PatientStorage> PatientStoragePtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class PatientStorage> PatientStoragePtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /**\brief Helper class for storing variables in the patient file.
  *
@@ -51,14 +51,14 @@ public:
 	 * @param getValueFunction Suppy a get function returning a QString. Use boost::bind
 	 * @param setValueFunction Suppy a set function with a QString as parameter. Use boost::bind
 	 */
-	void storeVariable(QString nodeName, boost::function<QString ()> getValueFunction, boost::function<void (QString)> setValueFunction);
+	void storeVariable(QString nodeName, std::function<QString ()> getValueFunction, std::function<void (QString)> setValueFunction);
 private slots:
 	void duringSavePatientSlot(QDomElement &node);
 	void duringLoadPatientSlot(QDomElement &node);
 private:
 	QString mBaseNodeName;
-	std::map<QString, boost::function<QString()> > mGetFunctions;
-	std::map<QString, boost::function<void(QString value)> > mSetFunctions;
+	std::map<QString, std::function<QString()> > mGetFunctions;
+	std::map<QString, std::function<void(QString value)> > mSetFunctions;
 	void addXml(QDomNode &parentNode);
 	void parseXml(QDomNode &dataNode);
 };

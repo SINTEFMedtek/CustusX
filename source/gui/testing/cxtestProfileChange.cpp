@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxLogicManager.h"
 #include <QTimer>
-#include "boost/function.hpp"
+#include <functional>
 #include "boost/bind/bind.hpp"
 
 namespace cxtest

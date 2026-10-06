@@ -39,7 +39,7 @@ namespace cx
  *
  * \ingroup cx_resource_view_internal
  */
-typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+typedef std::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 
 class cxResourceVisualization_EXPORT MultiViewCache
 {
@@ -52,7 +52,7 @@ public:
 	void clearCache();
 
 private:
-	typedef boost::shared_ptr<ViewCache<ViewWidget> > ViewCachePtr;
+	typedef std::shared_ptr<ViewCache<ViewWidget> > ViewCachePtr;
 	std::map<QString, ViewCachePtr> mViewCache;
 	vtkRenderWindowPtr mStaticRenderWindow;
 };

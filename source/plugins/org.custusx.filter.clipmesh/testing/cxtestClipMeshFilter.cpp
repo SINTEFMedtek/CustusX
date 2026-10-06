@@ -251,7 +251,7 @@ TEST_CASE("ClipMeshFilter: full pipeline clips mesh and creates output", "[integ
 	REQUIRE(filter.postProcess());
 
 	cx::StringPropertySelectMeshPtr meshProp =
-		boost::dynamic_pointer_cast<cx::StringPropertySelectMesh>(filter.getOutputTypes()[0]);
+		std::dynamic_pointer_cast<cx::StringPropertySelectMesh>(filter.getOutputTypes()[0]);
 	REQUIRE(meshProp);
 	cx::MeshPtr outputMesh = meshProp->getMesh();
 	REQUIRE(outputMesh);

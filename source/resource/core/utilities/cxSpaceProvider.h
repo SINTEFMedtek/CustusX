@@ -19,8 +19,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class SpaceListener> SpaceListenerPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 /** Provides information about all the coordinate systems in the application.
  *

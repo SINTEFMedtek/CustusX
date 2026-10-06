@@ -44,7 +44,7 @@ private:
     ctkPluginContext *mPluginContext;
     QString mServiceName;
     StreamerServicePtr mStreamerService;
-    boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
+    std::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
 };
 
 } //end namespace cx

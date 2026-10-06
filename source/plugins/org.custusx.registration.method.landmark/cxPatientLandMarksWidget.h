@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
+typedef std::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
 
 /**
  * \class PatientLandMarksWidget

@@ -53,7 +53,7 @@ public: // optional methods
   QString mName;
   QString mHelp;
 };
-typedef boost::shared_ptr<Vector3DComponentProperty> Vector3DComponentPropertyPtr;
+typedef std::shared_ptr<Vector3DComponentProperty> Vector3DComponentPropertyPtr;
 
 
 /**

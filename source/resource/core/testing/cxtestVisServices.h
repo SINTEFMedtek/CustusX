@@ -22,7 +22,7 @@ class ctkPluginContext;
 namespace cxtest
 {
 
-typedef boost::shared_ptr<class TestVisServices> TestVisServicesPtr;
+typedef std::shared_ptr<class TestVisServices> TestVisServicesPtr;
 
 /**
  * Test version of cx::VisServices.

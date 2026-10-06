@@ -20,13 +20,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
+typedef std::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
 }
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class ToolMetricRep> ToolMetricRepPtr;
+typedef std::shared_ptr<class ToolMetricRep> ToolMetricRepPtr;
 
 /** Rep for visualizing a ToolMetric.
  *

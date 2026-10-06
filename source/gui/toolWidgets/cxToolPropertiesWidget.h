@@ -33,7 +33,7 @@ class UsConfigGui;
 
 namespace cx
 {
-typedef boost::shared_ptr<class DoublePropertyToolOffset> DoublePropertyToolOffsetPtr;
+typedef std::shared_ptr<class DoublePropertyToolOffset> DoublePropertyToolOffsetPtr;
 class LabeledComboBoxWidget;
 
 

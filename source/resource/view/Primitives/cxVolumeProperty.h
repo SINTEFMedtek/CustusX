@@ -20,7 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
+typedef std::shared_ptr<class VolumeProperty> VolumePropertyPtr;
 
 /** Wrapper for vtkVolumeProperty
   * Given an internal Image, the vtkVolumeProperty

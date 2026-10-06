@@ -16,8 +16,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
-typedef boost::shared_ptr<class PlaybackTool> PlaybackToolPtr;
+typedef std::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef std::shared_ptr<class PlaybackTool> PlaybackToolPtr;
 
 /**
  * \brief Interface towards a playback tracking system.

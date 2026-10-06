@@ -119,7 +119,7 @@ private:
 	XmlOptionFile mSettings;
 	QString mShaderPath; ///< name of shader folder
 
-	boost::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> > mServiceListener;
 	std::vector<ReconstructionExecuterPtr> mExecuters;
 
 	PatientModelServicePtr mPatientModelService;

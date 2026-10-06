@@ -19,8 +19,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class SpaceListener> SpaceListenerPtr;
 
 /** 
  * Ad-hoc class for connecting axis reps to coord spaces.
@@ -46,7 +46,7 @@ class org_custusx_core_view_EXPORT AxisConnector : public QObject
 		ToolPtr mTool;
 		SpaceProviderPtr mSpaceProvider;
 };
-typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
+typedef std::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 
 } // namespace cx

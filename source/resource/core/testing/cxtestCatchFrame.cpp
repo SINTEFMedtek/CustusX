@@ -22,7 +22,7 @@ void singleTestFrame(const Transform3D& transform)
 	Frame3D frame = Frame3D::create(transform);
 	Transform3D restored = frame.transform();
 
-	boost::array<double, 6> rep = frame.getCompactAxisAngleRep();
+	std::array<double, 6> rep = frame.getCompactAxisAngleRep();
 	Transform3D restored_rep = Frame3D::fromCompactAxisAngleRep(rep).transform();
 
 	if (!similar(transform, restored))

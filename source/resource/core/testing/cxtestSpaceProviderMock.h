@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class SpaceProviderMock> SpaceProviderMockPtr;
+typedef std::shared_ptr<class SpaceProviderMock> SpaceProviderMockPtr;
 
 /**
  *

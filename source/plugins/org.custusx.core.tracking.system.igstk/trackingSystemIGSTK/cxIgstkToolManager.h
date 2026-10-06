@@ -94,7 +94,7 @@ private:
 	bool mInternalInitialized;
 
 };
-typedef boost::shared_ptr<IgstkToolManager> IgstkToolManagerPtr;
+typedef std::shared_ptr<IgstkToolManager> IgstkToolManagerPtr;
 
 /**
  * @}

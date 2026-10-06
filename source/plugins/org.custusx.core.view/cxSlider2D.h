@@ -50,6 +50,6 @@ protected:
 	SliceProxyPtr mSliceProxy;
 
 };
-typedef boost::shared_ptr<Slider2D> Slider2DPtr;
+typedef std::shared_ptr<Slider2D> Slider2DPtr;
 }//cx
 #endif // CX2DSLIDER_H

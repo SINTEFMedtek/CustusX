@@ -124,7 +124,7 @@ void ProbeConfigWidget::savePresetSlot()
 	if (!mActiveProbeConfig->getTool())
 		return;
 	ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
-//	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
+//	ProbeImplPtr probe = std::dynamic_pointer_cast<ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 
@@ -173,7 +173,7 @@ void ProbeConfigWidget::savePresetSlot()
 void ProbeConfigWidget::deletePresetSlot()
 {
 	ProbePtr probe = mActiveProbeConfig->getTool()->getProbe();
-//	ProbeImplPtr probe = boost::dynamic_pointer_cast<ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
+//	ProbeImplPtr probe = std::dynamic_pointer_cast<ProbeImpl>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 

@@ -48,7 +48,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class MetricBase> MetricBasePtr;
+typedef std::shared_ptr<class MetricBase> MetricBasePtr;
 
 class cxGui_EXPORT MetricBase : public QObject
 {

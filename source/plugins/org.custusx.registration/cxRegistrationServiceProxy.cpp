@@ -32,7 +32,7 @@ void RegistrationServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<RegistrationService>(
 								 mPluginContext,
 								 boost::bind(&RegistrationServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (RegistrationService*)>(),
+								 std::function<void (RegistrationService*)>(),
 								 boost::bind(&RegistrationServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

@@ -63,7 +63,7 @@ USSavingRecorderFixture::~USSavingRecorderFixture()
 	this->tearDown();
 }
 
-void USSavingRecorderFixture::addOperation(boost::function0<void> operation)
+void USSavingRecorderFixture::addOperation(std::function<void()> operation)
 {
 	mOperations.push_back(operation);
 }

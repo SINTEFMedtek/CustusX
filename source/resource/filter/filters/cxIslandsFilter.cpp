@@ -94,7 +94,7 @@ void IslandsFilter::createOutputTypes()
 
 bool IslandsFilter::execute()
 {
-	ImagePtr inputImage = boost::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[0])->getImage();
+	ImagePtr inputImage = std::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[0])->getImage();
 	if (!inputImage)
 		return false;
 	

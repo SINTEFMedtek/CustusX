@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QSize>
 #include "vtkSmartPointer.h"
 #include "vtkForwardDeclarations.h"
@@ -29,7 +29,7 @@ typedef vtkSmartPointer<class vtkPolyLine> vtkPolyLinePtr;
 namespace cx
 {
 
-typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
+typedef std::shared_ptr<class ProbeSector> ProbeSectorPtr;
 
 /** \brief Utility functions for drawing an US Probe sector
  *

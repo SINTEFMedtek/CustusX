@@ -91,7 +91,7 @@ void DistanceMetricRep2D::onModifiedStartRender()
 	mLine->setWidth(2);
 
 	mLine->setColor(mMetric->getColor());
-	DistanceMetricPtr distanceMetric = boost::dynamic_pointer_cast<DistanceMetric>(mMetric);
+	DistanceMetricPtr distanceMetric = std::dynamic_pointer_cast<DistanceMetric>(mMetric);
 	if(!distanceMetric)
 	{
 		CX_LOG_WARNING() << "DistanceMetricRep2D: Got no DistanceMetric";

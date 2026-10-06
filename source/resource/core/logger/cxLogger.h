@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 #include "cxDefinitions.h"
 #include "cxTypeConversions.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 /**
 * \file
@@ -52,7 +52,7 @@ public:
 	}
 
 private:
-	boost::shared_ptr<class MessageLoggerInternalData> mInternalData;
+	std::shared_ptr<class MessageLoggerInternalData> mInternalData;
 	std::stringstream& getStream();
 };
 

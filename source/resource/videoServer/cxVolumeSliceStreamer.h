@@ -67,7 +67,7 @@ private:
 
 	CyclicActionLoggerPtr mTimer;
 };
-typedef boost::shared_ptr<VolumeSliceStreamer> VolumeSliceStreamerPtr;
+typedef std::shared_ptr<VolumeSliceStreamer> VolumeSliceStreamerPtr;
 
 } /* namespace cx */
 #endif /* CXVOLUMESLICESTREAMER_H */

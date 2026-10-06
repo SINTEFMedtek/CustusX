@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include <boost/function.hpp>
+#include <functional>
 #include <boost/type_traits.hpp>
 
 #include <QObject>
@@ -100,7 +100,7 @@ template<typename SIGNATURE>
 class Qt2FuncSlot0
 {
 public:
-	typedef boost::function<SIGNATURE> FuncType;
+	typedef std::function<SIGNATURE> FuncType;
 	
 	Qt2FuncSlot0(const FuncType& func) :
 		func_(func)
@@ -128,7 +128,7 @@ template<typename SIGNATURE>
 class Qt2Func0 : public QObject, public QtConnDefault
 {
 public:
-	typedef boost::function<SIGNATURE> FuncType;
+	typedef std::function<SIGNATURE> FuncType;
 
 	Qt2Func0(QObject* qobject, int signalIdx, const FuncType& func,
 			bool initiallyConnected=true) :
@@ -142,7 +142,7 @@ public:
 		slotIdx_ = metaObject()->methodCount();
 
 		//
-		// Create a slot to handle invoking the boost::function object.
+		// Create a slot to handle invoking the std::function object.
 		//
 		slot_ = new Qt2FuncSlot0<SIGNATURE>(func);
 

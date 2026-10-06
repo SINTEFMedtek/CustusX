@@ -57,7 +57,7 @@ StreamerPtr OpenCVStreamerService::createStreamer(QDomElement root)
 
 	else
 	{
-		boost::shared_ptr<ImageStreamerOpenCV> streamer(new ImageStreamerOpenCV());
+		std::shared_ptr<ImageStreamerOpenCV> streamer(new ImageStreamerOpenCV());
 		streamer->initialize(args);
 		return streamer;
 	}

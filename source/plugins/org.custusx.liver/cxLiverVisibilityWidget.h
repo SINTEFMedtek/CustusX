@@ -25,7 +25,7 @@ class QComboBox;
 namespace cx
 {
 
-typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
+typedef std::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
 
 struct org_custusx_liver_EXPORT SelectableLiverStructure
 {

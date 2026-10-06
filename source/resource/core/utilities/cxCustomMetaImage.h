@@ -23,7 +23,7 @@ namespace cx
 cxResource_EXPORT IMAGE_MODALITY convertToModality(QString modalityString);
 cxResource_EXPORT IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString);
 
-typedef boost::shared_ptr<class CustomMetaImage> CustomMetaImagePtr;
+typedef std::shared_ptr<class CustomMetaImage> CustomMetaImagePtr;
 
 /**\brief utility class for accessing metaheader files.
  *

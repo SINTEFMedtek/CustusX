@@ -49,7 +49,7 @@ void AngleMetricRep::clear()
 
 AngleMetricPtr AngleMetricRep::getAngleMetric()
 {
-    return boost::dynamic_pointer_cast<AngleMetric>(mMetric);
+    return std::dynamic_pointer_cast<AngleMetric>(mMetric);
 }
 
 void AngleMetricRep::onModifiedStartRender()

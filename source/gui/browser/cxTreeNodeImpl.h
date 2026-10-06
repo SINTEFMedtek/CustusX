@@ -19,8 +19,8 @@ namespace cx
 {
 
 class TreeNode;
-typedef boost::weak_ptr<TreeNode> TreeNodeWeakPtr;
-typedef boost::shared_ptr<TreeNode> TreeNodePtr;
+typedef std::weak_ptr<TreeNode> TreeNodeWeakPtr;
+typedef std::shared_ptr<TreeNode> TreeNodePtr;
 
 
 class TreeNodeImpl : public TreeNode
@@ -38,7 +38,7 @@ public:
 	virtual QVariant getColor() const { return QVariant(); }
 	virtual bool  useColoredName() const { return false; }
 	virtual QVariant getFont() const { return QVariant(); }
-	virtual boost::shared_ptr<QWidget> createPropertiesWidget() const { return boost::shared_ptr<QWidget>(); }
+	virtual std::shared_ptr<QWidget> createPropertiesWidget() const { return std::shared_ptr<QWidget>(); }
 	virtual bool isDefaultExpanded() const { return true; }
 
 	virtual bool isRemovable() const { return false; }

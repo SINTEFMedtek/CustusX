@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class SpaceProperty> SpacePropertyPtr;
+typedef std::shared_ptr<class SpaceProperty> SpacePropertyPtr;
 
 /**
  * \ingroup cx_resource_core_properties

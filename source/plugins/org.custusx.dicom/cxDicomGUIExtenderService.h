@@ -38,7 +38,7 @@ public:
 	std::vector<CategorizedWidget> createWidgets() const;
 	ctkPluginContext* mContext;
 };
-typedef boost::shared_ptr<DicomGUIExtenderService> DicomGUIExtenderServicePtr;
+typedef std::shared_ptr<DicomGUIExtenderService> DicomGUIExtenderServicePtr;
 
 } /* namespace cx */
 

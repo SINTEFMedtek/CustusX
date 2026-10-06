@@ -40,7 +40,7 @@ private:
   ctkPluginContext* mContext;
 
 };
-typedef boost::shared_ptr<CalibrationGUIExtenderService> CalibrationGUIExtenderServicePtr;
+typedef std::shared_ptr<CalibrationGUIExtenderService> CalibrationGUIExtenderServicePtr;
 
 } /* namespace cx */
 

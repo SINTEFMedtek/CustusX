@@ -68,7 +68,7 @@ bool TrackingSystemServiceMoc::isTracking() const
 	return cx::TrackingSystemService::isTracking();
 }
 
-typedef boost::shared_ptr<TrackingSystemServiceMoc> TrackingSystemServiceMocPtr;
+typedef std::shared_ptr<TrackingSystemServiceMoc> TrackingSystemServiceMocPtr;
 
 namespace cxtest
 {

@@ -33,7 +33,7 @@ void StateServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<StateService>(
 								 mPluginContext,
 								 boost::bind(&StateServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (StateService*)>(),
+								 std::function<void (StateService*)>(),
 								 boost::bind(&StateServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

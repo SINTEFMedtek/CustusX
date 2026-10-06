@@ -24,7 +24,7 @@ class ctkPluginContext;
 namespace cx
 {
 
-typedef boost::shared_ptr<class Data> DataPtr;
+typedef std::shared_ptr<class Data> DataPtr;
 
 /** \brief Always provides a RegistrationService
  *
@@ -73,7 +73,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	RegistrationServicePtr mRegistrationService;
-	boost::shared_ptr<ServiceTrackerListener<RegistrationService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<RegistrationService> > mServiceListener;
 };
 
 } //cx

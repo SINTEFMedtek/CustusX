@@ -97,7 +97,7 @@ public:
 		{}	///< sets up default values for all the members
 	};
 
-	typedef boost::shared_ptr<ToolInternalStructure> ToolInternalStructurePtr;
+	typedef std::shared_ptr<ToolInternalStructure> ToolInternalStructurePtr;
 
 public:
 	ToolFileParser(QString absoluteToolFilePath, QString loggingFolder = "");

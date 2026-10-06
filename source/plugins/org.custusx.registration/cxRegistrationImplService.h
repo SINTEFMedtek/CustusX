@@ -25,8 +25,8 @@ namespace cx
 {
 class RegistrationTransform;
 class PatientModelService;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 
 /**
@@ -97,7 +97,7 @@ private:
 	void performPatientRegistration(Transform3D rMpr_new, QString description, bool temporaryRegistration = false);
 };
 
-typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;
+typedef std::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;
 
 } /* namespace cx */
 

@@ -29,8 +29,8 @@ namespace cx
 * @{
 */
 
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+typedef std::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef std::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 
 /**
  * \class RecordSessionWidget

@@ -129,13 +129,13 @@ bool AirwaysFromCenterlineFilter::execute()
 {
 	mAirwaysFromCenterline.reset(new AirwaysFromCenterline());
 
-	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+	MeshPtr mesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	if (!mesh)
 		return false;
 
 	mAirwaysFromCenterline->processCenterline(mesh);
 
-	ImagePtr segmentedVolume = boost::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[1])->getImage();
+	ImagePtr segmentedVolume = std::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[1])->getImage();
 
 	if(segmentedVolume)
 	{
@@ -151,7 +151,7 @@ bool AirwaysFromCenterlineFilter::execute()
 
 bool AirwaysFromCenterlineFilter::postProcess()
 {
-    MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+    MeshPtr inputMesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
     if (!inputMesh)
         return false;
 
@@ -165,7 +165,7 @@ bool AirwaysFromCenterlineFilter::postProcess()
 		patientService()->insertData(outputMesh);
 
 		//Meshes are expected to be in data(d) space
-		ImagePtr segmentedinputVolume = boost::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[1])->getImage();
+		ImagePtr segmentedinputVolume = std::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[1])->getImage();
 		if(segmentedinputVolume)
 		{
 			outputMesh->get_rMd_History()->setParentSpace(segmentedinputVolume->getUid());

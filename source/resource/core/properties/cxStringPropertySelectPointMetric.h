@@ -14,8 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx {
 
-typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
-typedef boost::shared_ptr<class StringPropertySelectPointMetric> StringPropertySelectPointMetricPtr;
+typedef std::shared_ptr<class PointMetric> PointMetricPtr;
+typedef std::shared_ptr<class StringPropertySelectPointMetric> StringPropertySelectPointMetricPtr;
 /** Adapter that selects and stores a point metric.
  * The point metrics uid is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.

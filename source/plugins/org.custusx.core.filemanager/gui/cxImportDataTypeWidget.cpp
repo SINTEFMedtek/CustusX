@@ -118,7 +118,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 		//create point metric groups
 		if(type == PointMetric::getTypeName())
 		{
-			space = boost::dynamic_pointer_cast<PointMetric>(mData[i])->getSpace().toString();
+			space = std::dynamic_pointer_cast<PointMetric>(mData[i])->getSpace().toString();
 			(mPointMetricGroups[space]).push_back(mData[i]);
 		}
 		//add image or mesh directly to the table
@@ -205,7 +205,7 @@ void ImportDataTypeWidget::createDataSpecificGui(int index, IMAGE_MODALITY modal
 {
 	QWidget* paramWidget = new QWidget(this);
 
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData[index]);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(mData[index]);
 	if(image)
 	{
 		mTableWidget->setItem(mTableWidget->rowCount()-1, mSeriesNumColumn, new QTableWidgetItem(image->getDicomSeriesNumber()));
@@ -450,7 +450,7 @@ void ImportDataTypeWidget::applyConversionToUnsigned()
 	{
 		DataPtr data = (*it);
 
-		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+		ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 		if (!image)
 			return;
 
@@ -464,7 +464,7 @@ void ImportDataTypeWidget::applyConversionToUnsigned()
 		image->setTransferFunctions3D(TF3D);
 		//mServices->patient()->insertData(image);
 
-		DataPtr convertedData = boost::dynamic_pointer_cast<Data>(image);
+		DataPtr convertedData = std::dynamic_pointer_cast<Data>(image);
 		(*it) = convertedData;
 	}
 
@@ -472,7 +472,7 @@ void ImportDataTypeWidget::applyConversionToUnsigned()
 	if (!mConvertToUnsignedCheckBox->isChecked())
 		return;
 
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(mData);
 	if (!image)
 		return;
 
@@ -536,7 +536,7 @@ void ImportDataTypeWidget::pointMetricGroupSpaceChanged(int index)
 	for(unsigned i=0; i<pointMetricGroup.size(); ++i)
 	{
 		CoordinateSystem cs(csDATA, newSpace);
-		boost::dynamic_pointer_cast<PointMetric>(pointMetricGroup[i])->setSpace(cs);
+		std::dynamic_pointer_cast<PointMetric>(pointMetricGroup[i])->setSpace(cs);
 	}
 }
 
@@ -706,7 +706,7 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 	simpleTableWidget->setRowCount(mTableWidget->rowCount());
 	for(int i = 0; i < mTableWidget->rowCount(); ++i)
 	{
-		ImagePtr image = boost::dynamic_pointer_cast<Image>(mData[i]);
+		ImagePtr image = std::dynamic_pointer_cast<Image>(mData[i]);
 		QString modality;
 		if(image)
 			modality = enum2string(image->getModality());

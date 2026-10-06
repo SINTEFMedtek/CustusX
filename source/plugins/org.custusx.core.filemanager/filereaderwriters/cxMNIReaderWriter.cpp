@@ -113,7 +113,7 @@ std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
 
 				double *point = points->GetPoint(j);
                 DataPtr data_point_metric = this->createData(type, filename, name);
-				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data_point_metric);
+				PointMetricPtr point_metric = std::static_pointer_cast<PointMetric>(data_point_metric);
 
                 // TODO: Should probably be a GUI selecter for type of coordinate system (REFERENCE/DATA...)
                 CoordinateSystem space(csREF, mVolumeUids[i]);
@@ -191,7 +191,7 @@ bool MNIReaderWriter::readInto(DataPtr data, QString path)
 				double *point = points->GetPoint(j);
 				//DataPtr data = this->createData(type, uid, QString::number(j+1));
 				data = this->createData(type, path, QString::number(j+1));
-				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
+				PointMetricPtr point_metric = std::static_pointer_cast<PointMetric>(data);
 
 				CoordinateSystem space(csDATA, mVolumeUids[i]);
 				Vector3D vector_ras(point[0], point[1], point[2]);

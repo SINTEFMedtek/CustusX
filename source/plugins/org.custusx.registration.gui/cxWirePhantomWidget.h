@@ -26,7 +26,7 @@ class QTextEdit;
 
 namespace cx
 {
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+typedef std::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 
 /**
  * \brief Probe accuracy measurements using the Wire Phantom.

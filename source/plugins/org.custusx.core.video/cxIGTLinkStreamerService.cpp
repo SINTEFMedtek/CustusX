@@ -37,7 +37,7 @@ std::vector<PropertyPtr> IGTLinkStreamerService::getSettings(QDomElement root)
 
 StreamerPtr IGTLinkStreamerService::createStreamer(QDomElement root)
 {
-	boost::shared_ptr<IGTLinkClientStreamer> streamer(new IGTLinkClientStreamer());
+	std::shared_ptr<IGTLinkClientStreamer> streamer(new IGTLinkClientStreamer());
 	streamer->setAddress(this->getIPOption(root)->getValue(),
 						 this->getStreamPortOption(root)->getValue());
 	return streamer;

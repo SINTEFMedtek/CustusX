@@ -21,7 +21,7 @@ class QTableWidget;
 namespace cx
 {
 
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+typedef std::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
 /**\brief Turn clippers on/off for a spesific data structure.
  *

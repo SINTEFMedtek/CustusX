@@ -40,7 +40,7 @@ namespace cx
 
 ImagePtr UnsignedDerivedImage::create(ImagePtr base)
 {
-    boost::shared_ptr<UnsignedDerivedImage> retval;
+    std::shared_ptr<UnsignedDerivedImage> retval;
     retval.reset(new UnsignedDerivedImage(base));
     return retval;
 }

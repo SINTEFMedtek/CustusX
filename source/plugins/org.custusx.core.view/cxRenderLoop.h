@@ -84,7 +84,7 @@ private:
 	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
 };
 
-typedef boost::shared_ptr<RenderLoop> RenderLoopPtr;
+typedef std::shared_ptr<RenderLoop> RenderLoopPtr;
 
 } // namespace cx
 

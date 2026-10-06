@@ -18,7 +18,7 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+typedef std::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 /**
  * Implementation of Help service.
@@ -41,7 +41,7 @@ private:
   ctkPluginContext* mContext;
   HelpEnginePtr mEngine;
 };
-typedef boost::shared_ptr<HelpGUIExtenderService> HelpGUIExtenderServicePtr;
+typedef std::shared_ptr<HelpGUIExtenderService> HelpGUIExtenderServicePtr;
 
 } /* namespace cx */
 

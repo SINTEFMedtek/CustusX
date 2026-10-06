@@ -26,7 +26,7 @@ typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 namespace cx
 {
 
-typedef boost::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotation3DRepPtr;
+typedef std::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotation3DRepPtr;
 
 /** \brief Class for display of an orientation annotation cube in 3D.
  * \ingroup cx_resource_view

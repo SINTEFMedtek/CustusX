@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include <string>
-#include <boost/array.hpp>
+#include <array>
 #include <boost/algorithm/string.hpp>
 #include <QString>
 #include "cxTypeConversions.h"
@@ -87,7 +87,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
  * Define the mText array for your enum, for example
  * 
 	template<>
-	boost::array<QString, vm::vtCOUNT> EnumConverter<vm::VIEW_ZONE_TYPE,vm::vtCOUNT>::mText =
+	std::array<QString, vm::vtCOUNT> EnumConverter<vm::VIEW_ZONE_TYPE,vm::vtCOUNT>::mText =
 	{
 		{
 			"ACS_3D_LAYOUT",
@@ -115,7 +115,7 @@ template<class ENUM, unsigned COUNT>
 class EnumConverter
 {
 public:
-	static boost::array<QString, COUNT> mText;
+	static std::array<QString, COUNT> mText;
 
 	static QString enum2string(const ENUM& val)
 	{
@@ -171,7 +171,7 @@ EXPORT NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const QString& val); \
  */
 #define DEFINE_ENUM_STRING_CONVERTERS_BEGIN(NS, ENUM_NAME, ENUM_SIZE)                  \
 template<>                                                                                 \
-boost::array<QString, NS::ENUM_SIZE> EnumConverter<NS::ENUM_NAME,NS::ENUM_SIZE>::mText = \
+std::array<QString, NS::ENUM_SIZE> EnumConverter<NS::ENUM_NAME,NS::ENUM_SIZE>::mText = \
 {                                                                                          \
 
 #define DEFINE_ENUM_STRING_CONVERTERS_END(NS, ENUM_NAME, ENUM_SIZE)     \

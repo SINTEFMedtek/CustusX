@@ -35,7 +35,7 @@ void FrameMetricRep::clear()
 
 FrameMetricPtr FrameMetricRep::getFrameMetric()
 {
-    return boost::dynamic_pointer_cast<FrameMetric>(mMetric);
+    return std::dynamic_pointer_cast<FrameMetric>(mMetric);
 }
 
 void FrameMetricRep::onModifiedStartRender()

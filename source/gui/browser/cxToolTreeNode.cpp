@@ -106,11 +106,11 @@ QVariant ToolTreeNode::getFont() const
 	return QVariant();
 }
 
-boost::shared_ptr<QWidget> ToolTreeNode::createPropertiesWidget() const
+std::shared_ptr<QWidget> ToolTreeNode::createPropertiesWidget() const
 {
 	StringPropertySelectToolPtr selector = StringPropertySelectTool::New(this->getServices()->tracking());
 	selector->setValue(mTool->getUid());
-	return boost::shared_ptr<QWidget>(new ToolPropertiesWidget(selector,
+	return std::shared_ptr<QWidget>(new ToolPropertiesWidget(selector,
 															   this->getServices()->tracking(),
 															   this->getServices()->spaceProvider(),
 															   NULL));

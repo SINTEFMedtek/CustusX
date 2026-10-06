@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
+typedef std::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
 /** \brief Display a stream as 2D in 3D
  *

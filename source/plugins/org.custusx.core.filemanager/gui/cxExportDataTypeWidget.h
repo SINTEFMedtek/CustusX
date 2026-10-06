@@ -66,7 +66,7 @@ public:
 protected:
 	void save(QString suffix, QString data_uid)
 	{
-		boost::shared_ptr<TYPE> data = boost::dynamic_pointer_cast<TYPE>(mServices->patient()->getData(data_uid));
+		std::shared_ptr<TYPE> data = std::dynamic_pointer_cast<TYPE>(mServices->patient()->getData(data_uid));
 		if(!data)
 			CX_LOG_ERROR() << "Data with uid: " << data_uid << " not found";
 		QString export_folder = mServices->session()->getSubFolder("Export");
@@ -99,8 +99,8 @@ protected:
 	{
 		CX_LOG_DEBUG() << "EXPORTING ALL " << mDataType;
 
-		std::map<QString, boost::shared_ptr<TYPE> > all_data = mServices->patient()->getDataOfType<TYPE>();
-		for (typename std::map<QString, boost::shared_ptr<TYPE> >::const_iterator iter = all_data.begin(); iter != all_data.end(); ++iter)
+		std::map<QString, std::shared_ptr<TYPE> > all_data = mServices->patient()->getDataOfType<TYPE>();
+		for (typename std::map<QString, std::shared_ptr<TYPE> >::const_iterator iter = all_data.begin(); iter != all_data.end(); ++iter)
 		{
 			this->saveAsSelected(iter->first);
 		}

@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QString>
 #include <QObject>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 class QSettings;
 

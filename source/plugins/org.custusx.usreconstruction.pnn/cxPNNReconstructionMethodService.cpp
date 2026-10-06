@@ -50,7 +50,7 @@ DoublePropertyPtr PNNReconstructionMethodService::getInterpolationStepsOption(QD
 	return retval;
 }
 
-void optimizedCoordTransform(Vector3D* p, boost::array<double, 16> tt)
+void optimizedCoordTransform(Vector3D* p, std::array<double, 16> tt)
 {
 	double* t = tt.begin();
 	double x = (*p)[0];
@@ -105,7 +105,7 @@ bool PNNReconstructionMethodService::reconstruct(ProcessedUSInputDataPtr input,
 	for (int record = 0; record < inputDims[2]; record++)
 	{
 		unsigned char *inputPointer = input->getFrame(record);
-		boost::array<double, 16> recordTransform = frameInfo[record].mPos.flatten();
+		std::array<double, 16> recordTransform = frameInfo[record].mPos.flatten();
 
 		for (int beam = 0; beam < inputDims[0]; beam++)
 		{

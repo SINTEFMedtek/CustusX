@@ -95,7 +95,7 @@ void ShowDataTreeNodeBase::setViewGroupVisibility(int index, bool value)
 	group->setProperties(mData->getUid(), props);
 }
 
-boost::shared_ptr<QWidget> ShowDataTreeNodeBase::createPropertiesWidget() const
+std::shared_ptr<QWidget> ShowDataTreeNodeBase::createPropertiesWidget() const
 {
 	return this->getParent()->createPropertiesWidget();
 }

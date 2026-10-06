@@ -44,10 +44,10 @@ public: // optional methods
 protected:
   AcquisitionDataPtr mPluginData;
 };
-typedef boost::shared_ptr<class StringPropertySelectRecordSessionBase> StringPropertySelectRecordSessionBasePtr;
+typedef std::shared_ptr<class StringPropertySelectRecordSessionBase> StringPropertySelectRecordSessionBasePtr;
 
 
-typedef boost::shared_ptr<class StringPropertySelectRecordSession> StringPropertySelectRecordSessionPtr;
+typedef std::shared_ptr<class StringPropertySelectRecordSession> StringPropertySelectRecordSessionPtr;
 
 /** Adapter that selects and stores a tool.
  * The tool is stored internally in the adapter.

@@ -464,7 +464,7 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   //TODO: Move the following into a publishFrame() function
   //this->publishFrame();
 
-//  boost::shared_ptr<unsigned char> dataPtr(new char[dataSize]);
+//  std::shared_ptr<unsigned char> dataPtr(new char[dataSize]);
 //  memcpy(dataPtr, frameBufferPtr, dataSize);
 //  emit newFrame(dataPtr);
   ////

@@ -40,7 +40,7 @@ private:
   ctkPluginContext* mContext;
 
 };
-typedef boost::shared_ptr<ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
+typedef std::shared_ptr<ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
 
 } /* namespace cx */
 

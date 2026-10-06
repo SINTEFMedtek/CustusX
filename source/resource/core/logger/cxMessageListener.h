@@ -20,10 +20,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class MessageFilter> MessageFilterPtr;
-typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
-typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
-typedef boost::shared_ptr<class Log> LogPtr;
+typedef std::shared_ptr<class MessageFilter> MessageFilterPtr;
+typedef std::shared_ptr<class MessageObserver> MessageObserverPtr;
+typedef std::shared_ptr<class MessageListener> MessageListenerPtr;
+typedef std::shared_ptr<class Log> LogPtr;
 
 /** Utility for listening to the Reporter
   * and storing messages from it.

@@ -39,11 +39,11 @@ private:
 	void onServiceAdded(FileReaderWriterService *service);
 	void onServiceRemoved(FileReaderWriterService *service);
 
-	boost::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
 
 };
 
-typedef boost::shared_ptr<FileManagerImpService> FileManagerImplServicePtr;
+typedef std::shared_ptr<FileManagerImpService> FileManagerImplServicePtr;
 
 } //cx
 

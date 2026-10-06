@@ -218,7 +218,7 @@ bool BrowserWidget::setCurrentNode(QString uid, QModelIndex index)
 	if (node && (node->getUid()==uid))
 	{
 //		CX_LOG_CHANNEL_DEBUG("CA") << " setCurrentNode: HIT, setting current index " << node->getUid();
-//		boost::function<void()> f =
+//		std::function<void()> f =
 //				boost::bind(&QItemSelectionModel::setCurrentIndex,
 //							mTreeView->selectionModel(),
 //							index,
@@ -287,7 +287,7 @@ void BrowserWidget::onCurrentItemChanged()
 	{
 		mActiveNodeUid = node->getUid();
 //		CX_LOG_CHANNEL_DEBUG("CA") << "   store CurrentNode  " << mActiveNodeUid;
-		boost::shared_ptr<QWidget> widget = node->createPropertiesWidget();
+		std::shared_ptr<QWidget> widget = node->createPropertiesWidget();
 		mPropertiesWidget->setWidget(widget);
 //		CX_LOG_CHANNEL_DEBUG("CA") << "mPropertiesWidget: " << mPropertiesWidget->parent();
 //		if (widget)

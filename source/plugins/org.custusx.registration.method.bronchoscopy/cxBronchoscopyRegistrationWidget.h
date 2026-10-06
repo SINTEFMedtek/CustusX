@@ -24,14 +24,14 @@ namespace cx
 {
 class RecordTrackingWidget;
 class WidgetObscuredListener;
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
+typedef std::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef std::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef std::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef std::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+typedef std::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+typedef std::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef std::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 /**
  * BronchoscopyRegistrationWidget

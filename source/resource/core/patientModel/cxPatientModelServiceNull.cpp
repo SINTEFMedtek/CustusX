@@ -51,7 +51,7 @@ std::map<QString, DataPtr> PatientModelServiceNull::getChildren(QString parent_u
 LandmarksPtr PatientModelServiceNull::getPatientLandmarks() const
 {
 	printWarning();
-	return boost::shared_ptr<Landmarks>();
+	return std::shared_ptr<Landmarks>();
 }
 
 

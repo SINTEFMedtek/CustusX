@@ -69,7 +69,7 @@ MetricManager::MetricManager(ViewServicePtr viewService, PatientModelServicePtr 
 DataMetricPtr MetricManager::getMetric(QString uid)
 {
 	DataPtr data = mPatientModelService->getData(uid);
-	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
+	DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(data);
 	return metric;
 }
 
@@ -89,7 +89,7 @@ std::vector<DataMetricPtr> MetricManager::getAllMetrics() const
 	std::map<QString, DataPtr> all = mPatientModelService->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
 	{
-		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
+		DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(iter->second);
 		if (metric)
 			retval.push_back(metric);
 	}
@@ -178,14 +178,14 @@ PointMetricPtr MetricManager::addPointInDefaultPosition()
 
 		return this->addPoint(p_ref, ref,"point%1", color);
 
-	PointMetricPtr pointMetric = boost::dynamic_pointer_cast<PointMetric>(data);
+	PointMetricPtr pointMetric = std::dynamic_pointer_cast<PointMetric>(data);
 	if(pointMetric)
 	{
 		ref = pointMetric->getSpace();
 		p_ref = mSpaceProvider->getActiveToolTipPoint(ref, true);
 	}
 
-	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
+	DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(data);
 	if(metric)
 		color = metric->getColor();
 
@@ -400,7 +400,7 @@ void MetricManager::exportMetricsToXMLFile(QString& filename)
 	std::map<QString, DataPtr>::iterator iter;
 	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
 	{
-		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
+		DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(iter->second);
 		if(metric)
 		{
 			QDomElement dataNode = doc.createElement("data");
@@ -415,7 +415,7 @@ void MetricManager::exportMetricsToXMLFile(QString& filename)
 void MetricManager::resolveUnknownParentSpacesForPointMetrics(QDomNode dataNode, std::map<QString, QString> mapping_of_unknown_to_known_spaces, DataPtr data)
 {
 	QString uid = data->getUid();
-	PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
+	PointMetricPtr point_metric = std::static_pointer_cast<PointMetric>(data);
 	if(!point_metric)
 		return;
 

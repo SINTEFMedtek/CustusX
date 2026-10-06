@@ -64,7 +64,7 @@ private:
 	QTimer* mPositionTimer = nullptr;
 };
 
-typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;
+typedef std::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;
 
 }
 

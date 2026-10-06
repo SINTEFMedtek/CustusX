@@ -36,7 +36,7 @@ void TrackingServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<TrackingService>(
 								 mPluginContext,
 								 boost::bind(&TrackingServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (TrackingService*)>(),
+								 std::function<void (TrackingService*)>(),
 								 boost::bind(&TrackingServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

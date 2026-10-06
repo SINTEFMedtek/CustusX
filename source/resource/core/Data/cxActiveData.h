@@ -20,10 +20,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ActiveData> ActiveDataPtr;
-typedef boost::shared_ptr<class Data> DataPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
-typedef boost::shared_ptr<class PatientStorage> PatientStoragePtr;
+typedef std::shared_ptr<class ActiveData> ActiveDataPtr;
+typedef std::shared_ptr<class Data> DataPtr;
+typedef std::shared_ptr<class Image> ImagePtr;
+typedef std::shared_ptr<class PatientStorage> PatientStoragePtr;
 
 /** \brief Provides the last active data of warious types
  *
@@ -41,7 +41,7 @@ public:
 	virtual DataPtr getActive() const;
 	virtual DataPtr getActiveUsingRegexp(QString typeRegexp) const;
 	template <class DATA>
-	boost::shared_ptr<DATA> getActive() const;
+	std::shared_ptr<DATA> getActive() const;
 	virtual ImagePtr getDerivedActiveImage() const;///< In addition to returning Image this also provides derived (changing) images from TrackedStream
 	virtual void setActive(DataPtr activeData);
 	virtual void setActive(QString uid);
@@ -71,13 +71,13 @@ private:
 };
 
 template <class DATA>
-boost::shared_ptr<DATA> ActiveData::getActive() const
+std::shared_ptr<DATA> ActiveData::getActive() const
 {
-	boost::shared_ptr<DATA> retval;
+	std::shared_ptr<DATA> retval;
 	QList<DataPtr> activeDataList = this->getActiveDataHistory();
 	for(int i = activeDataList.size() - 1; i >= 0; --i)
 	{
-		retval = boost::dynamic_pointer_cast<DATA>(activeDataList.at(i));
+		retval = std::dynamic_pointer_cast<DATA>(activeDataList.at(i));
 		if(retval)
 			return retval;
 	}

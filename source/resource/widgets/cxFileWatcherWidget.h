@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceWidgetsExport.h"
 
 #include "cxBaseWidget.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 class QFileSystemWatcher;
 class QFile;
@@ -48,7 +48,7 @@ protected:
 	void watchFile(bool on);
 
 	QFileSystemWatcher*				mFileSystemWatcher;
-	boost::shared_ptr<QFile>	mCurrentFile;
+	std::shared_ptr<QFile>	mCurrentFile;
 };
 
 } /* namespace cx */

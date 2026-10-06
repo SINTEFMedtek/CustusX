@@ -88,7 +88,7 @@ private:
 	vtkPolyDataPtr mRawResult;
 	ImagePtr mPreviewImage;
 };
-typedef boost::shared_ptr<class ContourFilter> ContourFilterPtr;
+typedef std::shared_ptr<class ContourFilter> ContourFilterPtr;
 
 
 } // namespace cx

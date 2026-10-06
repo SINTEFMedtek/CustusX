@@ -593,7 +593,7 @@ QList<ORGAN_TYPE> LiverSegmentationWidget::organTypesFor(FilterKind filter)
 
 ImagePtr LiverSegmentationWidget::selectedImage1() const
 {
-	return boost::dynamic_pointer_cast<Image>(mImageSelector->getData());
+	return std::dynamic_pointer_cast<Image>(mImageSelector->getData());
 }
 
 ImagePtr LiverSegmentationWidget::selectedImage2() const

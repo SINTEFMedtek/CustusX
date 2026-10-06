@@ -20,8 +20,8 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
-typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
+typedef std::shared_ptr<class VideoConnection> VideoConnectionPtr;
+typedef std::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
  * Implementation of VideoService.
@@ -94,12 +94,12 @@ private:
 	void onStreamerServiceAdded(StreamerService *service);
 	void onStreamerServiceRemoved(StreamerService *service);
 
-	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mStreamerServiceListener;
+	std::shared_ptr<ServiceTrackerListener<StreamerService> > mStreamerServiceListener;
 
 private:
 	ctkPluginContext *mContext;
 };
-typedef boost::shared_ptr<VideoImplService> VideoImplServicePtr;
+typedef std::shared_ptr<VideoImplService> VideoImplServicePtr;
 
 } /* namespace cx */
 

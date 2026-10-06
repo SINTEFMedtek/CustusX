@@ -9,7 +9,7 @@
 namespace cx
 {
 
-typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
+typedef std::shared_ptr<class RouteToTarget> RouteToTargetPtr;
 
 class org_custusx_filter_accusurf_EXPORT Accusurf
 {

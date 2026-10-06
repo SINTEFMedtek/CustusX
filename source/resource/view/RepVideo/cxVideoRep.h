@@ -22,10 +22,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
-typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
+typedef std::shared_ptr<class ViewportListener> ViewportListenerPtr;
+typedef std::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
-typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
+typedef std::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
 
 
 /** \brief Display a VideoSource in a View.

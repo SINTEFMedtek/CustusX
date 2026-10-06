@@ -18,7 +18,7 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * Virtual Bronchoscopy service interface.
@@ -40,7 +40,7 @@ public:
 private:
 	VisServicesPtr mServices;
 };
-typedef boost::shared_ptr<VBGUIExtenderService> VBGUIExtenderServicePtr;
+typedef std::shared_ptr<VBGUIExtenderService> VBGUIExtenderServicePtr;
 
 } /* namespace cx */
 

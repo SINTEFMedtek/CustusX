@@ -41,10 +41,10 @@ public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
 };
-typedef boost::shared_ptr<class StringPropertySelectCoordinateSystemBase> StringPropertySelectCoordinateSystemBasePtr;
+typedef std::shared_ptr<class StringPropertySelectCoordinateSystemBase> StringPropertySelectCoordinateSystemBasePtr;
 
 
-typedef boost::shared_ptr<class StringPropertySelectCoordinateSystem> StringPropertySelectCoordinateSystemPtr;
+typedef std::shared_ptr<class StringPropertySelectCoordinateSystem> StringPropertySelectCoordinateSystemPtr;
 
 /**
  * \brief Adapter that selects and stores a coordinate systems.

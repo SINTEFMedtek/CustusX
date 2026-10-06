@@ -57,7 +57,7 @@ void ViewServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<ViewService>(
 								 mPluginContext,
 								 boost::bind(&ViewServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (ViewService*)>(),
+								 std::function<void (ViewService*)>(),
 								 boost::bind(&ViewServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

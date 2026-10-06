@@ -55,7 +55,7 @@ void SphereMetricRep2D::clear()
 
 SphereMetricPtr SphereMetricRep2D::getSphereMetric()
 {
-	return boost::dynamic_pointer_cast<SphereMetric>(mMetric);
+	return std::dynamic_pointer_cast<SphereMetric>(mMetric);
 }
 
 void SphereMetricRep2D::onModifiedStartRender()

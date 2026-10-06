@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef std::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 
 /**
  * \file
@@ -76,7 +76,7 @@ private:
 	QString mDeformImage;
     XmlOptionFile mOptions;
 };
-typedef boost::shared_ptr<ElastixParameters> ElastixParametersPtr;
+typedef std::shared_ptr<ElastixParameters> ElastixParametersPtr;
 
 /**
  * @}

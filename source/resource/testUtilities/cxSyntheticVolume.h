@@ -115,7 +115,7 @@ protected:
 
 };
 
-typedef boost::shared_ptr<cxSyntheticVolume> cxSyntheticVolumePtr;
+typedef std::shared_ptr<cxSyntheticVolume> cxSyntheticVolumePtr;
 
 CXTESTUTILITIES_EXPORT double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b);
 CXTESTUTILITIES_EXPORT cx::Vector3D calculateCentroid(cx::ImagePtr image);

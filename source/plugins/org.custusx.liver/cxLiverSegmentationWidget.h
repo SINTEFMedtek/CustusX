@@ -31,9 +31,9 @@ class QDoubleSpinBox;
 namespace cx
 {
 
-typedef boost::shared_ptr<class LiverSegmentationRunner> LiverSegmentationRunnerPtr;
-typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
-typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
+typedef std::shared_ptr<class LiverSegmentationRunner> LiverSegmentationRunnerPtr;
+typedef std::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
+typedef std::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
 
 /**
  * Widget for selecting and running one or more of the liver segmentation

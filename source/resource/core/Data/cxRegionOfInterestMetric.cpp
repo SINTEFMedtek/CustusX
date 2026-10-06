@@ -209,7 +209,7 @@ RegionOfInterest RegionOfInterestMetric::getROI() const
 	std::map<QString, DataPtr> alldata = mDataManager->getDatas();
 	for (std::map<QString, DataPtr>::const_iterator i=alldata.begin(); i!=alldata.end(); ++i)
 	{
-		if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(i->second))
+		if (std::dynamic_pointer_cast<RegionOfInterestMetric>(i->second))
 			continue;
 
 		if (mContainedData.contains(i->first))

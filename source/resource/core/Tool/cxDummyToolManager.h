@@ -33,7 +33,7 @@ class cxResource_EXPORT DummyToolManager : public TrackingService
 	Q_OBJECT
 
 public:
-	typedef boost::shared_ptr<DummyToolManager> DummyToolManagerPtr;
+	typedef std::shared_ptr<DummyToolManager> DummyToolManagerPtr;
 	static DummyToolManagerPtr create();
 
 	virtual ~DummyToolManager();

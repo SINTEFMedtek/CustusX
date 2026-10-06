@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxHelpWidget.h"
 
 #include "boost/bind/bind.hpp"
-#include "boost/function.hpp"
+#include <functional>
 #include <QHelpEngine>
 #include <QSplitter>
 #include <QHelpContentWidget>
@@ -102,7 +102,7 @@ void HelpWidget::addContentWidget(QTabWidget* tabWidget, QBoxLayout* buttonLayou
 	QHelpContentWidget* contentWidget = mEngine->engine()->contentWidget();
 	tabWidget->addTab(contentWidget, "contents");
 
-	boost::function<void()> f = boost::bind(&QHelpContentWidget::expandToDepth, contentWidget, 2);
+	std::function<void()> f = boost::bind(&QHelpContentWidget::expandToDepth, contentWidget, 2);
 	connect(mEngine->engine()->contentModel(), &QHelpContentModel::contentsCreated, f);
 	contentWidget->expandToDepth(2); // in case contents have been created
 

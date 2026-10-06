@@ -22,10 +22,10 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
-typedef boost::shared_ptr<class StringPropertyRegistrationFixedImage> StringPropertyRegistrationFixedImagePtr;
+typedef std::shared_ptr<class StringPropertyRegistrationFixedImage> StringPropertyRegistrationFixedImagePtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
 class org_custusx_registration_EXPORT StringPropertyRegistrationFixedImage : public SelectDataStringPropertyBase
@@ -45,7 +45,7 @@ private:
 };
 
 
-typedef boost::shared_ptr<class StringPropertyRegistrationMovingImage> StringPropertyRegistrationMovingImagePtr;
+typedef std::shared_ptr<class StringPropertyRegistrationMovingImage> StringPropertyRegistrationMovingImagePtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
 class org_custusx_registration_EXPORT StringPropertyRegistrationMovingImage : public SelectDataStringPropertyBase

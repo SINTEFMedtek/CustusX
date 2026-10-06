@@ -17,13 +17,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ViewWrapper2D> ViewWrapper2DPtr;
+typedef std::shared_ptr<class ViewWrapper2D> ViewWrapper2DPtr;
 }
 
 namespace cxtest
 {
 
-typedef boost::shared_ptr<class FastPatientRegistrationWidgetFixture> FastPatientRegistrationWidgetFixturePtr;
+typedef std::shared_ptr<class FastPatientRegistrationWidgetFixture> FastPatientRegistrationWidgetFixturePtr;
 class CXTEST_ORG_CUSTUSX_REGISTRATION_METHOD_LANDMARK_EXPORT FastPatientRegistrationWidgetFixture : public cx::FastPatientRegistrationWidget
 {
 	Q_OBJECT

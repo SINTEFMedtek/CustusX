@@ -65,7 +65,7 @@ SocketConnection::SocketConnection(QObject *parent) :
     QObject(parent)
 {
     mCurrentState = scsINACTIVE;
-    qRegisterMetaType<boost::function<void()> >("boost::function<void()>");
+    qRegisterMetaType<std::function<void()> >("std::function<void()>");
     qRegisterMetaType<CX_SOCKETCONNECTION_STATE>("CX_SOCKETCONNECTION_STATE");
 
     mNextConnectionInfo.host = "localhost";

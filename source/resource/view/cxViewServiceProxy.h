@@ -68,7 +68,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
     ViewServicePtr mViewService;
-	boost::shared_ptr<ServiceTrackerListener<ViewService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<ViewService> > mServiceListener;
 };
 } //cx
 #endif // CXVIEWSERVICEPROXY_H_

@@ -76,7 +76,7 @@ private:
 	Transform3D get_tMu();
 };
 
-typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;
+typedef std::shared_ptr<TrackedStream> TrackedStreamPtr;
 
 } //cx
 

@@ -42,7 +42,7 @@ TEST_CASE("ColorVariationFilter: execute", "[unit][ColorVariationFilter]")
 
 	REQUIRE(dataMesh);
 
-	cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(dataMesh);
+	cx::MeshPtr mesh = std::dynamic_pointer_cast<cx::Mesh>(dataMesh);
 
 	double globaleVariance = 50.0;
 	double localeVariance = 5.0;

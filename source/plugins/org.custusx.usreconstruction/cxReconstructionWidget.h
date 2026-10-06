@@ -27,7 +27,7 @@ namespace cx
 {
 class TimedAlgorithmProgressBar;
 class UsReconstructionService;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 
 /**
  * \file

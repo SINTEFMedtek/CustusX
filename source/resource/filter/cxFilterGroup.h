@@ -62,7 +62,7 @@ private:
     std::vector<FilterPtr> mFilters;
     XmlOptionFile mOptions;
 };
-typedef boost::shared_ptr<FilterGroup> FilterGroupPtr;
+typedef std::shared_ptr<FilterGroup> FilterGroupPtr;
 
 } //namespace cx
 

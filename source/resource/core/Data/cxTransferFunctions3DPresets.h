@@ -28,7 +28,7 @@ class QDomDocument;
 namespace cx
 {
 
-typedef boost::shared_ptr<class TransferFunctions3DPresets> TransferFunctions3DPresetsPtr;
+typedef std::shared_ptr<class TransferFunctions3DPresets> TransferFunctions3DPresetsPtr;
 
 /**
  * \date 11. juni 2010

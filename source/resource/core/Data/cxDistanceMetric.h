@@ -28,7 +28,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class DistanceMetric> DistanceMetricPtr;
+typedef std::shared_ptr<class DistanceMetric> DistanceMetricPtr;
 
 /**\brief Data class that represents a distance between two points,
  * or a point and a plane.

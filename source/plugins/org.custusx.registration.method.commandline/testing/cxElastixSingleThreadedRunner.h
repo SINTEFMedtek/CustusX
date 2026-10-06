@@ -22,8 +22,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
-typedef boost::shared_ptr<class ElastixParameters> ElastixParametersPtr;
+typedef std::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
+typedef std::shared_ptr<class ElastixParameters> ElastixParametersPtr;
 
 
 /** Helper class for running ElastixExecuter in a test.

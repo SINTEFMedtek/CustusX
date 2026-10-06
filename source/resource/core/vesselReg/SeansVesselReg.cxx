@@ -506,8 +506,8 @@ vtkPolyDataPtr SeansVesselReg::convertToPolyData(DataPtr data, QString id)
 		return vtkPolyDataPtr();
 	}
 
-	//	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
+	//	ImagePtr image = std::dynamic_pointer_cast<Image>(data);
+	MeshPtr mesh = std::dynamic_pointer_cast<Mesh>(data);
 
 //	if (image)
 //	{

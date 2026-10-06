@@ -26,7 +26,7 @@ namespace cx
 {
 
 class MatrixTextEdit;
-typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
+typedef std::shared_ptr<class DoubleProperty> DoublePropertyPtr;
 
 /**
  * \brief Widget for displaying and manipulating an affine matrix,
@@ -72,8 +72,8 @@ private:
 
 //  Frame3D mFrame;
   MatrixTextEdit* mTextEdit;
-  boost::array<DoublePropertyPtr, 3> mAngleAdapter;
-  boost::array<DoublePropertyPtr, 3> mTranslationAdapter;
+  std::array<DoublePropertyPtr, 3> mAngleAdapter;
+  std::array<DoublePropertyPtr, 3> mTranslationAdapter;
   bool recursive;
   bool mBlockChanges;
   QAction* mEditAction;

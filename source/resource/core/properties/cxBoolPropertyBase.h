@@ -57,7 +57,7 @@ public:
 	//signals:
 	//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 };
-typedef boost::shared_ptr<BoolPropertyBase> BoolPropertyBasePtr;
+typedef std::shared_ptr<BoolPropertyBase> BoolPropertyBasePtr;
 
 }
 

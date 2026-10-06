@@ -26,8 +26,8 @@ class QLineEdit;
 
 namespace cx
 {
-typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+typedef std::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef std::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 class TimedAlgorithmProgressBar;
 
 /**

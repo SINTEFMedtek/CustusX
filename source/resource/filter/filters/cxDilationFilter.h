@@ -48,7 +48,7 @@ private:
 	vtkImageDataPtr mRawResult;
 	vtkPolyDataPtr mRawContour;
 };
-typedef boost::shared_ptr<class DilationFilter> DilationFilterPtr;
+typedef std::shared_ptr<class DilationFilter> DilationFilterPtr;
 
 } // namespace cx
 

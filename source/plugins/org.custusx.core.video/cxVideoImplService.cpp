@@ -327,7 +327,7 @@ void VideoImplService::initServiceListener()
     mStreamerServiceListener.reset(new ServiceTrackerListener<StreamerService>(
                                mBackend->mContext,
                                boost::bind(&VideoImplService::onStreamerServiceAdded, this, boost::placeholders::_1),
-                               boost::function<void (StreamerService*)>(),
+                               std::function<void (StreamerService*)>(),
                                boost::bind(&VideoImplService::onStreamerServiceRemoved, this, boost::placeholders::_1)
                                ));
     mStreamerServiceListener->open();

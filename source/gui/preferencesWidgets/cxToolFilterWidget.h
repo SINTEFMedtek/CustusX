@@ -25,7 +25,7 @@ namespace cx
 {
 class SelectionGroupBox;
 class FilteringToolListWidget;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef std::shared_ptr<class TrackingService> TrackingServicePtr;
 
 /**
  * ToolFilterWidget

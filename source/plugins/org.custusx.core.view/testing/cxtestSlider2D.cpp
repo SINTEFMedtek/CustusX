@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace
 {
-typedef boost::shared_ptr<class Slider2DTest> Slider2DTestPtr;
+typedef std::shared_ptr<class Slider2DTest> Slider2DTestPtr;
 class Slider2DTest : public cx::Slider2D
 {
 public:

@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
+typedef std::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
 
 /**
  * \brief Implementation of DoublePairPropertyBase.

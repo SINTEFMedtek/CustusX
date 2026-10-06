@@ -124,7 +124,7 @@ MeshPtr WirePhantomWidget::loadNominalCross()
     if (!retval)
     {
     	QString infoText;
-		retval = boost::dynamic_pointer_cast<Mesh>(mServices->patient()->importData(nominalCrossFilename, infoText));
+		retval = std::dynamic_pointer_cast<Mesh>(mServices->patient()->importData(nominalCrossFilename, infoText));
     }
 
     if (!retval)
@@ -285,7 +285,7 @@ void WirePhantomWidget::showDataMetrics(Vector3D cross_r)
 				mServices->spaceProvider()->getD(mServices->registration()->getMovingData()));
     Vector3D cross_us = usMnom.coord(cross_r);
 
-	PointMetricPtr p1 = boost::dynamic_pointer_cast<PointMetric>(mServices->patient()->getData("cross_nominal"));
+	PointMetricPtr p1 = std::dynamic_pointer_cast<PointMetric>(mServices->patient()->getData("cross_nominal"));
     if (!p1)
 		p1 = mServices->patient()->createSpecificData<PointMetric>("cross_nominal");
 //		p1 = PointMetric::create("cross_nominal", "cross_nominal");

@@ -308,7 +308,7 @@ Transform3D SpaceProviderImpl::get_rMdv(QString uid)
 		return Transform3D::Identity();
 	}
 
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 	if (!image)
 		return data->get_rMd();
 	return data->get_rMd()*createTransformScale(Vector3D(image->getBaseVtkImageData()->GetSpacing())); // ref_M_d

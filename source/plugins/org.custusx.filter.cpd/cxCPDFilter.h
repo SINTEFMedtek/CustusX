@@ -69,7 +69,7 @@ private:
 	Transform3D mDeltaRMd;
 };
 
-typedef boost::shared_ptr<class CPDFilter> CPDFilterPtr;
+typedef std::shared_ptr<class CPDFilter> CPDFilterPtr;
 
 } // namespace cx
 

@@ -72,9 +72,9 @@ QVariant ViewGroupTreeNode::getFont() const
 	return QVariant();
 }
 
-boost::shared_ptr<QWidget> ViewGroupTreeNode::createPropertiesWidget() const
+std::shared_ptr<QWidget> ViewGroupTreeNode::createPropertiesWidget() const
 {
-	return boost::shared_ptr<QWidget>(new ViewGroupPropertiesWidget(mGroupIndex,
+	return std::shared_ptr<QWidget>(new ViewGroupPropertiesWidget(mGroupIndex,
 																	this->getServices(),
 																	NULL));
 }

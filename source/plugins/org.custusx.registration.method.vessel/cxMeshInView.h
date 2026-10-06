@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class MeshInView> MeshInViewPtr;
+typedef std::shared_ptr<class MeshInView> MeshInViewPtr;
 
 /**
  * Display a mesh or polydata in the main 3D view.

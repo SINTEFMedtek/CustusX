@@ -49,7 +49,7 @@ private:
 	FilterPtr mCurrentFilter;
 	OptionsWidget* mOptionsWidget;
 	QGroupBox* mFrame;
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+	std::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 } /* namespace cx */
 #endif /* CXCOMPACTFILTERSETUPWIDGET_H_ */

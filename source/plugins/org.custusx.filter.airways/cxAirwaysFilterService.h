@@ -17,8 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxFilter.h"
 #include "cxFilterImpl.h"
 
-#include <boost/unordered_map.hpp>
-#include <boost/shared_ptr.hpp>
+#include <unordered_map>
+#include <memory>
 
 #include "cxPatientModelService.h"
 
@@ -112,8 +112,8 @@ private:
 	BoolPropertyPtr mVesselCenterlineOption;
 	BoolPropertyPtr mVesselVolumeOption;
 };
-typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
-typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
+typedef std::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
+typedef std::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
 } /* namespace cx */
 #endif /* CXTUBESEGMENTATIONFILTERSERVICE_H_ */

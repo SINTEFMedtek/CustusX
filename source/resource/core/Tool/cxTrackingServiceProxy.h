@@ -69,7 +69,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	TrackingServicePtr mTrackingService;
-	boost::shared_ptr<ServiceTrackerListener<TrackingService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<TrackingService> > mServiceListener;
 };
 } //cx
 #endif // CXTRACKINGSERVICEPROXY_H

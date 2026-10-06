@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class ViewGroupFixture> ViewGroupFixturePtr;
+typedef std::shared_ptr<class ViewGroupFixture> ViewGroupFixturePtr;
 class ViewGroupFixture : public cx::ViewGroup
 {
 public:

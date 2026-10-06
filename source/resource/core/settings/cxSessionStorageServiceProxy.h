@@ -45,7 +45,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	SessionStorageServicePtr mService;
-	boost::shared_ptr<ServiceTrackerListener<SessionStorageService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<SessionStorageService> > mServiceListener;
 };
 
 } // namespace cx

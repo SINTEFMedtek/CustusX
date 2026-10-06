@@ -20,8 +20,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
-typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
+typedef std::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
+typedef std::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
 
 /** \brief Tracking System Service
  *

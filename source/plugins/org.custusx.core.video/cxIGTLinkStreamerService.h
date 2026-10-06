@@ -17,8 +17,8 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
-typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
+typedef std::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef std::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
 
 /**
  * \ingroup org_custusx_core_video

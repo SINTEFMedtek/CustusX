@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxGrabberExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QTcpSocket>
 #include <QStringList>
 #include <QMetaType>

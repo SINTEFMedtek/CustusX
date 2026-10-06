@@ -43,7 +43,7 @@ public:
 	double alpha;
 };
 
-typedef boost::shared_ptr<class ViewsWindow> ViewsWindowPtr;
+typedef std::shared_ptr<class ViewsWindow> ViewsWindowPtr;
 
 /** Test class  with convenience methods for defining views.
  *

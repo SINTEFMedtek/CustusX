@@ -32,8 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPluginFramework.h"
 #include "cxLogicManager.h"
 #include <boost/bind/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxNullDeleter.h"
 #include "cxProfile.h"
 
@@ -145,7 +144,7 @@ void FiltersWidget::appendFilterServices()
             new ServiceTrackerListener<Filter>(
                     LogicManager::getInstance()->getPluginContext(),
                     boost::bind(&FiltersWidget::onServiceAdded, this, boost::placeholders::_1),
-                    boost::function<void(Filter*)>(),
+                    std::function<void(Filter*)>(),
                     boost::bind(&FiltersWidget::onServiceRemoved, this, boost::placeholders::_1)));
     mServiceListener->open();
 }

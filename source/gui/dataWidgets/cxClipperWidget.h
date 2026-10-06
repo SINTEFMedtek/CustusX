@@ -24,8 +24,8 @@ class QTableWidget;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-typedef boost::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
+typedef std::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef std::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
 
 class LabeledComboBoxWidget;
 

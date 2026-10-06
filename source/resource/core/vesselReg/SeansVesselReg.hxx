@@ -57,7 +57,7 @@ public:
 		bool mInvertedTransform; ///< the calculated registration goes from target to source instead of source to target
 		//---------------------------------------------------------------------------
 	};
-	typedef boost::shared_ptr<Context> ContextPtr;
+	typedef std::shared_ptr<Context> ContextPtr;
 
 	SeansVesselReg();
 	~SeansVesselReg();

@@ -18,8 +18,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
-typedef boost::shared_ptr<class LayoutVideoSource> LayoutVideoSourcePtr;
+typedef std::shared_ptr<class RemoteAPI> RemoteAPIPtr;
+typedef std::shared_ptr<class LayoutVideoSource> LayoutVideoSourcePtr;
 class ScreenVideoProvider;
 
 /**

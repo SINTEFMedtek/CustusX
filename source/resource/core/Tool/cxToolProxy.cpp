@@ -9,7 +9,7 @@ namespace cx
 
 ToolPtr ToolProxy::create(ToolPtr base, ctkPluginContext *pluginContext)
 {
-	return boost::shared_ptr<ToolProxy>(new ToolProxy(base, pluginContext));
+	return std::shared_ptr<ToolProxy>(new ToolProxy(base, pluginContext));
 }
 
 ToolProxy::ToolProxy(ToolPtr base, ctkPluginContext *pluginContext)
@@ -24,7 +24,7 @@ void ToolProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<TrackingService>(
 							   mPluginContext,
 							   boost::bind(&ToolProxy::onServiceAdded, this, boost::placeholders::_1),
-							   boost::function<void (TrackingService*)>(),
+							   std::function<void (TrackingService*)>(),
 							   boost::bind(&ToolProxy::onServiceRemoved, this, boost::placeholders::_1)
 							   ));
 	mServiceListener->open();

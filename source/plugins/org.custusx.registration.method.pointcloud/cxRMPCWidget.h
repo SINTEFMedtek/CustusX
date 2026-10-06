@@ -22,17 +22,17 @@ namespace cx
 {
 class WidgetObscuredListener;
 class ICPWidget;
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-//typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
+typedef std::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef std::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef std::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef std::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+typedef std::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+//typedef std::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-typedef boost::shared_ptr<class SeansVesselReg> SeansVesselRegPtr;
-typedef boost::shared_ptr<class MeshInView> MeshInViewPtr;
-typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
+typedef std::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef std::shared_ptr<class SeansVesselReg> SeansVesselRegPtr;
+typedef std::shared_ptr<class MeshInView> MeshInViewPtr;
+typedef std::shared_ptr<class SpaceListener> SpaceListenerPtr;
 
 /**
  *

@@ -52,7 +52,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	StateServicePtr mService;
-	boost::shared_ptr<ServiceTrackerListener<StateService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<StateService> > mServiceListener;
 };
 
 }

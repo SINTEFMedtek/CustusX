@@ -82,7 +82,7 @@ private:
 	XmlOptionFile mSettings;
 	void add(PropertyPtr param);
 };
-typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
+typedef std::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 
 /**
  * \}

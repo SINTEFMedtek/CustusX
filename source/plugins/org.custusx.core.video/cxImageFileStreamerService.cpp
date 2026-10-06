@@ -74,7 +74,7 @@ StreamerPtr ImageFileStreamerService::createStreamer(QDomElement root)
 	}
 	else
 	{
-		boost::shared_ptr<DummyImageStreamer> streamer(new DummyImageStreamer());
+		std::shared_ptr<DummyImageStreamer> streamer(new DummyImageStreamer());
 
 		QString filename = ImageStreamerDummyArguments().getFilenameOption(root)->getValue();
 		bool secondary = ImageStreamerDummyArguments().getSecondaryOption(root)->getValue();

@@ -19,10 +19,10 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
-typedef boost::shared_ptr<class PatientData> PatientDataPtr;
-typedef boost::shared_ptr<class DataManager> DataServicePtr;
-typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
+typedef std::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
+typedef std::shared_ptr<class PatientData> PatientDataPtr;
+typedef std::shared_ptr<class DataManager> DataServicePtr;
+typedef std::shared_ptr<class DataFactory> DataFactoryPtr;
 
 /**
  * Implementation of PatientModelService.
@@ -113,7 +113,7 @@ private:
 	void disconnectProbes();
 	void connectProbes();
 };
-typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
+typedef std::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 
 } /* namespace cx */
 

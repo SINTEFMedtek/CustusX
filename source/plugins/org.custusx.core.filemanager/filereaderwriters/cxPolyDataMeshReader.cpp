@@ -26,7 +26,7 @@ namespace cx
 
 bool PolyDataMeshReader::readInto(DataPtr data, QString filename)
 {
-	return this->readInto(boost::dynamic_pointer_cast<Mesh>(data), filename);
+	return this->readInto(std::dynamic_pointer_cast<Mesh>(data), filename);
 }
 
 bool PolyDataMeshReader::readInto(MeshPtr mesh, QString filename)
@@ -67,7 +67,7 @@ DataPtr PolyDataMeshReader::read(const QString& uid, const QString& filename)
 std::vector<DataPtr> PolyDataMeshReader::read(const QString &filename)
 {
 	std::vector<DataPtr> retval;
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(this->createData(Mesh::getTypeName(), filename));
+	MeshPtr mesh = std::dynamic_pointer_cast<Mesh>(this->createData(Mesh::getTypeName(), filename));
 
 	vtkPolyDataPtr raw = this->loadVtkPolyData(filename);
 	if(!raw)
@@ -80,7 +80,7 @@ std::vector<DataPtr> PolyDataMeshReader::read(const QString &filename)
 
 void PolyDataMeshReader::write(DataPtr data, const QString &filename)
 {
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
+	MeshPtr mesh = std::dynamic_pointer_cast<Mesh>(data);
 	if(!mesh)
 		reportError("Could not cast data to mesh");
 	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();

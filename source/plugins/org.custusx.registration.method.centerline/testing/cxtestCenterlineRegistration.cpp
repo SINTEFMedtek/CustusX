@@ -21,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <cmath>
 #include <random>
 
-typedef boost::shared_ptr<cx::CenterlineRegistration> CenterlineRegistrationPtr;
+typedef std::shared_ptr<cx::CenterlineRegistration> CenterlineRegistrationPtr;
 
 
 namespace cxtest {
@@ -50,8 +50,8 @@ TEST_CASE("CenterlineRegistration: execute", "[integration][org.custusx.registra
     REQUIRE(dataCenterline1);
     REQUIRE(dataCenterline2);
 
-    cx::MeshPtr mesh1 = boost::dynamic_pointer_cast<cx::Mesh>(dataCenterline1);
-    cx::MeshPtr mesh2 = boost::dynamic_pointer_cast<cx::Mesh>(dataCenterline2);
+    cx::MeshPtr mesh1 = std::dynamic_pointer_cast<cx::Mesh>(dataCenterline1);
+    cx::MeshPtr mesh2 = std::dynamic_pointer_cast<cx::Mesh>(dataCenterline2);
 
     vtkPointsPtr centerlinePoints1 = centerlineRegistration->processCenterline(mesh1->getVtkPolyData(), cx::Transform3D::Identity());
     centerlineRegistration->SetFixedPoints(centerlinePoints1);

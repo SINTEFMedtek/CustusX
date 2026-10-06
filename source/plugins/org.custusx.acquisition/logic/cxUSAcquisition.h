@@ -23,14 +23,14 @@ struct USReconstructInputData;
 }
 namespace cx
 {
-typedef boost::shared_ptr<class UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
-typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
-typedef boost::shared_ptr<class USSavingRecorder> USSavingRecorderPtr;
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
+typedef std::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
+typedef std::shared_ptr<class USSavingRecorder> USSavingRecorderPtr;
+typedef std::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 
 /**
@@ -93,7 +93,7 @@ private:
 	bool mReady;
 	QString mInfoText;
 };
-typedef boost::shared_ptr<USAcquisition> USAcquisitionPtr;
+typedef std::shared_ptr<USAcquisition> USAcquisitionPtr;
 
 /**
 * @}

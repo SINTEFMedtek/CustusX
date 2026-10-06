@@ -21,8 +21,8 @@ class QHttpResponse;
 namespace cx
 {
 
-typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
-typedef boost::shared_ptr<class HttpRequestHandler> HttpRequestHandlerPtr;
+typedef std::shared_ptr<class RemoteAPI> RemoteAPIPtr;
+typedef std::shared_ptr<class HttpRequestHandler> HttpRequestHandlerPtr;
 
 /**
  * Widget for use by the Webserver plugin

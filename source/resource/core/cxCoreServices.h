@@ -12,20 +12,20 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCORESERVICES_H
 
 #include "cxResourceExport.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 class ctkPluginContext;
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class StateService> StateServicePtr;
-typedef boost::shared_ptr<class FileManagerService> FileManagerServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef std::shared_ptr<class VideoService> VideoServicePtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class StateService> StateServicePtr;
+typedef std::shared_ptr<class FileManagerService> FileManagerServicePtr;
 
 /**
  * Convenience class combining all services in resource/core.

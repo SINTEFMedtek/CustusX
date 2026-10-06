@@ -47,21 +47,21 @@ void DataRepContainer::updateSettings()
 
 void DataRepContainer::addData(DataPtr data)
 {
-	if (boost::dynamic_pointer_cast<Mesh>(data))
+	if (std::dynamic_pointer_cast<Mesh>(data))
 	{
-		this->meshAdded(boost::dynamic_pointer_cast<Mesh>(data));
+		this->meshAdded(std::dynamic_pointer_cast<Mesh>(data));
 	}
-	else if (boost::dynamic_pointer_cast<PointMetric>(data))
+	else if (std::dynamic_pointer_cast<PointMetric>(data))
 	{
-		this->pointMetricAdded(boost::dynamic_pointer_cast<PointMetric>(data));
+		this->pointMetricAdded(std::dynamic_pointer_cast<PointMetric>(data));
 	}
-	else if (boost::dynamic_pointer_cast<SphereMetric>(data))
+	else if (std::dynamic_pointer_cast<SphereMetric>(data))
 	{
-		this->sphereMetricAdded(boost::dynamic_pointer_cast<SphereMetric>(data));
+		this->sphereMetricAdded(std::dynamic_pointer_cast<SphereMetric>(data));
 	}
-	else if (boost::dynamic_pointer_cast<DistanceMetric>(data))
+	else if (std::dynamic_pointer_cast<DistanceMetric>(data))
 	{
-		this->distanceMetricAdded(boost::dynamic_pointer_cast<DistanceMetric>(data));
+		this->distanceMetricAdded(std::dynamic_pointer_cast<DistanceMetric>(data));
 	}
 }
 
@@ -137,7 +137,7 @@ void DataRepContainer::sphereMetricAdded(SphereMetricPtr mesh)
 
 void DataRepContainer::updateSettings(RepPtr rep)
 {
-	DataMetricRepPtr val = boost::dynamic_pointer_cast<DataMetricRep>(rep);
+	DataMetricRepPtr val = std::dynamic_pointer_cast<DataMetricRep>(rep);
 	if (!val)
 		return;
 

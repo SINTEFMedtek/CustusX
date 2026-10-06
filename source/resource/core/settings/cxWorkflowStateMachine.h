@@ -70,7 +70,7 @@ private:
 	bool mStarted;
 };
 
-typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
+typedef std::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
 }
 
 #endif /* CXWORKFLOWSTATEMACHINE_H_ */

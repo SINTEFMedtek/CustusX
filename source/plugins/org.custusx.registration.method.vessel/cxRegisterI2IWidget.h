@@ -20,7 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
+typedef std::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
 class SeansVesselRegistrationWidget;
 
 /**

@@ -22,9 +22,9 @@ class ctkPluginContext;
 namespace cx
 {
 /*
-typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
-typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
-typedef boost::shared_ptr<class NetworkDataTransfer> NetworkDataTransferPtr;
+typedef std::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
+typedef std::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
+typedef std::shared_ptr<class NetworkDataTransfer> NetworkDataTransferPtr;
 class NetworkConnection;
 */
 
@@ -43,7 +43,7 @@ private:
     //NetworkDataTransferPtr mDataTransfer;
 	igtlioLogicPointer mLogic;
 };
-typedef boost::shared_ptr<OpenIGTLink3GuiExtenderService> OpenIGTLink3GuiExtenderServicePtr;
+typedef std::shared_ptr<OpenIGTLink3GuiExtenderService> OpenIGTLink3GuiExtenderServicePtr;
 
 }
 #endif //CXOPENIGTLINKGUIEXTENDERSERVICE_H

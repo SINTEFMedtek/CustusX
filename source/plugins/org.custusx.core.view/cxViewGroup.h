@@ -26,10 +26,10 @@ class QPoint;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
-typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
-typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef std::shared_ptr<class SyncedValue> SyncedValuePtr;
+typedef std::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * \file

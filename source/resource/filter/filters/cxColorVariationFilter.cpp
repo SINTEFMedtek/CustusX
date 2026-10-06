@@ -110,7 +110,7 @@ void ColorVariationFilter::createOutputTypes()
 
 bool ColorVariationFilter::execute()
 {
-	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+	MeshPtr inputMesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	if (!inputMesh)
 		return false;
 	

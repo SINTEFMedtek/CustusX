@@ -73,7 +73,7 @@ private:
 };
 
 
-typedef boost::shared_ptr<TemporalCalibration> TemporalCalibrationPtr;
+typedef std::shared_ptr<TemporalCalibration> TemporalCalibrationPtr;
 
 /**
  * @}

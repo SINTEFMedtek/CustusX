@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONMETHODCENTERLINEPLUGINACTIVATOR_H_
 
 #include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "org_custusx_registration_method_centerline_Export.h"
 
 namespace cx
@@ -26,7 +26,7 @@ namespace cx
  *
  */
 
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef std::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for Registration method Centerline service

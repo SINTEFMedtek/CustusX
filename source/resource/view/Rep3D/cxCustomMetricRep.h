@@ -19,10 +19,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class CustomMetricRep> CustomMetricRepPtr;
-typedef boost::shared_ptr<class CustomMetric> CustomMetricPtr;
-typedef boost::shared_ptr<class GraphicalGeometric> GraphicalGeometricPtr;
-typedef boost::shared_ptr<class Image2DProxy> Image2DProxyPtr;
+typedef std::shared_ptr<class CustomMetricRep> CustomMetricRepPtr;
+typedef std::shared_ptr<class CustomMetric> CustomMetricPtr;
+typedef std::shared_ptr<class GraphicalGeometric> GraphicalGeometricPtr;
+typedef std::shared_ptr<class Image2DProxy> Image2DProxyPtr;
 
 
 /**Rep for visualizing a CustomMetric.

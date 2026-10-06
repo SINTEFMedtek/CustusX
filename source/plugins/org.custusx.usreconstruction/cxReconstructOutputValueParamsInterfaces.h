@@ -17,8 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-//typedef boost::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+//typedef std::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 class OutputVolumeParams;
 
 /**

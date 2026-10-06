@@ -53,7 +53,7 @@ private slots:
 private:
 	vtkImageDataPtr mRawResult;
 };
-typedef boost::shared_ptr<class SmoothingImageFilter> SmoothingImageFilterPtr;
+typedef std::shared_ptr<class SmoothingImageFilter> SmoothingImageFilterPtr;
 
 
 } // namespace cx

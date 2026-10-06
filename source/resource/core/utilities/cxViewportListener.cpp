@@ -92,7 +92,7 @@ bool ViewportListenerBase::isListening() const
 	return mObserver!=0;
 }
 
-void ViewportListenerBase::setCallback(boost::function<void ()> func)
+void ViewportListenerBase::setCallback(std::function<void ()> func)
 {
 	mCallback = func;
 }

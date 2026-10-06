@@ -62,7 +62,7 @@ private:
 
 
 };
-//typedef boost::shared_ptr<PNNReconstructionMethodService> PNNReconstructionMethodService*;
+//typedef std::shared_ptr<PNNReconstructionMethodService> PNNReconstructionMethodService*;
 
 } /* namespace cx */
 

@@ -34,7 +34,7 @@ namespace cx
 typedef vtkSmartPointer<class CropBoxCallback> CropBoxCallbackPtr;
 typedef vtkSmartPointer<class CropBoxEnableCallback> CropBoxEnableCallbackPtr;
 typedef vtkSmartPointer<class CropBoxInteractionCallback> CropBoxInteractionCallbackPtr;
-typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
+typedef std::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 
 /**
 * \file

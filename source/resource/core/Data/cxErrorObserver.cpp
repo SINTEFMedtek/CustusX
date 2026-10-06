@@ -14,6 +14,6 @@ StaticMutexVtkLocker::~StaticMutexVtkLocker()
 {
 //	mMutex->unlock();
 }
-boost::shared_ptr<QMutex> StaticMutexVtkLocker::mMutex;
+std::shared_ptr<QMutex> StaticMutexVtkLocker::mMutex;
 
 }

@@ -21,8 +21,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
-typedef boost::shared_ptr<class FilterTimedAlgorithm> FilterTimedAlgorithmPtr;
+typedef std::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
+typedef std::shared_ptr<class FilterTimedAlgorithm> FilterTimedAlgorithmPtr;
 
 /**
  * One queued filter run: an .ini file to run against a specific image.
@@ -88,7 +88,7 @@ private:
 	GenericScriptFilterPtr mCurrentFilter;
 	FilterTimedAlgorithmPtr mCurrentThread;
 };
-typedef boost::shared_ptr<LiverSegmentationRunner> LiverSegmentationRunnerPtr;
+typedef std::shared_ptr<LiverSegmentationRunner> LiverSegmentationRunnerPtr;
 
 } /* namespace cx */
 

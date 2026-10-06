@@ -26,8 +26,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
-typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
+typedef std::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
+typedef std::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
 
 /**
  * \brief Interface to the tool offset of the active tool
@@ -36,9 +36,9 @@ class cxGui_EXPORT DoublePropertyActiveToolOffset : public DoublePropertyBase
 {
 	Q_OBJECT
 public:
-	static boost::shared_ptr<DoublePropertyActiveToolOffset> create(ActiveToolProxyPtr activeTool)
+	static std::shared_ptr<DoublePropertyActiveToolOffset> create(ActiveToolProxyPtr activeTool)
 	{
-		return boost::shared_ptr<DoublePropertyActiveToolOffset>(new DoublePropertyActiveToolOffset(activeTool));
+		return std::shared_ptr<DoublePropertyActiveToolOffset>(new DoublePropertyActiveToolOffset(activeTool));
 	}
 
 	DoublePropertyActiveToolOffset(ActiveToolProxyPtr activeTool);
@@ -64,9 +64,9 @@ class cxGui_EXPORT DoublePropertyToolOffset : public DoublePropertyBase
 {
 	Q_OBJECT
 public:
-	static boost::shared_ptr<DoublePropertyToolOffset> create(ToolPtr tool)
+	static std::shared_ptr<DoublePropertyToolOffset> create(ToolPtr tool)
 	{
-		return boost::shared_ptr<DoublePropertyToolOffset>(new DoublePropertyToolOffset(tool));
+		return std::shared_ptr<DoublePropertyToolOffset>(new DoublePropertyToolOffset(tool));
 	}
 
 	DoublePropertyToolOffset(ToolPtr tool);
@@ -137,7 +137,7 @@ public:
 	virtual DoubleRange getValueRange() const;
 };
 
-typedef boost::shared_ptr<class StringPropertyParentFrame> StringPropertyParentFramePtr;
+typedef std::shared_ptr<class StringPropertyParentFrame> StringPropertyParentFramePtr;
 
 /**
  * \brief Adapter that selects the parent frame of the given Data.
@@ -166,7 +166,7 @@ protected:
 	PatientModelServicePtr mPatientModelService;
 };
 
-typedef boost::shared_ptr<class StringPropertySetParentFrame> StringPropertySetParentFramePtr;
+typedef std::shared_ptr<class StringPropertySetParentFrame> StringPropertySetParentFramePtr;
 
 /**
  * \brief Adapter that force sets the parent frame of the given Data,
@@ -187,7 +187,7 @@ signals:
 };
 
 
-typedef boost::shared_ptr<class StringPropertyDataNameEditable> StringPropertyDataNameEditablePtr;
+typedef std::shared_ptr<class StringPropertyDataNameEditable> StringPropertyDataNameEditablePtr;
 
 /**
  * \brief Adapter for displaying and changing name of a Data.
@@ -214,7 +214,7 @@ private:
 	DataPtr mData;
 };
 
-typedef boost::shared_ptr<class StringPropertyDataUidEditable> StringPropertyDataUidEditablePtr;
+typedef std::shared_ptr<class StringPropertyDataUidEditable> StringPropertyDataUidEditablePtr;
 
 /**
  * \brief Adapter for displaying and changing name of a Data.
@@ -239,7 +239,7 @@ public: // basic methods
 private:
 	DataPtr mData;
 };
-typedef boost::shared_ptr<class StringPropertyDataModality> StringPropertyDataModalityPtr;
+typedef std::shared_ptr<class StringPropertyDataModality> StringPropertyDataModalityPtr;
 
 /**
  * \brief Adapter that selects the modality of the given Data.
@@ -267,7 +267,7 @@ protected:
 	PatientModelServicePtr mPatientModelService;
 };
 
-typedef boost::shared_ptr<class StringPropertyImageType> StringPropertyImageTypePtr;
+typedef std::shared_ptr<class StringPropertyImageType> StringPropertyImageTypePtr;
 
 /**
  * \brief Adapter that selects the image type of the given Data.
@@ -296,7 +296,7 @@ protected:
 };
 
 
-typedef boost::shared_ptr<class StringPropertyGlyphOrientationArray> StringPropertyGlyphOrientationArrayPtr;
+typedef std::shared_ptr<class StringPropertyGlyphOrientationArray> StringPropertyGlyphOrientationArrayPtr;
 
 /**
  * \brief Adapter that selects the glyph orientation array.
@@ -325,7 +325,7 @@ protected:
 };
 
 
-typedef boost::shared_ptr<class StringPropertyGlyphColorArray> StringPropertyGlyphColorArrayPtr;
+typedef std::shared_ptr<class StringPropertyGlyphColorArray> StringPropertyGlyphColorArrayPtr;
 
 /**
  * \brief Adapter that selects the glyph color array.
@@ -355,7 +355,7 @@ protected:
 
 
 
-typedef boost::shared_ptr<class StringPropertyGlyphLUT> StringPropertyGlyphLUTPtr;
+typedef std::shared_ptr<class StringPropertyGlyphLUT> StringPropertyGlyphLUTPtr;
 
 /**
  * \brief Adapter that selects the glyph color LUT.

@@ -28,7 +28,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProbeSector.h"
 #include "cxTime.h"
 
-typedef boost::shared_ptr<class QTimer> QTimerPtr;
+typedef std::shared_ptr<class QTimer> QTimerPtr;
 
 namespace cx
 {
@@ -224,6 +224,6 @@ private:
 	ProbePtr mProbe;
 	DummyToolThread* mThread;
 };
-typedef boost::shared_ptr<DummyTool> DummyToolPtr;
+typedef std::shared_ptr<DummyTool> DummyToolPtr;
 }//namespace cx
 #endif /* CXDUMMYTOOL_H_ */

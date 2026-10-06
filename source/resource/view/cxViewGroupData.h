@@ -27,10 +27,10 @@ class QDomNode;
 namespace cx
 {
 
-typedef boost::shared_ptr<class CameraData> CameraDataPtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class StringListProperty> StringListPropertyPtr;
+typedef std::shared_ptr<class CameraData> CameraDataPtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class StringListProperty> StringListPropertyPtr;
 
 
 /**
@@ -71,8 +71,8 @@ cxResourceVisualization_EXPORT int getPriority(DataPtr data);
  */
 cxResourceVisualization_EXPORT bool dataTypeSort(const DataPtr data1, const DataPtr data2);
 
-typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
-typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef std::shared_ptr<class SyncedValue> SyncedValuePtr;
+typedef std::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 
 /** Stores how a Data should be visualized in 2D and 3D views.
   */
@@ -182,7 +182,7 @@ private:
 	};
 
 	template<class DATA_TYPE>
-	std::vector<boost::shared_ptr<DATA_TYPE> > getDataOfType(DataViewProperties requiredProperties) const;
+	std::vector<std::shared_ptr<DATA_TYPE> > getDataOfType(DataViewProperties requiredProperties) const;
 	bool contains(QString uid) const;
 	void createSliceDefinitionProperty();
 	void insertData(std::vector<DataAndViewPropertiesPair>::iterator iter, DataAndViewPropertiesPair &item);

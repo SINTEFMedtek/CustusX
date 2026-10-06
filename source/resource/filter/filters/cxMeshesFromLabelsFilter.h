@@ -91,7 +91,7 @@ private:
 	std::vector<vtkPolyDataPtr> mRawResult;
 	ImagePtr mPreviewImage;
 };
-typedef boost::shared_ptr<class MeshesFromLabelsFilter> MeshesFromLabelsFilterPtr;
+typedef std::shared_ptr<class MeshesFromLabelsFilter> MeshesFromLabelsFilterPtr;
 
 
 } // namespace cx

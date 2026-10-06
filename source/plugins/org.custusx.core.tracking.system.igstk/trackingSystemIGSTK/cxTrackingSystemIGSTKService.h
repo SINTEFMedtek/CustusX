@@ -30,9 +30,9 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class ManualToolAdapter> ManualToolAdapterPtr;
-typedef boost::shared_ptr<class IgstkTrackerThread> IgstkTrackerThreadPtr;
-typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef std::shared_ptr<class ManualToolAdapter> ManualToolAdapterPtr;
+typedef std::shared_ptr<class IgstkTrackerThread> IgstkTrackerThreadPtr;
+typedef std::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 /**
  * \brief Interface towards one tracking system.

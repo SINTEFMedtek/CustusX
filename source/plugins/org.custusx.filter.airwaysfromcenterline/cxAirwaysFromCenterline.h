@@ -21,7 +21,7 @@ namespace cx
 {
 
 typedef std::vector< Eigen::Matrix4d > M4Vector;
-typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
+typedef std::shared_ptr<class RouteToTarget> RouteToTargetPtr;
 
 class org_custusx_filter_airwaysfromcenterline_EXPORT AirwaysFromCenterline
 {
@@ -67,7 +67,7 @@ private:
 org_custusx_filter_airwaysfromcenterline_EXPORT std::pair<int, double> findDistanceToLine(Eigen::Vector3d point, Eigen::MatrixXd line);
 org_custusx_filter_airwaysfromcenterline_EXPORT double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 
-typedef boost::shared_ptr<AirwaysFromCenterline> AirwaysFromCenterlinePtr;
+typedef std::shared_ptr<AirwaysFromCenterline> AirwaysFromCenterlinePtr;
 
 } /* namespace cx */
 

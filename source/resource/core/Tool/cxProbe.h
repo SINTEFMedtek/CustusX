@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include <QObject>
-#include <boost/weak_ptr.hpp>
+#include <memory>
 #include "cxProbeDefinition.h"
 #include "cxForwardDeclarations.h"
 
@@ -69,8 +69,8 @@ signals:
 	void videoSourceAdded(VideoSourcePtr source);
 };
 
-typedef boost::shared_ptr<Probe> ProbePtr;
-typedef boost::weak_ptr<Probe> ProbeWeakPtr;
+typedef std::shared_ptr<Probe> ProbePtr;
+typedef std::weak_ptr<Probe> ProbeWeakPtr;
 
 }//namespace cx
 

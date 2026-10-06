@@ -26,7 +26,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class DonutMetric> DonutMetricPtr;
+typedef std::shared_ptr<class DonutMetric> DonutMetricPtr;
 
 /** \brief Data class that represents a donut.
  *

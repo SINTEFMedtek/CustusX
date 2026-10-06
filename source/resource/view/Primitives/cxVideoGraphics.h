@@ -25,7 +25,7 @@ typedef vtkSmartPointer<class UltrasoundSectorSource> UltrasoundSectorSourcePtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
+typedef std::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
 /** \brief Wrap vtkActor displaying a video image, possibly clipped by a sector.
  *
@@ -102,7 +102,7 @@ private:
 	vtkImageThresholdPtr mMapZeroToOne;
 	vtkImageMaskPtr mMaskFilter;
 };
-typedef boost::shared_ptr<VideoGraphics> VideoGraphicsPtr;
+typedef std::shared_ptr<VideoGraphics> VideoGraphicsPtr;
 
 } // namespace cx
 

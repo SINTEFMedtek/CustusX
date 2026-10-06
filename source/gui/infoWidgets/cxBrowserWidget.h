@@ -31,8 +31,8 @@ namespace cx
 class PopupToolbarWidget;
 class TreeItemModel;
 class EraseDataToolButton;
-typedef boost::shared_ptr<class TreeNode> TreeNodePtr;
-typedef boost::shared_ptr<class TreeRepository> TreeRepositoryPtr;
+typedef std::shared_ptr<class TreeNode> TreeNodePtr;
+typedef std::shared_ptr<class TreeRepository> TreeRepositoryPtr;
 
 
 /**

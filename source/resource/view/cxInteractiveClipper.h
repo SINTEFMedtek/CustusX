@@ -22,7 +22,7 @@ class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
 * \file
@@ -83,7 +83,7 @@ protected:
 	void addAllInteractiveClipPlanes();
 	void updateClipPlanesInData();
 };
-typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
+typedef std::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
 
 /**
 * @}

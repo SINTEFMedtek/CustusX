@@ -70,7 +70,7 @@ protected:
     Vector3D mVectorUp;
 	Vector3D mScale;
 };
-typedef boost::shared_ptr<GraphicalObjectWithDirection> GraphicalObjectWithDirectionPtr;
+typedef std::shared_ptr<GraphicalObjectWithDirection> GraphicalObjectWithDirectionPtr;
 
 } // namespace cx
 

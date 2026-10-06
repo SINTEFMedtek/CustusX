@@ -126,7 +126,7 @@ void LiverVisibilityWidget::addStructureButton(ORGAN_TYPE organType, QString lab
 
 ImagePtr LiverVisibilityWidget::sourceImage() const
 {
-	return boost::dynamic_pointer_cast<Image>(mSourceImageSelector->getData());
+	return std::dynamic_pointer_cast<Image>(mSourceImageSelector->getData());
 }
 
 MeshPtr LiverVisibilityWidget::findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const

@@ -17,9 +17,9 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
-typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
-typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
+typedef std::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef std::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
+typedef std::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
 
 
 /**

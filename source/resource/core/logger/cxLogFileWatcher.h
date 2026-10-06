@@ -31,7 +31,7 @@ class QTextStream;
 namespace cx
 {
 
-typedef boost::shared_ptr<class LogFileWatcher> LogFileWatcherPtr;
+typedef std::shared_ptr<class LogFileWatcher> LogFileWatcherPtr;
 
 /**
  * \author Christian Askeland, SINTEF

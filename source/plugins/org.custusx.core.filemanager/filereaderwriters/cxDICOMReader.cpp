@@ -113,7 +113,7 @@ QString DICOMReader::canReadDataType() const
 
 bool DICOMReader::readInto(DataPtr data, QString filename)
 {
-	return this->readInto(boost::dynamic_pointer_cast<Image>(data), filename);
+	return this->readInto(std::dynamic_pointer_cast<Image>(data), filename);
 }
 
 bool DICOMReader::readInto(ImagePtr image, QString filename)

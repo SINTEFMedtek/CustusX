@@ -27,7 +27,7 @@ namespace cx
 {
 typedef vtkSmartPointer<class GraphicalBoxCallback> GraphicalBoxCallbackPtr;
 typedef vtkSmartPointer<class GraphicalBoxEnableCallback> GraphicalBoxEnableCallbackPtr;
-typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
+typedef std::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 
 /**
 * \file
@@ -100,7 +100,7 @@ private:
 	bool mVisible;
 };
 
-typedef boost::shared_ptr<GraphicalBox> GraphicalBoxPtr;
+typedef std::shared_ptr<GraphicalBox> GraphicalBoxPtr;
 
 /**
 * @}

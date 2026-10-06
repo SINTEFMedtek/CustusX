@@ -33,7 +33,7 @@ void SessionStorageServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<SessionStorageService>(
 								 mPluginContext,
 								 boost::bind(&SessionStorageServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (SessionStorageService*)>(),
+								 std::function<void (SessionStorageService*)>(),
 								 boost::bind(&SessionStorageServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

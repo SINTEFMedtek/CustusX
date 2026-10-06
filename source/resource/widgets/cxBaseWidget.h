@@ -18,9 +18,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QAction>
 #include <QLayout>
 #include <iostream>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxOptimizedUpdateWidget.h"
-#include "boost/function.hpp"
+#include <functional>
 
 class QWidget;
 class QGroupBox;
@@ -73,9 +73,9 @@ public:
 
 namespace cx
 {
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class ViewService> ViewServicePtr;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class ViewService> ViewServicePtr;
+typedef std::shared_ptr<class TrackingService> TrackingServicePtr;
 /**
  * \class BaseWidget
  *

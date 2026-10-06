@@ -39,9 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
-typedef boost::shared_ptr<class BronchoscopyTool> BronchoscopyToolPtr;
-typedef boost::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
+typedef std::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef std::shared_ptr<class BronchoscopyTool> BronchoscopyToolPtr;
+typedef std::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
 
 /**
  * \brief Interface towards a bronchoscopy navigation tracking system.

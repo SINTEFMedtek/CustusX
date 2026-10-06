@@ -32,9 +32,9 @@ class QActionGroup;
 namespace cx
 {
 
-typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef std::shared_ptr<class CameraStyle> CameraStylePtr;
 using cx::Transform3D;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * \file

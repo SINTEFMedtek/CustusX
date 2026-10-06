@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QtWidgets>
 #include <QPushButton>
 #include "boost/bind/bind.hpp"
-#include "boost/function.hpp"
+#include <functional>
 #include "cxHelpEngine.h"
 #include "cxHelpBrowser.h"
 #include "cxLogger.h"
@@ -49,9 +49,9 @@ TrainingWidget::TrainingWidget(RegServicesPtr services, QString objectName, QStr
 	this->addToolButtonFor(buttonLayout, mNextAction);
 
 	connect(mImportAction, &QAction::triggered, this, &TrainingWidget::onImportSimulatedPatient);
-	connect(mPreviousAction, &QAction::triggered, boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, -1)));
-	connect(mCurrentAction, &QAction::triggered, boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, 0)));
-	connect(mNextAction, &QAction::triggered, boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, +1)));
+	connect(mPreviousAction, &QAction::triggered, std::function<void()>(boost::bind(&TrainingWidget::onStep, this, -1)));
+	connect(mCurrentAction, &QAction::triggered, std::function<void()>(boost::bind(&TrainingWidget::onStep, this, 0)));
+	connect(mNextAction, &QAction::triggered, std::function<void()>(boost::bind(&TrainingWidget::onStep, this, +1)));
 
 	//must always be the initial step
 	func_t welcome = boost::bind(&TrainingWidget::toWelcomeStep, this);
@@ -180,7 +180,7 @@ QString TrainingWidget::getFirstUSVolume()
 	for(; iter != datas.end(); ++iter)
 	{
 		DataPtr data = iter->second;
-		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+		ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 
 		if (image && image->getModality() == imUS)
 			return image->getUid();
@@ -221,7 +221,7 @@ void TrainingWidget::setAvailability(std::map<QString, DataPtr> datas, bool avai
 	for(; iter != datas.end(); ++iter)
 	{
 		DataPtr data = iter->second;
-		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+		ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 
 		if (makeModalityUnavailable && image && image->getModality() == modality)
 			mServices->patient()->makeAvailable(image->getUid(), available);

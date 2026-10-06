@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
 
-typedef boost::shared_ptr<class cx::Accusurf> AccusurfPtr;
+typedef std::shared_ptr<class cx::Accusurf> AccusurfPtr;
 
 namespace cxtest {
 
@@ -44,8 +44,8 @@ TEST_CASE("AccusurfFilter: execute", "[unit][org.custusx.filter.accusurf]")
     REQUIRE(dataVolume);
     REQUIRE(dataCenterline);
 
-    cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(dataCenterline);
-    cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(dataVolume);
+    cx::MeshPtr mesh = std::dynamic_pointer_cast<cx::Mesh>(dataCenterline);
+    cx::ImagePtr image = std::dynamic_pointer_cast<cx::Image>(dataVolume);
 
 	vtkPolyDataPtr route_d_image = mesh->getTransformedPolyDataCopy((image->get_rMd().inverse())*mesh->get_rMd());
     accusurf->setRoutePositions(route_d_image);

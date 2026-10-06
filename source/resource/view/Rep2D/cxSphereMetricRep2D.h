@@ -21,9 +21,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
-typedef boost::shared_ptr<class SphereMetricRep2D> SphereMetricRep2DPtr;
-typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
+typedef std::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
+typedef std::shared_ptr<class SphereMetricRep2D> SphereMetricRep2DPtr;
+typedef std::shared_ptr<class SphereMetric> SphereMetricPtr;
 
 /**
  *

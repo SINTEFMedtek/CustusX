@@ -32,18 +32,18 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-boost::shared_ptr<QWidget> WidgetTypeRepository::findMetricWidget(DataPtr data)
+std::shared_ptr<QWidget> WidgetTypeRepository::findMetricWidget(DataPtr data)
 {
 	for (unsigned i=0; i<mWidgets.size(); ++i)
 	{
-		boost::shared_ptr<SingleMetricWidget> w = boost::dynamic_pointer_cast<SingleMetricWidget>(mWidgets[i]);
+		std::shared_ptr<SingleMetricWidget> w = std::dynamic_pointer_cast<SingleMetricWidget>(mWidgets[i]);
 		if(w && w->getData() && data && w->getData()->getUid() == data->getUid())
 			return w;
 	}
-	return boost::shared_ptr<QWidget>();
+	return std::shared_ptr<QWidget>();
 }
 
-void WidgetTypeRepository::add(boost::shared_ptr<QWidget> widget)
+void WidgetTypeRepository::add(std::shared_ptr<QWidget> widget)
 {
 	mWidgets.push_back(widget);
 }

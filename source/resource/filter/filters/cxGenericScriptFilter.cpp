@@ -1239,7 +1239,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 		{
 			QFileInfo fileInfoOutput(filePath);
 			QString uid = changeExtension(fileInfoOutput.fileName(), "");
-			ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
+			ImagePtr newImage = std::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
 			if(!newImage)
 			{
 				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFiles: No new image file created";
@@ -1316,7 +1316,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 					outputColor = getDefaultColor();
 
 				QString info;
-				MeshPtr outputMesh = boost::dynamic_pointer_cast<Mesh>(patientService()->importData(filePath, info));
+				MeshPtr outputMesh = std::dynamic_pointer_cast<Mesh>(patientService()->importData(filePath, info));
 				outputMesh->setColor(outputColor);
 				mServices->view()->autoShowData(outputMesh);
 				ImagePtr inputImage = this->getCopiedInputImage();

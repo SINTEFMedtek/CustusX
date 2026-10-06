@@ -43,7 +43,7 @@ void RegionOfInterestMetricRep::clear()
 
 RegionOfInterestMetricPtr RegionOfInterestMetricRep::getRegionOfInterestMetric()
 {
-	return boost::dynamic_pointer_cast<RegionOfInterestMetric>(mMetric);
+	return std::dynamic_pointer_cast<RegionOfInterestMetric>(mMetric);
 }
 
 void RegionOfInterestMetricRep::onModifiedStartRender()

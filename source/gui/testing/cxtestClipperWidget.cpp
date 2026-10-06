@@ -27,7 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cxtest
 {
 
-typedef boost::shared_ptr<class VisServicesFixture> VisServicesFixturePtr;
+typedef std::shared_ptr<class VisServicesFixture> VisServicesFixturePtr;
 class VisServicesFixture : public cx::VisServices
 {
 public:
@@ -41,7 +41,7 @@ public:
 	}
 };
 
-typedef boost::shared_ptr<class ClipperWidgetFixture> ClipperWidgetFixturePtr;
+typedef std::shared_ptr<class ClipperWidgetFixture> ClipperWidgetFixturePtr;
 class ClipperWidgetFixture : public cx::ClipperWidget
 {
 public:
@@ -155,7 +155,7 @@ public:
 	TestDataStructures testData;
 };
 
-typedef boost::shared_ptr<class InteractiveClipperFixture> InteractiveClipperFixturePtr;
+typedef std::shared_ptr<class InteractiveClipperFixture> InteractiveClipperFixturePtr;
 class InteractiveClipperFixture : public cx::InteractiveClipper
 {
 public:

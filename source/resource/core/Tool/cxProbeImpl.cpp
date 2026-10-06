@@ -191,7 +191,7 @@ void ProbeImpl::setRTSource(VideoSourcePtr source)
 		VideoSourcePtr old = mSource.find(source->getUid())->second;
 
 		ProbeAdapterRTSourcePtr oldAdapter;
-		oldAdapter = boost::dynamic_pointer_cast<ProbeAdapterRTSource>(old);
+		oldAdapter = std::dynamic_pointer_cast<ProbeAdapterRTSource>(old);
 		// check for identity, ignore if no change
 		if (oldAdapter && (source==oldAdapter->getBaseSource()))
 			return;

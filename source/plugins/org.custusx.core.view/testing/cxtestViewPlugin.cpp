@@ -32,7 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace
 {
-typedef boost::shared_ptr<class ViewServiceFixture> ViewServiceFixturePtr;
+typedef std::shared_ptr<class ViewServiceFixture> ViewServiceFixturePtr;
 class ViewServiceFixture
 {
 public:
@@ -161,7 +161,7 @@ TEST_CASE("ViewWrapper: Changing active tool also changes controlling tool", "[i
 	cxtest::VisualizationHelper visHelper;
 	
 	cx::DummyToolPtr tool2(new cx::DummyTool("dummytool2"));
-	cx::DummyToolManager::DummyToolManagerPtr toolManager = boost::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
+	cx::DummyToolManager::DummyToolManagerPtr toolManager = std::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
 	REQUIRE(toolManager);
 	toolManager->addTool(tool2);
 	
@@ -174,7 +174,7 @@ TEST_CASE("ViewWrapper: Setting controlling tool overrides active tool for view"
 	cxtest::VisualizationHelper visHelper;
 		
 	cx::DummyToolPtr tool2(new cx::DummyTool("dummytool2"));
-	cx::DummyToolManager::DummyToolManagerPtr toolManager = boost::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
+	cx::DummyToolManager::DummyToolManagerPtr toolManager = std::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
 	REQUIRE(toolManager);
 	toolManager->addTool(tool2);
 	
@@ -197,7 +197,7 @@ TEST_CASE("ViewWrapper: Resetting controlling tool reverts back to using active 
 	cxtest::VisualizationHelper visHelper;
 		
 	cx::DummyToolPtr tool2(new cx::DummyTool("dummytool2"));
-	cx::DummyToolManager::DummyToolManagerPtr toolManager = boost::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
+	cx::DummyToolManager::DummyToolManagerPtr toolManager = std::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
 	REQUIRE(toolManager);
 	toolManager->addTool(tool2);
 	
@@ -224,7 +224,7 @@ TEST_CASE("ViewWrapper: ActiveTool", "[integration][plugins][org.custusx.core.vi
 
 	QString toolUid("dummytool2");
 	cx::DummyToolPtr tool2(new cx::DummyTool(toolUid));
-	cx::DummyToolManager::DummyToolManagerPtr toolManager = boost::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
+	cx::DummyToolManager::DummyToolManagerPtr toolManager = std::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
 	REQUIRE(toolManager);
 	toolManager->addTool(tool2);
 	CHECK_FALSE(visHelper.services->tracking()->getActiveTool()->getUid() == toolUid);

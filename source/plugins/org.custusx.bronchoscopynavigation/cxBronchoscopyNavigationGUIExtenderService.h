@@ -60,7 +60,7 @@ public:
 private:
 	VisServicesPtr mServices;
 };
-typedef boost::shared_ptr<BronchoscopyNavigationGUIExtenderService> BronchoscopyNavigationGUIExtenderServicePtr;
+typedef std::shared_ptr<BronchoscopyNavigationGUIExtenderService> BronchoscopyNavigationGUIExtenderServicePtr;
 
 } /* namespace cx */
 

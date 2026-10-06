@@ -24,7 +24,7 @@ class QLabel;
 
 namespace cx
 {
-//typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
+//typedef std::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
 
 /** GUI for ICP control - no logic.
  *

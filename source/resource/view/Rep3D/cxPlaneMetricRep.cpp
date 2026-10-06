@@ -52,7 +52,7 @@ void PlaneMetricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 
 PlaneMetricPtr PlaneMetricRep::getPlaneMetric()
 {
-	return boost::dynamic_pointer_cast<PlaneMetric>(mMetric);
+	return std::dynamic_pointer_cast<PlaneMetric>(mMetric);
 }
 
 void PlaneMetricRep::onModifiedStartRender()

@@ -52,7 +52,7 @@ UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *plugi
 	connect(mParams.get(), SIGNAL(changedInputSettings()), this, SLOT(setSettings()));
 	connect(patientModelService.get(), &PatientModelService::patientChanged, this, &UsReconstructionImplService::patientChangedSlot);
 
-	mServiceListener = boost::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> >(new ServiceTrackerListener<ReconstructionMethodService>(
+	mServiceListener = std::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> >(new ServiceTrackerListener<ReconstructionMethodService>(
 			pluginContext,
 			boost::bind(&UsReconstructionImplService::onServiceAdded, this, boost::placeholders::_1),
 			boost::bind(&UsReconstructionImplService::onServiceModified, this, boost::placeholders::_1),

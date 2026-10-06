@@ -18,7 +18,7 @@ namespace QtSignalAdapters
 */
 template <typename SIGNATURE>
 int checkConnection(QObject* qobject, const char* signal,
-	const boost::function<SIGNATURE>& func)
+	const std::function<SIGNATURE>& func)
 {
 	QByteArray norm = QMetaObject::normalizedSignature(signal+1);
 
@@ -53,13 +53,13 @@ int checkConnection(QObject* qobject, const char* signal,
 
 
 /**
-* Creates a Qt signal to boost::function adapter object that causes
-* signals with 0 parameters to invoke boost::function objects with the
+* Creates a Qt signal to std::function adapter object that causes
+* signals with 0 parameters to invoke std::function objects with the
 * signature void(void).
 */
 template <typename SIGNATURE>
 QtConn* connect0(QObject* qobject, const char* signal,
-	const boost::function<SIGNATURE>& func)
+	const std::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal,func);
 
@@ -70,13 +70,13 @@ QtConn* connect0(QObject* qobject, const char* signal,
 }
 
 /**
-* Creates a Qt signal to boost::function adapter object that causes
-* signals with 1 parameter to invoke boost::function objects with the
+* Creates a Qt signal to std::function adapter object that causes
+* signals with 1 parameter to invoke std::function objects with the
 * signature void(T), where T is the type of the argument.
 */
 template <typename SIGNATURE>
 QtConn* connect1(QObject* qobject, const char* signal,
-	const boost::function<SIGNATURE>& func)
+	const std::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal,func);
 
@@ -88,13 +88,13 @@ QtConn* connect1(QObject* qobject, const char* signal,
 
 
 /**
-* Creates a Qt signal to boost::function adapter object that causes
-* signals with 2 parameters to invoke boost::function objects with the
+* Creates a Qt signal to std::function adapter object that causes
+* signals with 2 parameters to invoke std::function objects with the
 * signature void(T1, T2), where T1 and T2 are the types of the arguments.
 */
 template <typename SIGNATURE>
 QtConn* connect2(QObject* qobject, const char* signal,
-	const boost::function<SIGNATURE>& func)
+	const std::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal, func);
 
@@ -106,14 +106,14 @@ QtConn* connect2(QObject* qobject, const char* signal,
 
 
 /**
-* Creates a Qt signal to boost::function adapter object that causes
-* signals with 3 parameters to invoke boost::function objects with the
+* Creates a Qt signal to std::function adapter object that causes
+* signals with 3 parameters to invoke std::function objects with the
 * signature void(T1, T2, T3), where T1, T2, and T3 are the types of the
 * arguments.
 */
 template <typename SIGNATURE>
 QtConn* connect3(QObject* qobject, const char* signal,
-	const boost::function<SIGNATURE>& func)
+	const std::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal, func);
 
@@ -125,14 +125,14 @@ QtConn* connect3(QObject* qobject, const char* signal,
 
 
 /**
-* Creates a Qt signal to boost::function adapter object that causes
-* signals with 4 parameters to invoke boost::function objects with the
+* Creates a Qt signal to std::function adapter object that causes
+* signals with 4 parameters to invoke std::function objects with the
 * signature void(T1, T2, T3, T4), where T1, T2, T3, and T4 are the types of the
 * arguments.
 */
 template <typename SIGNATURE>
 QtConn* connect4(QObject* qobject, const char* signal,
-	const boost::function<SIGNATURE>& func)
+	const std::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal, func);
 
@@ -143,14 +143,14 @@ QtConn* connect4(QObject* qobject, const char* signal,
 }
 
 /**
-* Creates a Qt signal to boost::function adapter object that causes
-* signals with 5 parameters to invoke boost::function objects with the
+* Creates a Qt signal to std::function adapter object that causes
+* signals with 5 parameters to invoke std::function objects with the
 * signature void(T1, T2, T3, T4, T5), where T1, T2, T3, T4, and T5
 * are the types of the arguments.
 */
 template <typename SIGNATURE>
 QtConn* connect5(QObject* qobject, const char* signal,
-	const boost::function<SIGNATURE>& func)
+	const std::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal, func);
 

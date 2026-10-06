@@ -37,7 +37,7 @@ public:
     void setThickness(double radius);
     void setColor(QColor color);
 };
-typedef boost::shared_ptr<GraphicalTorus3D> GraphicalTorus3DPtr;
+typedef std::shared_ptr<GraphicalTorus3D> GraphicalTorus3DPtr;
 
 
 } // namespace cx

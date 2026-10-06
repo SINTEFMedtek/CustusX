@@ -46,7 +46,7 @@ static LOG_SEVERITY level2severity(MESSAGE_LEVEL level)
 	}
 }
 
-typedef boost::shared_ptr<class MessageFilter> MessageFilterPtr;
+typedef std::shared_ptr<class MessageFilter> MessageFilterPtr;
 
 class MessageFilter
 {

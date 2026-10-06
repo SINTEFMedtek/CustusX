@@ -36,7 +36,7 @@ void AcquisitionServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<AcquisitionService>(
 								 mPluginContext,
 								 boost::bind(&AcquisitionServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (AcquisitionService*)>(),
+								 std::function<void (AcquisitionService*)>(),
 								 boost::bind(&AcquisitionServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

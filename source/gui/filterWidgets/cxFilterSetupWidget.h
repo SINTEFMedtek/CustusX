@@ -20,8 +20,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class WidgetObscuredListener> WidgetObscuredListenerPtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class WidgetObscuredListener> WidgetObscuredListenerPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 class TimedAlgorithmProgressBar;
 class FilterPresetWidget;
 
@@ -64,7 +64,7 @@ private:
 	QGroupBox* 	   mOptionsGroupBox;
 	QCheckBox*	   mAdvancedButton;
 	QGroupBox* 	   mFrame;
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+	std::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 
 }

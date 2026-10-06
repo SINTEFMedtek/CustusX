@@ -37,9 +37,9 @@ public:
 	void initializeVisualizerAndImages(QString type, int imageCount=1);
 
 	template<class REP>
-	boost::shared_ptr<REP> downcastRep(int i)
+	std::shared_ptr<REP> downcastRep(int i)
 	{
-		return boost::dynamic_pointer_cast<REP>(mBase.getAllReps()[i]);
+		return std::dynamic_pointer_cast<REP>(mBase.getAllReps()[i]);
 	}
 
 	cx::MultiVolume3DRepProducer mBase;

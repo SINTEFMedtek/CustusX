@@ -36,7 +36,7 @@ public:
 private:
 	ctkPluginContext* mContext;
 };
-typedef boost::shared_ptr<LiverGUIExtenderService> LiverGUIExtenderServicePtr;
+typedef std::shared_ptr<LiverGUIExtenderService> LiverGUIExtenderServicePtr;
 
 } /* namespace cx */
 

@@ -42,7 +42,7 @@ namespace cx
 * @{
 */
 
-typedef boost::shared_ptr<class CameraData> CameraDataPtr;
+typedef std::shared_ptr<class CameraData> CameraDataPtr;
 
 /** Class encapsulating the view transform of a camera. Use with vtkCamera
  */

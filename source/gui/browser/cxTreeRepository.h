@@ -12,8 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTREEREPOSITORY_H
 
 #include <vector>
-#include <boost/weak_ptr.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QString>
 #include <QObject>
 #include <QWidget>
@@ -28,11 +27,11 @@ namespace cx
 
 class TreeNode;
 class TreeRepository;
-typedef boost::shared_ptr<TreeNode> TreeNodePtr;
-typedef boost::shared_ptr<TreeRepository> TreeRepositoryPtr;
-typedef boost::shared_ptr<class StringListProperty> StringListPropertyPtr;
-typedef boost::weak_ptr<class TreeRepository> TreeRepositoryWeakPtr;
-typedef boost::shared_ptr<class WidgetTypeRepository> WidgetTypeRepositoryPtr;
+typedef std::shared_ptr<TreeNode> TreeNodePtr;
+typedef std::shared_ptr<TreeRepository> TreeRepositoryPtr;
+typedef std::shared_ptr<class StringListProperty> StringListPropertyPtr;
+typedef std::weak_ptr<class TreeRepository> TreeRepositoryWeakPtr;
+typedef std::shared_ptr<class WidgetTypeRepository> WidgetTypeRepositoryPtr;
 
 class WidgetTypeRepository
 {
@@ -42,24 +41,24 @@ public:
 	}
 
 	template<class WIDGET>
-	boost::shared_ptr<WIDGET> find()
+	std::shared_ptr<WIDGET> find()
 	{
 		for (unsigned i=0; i<mWidgets.size(); ++i)
 		{
-			boost::shared_ptr<WIDGET> w = boost::dynamic_pointer_cast<WIDGET>(mWidgets[i]);
+			std::shared_ptr<WIDGET> w = std::dynamic_pointer_cast<WIDGET>(mWidgets[i]);
 			if (w)
 				return w;
 		}
-		return boost::shared_ptr<WIDGET>();
+		return std::shared_ptr<WIDGET>();
 	}
 
-	boost::shared_ptr<QWidget> findMetricWidget(DataPtr data);
+	std::shared_ptr<QWidget> findMetricWidget(DataPtr data);
 
-	void add(boost::shared_ptr<QWidget> widget);
+	void add(std::shared_ptr<QWidget> widget);
 
 private:
 	typedef QPointer<QWidget> QWidgetPtr;
-	std::vector<boost::shared_ptr<QWidget> > mWidgets;
+	std::vector<std::shared_ptr<QWidget> > mWidgets;
 };
 
 class TreeRepository : public QObject

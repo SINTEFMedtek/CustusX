@@ -37,7 +37,7 @@ bool StlMeshReader::canRead(const QString &type, const QString &filename)
 
 bool StlMeshReader::readInto(DataPtr data, QString filename)
 {
-	return this->readInto(boost::dynamic_pointer_cast<Mesh>(data), filename);
+	return this->readInto(std::dynamic_pointer_cast<Mesh>(data), filename);
 }
 
 bool StlMeshReader::readInto(MeshPtr mesh, QString filename)
@@ -78,7 +78,7 @@ DataPtr StlMeshReader::read(const QString& uid, const QString& filename)
 std::vector<DataPtr> StlMeshReader::read(const QString &filename)
 {
 	std::vector<DataPtr> retval;
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(this->createData(Mesh::getTypeName(), filename));
+	MeshPtr mesh = std::dynamic_pointer_cast<Mesh>(this->createData(Mesh::getTypeName(), filename));
 
 	vtkPolyDataPtr raw = this->loadVtkPolyData(filename);
 	if(!raw)
@@ -91,7 +91,7 @@ std::vector<DataPtr> StlMeshReader::read(const QString &filename)
 
 void StlMeshReader::write(DataPtr data, const QString &filename)
 {
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
+	MeshPtr mesh = std::dynamic_pointer_cast<Mesh>(data);
 	if(!mesh)
 		reportError("Could not cast data to mesh");
 	vtkSTLWriterPtr writer = vtkSTLWriterPtr::New();

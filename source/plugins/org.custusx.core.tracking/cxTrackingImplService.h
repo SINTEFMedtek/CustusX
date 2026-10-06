@@ -28,14 +28,14 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrackingImplService> TrackingImplServicePtr;
+typedef std::shared_ptr<class TrackingImplService> TrackingImplServicePtr;
 
-typedef boost::shared_ptr<class ManualToolAdapter> ManualToolAdapterPtr;
-typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef std::shared_ptr<class ManualToolAdapter> ManualToolAdapterPtr;
+typedef std::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
-typedef boost::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
-typedef boost::shared_ptr<class TrackingSystemPlaybackService> TrackingSystemPlaybackServicePtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
+typedef std::shared_ptr<class TrackingSystemPlaybackService> TrackingSystemPlaybackServicePtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /**
  * \brief Interface towards the navigation system.
@@ -160,7 +160,7 @@ private:
 
 	double mToolTipOffset; ///< Common tool tip offset for all tools
 
-	boost::shared_ptr<ServiceTrackerListener<TrackingSystemService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<TrackingSystemService> > mServiceListener;
 	QString mTrackingSystemImplementation;
 };
 

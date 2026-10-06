@@ -22,15 +22,15 @@ typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class CaptionText3D> CaptionText3DPtr;
-typedef boost::shared_ptr<class GraphicalArc3D> GraphicalArc3DPtr;
+typedef std::shared_ptr<class CaptionText3D> CaptionText3DPtr;
+typedef std::shared_ptr<class GraphicalArc3D> GraphicalArc3DPtr;
 }
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class SphereMetricRep> SphereMetricRepPtr;
-typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
+typedef std::shared_ptr<class SphereMetricRep> SphereMetricRepPtr;
+typedef std::shared_ptr<class SphereMetric> SphereMetricPtr;
 
 /**Rep for visualizing a SphereMetric.
  *

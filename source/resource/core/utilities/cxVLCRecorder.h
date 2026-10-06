@@ -26,7 +26,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class VLCRecorder> VLCRecorderPtr;
+typedef std::shared_ptr<class VLCRecorder> VLCRecorderPtr;
 
 /**
  * \brief Lets you use the third party application VLC

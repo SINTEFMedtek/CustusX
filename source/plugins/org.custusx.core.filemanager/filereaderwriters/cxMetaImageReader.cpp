@@ -67,7 +67,7 @@ QString MetaImageReader::canReadDataType() const
 
 bool MetaImageReader::readInto(DataPtr data, QString filename)
 {
-	return this->readInto(boost::dynamic_pointer_cast<Image>(data), filename);
+	return this->readInto(std::dynamic_pointer_cast<Image>(data), filename);
 }
 bool MetaImageReader::readInto(ImagePtr image, QString filename)
 {
@@ -115,7 +115,7 @@ std::vector<DataPtr> MetaImageReader::read(const QString &filename)
 {
 	std::vector<DataPtr> retval;
 
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(this->createData(Image::getTypeName(), filename));
+	ImagePtr image = std::dynamic_pointer_cast<Image>(this->createData(Image::getTypeName(), filename));
 
 	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
 	Transform3D rMd = customReader->readTransform();
@@ -151,7 +151,7 @@ std::vector<DataPtr> MetaImageReader::read(const QString &filename)
 
 void MetaImageReader::write(DataPtr data, const QString& filename)
 {
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 	if(!image)
 	{
 		CX_LOG_ERROR() << "MetaImageReader::write: Could not cast data to image";

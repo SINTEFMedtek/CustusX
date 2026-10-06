@@ -31,7 +31,7 @@ class ViewLinkingViewWidget : public ViewRepCollection
 public:
 	static ViewRepCollectionPtr create(ViewWidget* base, vtkRenderWindowPtr renderWindow)
 	{
-		boost::shared_ptr<ViewLinkingViewWidget> retval(new ViewLinkingViewWidget(base, renderWindow));
+		std::shared_ptr<ViewLinkingViewWidget> retval(new ViewLinkingViewWidget(base, renderWindow));
 		retval->mSelf = retval;
 		return retval;
 	}

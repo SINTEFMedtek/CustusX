@@ -30,7 +30,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cxtest
 {
 
-typedef boost::shared_ptr<class cx::ManualImage2ImageRegistrationWidget> registrationWidgetPtr;
+typedef std::shared_ptr<class cx::ManualImage2ImageRegistrationWidget> registrationWidgetPtr;
 void init()
 {
     cx::LogicManager::initialize();

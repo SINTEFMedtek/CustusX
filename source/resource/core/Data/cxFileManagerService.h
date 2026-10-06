@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QObject>
 #include "cxResourceExport.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxData.h"
 
 #define FileManagerService_iid "cx::FileManagerService"
@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class FileManagerService> FileManagerServicePtr;
+typedef std::shared_ptr<class FileManagerService> FileManagerServicePtr;
 
 
 class cxResource_EXPORT FileManagerService : public QObject

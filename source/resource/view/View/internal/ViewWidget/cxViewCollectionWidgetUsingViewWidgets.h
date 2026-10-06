@@ -26,7 +26,7 @@ class ctkDoubleSlider;
 namespace cx
 {
 
-typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+typedef std::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 
 struct cxResourceVisualization_EXPORT ViewAndSlider
 {

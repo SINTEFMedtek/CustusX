@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtest_org_custusx_core_patientmodel_export.h"
 
 #include <QString>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxImage.h"
 #include "cxMesh.h"
@@ -25,13 +25,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
 }
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class SessionStorageTestFixture> SessionStorageTestFixturePtr;
+typedef std::shared_ptr<class SessionStorageTestFixture> SessionStorageTestFixturePtr;
 
 class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT SessionStorageTestFixture
 {

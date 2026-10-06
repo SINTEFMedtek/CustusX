@@ -58,7 +58,7 @@ private:
 	std::vector<double> mIslandSizes;
 };
 
-typedef boost::shared_ptr<IslandsFilter> IslandsFilterPtr;
+typedef std::shared_ptr<IslandsFilter> IslandsFilterPtr;
 
 } // namespace cx
 

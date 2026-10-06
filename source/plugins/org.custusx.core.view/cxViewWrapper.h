@@ -33,7 +33,7 @@ class QActionGroup;
 namespace cx
 {
 
-typedef boost::shared_ptr<class CameraData> CameraDataPtr;
+typedef std::shared_ptr<class CameraData> CameraDataPtr;
 
 /**
  * \file
@@ -42,7 +42,7 @@ typedef boost::shared_ptr<class CameraData> CameraDataPtr;
  */
 
 
-typedef boost::shared_ptr<class DataViewPropertiesInteractor> DataViewPropertiesInteractorPtr;
+typedef std::shared_ptr<class DataViewPropertiesInteractor> DataViewPropertiesInteractorPtr;
 /** Provide an action list for showing data in views.
   *
   */
@@ -73,9 +73,9 @@ template <class DATA>
 void DataViewPropertiesInteractor::addDataActionsOfType(QWidget* parent)
 {
 	//add actions to the actiongroups and the contextmenu
-	std::vector< boost::shared_ptr<DATA> > sorted = sortOnGroupsAndAcquisitionTime(mServices->patient()->getDataOfType<DATA>());
+	std::vector< std::shared_ptr<DATA> > sorted = sortOnGroupsAndAcquisitionTime(mServices->patient()->getDataOfType<DATA>());
 	mLastDataActionUid = "________________________";
-	for (typename std::vector< boost::shared_ptr<DATA> >::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
+	for (typename std::vector< std::shared_ptr<DATA> >::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{
 		this->addDataAction((*iter)->getUid(), parent);
 	}

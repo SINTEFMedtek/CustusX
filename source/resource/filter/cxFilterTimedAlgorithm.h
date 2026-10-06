@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class Filter> FilterPtr;
+typedef std::shared_ptr<class Filter> FilterPtr;
 
 /** Wrap a Filter into a TimedAlgorithm
  *
@@ -50,7 +50,7 @@ private:
 	//  QDomElement mOptions;
 	FilterPtr mFilter;
 };
-typedef boost::shared_ptr<class FilterTimedAlgorithm> FilterTimedAlgorithmPtr;
+typedef std::shared_ptr<class FilterTimedAlgorithm> FilterTimedAlgorithmPtr;
 
 
 

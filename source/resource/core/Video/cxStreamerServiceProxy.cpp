@@ -53,7 +53,7 @@ void StreamerServiceProxy::initServiceListener()
     mServiceListener.reset(new ServiceTrackerListener<StreamerService>(
                                  mPluginContext,
                                  boost::bind(&StreamerServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-                                 boost::function<void (StreamerService*)>(),
+                                 std::function<void (StreamerService*)>(),
                                  boost::bind(&StreamerServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
                                  ));
     mServiceListener->open();

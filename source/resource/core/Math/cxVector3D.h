@@ -40,7 +40,7 @@ cxResource_EXPORT bool similar(double a, double b, double tol = 1.0E-6); ///< ch
  *
  */
 typedef Eigen::Vector3d Vector3D;
-typedef boost::shared_ptr<Vector3D> Vector3DPtr;
+typedef std::shared_ptr<Vector3D> Vector3DPtr;
 
 cxResource_EXPORT Vector3D multiply_elems(const Vector3D& a, const Vector3D& b); ///< perform element-wise multiplication of a and b.
 cxResource_EXPORT Vector3D divide_elems(const Vector3D& a, const Vector3D& b); ///< perform element-wise division of a and b.

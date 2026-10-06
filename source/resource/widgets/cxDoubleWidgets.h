@@ -208,7 +208,7 @@ Q_OBJECT
 public:
 	SpinBoxAndSliderGroupWidget(QWidget* parent, DoublePropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 };
-typedef boost::shared_ptr<SpinBoxAndSliderGroupWidget> SpinBoxAndSliderGroupWidgetPtr;
+typedef std::shared_ptr<SpinBoxAndSliderGroupWidget> SpinBoxAndSliderGroupWidgetPtr;
 
 /**\brief Composite widget for scalar data manipulation.
  *
@@ -225,7 +225,7 @@ Q_OBJECT
 public:
 SpinBoxAndDialGroupWidget(QWidget* parent, DoublePropertyBasePtr, QGridLayout* gridLayout = 0, int row = 0);
 };
-typedef boost::shared_ptr<SpinBoxAndDialGroupWidget> SpinBoxAndDialGroupWidgetPtr;
+typedef std::shared_ptr<SpinBoxAndDialGroupWidget> SpinBoxAndDialGroupWidgetPtr;
 
 
 /**\brief Composite widget for scalar data manipulation.

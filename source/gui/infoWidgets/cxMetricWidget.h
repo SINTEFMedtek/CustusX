@@ -55,7 +55,7 @@ public:
 
 namespace cx
 {
-typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
+typedef std::shared_ptr<class MetricManager> MetricManagerPtr;
 
 
 /**

@@ -296,8 +296,8 @@ bool CPDFilter::ensureVenv()
 
 bool CPDFilter::execute()
 {
-	MeshPtr fixedMesh = boost::dynamic_pointer_cast<Mesh>(mCopiedInput[0]);
-	MeshPtr movingMesh = boost::dynamic_pointer_cast<Mesh>(mCopiedInput[1]);
+	MeshPtr fixedMesh = std::dynamic_pointer_cast<Mesh>(mCopiedInput[0]);
+	MeshPtr movingMesh = std::dynamic_pointer_cast<Mesh>(mCopiedInput[1]);
 
 	if (!fixedMesh || !movingMesh)
 	{
@@ -400,8 +400,8 @@ bool CPDFilter::execute()
 
 bool CPDFilter::postProcess()
 {
-	MeshPtr movingMesh = boost::dynamic_pointer_cast<Mesh>(mInputTypes[1]->getData());
-	MeshPtr fixedMesh = boost::dynamic_pointer_cast<Mesh>(mInputTypes[0]->getData());
+	MeshPtr movingMesh = std::dynamic_pointer_cast<Mesh>(mInputTypes[1]->getData());
+	MeshPtr fixedMesh = std::dynamic_pointer_cast<Mesh>(mInputTypes[0]->getData());
 	if (!movingMesh || !fixedMesh)
 		return false;
 

@@ -74,7 +74,7 @@ private:
 protected:
 	ImagePtr mPreviewImage;
 };
-typedef boost::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
+typedef std::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
 
 
 /**

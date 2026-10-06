@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace
 {
-typedef boost::shared_ptr<class BinaryThresholdImageFilterFixture> BinaryThresholdImageFilterFixturePtr;
+typedef std::shared_ptr<class BinaryThresholdImageFilterFixture> BinaryThresholdImageFilterFixturePtr;
 class BinaryThresholdImageFilterFixture : public cx::BinaryThresholdImageFilter
 {
 public:

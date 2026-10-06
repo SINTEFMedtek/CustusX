@@ -256,7 +256,7 @@ void LogicManager::shutdownLegacyStoredServices()
 }
 
 template<class T>
-void LogicManager::shutdownService(boost::shared_ptr<T>& service, QString name)
+void LogicManager::shutdownService(std::shared_ptr<T>& service, QString name)
 {
 	requireUnique(service, name);
 	service.reset();

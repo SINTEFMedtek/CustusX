@@ -24,7 +24,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
+typedef std::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
 class ToolManager;
 
 /**

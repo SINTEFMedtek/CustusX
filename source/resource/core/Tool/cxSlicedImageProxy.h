@@ -23,12 +23,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 // forward declarations
-typedef boost::shared_ptr<class Image> ImagePtr;
-typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
-typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
+typedef std::shared_ptr<class Image> ImagePtr;
+typedef std::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef std::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
 
-typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
-typedef boost::shared_ptr<class ApplyLUTToImage2DProxy> ApplyLUTToImage2DProxyPtr;
+typedef std::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
+typedef std::shared_ptr<class ApplyLUTToImage2DProxy> ApplyLUTToImage2DProxyPtr;
 
 /** \brief Helper class for applying sscLUT2D to an image.
  *

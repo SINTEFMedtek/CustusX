@@ -35,7 +35,7 @@ class QStringList;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ImageRenderPropertiesWidget> ImageRenderPropertiesWidgetPtr;
+typedef std::shared_ptr<class ImageRenderPropertiesWidget> ImageRenderPropertiesWidgetPtr;
 
 class cxGui_EXPORT ImageRenderPropertiesWidget : public BaseWidget
 {

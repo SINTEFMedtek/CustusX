@@ -29,8 +29,8 @@ class QTableWidgetItem;
 namespace cx
 {
 typedef std::map<QString, class Landmark> LandmarkMap;
-typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
-typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
+typedef std::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+typedef std::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
 
 /**
  * \file

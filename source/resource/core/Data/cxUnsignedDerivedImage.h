@@ -74,7 +74,7 @@ private:
     vtkImageDataPtr convertImage();
     void convertTransferFunctions();
 
-    boost::weak_ptr<Image> mBase;
+    std::weak_ptr<Image> mBase;
 };
 
 }

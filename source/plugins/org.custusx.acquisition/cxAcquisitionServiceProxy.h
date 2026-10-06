@@ -55,7 +55,7 @@ public:
 private:
 	ctkPluginContext *mPluginContext;
 	AcquisitionServicePtr mAcquisitionService;
-	boost::shared_ptr<ServiceTrackerListener<AcquisitionService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<AcquisitionService> > mServiceListener;
 
 	void initServiceListener();
 	void onServiceAdded(AcquisitionService *service);

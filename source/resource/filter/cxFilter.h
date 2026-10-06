@@ -25,9 +25,9 @@ class QDomElement;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+typedef std::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
-typedef boost::shared_ptr<class Filter> FilterPtr;
+typedef std::shared_ptr<class Filter> FilterPtr;
 
 
 /** Base class for CustusX filters/algorithms

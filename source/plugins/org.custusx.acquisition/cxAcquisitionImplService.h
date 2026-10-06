@@ -18,13 +18,13 @@ class QDomElement;
 
 namespace cx
 {
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-typedef boost::shared_ptr<class USAcquisition> USAcquisitionPtr;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef std::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+typedef std::shared_ptr<class USAcquisition> USAcquisitionPtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /** \brief Implementation for Acqusition service
  *
@@ -71,7 +71,7 @@ private:
 	void parseXml(QDomNode& dataNode);
 };
 
-typedef boost::shared_ptr<AcquisitionImplService> AcquisitionImplServicePtr;
+typedef std::shared_ptr<AcquisitionImplService> AcquisitionImplServicePtr;
 
 } //cx
 

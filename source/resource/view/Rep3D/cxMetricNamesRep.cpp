@@ -94,7 +94,7 @@ std::vector<DataMetricPtr> MetricNamesRep::convertToMetrics(std::vector<DataPtr>
 	std::vector<DataMetricPtr> metrics;
 	for (unsigned i=0; i<data.size(); ++i)
 	{
-		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data[i]);
+		DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(data[i]);
 		if (metric)
 			metrics.push_back(metric);
 	}

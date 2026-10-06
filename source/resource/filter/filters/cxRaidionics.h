@@ -54,6 +54,6 @@ protected:
 	QStringList mTargets;
 };
 
-typedef boost::shared_ptr<class Raidionics> RaidionicsPtr;
+typedef std::shared_ptr<class Raidionics> RaidionicsPtr;
 }//cx
 #endif // CXRAIDIONICS_H

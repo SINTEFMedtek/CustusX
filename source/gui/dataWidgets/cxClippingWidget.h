@@ -20,7 +20,7 @@ class QCheckBox;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
+typedef std::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 
 /**
  * \file

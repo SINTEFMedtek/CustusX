@@ -53,7 +53,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	VideoServicePtr mVideoService;
-	boost::shared_ptr<ServiceTrackerListener<VideoService> > mVideoServiceListener;
+	std::shared_ptr<ServiceTrackerListener<VideoService> > mVideoServiceListener;
 };
 } //cx
 #endif // CXVIDEOSERVICEPROXY_H

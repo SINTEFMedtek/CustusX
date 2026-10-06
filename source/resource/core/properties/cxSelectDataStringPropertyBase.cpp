@@ -82,7 +82,7 @@ std::map<QString, DataPtr> SelectDataStringPropertyBase::filterImagesOn2D(std::m
 	for (iter=input.begin(); iter!=input.end(); )
 	{
 		current = iter++; // increment iterator before erasing!
-		ImagePtr image = boost::dynamic_pointer_cast<Image>(current->second);
+		ImagePtr image = std::dynamic_pointer_cast<Image>(current->second);
 		if(image && !image->is2D())
 			input.erase(current);
 	}

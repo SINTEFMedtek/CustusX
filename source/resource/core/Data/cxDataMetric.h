@@ -22,8 +22,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class SpaceListener> SpaceListenerPtr;
 
 /**
  * \file
@@ -70,7 +70,7 @@ protected:
 	QColor mColor;
 
 };
-typedef boost::shared_ptr<DataMetric> DataMetricPtr;
+typedef std::shared_ptr<DataMetric> DataMetricPtr;
 
 /**
  * @}

@@ -25,7 +25,7 @@ class QGridLayout;
 namespace cx
 {
 
-typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+typedef std::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 class ViewCollectionWidgetUsingViewContainer;
 class LayoutWidgetUsingViewWidgets;
 

@@ -252,7 +252,7 @@ void ImageLandmarksWidget::importPointMetricsToLandmarkButtonClickedSlot()
 
 	for(; it != point_metrics.end(); ++it)
 	{
-		PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(it->second);
+		PointMetricPtr point_metric = std::static_pointer_cast<PointMetric>(it->second);
 		if(!point_metric)
 			continue;
 

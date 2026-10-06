@@ -38,7 +38,7 @@ public:
 signals:
 	void changed();
 };
-typedef boost::shared_ptr<SpaceListener> SpaceListenerPtr;
+typedef std::shared_ptr<SpaceListener> SpaceListenerPtr;
 
 } // namespace cx
 

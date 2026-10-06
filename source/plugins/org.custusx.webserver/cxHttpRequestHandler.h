@@ -21,7 +21,7 @@ class QHttpResponse;
 
 namespace cx
 {
-typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
+typedef std::shared_ptr<class RemoteAPI> RemoteAPIPtr;
 
 /**
  *

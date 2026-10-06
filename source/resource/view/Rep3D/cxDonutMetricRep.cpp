@@ -51,7 +51,7 @@ void DonutMetricRep::clear()
 
 DonutMetricPtr DonutMetricRep::getDonutMetric()
 {
-	return boost::dynamic_pointer_cast<DonutMetric>(mMetric);
+	return std::dynamic_pointer_cast<DonutMetric>(mMetric);
 }
 
 void DonutMetricRep::onModifiedStartRender()

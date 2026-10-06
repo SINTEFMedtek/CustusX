@@ -91,10 +91,10 @@ private:
 	DataMap mData;
 	bool mConnectedTo3D;
 };
-typedef boost::shared_ptr<class SlicePlanesProxy> SlicePlanesProxyPtr;
+typedef std::shared_ptr<class SlicePlanesProxy> SlicePlanesProxyPtr;
 
 
-typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
+typedef std::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
 
 /**\brief Display a set of planes in 3D.
  *
@@ -144,7 +144,7 @@ private:
 	void rescale();
 };
 
-typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerIn2DRepPtr;
+typedef std::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerIn2DRepPtr;
 
 /**\brief Display annotations for the SlicePlanesProxy planes in 2D.
  *

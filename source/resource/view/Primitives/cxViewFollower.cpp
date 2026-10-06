@@ -71,7 +71,7 @@ void ViewFollower::setAutoZoomROI(QString uid)
 //		disconnect(mRoi.get(), &Data::transformChanged, this, &ViewFollower::updateView);
 
 //	DataPtr data = mDataManager->getData(uid);
-//	mRoi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
+//	mRoi = std::dynamic_pointer_cast<RegionOfInterestMetric>(data);
 
 //	if (mRoi)
 //		connect(mRoi.get(), &Data::transformChanged, this, &ViewFollower::updateView);
@@ -112,7 +112,7 @@ SliceAutoViewportCalculator::ReturnType ViewFollower::calculate()
 DoubleBoundingBox3D ViewFollower::getROI_BB_s()
 {
 	DataPtr data = mDataManager->getData(mRoi);
-	RegionOfInterestMetricPtr roi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
+	RegionOfInterestMetricPtr roi = std::dynamic_pointer_cast<RegionOfInterestMetric>(data);
 
 	if (!roi)
 	{

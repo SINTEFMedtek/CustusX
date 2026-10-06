@@ -27,7 +27,7 @@ typedef vtkSmartPointer<vtkTextActor> vtkTextActorPtr;
 namespace cx
 {
 
-typedef boost::shared_ptr<class DistanceMetricRep> DistanceMetricRepPtr;
+typedef std::shared_ptr<class DistanceMetricRep> DistanceMetricRepPtr;
 
 /** \brief Rep for visualizing a DistanceMetric.
  *

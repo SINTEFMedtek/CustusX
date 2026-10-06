@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxGUIExtenderServiceExport.h"
 
 #include <QObject>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 class QWidget;
 class QToolBar;
 #include <vector>
@@ -24,12 +24,12 @@ class QToolBar;
 
 namespace cx
 {
-typedef boost::shared_ptr<class GUIExtenderService> GUIExtenderServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class ViewService> ViewServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class GUIExtenderService> GUIExtenderServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef std::shared_ptr<class ViewService> ViewServicePtr;
+typedef std::shared_ptr<class VideoService> VideoServicePtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /** Interface for service that extends the user interface with more widgets.
  *

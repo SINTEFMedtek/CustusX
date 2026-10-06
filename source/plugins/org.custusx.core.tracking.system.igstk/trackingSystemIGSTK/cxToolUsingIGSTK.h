@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <limits.h>
 #include <QTimer>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxTransform3D.h"
 #include "cxDefinitions.h"
 #include "vtkForwardDeclarations.h"
@@ -33,10 +33,10 @@ class EventObject;
 namespace cx
 {
 typedef std::vector<double> DoubleVector;
-typedef boost::shared_ptr<DoubleVector> DoubleVectorPtr;
+typedef std::shared_ptr<DoubleVector> DoubleVectorPtr;
 typedef std::vector<Transform3DPtr> Transform3DVector;
-typedef boost::shared_ptr<Transform3DVector> Transform3DVectorPtr;
-typedef boost::shared_ptr<class IgstkTool> IgstkToolPtr;
+typedef std::shared_ptr<Transform3DVector> Transform3DVectorPtr;
+typedef std::shared_ptr<class IgstkTool> IgstkToolPtr;
 
 /**
  * \file
@@ -44,7 +44,7 @@ typedef boost::shared_ptr<class IgstkTool> IgstkToolPtr;
  * @{
  */
 
-typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
+typedef std::shared_ptr<class ProbeImpl> ProbeImplPtr;
 
 /**
  * \brief Class representing the tools a navigation system can recognize.
@@ -122,7 +122,7 @@ private:
 	QTimer mTpsTimer;
 	double mTimestamp;
 };
-typedef boost::shared_ptr<ToolUsingIGSTK> ToolUsingIGSTKPtr;
+typedef std::shared_ptr<ToolUsingIGSTK> ToolUsingIGSTKPtr;
 
 /**
  * @}

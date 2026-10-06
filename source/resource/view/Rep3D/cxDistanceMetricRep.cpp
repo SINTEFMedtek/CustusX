@@ -42,7 +42,7 @@ void DistanceMetricRep::clear()
 
 DistanceMetricPtr DistanceMetricRep::getDistanceMetric()
 {
-    return boost::dynamic_pointer_cast<DistanceMetric>(mMetric);
+    return std::dynamic_pointer_cast<DistanceMetric>(mMetric);
 }
 
 void DistanceMetricRep::onModifiedStartRender()

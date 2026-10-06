@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cxtest
 {
 
-typedef boost::shared_ptr<class SyntheticReconstructInput> SyntheticReconstructInputPtr;
+typedef std::shared_ptr<class SyntheticReconstructInput> SyntheticReconstructInputPtr;
 
 /** Generate synthetic US reconstruct input data based on a SyntheticVolume.
  *

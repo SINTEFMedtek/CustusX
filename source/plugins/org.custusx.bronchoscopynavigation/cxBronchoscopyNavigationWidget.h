@@ -51,8 +51,8 @@ class QVBoxLayout;
 namespace cx
 {
 
-typedef boost::shared_ptr<class TrackingSystemBronchoscopyService> TrackingSystemBronchoscopyServicePtr;
-typedef boost::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
+typedef std::shared_ptr<class TrackingSystemBronchoscopyService> TrackingSystemBronchoscopyServicePtr;
+typedef std::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
 
 /**
  * Widget for use in the BronchoscopyNavigation

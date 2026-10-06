@@ -27,7 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
+typedef std::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
 
 struct ThreadResult
 {

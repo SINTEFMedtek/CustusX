@@ -30,7 +30,7 @@ namespace cx
  */
 
 
-typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
+typedef std::shared_ptr<class RouteToTarget> RouteToTargetPtr;
 
 class org_custusx_filter_routetotarget_EXPORT RouteToTargetFilter : public FilterImpl
 {
@@ -93,7 +93,7 @@ private:
 	QString mLobeName;
     BoolPropertyPtr getBloodVesselOption(QDomElement root);
 };
-typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
+typedef std::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
 
 
 } // namespace cx

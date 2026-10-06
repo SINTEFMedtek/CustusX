@@ -104,7 +104,7 @@ void LandmarkImage2ImageRegistrationWidget::prePaintEvent()
 
 LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
 {
-	ImagePtr moving = boost::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
+	ImagePtr moving = std::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
 
 	if (moving)
 		return moving->getLandmarks()->getLandmarks();
@@ -130,7 +130,7 @@ Transform3D LandmarkImage2ImageRegistrationWidget::getTargetTransform() const
 
 void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
+	ImagePtr image = std::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
 	if (!image)
 		return;
 	image->getLandmarks()->setLandmark(Landmark(uid, p_target));

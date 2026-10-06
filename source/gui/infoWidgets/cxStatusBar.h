@@ -29,8 +29,8 @@ class QToolButton;
 namespace cx
 {
 
-typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
-typedef boost::shared_ptr<class MessageFilterStatusBar> MessageFilterStatusBarPtr;
+typedef std::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
+typedef std::shared_ptr<class MessageFilterStatusBar> MessageFilterStatusBarPtr;
 
 /** Filter log messages for display in the StatusBar
  */
@@ -104,8 +104,8 @@ private:
 
   struct ToolData
   {
-	  boost::shared_ptr<QAction> mAction;
-	  boost::shared_ptr<QToolButton> mButton;
+	  std::shared_ptr<QAction> mAction;
+	  std::shared_ptr<QToolButton> mButton;
 	  ToolPtr mTool;
   };
   std::vector<ToolData> mToolData;

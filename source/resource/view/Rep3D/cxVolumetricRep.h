@@ -23,8 +23,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-	typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
-	typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
+	typedef std::shared_ptr<class VolumeProperty> VolumePropertyPtr;
+	typedef std::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 }
 
 namespace cx

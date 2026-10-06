@@ -27,10 +27,10 @@ class vtkInteractorStyle;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
 
-typedef boost::shared_ptr<class CameraStyleForView> CameraStyleForViewPtr;
+typedef std::shared_ptr<class CameraStyleForView> CameraStyleForViewPtr;
 using cx::Transform3D;
 
 /**

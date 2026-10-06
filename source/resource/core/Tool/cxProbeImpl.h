@@ -34,7 +34,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
+typedef std::shared_ptr<class ProbeImpl> ProbeImplPtr;
 
 /**
  * \ingroup cx_resource_core_tool

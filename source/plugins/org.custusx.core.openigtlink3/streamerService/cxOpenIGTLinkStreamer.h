@@ -60,7 +60,7 @@ private:
     SenderPtr mSender;
 
 };
-typedef boost::shared_ptr<OpenIGTLinkStreamer> OpenIGTLinkStreamerPtr;
+typedef std::shared_ptr<OpenIGTLinkStreamer> OpenIGTLinkStreamerPtr;
 
 } // namespace cx
 

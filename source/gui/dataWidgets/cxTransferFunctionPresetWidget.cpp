@@ -85,7 +85,7 @@ void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetNa
 {
 	ImagePtr activeImage = mActiveData->getActive<Image>();
 	if (activeImage) {
-		TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
+		TransferFunctions3DPresetsPtr preset = std::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
 		preset->load(presetName, activeImage, this->use2D(), this->use3D());
 	}
 }
@@ -101,7 +101,7 @@ void TransferFunctionPresetWidget::saveSlot()
 {
 	// generate a name suggestion: identical if custom, appended by index if default.
 	QString newName = PresetWidget::getCurrentPreset();
-	TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
+	TransferFunctions3DPresetsPtr preset = std::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
 	if (!preset->getPresetList(imUNKNOWN).contains(newName))
 		newName = "custom preset";
 	if (preset->isDefaultPreset(newName))
@@ -138,7 +138,7 @@ void TransferFunctionPresetWidget::deleteSlot()
 		return;
 	}
 
-	TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
+	TransferFunctions3DPresetsPtr preset = std::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
 	if (QMessageBox::question(this, "Delete current preset", "Do you really want to delete the current preset?", QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
 		return;
 	preset->deletePresetData(PresetWidget::getCurrentPreset(), this->use2D(), this->use3D());

@@ -20,7 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
 
-typedef boost::shared_ptr<class cx::AirwaysFromCenterline> AirwaysFromCenterlinePtr;
+typedef std::shared_ptr<class cx::AirwaysFromCenterline> AirwaysFromCenterlinePtr;
 
 namespace cxtest {
 
@@ -42,7 +42,7 @@ TEST_CASE("AirwaysFromCenterline: execute", "[integration][org.custusx.filter.ai
 
     REQUIRE(dataCenterline);
 
-    cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(dataCenterline);
+    cx::MeshPtr mesh = std::dynamic_pointer_cast<cx::Mesh>(dataCenterline);
 
 		airwaysFromCenterline->processCenterline(mesh);
 

@@ -25,7 +25,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
+typedef std::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 /**
  * \brief Helper class for connection the active image.
  * \ingroup cx_resource_core_data

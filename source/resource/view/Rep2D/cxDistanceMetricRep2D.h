@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class DistanceMetricRep2D> DistanceMetricRep2DPtr;
+typedef std::shared_ptr<class DistanceMetricRep2D> DistanceMetricRep2DPtr;
 
 /**Rep for visualizing a PointMetric in 2D views.
  *

@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vector>
 
 #include "boost/bind/bind.hpp"
-#include "boost/function.hpp"
+#include <functional>
 
 #include <QAction>
 #include <QMenu>
@@ -641,7 +641,7 @@ void ViewWrapper3D::addVolumeDataRep(DataPtr data)
 {
 	if (!data)
 		return;
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
 		mMultiVolume3DRepProducer->addImage(image);
@@ -675,15 +675,15 @@ void ViewWrapper3D::removeVolumeDataRep(QString uid)
  */
 RepPtr ViewWrapper3D::createDataRep3D(DataPtr data)
 {
-	if (boost::dynamic_pointer_cast<Mesh>(data))
+	if (std::dynamic_pointer_cast<Mesh>(data))
 	{
 		GeometricRepPtr rep = GeometricRep::New();
-		rep->setMesh(boost::dynamic_pointer_cast<Mesh>(data));
+		rep->setMesh(std::dynamic_pointer_cast<Mesh>(data));
 		return rep;
 	}
-	else if (boost::dynamic_pointer_cast<TrackedStream>(data))
+	else if (std::dynamic_pointer_cast<TrackedStream>(data))
 	{
-		TrackedStreamPtr trackedStream = boost::dynamic_pointer_cast<TrackedStream>(data);
+		TrackedStreamPtr trackedStream = std::dynamic_pointer_cast<TrackedStream>(data);
 		return this->createTrackedStreamRep(trackedStream);
 	}
 	else
@@ -728,31 +728,31 @@ DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)
 {
 	DataMetricRepPtr rep;
 
-	if (boost::dynamic_pointer_cast<PointMetric>(data))
+	if (std::dynamic_pointer_cast<PointMetric>(data))
 		rep = PointMetricRep::New();
-	else if (boost::dynamic_pointer_cast<FrameMetric>(data))
+	else if (std::dynamic_pointer_cast<FrameMetric>(data))
 		rep = FrameMetricRep::New();
-	else if (boost::dynamic_pointer_cast<ToolMetric>(data))
+	else if (std::dynamic_pointer_cast<ToolMetric>(data))
 		rep = ToolMetricRep::New();
-	else if (boost::dynamic_pointer_cast<DistanceMetric>(data))
+	else if (std::dynamic_pointer_cast<DistanceMetric>(data))
 		rep = DistanceMetricRep::New();
-	else if (boost::dynamic_pointer_cast<AngleMetric>(data))
+	else if (std::dynamic_pointer_cast<AngleMetric>(data))
 		rep = AngleMetricRep::New();
-	else if (boost::dynamic_pointer_cast<PlaneMetric>(data))
+	else if (std::dynamic_pointer_cast<PlaneMetric>(data))
 		rep = PlaneMetricRep::New();
-	else if (boost::dynamic_pointer_cast<DonutMetric>(data))
+	else if (std::dynamic_pointer_cast<DonutMetric>(data))
 		rep = DonutMetricRep::New();
-	else if (boost::dynamic_pointer_cast<CustomMetric>(data))
+	else if (std::dynamic_pointer_cast<CustomMetric>(data))
 		rep = CustomMetricRep::New();
-	else if (boost::dynamic_pointer_cast<SphereMetric>(data))
+	else if (std::dynamic_pointer_cast<SphereMetric>(data))
 		rep = SphereMetricRep::New();
-	else if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(data))
+	else if (std::dynamic_pointer_cast<RegionOfInterestMetric>(data))
 		rep = RegionOfInterestMetricRep::New();
 
 	if (rep)
 	{
 		this->readDataRepSettings(rep);
-		rep->setDataMetric(boost::dynamic_pointer_cast<DataMetric>(data));
+		rep->setDataMetric(std::dynamic_pointer_cast<DataMetric>(data));
 	}
 	return rep;
 }
@@ -762,7 +762,7 @@ DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)
  */
 void ViewWrapper3D::readDataRepSettings(RepPtr rep)
 {
-	DataMetricRepPtr val = boost::dynamic_pointer_cast<DataMetricRep>(rep);
+	DataMetricRepPtr val = std::dynamic_pointer_cast<DataMetricRep>(rep);
 	if (!val)
 		return;
 

@@ -45,8 +45,8 @@ private:
 	void addSmallControlsForIndex(QString name, QString help, int index, QBoxLayout* layout);
 
 	Vector3DPropertyBasePtr mData;
-	boost::array<DoublePropertyBasePtr, 3> mDoubleAdapter;
-	boost::array<QWidget*, 3> mWidgets;
+	std::array<DoublePropertyBasePtr, 3> mDoubleAdapter;
+	std::array<QWidget*, 3> mWidgets;
 };
 
 }

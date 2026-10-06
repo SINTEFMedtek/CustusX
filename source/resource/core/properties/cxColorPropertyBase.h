@@ -57,7 +57,7 @@ public:
         return QString();
     } ///< return a descriptive help string for the data, used for example as a tool tip.
 };
-typedef boost::shared_ptr<ColorPropertyBase> ColorPropertyBasePtr;
+typedef std::shared_ptr<ColorPropertyBase> ColorPropertyBasePtr;
 
 } // namespace cx
 

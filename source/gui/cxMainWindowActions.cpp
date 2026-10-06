@@ -13,7 +13,7 @@
 #include <QDir>
 
 #include "boost/bind/bind.hpp"
-#include "boost/function.hpp"
+#include <functional>
 #include "cxReporter.h"
 #include "cxLogger.h"
 #include "cxConfig.h"

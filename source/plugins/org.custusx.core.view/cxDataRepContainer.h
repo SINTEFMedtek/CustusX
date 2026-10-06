@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
+typedef std::shared_ptr<class SphereMetric> SphereMetricPtr;
 
 /** Creates and manages a list of reps based on input Data objects.
  *
@@ -28,7 +28,7 @@ typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
  * \date 2014-03-27
  * \author christiana
  */
-typedef boost::shared_ptr<class DataRepContainer> DataRepContainerPtr;
+typedef std::shared_ptr<class DataRepContainer> DataRepContainerPtr;
 /** Creates and manages a list of reps based on input Data objects.
   *
   */

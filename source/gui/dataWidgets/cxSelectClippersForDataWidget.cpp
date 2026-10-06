@@ -126,10 +126,10 @@ void SelectClippersForDataWidget::createDataCheckBox(int row, QString clipperNam
 	mClipperTableWidget->setCellWidget(row, 0, dataCheckBox);
 	mClipperTableWidget->setCellWidget(row, 2, invertCheckbox);
 
-	boost::function<void()> func = boost::bind(&SelectClippersForDataWidget::clipDataClicked, this, dataCheckBox, clipperName);
+	std::function<void()> func = boost::bind(&SelectClippersForDataWidget::clipDataClicked, this, dataCheckBox, clipperName);
 	connect(dataCheckBox, &QCheckBox::clicked, this, func);
 
-	boost::function<void()> invertFunc = boost::bind(&SelectClippersForDataWidget::invertClicked, this, invertCheckbox, clipperName);
+	std::function<void()> invertFunc = boost::bind(&SelectClippersForDataWidget::invertClicked, this, invertCheckbox, clipperName);
 	connect(invertCheckbox, &QCheckBox::clicked, this, invertFunc);
 
 	this->updateCheckBoxesFromClipper(dataCheckBox, invertCheckbox, clipperName);

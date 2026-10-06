@@ -133,7 +133,7 @@ std::vector<DataPtr> SimpleImportDataDialog::getSelectedData()
 
 bool SimpleImportDataDialog::isSelectedAndSetType(DataPtr data, int row)
 {
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 	if(!image)
 		return false;
 
@@ -303,7 +303,7 @@ bool ImportWidget::tryAutoAssignModalitiesForCT(ImportDataTypeWidget* widget)
 	std::vector<ImagePtr> images;
 	for(DataPtr& data : datas)
 	{
-		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+		ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 		if(!image)
 			return false;
 		images.push_back(image);

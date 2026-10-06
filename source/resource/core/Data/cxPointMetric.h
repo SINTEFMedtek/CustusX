@@ -30,7 +30,7 @@ struct CoordinateSystem;
  * @{
  */
 
-typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
+typedef std::shared_ptr<class PointMetric> PointMetricPtr;
 
 /** \brief Data class that represents a single point.
  *

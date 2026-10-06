@@ -23,7 +23,7 @@ namespace cx
 class ReconstructionMethodService;
 //typedef class ReconstructionMethodService* ReconstructionMethodServicePtr;
 
-typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
+typedef std::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 
 /** \brief Algorithm part of reconstruction -
  * no dependencies on parameter classes.

@@ -186,25 +186,25 @@ void Pipeline::setOption(PropertyPtr adapter, QVariant value)
 {
 	if (value.canConvert<bool>())
 	{
-		BoolPropertyBasePtr specific = boost::dynamic_pointer_cast<BoolPropertyBase>(adapter);
+		BoolPropertyBasePtr specific = std::dynamic_pointer_cast<BoolPropertyBase>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<bool>(value));
 	}
 	else if (value.canConvert<double>())
 	{
-		DoublePropertyBasePtr specific = boost::dynamic_pointer_cast<DoublePropertyBase>(adapter);
+		DoublePropertyBasePtr specific = std::dynamic_pointer_cast<DoublePropertyBase>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<double>(value));
 	}
 	else if (value.canConvert<QColor>())
 	{
-		ColorPropertyBasePtr specific = boost::dynamic_pointer_cast<ColorPropertyBase>(adapter);
+		ColorPropertyBasePtr specific = std::dynamic_pointer_cast<ColorPropertyBase>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<QColor>(value));
 	}
 	else if (value.canConvert<QString>())
 	{
-		StringPropertyBasePtr specific = boost::dynamic_pointer_cast<StringPropertyBase>(adapter);
+		StringPropertyBasePtr specific = std::dynamic_pointer_cast<StringPropertyBase>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<QString>(value));
 	}

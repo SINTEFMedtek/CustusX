@@ -21,12 +21,12 @@ class QComboBox;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class OpenIGTLinkStreamerService> OpenIGTLinkStreamerServicePtr;
-typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
-typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
-typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
-typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class OpenIGTLinkStreamerService> OpenIGTLinkStreamerServicePtr;
+typedef std::shared_ptr<class StreamerService> StreamerServicePtr;
+typedef std::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
+typedef std::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef std::shared_ptr<class BoolProperty> BoolPropertyPtr;
 class FileSelectWidget;
 class FilePreviewWidget;
 

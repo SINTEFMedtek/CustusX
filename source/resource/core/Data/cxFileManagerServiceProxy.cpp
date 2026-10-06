@@ -72,7 +72,7 @@ void FileManagerServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<FileManagerService>(
 								 mPluginContext,
 								 boost::bind(&FileManagerServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (FileManagerService*)>(),
+								 std::function<void (FileManagerService*)>(),
 								 boost::bind(&FileManagerServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

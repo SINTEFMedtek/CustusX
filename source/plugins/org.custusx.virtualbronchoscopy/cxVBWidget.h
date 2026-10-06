@@ -30,8 +30,8 @@ class QPushButton;
 namespace cx
 {
 
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-typedef boost::shared_ptr<class PatientStorage> PatientStoragePtr;
+typedef std::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef std::shared_ptr<class PatientStorage> PatientStoragePtr;
 
 /**
  * Widget for Virtual Bronchoscopy

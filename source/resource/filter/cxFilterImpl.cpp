@@ -105,7 +105,7 @@ ImagePtr FilterImpl::getCopiedInputImage(int index)
 {
 	if (mCopiedInput.size() < index+1)
 		return ImagePtr();
-	return boost::dynamic_pointer_cast<Image>(mCopiedInput[index]);
+	return std::dynamic_pointer_cast<Image>(mCopiedInput[index]);
 }
 
 void FilterImpl::updateThresholdFromImageChange(QString uid, DoublePropertyPtr threshold)
