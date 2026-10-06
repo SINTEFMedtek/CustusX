@@ -23,12 +23,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkPolyData.h>
 #include <vtkLandmarkTransform.h>
 
-#include <itkEuler3DTransform.h>
-#include <itkEuclideanDistancePointMetric.h>
-#include <itkLevenbergMarquardtOptimizer.h>
-#include <itkPointSetToPointSetRegistrationMethod.h>
-#include <itkPointSet.h>
-
 
 typedef std::vector< Eigen::Matrix4d > M4Vector;
 
@@ -41,27 +35,17 @@ typedef vtkSmartPointer<vtkDoubleArray>             vtkDoubleArrayPtr;
 typedef vtkSmartPointer<vtkPoints>                  vtkPointsPtr;
 typedef vtkSmartPointer<vtkPolyData>                vtkPolyDataPtr;
 
+/** Rigid registration of tracked positions (moving) to a centerline (fixed).
+ *
+ * Minimizes the sum of squared distances from each transformed moving point to
+ * its closest fixed point, with Levenberg-Marquardt over the Euler angles
+ * (rotation Rz*Rx*Ry about the origin) and the translation. Each of the six
+ * parameters can be locked with UpdateScales().
+ */
 class org_custusx_registration_method_centerline_EXPORT CenterlineRegistration
 {
 
 public:
-    typedef itk::PointSet< float, 3 >                   PointSetType;
-    typedef PointSetType::PointType                     PointType;
-    typedef PointSetType::PointsContainer               PointsContainer;
-    typedef PointSetType::PointsContainerPointer        PointsContainerPtr;
-    typedef PointsContainer::Iterator                   PointsIterator;
-
-    typedef itk::EuclideanDistancePointMetric<
-                                      PointSetType,
-                                      PointSetType>
-                                                        MetricType;
-    typedef itk::Euler3DTransform< double >             TransformType;
-    typedef itk::LevenbergMarquardtOptimizer            OptimizerType;
-
-    typedef itk::PointSetToPointSetRegistrationMethod<
-                                    PointSetType,
-                                    PointSetType>       RegistrationType;
-
     CenterlineRegistration();
     vtkPointsPtr smoothPositions(vtkPointsPtr centerline);
     void UpdateScales(bool xRot, bool yRot, bool zRot, bool xTrans, bool yTrans, bool zTrans);
@@ -74,14 +58,11 @@ public:
     virtual ~CenterlineRegistration();
 
 private:
-    PointSetType::Pointer mFixedPointSet;
-    PointSetType::Pointer mMovingPointSet;
-
-    RegistrationType::Pointer mRegistration;
-    TransformType::Pointer mTransform;
+    std::vector<Vector3D> mFixedPoints;
+    std::vector<Vector3D> mMovingPoints;
+    bool mFreeParameters[6];
     Transform3D mResultTransform;
     bool mRegistrationUpdated;
-    OptimizerType::Pointer mOptimizer;
 
 };
 

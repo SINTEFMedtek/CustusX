@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build System
 
-CustusX uses a **superbuild** via Python scripts that download and build all dependencies (Qt, VTK, ITK, Eigen, OpenCV, OpenIGTLink, CTK, DCMTK, Boost, etc.).
+CustusX uses a **superbuild** via Python scripts that download and build all dependencies (Qt, VTK, Eigen, OpenCV, OpenIGTLink, CTK, DCMTK, Boost, etc.; ITK only for IGSTK builds).
 
 **Full build from scratch (Linux/Mac):**
 ```bash
@@ -83,7 +83,7 @@ Application (CustusX main)
         └── Logic Layer (source/logic/) — LogicManager, plugin lifecycle
             └── Plugin Framework (CTK OSGi) — ~37 plugins in source/plugins/
                 └── Resource Layer (source/resource/) — shared libraries & utilities
-                    └── External Libraries (Qt, VTK, ITK, ...)
+                    └── External Libraries (Qt, VTK, CTK, ...)
 ```
 
 **Core services** (all plugin-based, discovered at runtime):
