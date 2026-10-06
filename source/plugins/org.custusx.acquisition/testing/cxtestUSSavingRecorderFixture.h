@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtest_org_custusx_acquisition_export.h"
 
 #include <QApplication>
-#include "boost/function.hpp"
+#include <functional>
 #include "cxForwardDeclarations.h"
 #include "cxAcquisitionData.h"
 #include "cxUSSavingRecorder.h"
@@ -38,7 +38,7 @@ public:
 	USSavingRecorderFixture(QObject* parent=NULL);
 	~USSavingRecorderFixture();
 
-	void addOperation(boost::function0<void> operation);
+	void addOperation(std::function<void()> operation);
 
 	void setTool(cx::ToolPtr tool);
 	void addVideoSource(int width, int height);
@@ -68,7 +68,7 @@ private:
 	QStringList mSavedData;
 
 	cx::USSavingRecorderPtr mRecorder;
-	std::vector<boost::function0<void> > mOperations;
+	std::vector<std::function<void()> > mOperations;
 };
 
 } // namespace cxtest

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <memory>
 #include "cxSlider2D.h"
 #include "cxtestVisServices.h"
 #include "cxImage.h"
@@ -18,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace
 {
-typedef boost::shared_ptr<class Slider2DTest> Slider2DTestPtr;
+typedef std::shared_ptr<class Slider2DTest> Slider2DTestPtr;
 class Slider2DTest : public cx::Slider2D
 {
 public:

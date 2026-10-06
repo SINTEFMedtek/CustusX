@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include <vector>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QThread>
 #include <QMutex>
 #include <QDateTime>
@@ -26,10 +26,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class Streamer> StreamerPtr;
-typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
-typedef boost::shared_ptr<class DirectlyLinkedSender> DirectlyLinkedSenderPtr;
-typedef boost::shared_ptr<class ProbeDefinition> ProbeDefinitionPtr;
+typedef std::shared_ptr<class Streamer> StreamerPtr;
+typedef std::shared_ptr<class StreamerService> StreamerServicePtr;
+typedef std::shared_ptr<class DirectlyLinkedSender> DirectlyLinkedSenderPtr;
+typedef std::shared_ptr<class ProbeDefinition> ProbeDefinitionPtr;
 
 /**
  * \file
@@ -38,7 +38,7 @@ typedef boost::shared_ptr<class ProbeDefinition> ProbeDefinitionPtr;
  */
 
 
-typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
+typedef std::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
 
 /** \brief Base class for receiving images from a video stream.
  *

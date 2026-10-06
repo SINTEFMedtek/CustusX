@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGRAPHICALBOX_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <QObject>
 #include <QPointer>
@@ -27,7 +28,7 @@ namespace cx
 {
 typedef vtkSmartPointer<class GraphicalBoxCallback> GraphicalBoxCallbackPtr;
 typedef vtkSmartPointer<class GraphicalBoxEnableCallback> GraphicalBoxEnableCallbackPtr;
-typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
+typedef std::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 
 /**
 * \file
@@ -100,7 +101,7 @@ private:
 	bool mVisible;
 };
 
-typedef boost::shared_ptr<GraphicalBox> GraphicalBoxPtr;
+typedef std::shared_ptr<GraphicalBox> GraphicalBoxPtr;
 
 /**
 * @}

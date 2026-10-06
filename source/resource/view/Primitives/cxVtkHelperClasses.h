@@ -14,6 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVTKHELPERCLASSES_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
+#include <array>
 
 #include "cxTransform3D.h"
 #include "cxGraphicalPrimitives.h"
@@ -45,7 +47,7 @@ Vector3D getColorAsVector3D(QColor color) ;
  *
  * \ingroup cx_resource_view
  */
-class cxResourceVisualization_EXPORT RGBColor : public boost::array<double,3>
+class cxResourceVisualization_EXPORT RGBColor : public std::array<double,3>
 {
 public:
 	RGBColor();
@@ -78,7 +80,7 @@ class cxResourceVisualization_EXPORT OffsetPoint
 		vtkActor2DPtr actor;
 		vtkRendererPtr mRenderer;
 };
-typedef boost::shared_ptr<OffsetPoint> OffsetPointPtr;
+typedef std::shared_ptr<OffsetPoint> OffsetPointPtr;
 
 /**\brief Helper for drawing a line in 2D.
  *
@@ -137,7 +139,7 @@ class cxResourceVisualization_EXPORT TextDisplay
 
 		static void verifyVtkTextMapper();
 };
-typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
+typedef std::shared_ptr<class TextDisplay> TextDisplayPtr;
 
 
 /**\brief Helper for drawing a crosshair in 2D.
@@ -160,7 +162,7 @@ class cxResourceVisualization_EXPORT CrossHair2D
 		vtkActor2DPtr actor;
 		vtkRendererPtr mRenderer;
 };
-typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
+typedef std::shared_ptr<class CrossHair2D> CrossHair2DPtr;
 
 /**\brief Helper for drawing a coordinate axis in 3D.
  *
@@ -182,7 +184,7 @@ private:
  	vtkAxesActorPtr mAxes;
 	vtkRendererPtr mRenderer;
 };
-typedef boost::shared_ptr<Axes3D> Axes3DPtr;
+typedef std::shared_ptr<Axes3D> Axes3DPtr;
 
 // --------------------------------------------------------
 }//	namespace vm

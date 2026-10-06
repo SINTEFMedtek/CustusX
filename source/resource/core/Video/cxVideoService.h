@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxPlaybackTime.h"
 
 #define VideoService_iid "cx::VideoService"
@@ -24,11 +24,11 @@ namespace cx
 {
 class StreamerService;
 
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
-typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
-typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
-typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef std::shared_ptr<class VideoService> VideoServicePtr;
+typedef std::shared_ptr<class StreamerService> StreamerServicePtr;
+typedef std::shared_ptr<class VideoSource> VideoSourcePtr;
+typedef std::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
+typedef std::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 /**
  * \brief Provides access to all video sources in the

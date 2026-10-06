@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMANUALREGISTRATIONWIDGET_H_
 
 #include "org_custusx_registration_method_manual_Export.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include "cxTransform3D.h"
@@ -23,11 +24,11 @@ class ctkPluginContext;
 namespace cx
 {
 class Transform3DWidget;
-typedef boost::shared_ptr<class Data> DataPtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef std::shared_ptr<class Data> DataPtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class RegistrationService> RegistrationServicePtr;
 
-//typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+//typedef std::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 /** Direct setting of image registration
  *

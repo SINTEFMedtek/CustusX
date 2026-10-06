@@ -12,13 +12,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOPTREENODE_H
 
 #include "cxTreeNodeImpl.h"
+#include <memory>
 
 namespace cx
 {
 
 class TreeNode;
-typedef boost::weak_ptr<TreeNode> TreeNodeWeakPtr;
-typedef boost::shared_ptr<TreeNode> TreeNodePtr;
+typedef std::weak_ptr<TreeNode> TreeNodeWeakPtr;
+typedef std::shared_ptr<TreeNode> TreeNodePtr;
 
 class TopTreeNode : public TreeNodeImpl
 {

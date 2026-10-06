@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxSocketConnection.h"
+#include <functional>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QNetworkInterface>
@@ -65,7 +66,7 @@ SocketConnection::SocketConnection(QObject *parent) :
     QObject(parent)
 {
     mCurrentState = scsINACTIVE;
-    qRegisterMetaType<boost::function<void()> >("boost::function<void()>");
+    qRegisterMetaType<std::function<void()> >("std::function<void()>");
     qRegisterMetaType<CX_SOCKETCONNECTION_STATE>("CX_SOCKETCONNECTION_STATE");
 
     mNextConnectionInfo.host = "localhost";

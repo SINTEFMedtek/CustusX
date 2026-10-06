@@ -18,13 +18,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLineEdit>
 #include <QLabel>
 #include <QGridLayout>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxOptimizedUpdateWidget.h"
 
 namespace cx
 {
 class FileInputWidget;
-typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef std::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 
 /**\brief Composite widget for filename edit.
  *

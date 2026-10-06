@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CX2DSLIDER_H
 
 #include "org_custusx_core_view_Export.h"
+#include <memory>
 
 #include "ctkDoubleSlider.h"
 #include "cxActiveImageProxy.h"
@@ -50,6 +51,6 @@ protected:
 	SliceProxyPtr mSliceProxy;
 
 };
-typedef boost::shared_ptr<Slider2D> Slider2DPtr;
+typedef std::shared_ptr<Slider2D> Slider2DPtr;
 }//cx
 #endif // CX2DSLIDER_H

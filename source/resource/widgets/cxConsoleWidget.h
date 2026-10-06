@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCONSOLEWIDGET_H_
 
 #include "cxResourceWidgetsExport.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include "cxReporter.h"
@@ -31,7 +32,7 @@ class QStackedLayout;
 namespace cx
 {
 class PopupToolbarWidget;
-typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
+typedef std::shared_ptr<class MessageListener> MessageListenerPtr;
 
 class LogMessageDisplayWidget : public QWidget
 {
@@ -151,7 +152,7 @@ private:
 	StringPropertyPtr mChannelSelector;
 	QStringList mChannels;
 	MessageListenerPtr mMessageListener;
-	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;
+	std::shared_ptr<class MessageFilterConsole> mMessageFilter;
 	XmlOptionFile mOptions;
 	PopupToolbarWidget* mPopupWidget;
 

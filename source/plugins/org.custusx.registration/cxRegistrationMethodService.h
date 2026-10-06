@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QObject>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxRegServices.h"
 #include "org_custusx_registration_Export.h"
 

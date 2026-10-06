@@ -17,18 +17,17 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <string>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
 
 #include <QObject>
 
 namespace cx
 {
-typedef boost::shared_ptr<class Rep> RepPtr;
-typedef boost::weak_ptr<class Rep> RepWeakPtr;
+typedef std::shared_ptr<class Rep> RepPtr;
+typedef std::weak_ptr<class Rep> RepWeakPtr;
 
 class Indent;
-typedef boost::shared_ptr<class View> ViewPtr;
+typedef std::shared_ptr<class View> ViewPtr;
 
 /**\brief Abstract interface for entities that can be added to a View.
  *

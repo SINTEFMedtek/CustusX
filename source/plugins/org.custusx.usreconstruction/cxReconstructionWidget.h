@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECONSTRUCTIONWIDGET_H_
 
 #include "org_custusx_usreconstruction_Export.h"
+#include <memory>
 
 #include <QtWidgets>
 
@@ -27,7 +28,7 @@ namespace cx
 {
 class TimedAlgorithmProgressBar;
 class UsReconstructionService;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 
 /**
  * \file

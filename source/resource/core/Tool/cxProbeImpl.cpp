@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxProbeImpl.h"
+#include <memory>
 
 #include <QStringList>
 #include <vtkPolyData.h>
@@ -191,7 +192,7 @@ void ProbeImpl::setRTSource(VideoSourcePtr source)
 		VideoSourcePtr old = mSource.find(source->getUid())->second;
 
 		ProbeAdapterRTSourcePtr oldAdapter;
-		oldAdapter = boost::dynamic_pointer_cast<ProbeAdapterRTSource>(old);
+		oldAdapter = std::dynamic_pointer_cast<ProbeAdapterRTSource>(old);
 		// check for identity, ignore if no change
 		if (oldAdapter && (source==oldAdapter->getBaseSource()))
 			return;

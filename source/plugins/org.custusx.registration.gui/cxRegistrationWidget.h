@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONWIDGET_H_
 
 #include "org_custusx_registration_gui_Export.h"
+#include <memory>
 #include "cxTabbedWidget.h"
 #include "cxServiceTrackerListener.h"
 #include "cxRegistrationMethodService.h"
@@ -24,7 +25,7 @@ class QStackedWidget;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef std::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
 
 
 /**
@@ -87,7 +88,7 @@ private:
 	void onServiceRemoved(RegistrationMethodService *service);
 
 	ctkPluginContext* mPluginContext;
-	boost::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<RegistrationMethodService> > mServiceListener;
 
 	StringPropertyPtr mTypeSelector;
 	std::map<QString, RegistrationTypeWidget*> mRegistrationTypeMap;

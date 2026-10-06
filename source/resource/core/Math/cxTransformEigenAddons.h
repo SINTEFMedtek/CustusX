@@ -1,3 +1,4 @@
+#include <array>
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
 
@@ -25,7 +26,7 @@ Vector3d unitVector(const Vector3d& v) const;///< transform a unit vector [x,y,z
 Vector3d coord(const Vector3d& v) const;///< transform a coordinate [x,y,z,1].
 Transform inv()
 const;                       ///< return an inverted transform M^-1
-boost::array<double, 16> flatten() const;///< return matrix as a flat array, vtk ordering
+std::array<double, 16> flatten() const;///< return matrix as a flat array, vtk ordering
 explicit Transform(vtkMatrix4x4* m);
 explicit Transform(double* m);
 vtkMatrix4x4Ptr getVtkMatrix()

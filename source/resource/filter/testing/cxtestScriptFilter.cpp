@@ -34,7 +34,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class TestGenericScriptFilter> TestGenericScriptFilterPtr;
+typedef std::shared_ptr<class TestGenericScriptFilter> TestGenericScriptFilterPtr;
 
 class TestGenericScriptFilter : public cx::GenericScriptFilter
 {
@@ -427,11 +427,11 @@ TEST_CASE("GenericScriptFilter: Detailed test of option adapters", "[unit]")
 
 	cx::PropertyPtr option = options[0];
 	REQUIRE(option->getUid() == "scriptSelector");
-	cx::FilePathPropertyPtr scriptSelectorOption = boost::dynamic_pointer_cast<cx::FilePathProperty>(option);
+	cx::FilePathPropertyPtr scriptSelectorOption = std::dynamic_pointer_cast<cx::FilePathProperty>(option);
 	REQUIRE(scriptSelectorOption);
 
 	option = options[1];
-	cx::FilePreviewPropertyPtr filePreviewOption = boost::dynamic_pointer_cast<cx::FilePreviewProperty>(option);
+	cx::FilePreviewPropertyPtr filePreviewOption = std::dynamic_pointer_cast<cx::FilePreviewProperty>(option);
 	REQUIRE(scriptSelectorOption);
 }
 

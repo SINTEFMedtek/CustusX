@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxImageFileStreamerService.h"
+#include <memory>
 
 #include <QFileInfo>
 #include "cxStringProperty.h"
@@ -74,7 +75,7 @@ StreamerPtr ImageFileStreamerService::createStreamer(QDomElement root)
 	}
 	else
 	{
-		boost::shared_ptr<DummyImageStreamer> streamer(new DummyImageStreamer());
+		std::shared_ptr<DummyImageStreamer> streamer(new DummyImageStreamer());
 
 		QString filename = ImageStreamerDummyArguments().getFilenameOption(root)->getValue();
 		bool secondary = ImageStreamerDummyArguments().getSecondaryOption(root)->getValue();

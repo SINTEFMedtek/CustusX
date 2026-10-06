@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVBWIDGET_H_
 
 #include <QWidget>
+#include <memory>
 
 #include "ctkPluginContext.h"
 
@@ -30,8 +31,8 @@ class QPushButton;
 namespace cx
 {
 
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-typedef boost::shared_ptr<class PatientStorage> PatientStoragePtr;
+typedef std::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef std::shared_ptr<class PatientStorage> PatientStoragePtr;
 
 /**
  * Widget for Virtual Bronchoscopy

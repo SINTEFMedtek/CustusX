@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXICPREGISTRATIONBASEWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
+#include <memory>
 #include "cxStringPropertyBase.h"
 
 class QSpinBox;
@@ -25,11 +26,11 @@ class QLabel;
 namespace cx
 {
 class ICPWidget;
-typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
-typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
-typedef boost::shared_ptr<class SeansVesselReg> SeansVesselRegPtr;
-typedef boost::shared_ptr<class MeshInView> MeshInViewPtr;
-typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
+typedef std::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
+typedef std::shared_ptr<class GeometricRep> GeometricRepPtr;
+typedef std::shared_ptr<class SeansVesselReg> SeansVesselRegPtr;
+typedef std::shared_ptr<class MeshInView> MeshInViewPtr;
+typedef std::shared_ptr<class SpaceListener> SpaceListenerPtr;
 
 
 
@@ -97,7 +98,7 @@ protected:
 	ICPWidget* mICPWidget;
 	XmlOptionFile mOptions;
 	SeansVesselRegPtr mRegistrator;
-	boost::shared_ptr<class WidgetObscuredListener> mObscuredListener;
+	std::shared_ptr<class WidgetObscuredListener> mObscuredListener;
 
 	void onSpacesChanged();
 	void onSettingsChanged();

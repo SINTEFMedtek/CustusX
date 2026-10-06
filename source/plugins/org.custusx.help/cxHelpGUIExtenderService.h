@@ -13,12 +13,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXHELPGUIEXTENDERSERVICE_H_
 
 #include "cxGUIExtenderService.h"
+#include <memory>
 #include "org_custusx_help_Export.h"
 class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+typedef std::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 /**
  * Implementation of Help service.
@@ -41,7 +42,7 @@ private:
   ctkPluginContext* mContext;
   HelpEnginePtr mEngine;
 };
-typedef boost::shared_ptr<HelpGUIExtenderService> HelpGUIExtenderServicePtr;
+typedef std::shared_ptr<HelpGUIExtenderService> HelpGUIExtenderServicePtr;
 
 } /* namespace cx */
 

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXEBUSCALIBRATIONWIDGET_H_
 
 #include "org_custusx_calibration_Export.h"
+#include <memory>
 
 #include "cxTransform3D.h"
 #include "cxVector3D.h"
@@ -28,7 +29,7 @@ class QLineEdit;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \file

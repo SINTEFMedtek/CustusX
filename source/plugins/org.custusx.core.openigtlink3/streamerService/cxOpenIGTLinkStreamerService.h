@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXOPENIGTLINKSTREAMERSERVICE_H
 
 #include "org_custusx_core_openigtlink3_Export.h"
+#include <memory>
 #include "cxStreamerService.h"
 #include "cxOpenIGTLinkStreamer.h"
 
@@ -23,8 +24,8 @@ namespace cx
 #define OPENIGTLINK3_STREAMER_IP "ip_scanner_openigtlink"
 #define OPENIGTLINK3_STREAMER_START_TRACKING "start_tracking"
 
-typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
-typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
+typedef std::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
+typedef std::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 
 
 class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkStreamerService : public StreamerService

@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxIGTLinkStreamerService.h"
+#include <memory>
 
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
@@ -37,7 +38,7 @@ std::vector<PropertyPtr> IGTLinkStreamerService::getSettings(QDomElement root)
 
 StreamerPtr IGTLinkStreamerService::createStreamer(QDomElement root)
 {
-	boost::shared_ptr<IGTLinkClientStreamer> streamer(new IGTLinkClientStreamer());
+	std::shared_ptr<IGTLinkClientStreamer> streamer(new IGTLinkClientStreamer());
 	streamer->setAddress(this->getIPOption(root)->getValue(),
 						 this->getStreamPortOption(root)->getValue());
 	return streamer;

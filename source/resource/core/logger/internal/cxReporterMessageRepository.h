@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREPORTERMESSAGEREPOSITORY_H
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxReporter.h"
 #include "cxMessageListener.h"
 
@@ -57,9 +58,9 @@ private:
 	QMutex mMutex;
 };
 
-typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
-typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
-typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
+typedef std::shared_ptr<class MessageObserver> MessageObserverPtr;
+typedef std::shared_ptr<class MessageListener> MessageListenerPtr;
+typedef std::shared_ptr<class MessageRepository> MessageRepositoryPtr;
 
 /** Utility for listening to the Reporter
   * and storing messages from it.

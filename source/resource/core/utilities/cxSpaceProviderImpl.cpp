@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxSpaceProviderImpl.h"
+#include <memory>
 
 #include "cxPatientModelService.h"
 #include "cxTrackingService.h"
@@ -308,7 +309,7 @@ Transform3D SpaceProviderImpl::get_rMdv(QString uid)
 		return Transform3D::Identity();
 	}
 
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 	if (!image)
 		return data->get_rMd();
 	return data->get_rMd()*createTransformScale(Vector3D(image->getBaseVtkImageData()->GetSpacing())); // ref_M_d

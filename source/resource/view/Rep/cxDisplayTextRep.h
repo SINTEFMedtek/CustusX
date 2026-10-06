@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDISPLAYTEXTREP_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <vector>
 #include "cxRepImpl.h"
@@ -24,9 +25,9 @@ class QColor;
 
 namespace cx
 {
-typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
+typedef std::shared_ptr<class TextDisplay> TextDisplayPtr;
 
-typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
+typedef std::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
 
 /**\brief Display a number of text strings.
  *

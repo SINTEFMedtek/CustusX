@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONIMPLSERVICE_H_
 
 #include "cxRegistrationService.h"
+#include <memory>
 #include <vector>
 #include "org_custusx_registration_Export.h"
 #include "qdatetime.h"
@@ -25,8 +26,8 @@ namespace cx
 {
 class RegistrationTransform;
 class PatientModelService;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 
 /**
@@ -97,7 +98,7 @@ private:
 	void performPatientRegistration(Transform3D rMpr_new, QString description, bool temporaryRegistration = false);
 };
 
-typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;
+typedef std::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;
 
 } /* namespace cx */
 

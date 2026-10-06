@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSRECONSTRUCTIONFILEMAKER_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 class QTextStream;
 class QDir;
@@ -25,10 +26,10 @@ class QDir;
 namespace cx
 {
 class TimeInfo;
-typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
-typedef boost::shared_ptr<class ImageDataContainer> ImageDataContainerPtr;
-//typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
-typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
+typedef std::shared_ptr<QTextStream> QTextStreamPtr;
+typedef std::shared_ptr<class ImageDataContainer> ImageDataContainerPtr;
+//typedef std::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
+typedef std::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
 
 
 /**
@@ -108,7 +109,7 @@ private:
 	QStringList mReport;
 };
 
-typedef boost::shared_ptr<UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
+typedef std::shared_ptr<UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
 
 /**
 * @}

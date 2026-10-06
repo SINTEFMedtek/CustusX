@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSLICERREPSW_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxRepImpl.h"
 
@@ -22,7 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
+typedef std::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
 
 
 /**\brief Display an image slice in 2D.

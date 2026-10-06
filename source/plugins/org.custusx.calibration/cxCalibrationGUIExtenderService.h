@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCALIBRATIONGUIEXTENDERSERVICE_H_
 
 #include "cxGUIExtenderService.h"
+#include <memory>
 #include "org_custusx_calibration_Export.h"
 class ctkPluginContext;
 
@@ -40,7 +41,7 @@ private:
   ctkPluginContext* mContext;
 
 };
-typedef boost::shared_ptr<CalibrationGUIExtenderService> CalibrationGUIExtenderServicePtr;
+typedef std::shared_ptr<CalibrationGUIExtenderService> CalibrationGUIExtenderServicePtr;
 
 } /* namespace cx */
 

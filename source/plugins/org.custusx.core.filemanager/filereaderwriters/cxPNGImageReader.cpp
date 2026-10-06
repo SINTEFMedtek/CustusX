@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxPNGImageReader.h"
+#include <memory>
 
 #include <QFileInfo>
 #include <vtkPNGReader.h>
@@ -36,7 +37,7 @@ bool PNGImageReader::canRead(const QString &type, const QString &filename)
 
 bool PNGImageReader::readInto(DataPtr data, QString filename)
 {
-	return this->readInto(boost::dynamic_pointer_cast<Image>(data), filename);
+	return this->readInto(std::dynamic_pointer_cast<Image>(data), filename);
 }
 
 bool PNGImageReader::readInto(ImagePtr image, QString filename)
@@ -65,7 +66,7 @@ DataPtr PNGImageReader::read(const QString& uid, const QString& filename)
 std::vector<DataPtr> PNGImageReader::read(const QString &filename)
 {
 	std::vector<DataPtr> retval;
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(this->createData(Image::getTypeName() , filename));
+	ImagePtr image = std::dynamic_pointer_cast<Image>(this->createData(Image::getTypeName() , filename));
 
 	vtkImageDataPtr raw = this->loadVtkImageData(filename);
 	if(!raw)

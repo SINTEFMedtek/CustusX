@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCOLORPROPERTY_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxColorPropertyBase.h"
 #include "cxXmlOptionItem.h"
@@ -20,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
+typedef std::shared_ptr<class ColorProperty> ColorPropertyPtr;
 
 /** Property for QColor values.
  *

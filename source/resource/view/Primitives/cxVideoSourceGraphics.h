@@ -14,15 +14,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIDEOSOURCEGRAPHICS_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxForwardDeclarations.h"
 #include "cxProbeSector.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
-typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
+typedef std::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 /** \brief Helper class for displaying a VideoSource.
  *

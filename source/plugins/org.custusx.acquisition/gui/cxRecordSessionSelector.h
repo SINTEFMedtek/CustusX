@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECORDSESSIONSELECTOR_H_
 
 #include <QPushButton>
+#include <memory>
 #include <QDomElement>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
@@ -22,16 +23,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 class WidgetObscuredListener;
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+typedef std::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef std::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef std::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef std::shared_ptr<class RecordSession> RecordSessionPtr;
 class RecordSessionWidget;
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-//typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
+typedef std::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+//typedef std::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-typedef boost::shared_ptr<class SelectRecordSession> SelectRecordSessionPtr;
+typedef std::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef std::shared_ptr<class SelectRecordSession> SelectRecordSessionPtr;
 
 /**
  *

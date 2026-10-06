@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_dicom_Export.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <vector>
 #include "cxDICOMModel.h"
 #include "ctkDICOMDatabase.h"
@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class DicomModelNode> NodePtr;
+typedef std::shared_ptr<class DicomModelNode> NodePtr;
 
 
 /** One node representing one of <root/patient/study/series>

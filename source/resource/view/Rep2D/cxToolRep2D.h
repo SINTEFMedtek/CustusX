@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLREP2D_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
@@ -25,7 +26,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 
 /**\brief Display a Tool in 2D.

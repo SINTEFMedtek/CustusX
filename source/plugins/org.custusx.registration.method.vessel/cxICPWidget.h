@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXICPWIDGET_H
 
 #include "cxRegistrationBaseWidget.h"
+#include <memory>
 #include "cxStringPropertyBase.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxBoolProperty.h"
@@ -24,7 +25,7 @@ class QLabel;
 
 namespace cx
 {
-//typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
+//typedef std::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
 
 /** GUI for ICP control - no logic.
  *

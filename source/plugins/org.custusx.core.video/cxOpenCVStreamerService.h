@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXOPENCVSTREAMERSERVICE_H
 
 #include "org_custusx_core_video_Export.h"
+#include <memory>
 #include "cxStreamerService.h"
 #include "cxStreamer.h"
 
@@ -19,10 +20,10 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
-typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
-typedef boost::shared_ptr<class Property> PropertyPtr;
-typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
+typedef std::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef std::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
+typedef std::shared_ptr<class Property> PropertyPtr;
+typedef std::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
 
 /**
  * \ingroup org_custusx_core_video

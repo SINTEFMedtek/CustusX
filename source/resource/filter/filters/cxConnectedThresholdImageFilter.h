@@ -13,13 +13,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCONNECTEDTHRESHOLDIMAGEFILTER_H_
 
 #include "cxThreadedTimedAlgorithm.h"
+#include <memory>
 #include "cxResourceFilterExport.h"
 #include "cxVector3D.h"
 #include "vtkForwardDeclarations.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \file

@@ -15,14 +15,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QObject>
 #include <QPointer>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxImage.h"
 #include "cxRep.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DVisualizerPtr;
+typedef std::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DVisualizerPtr;
 
 /** 
  *

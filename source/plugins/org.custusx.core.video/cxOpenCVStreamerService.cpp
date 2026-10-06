@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxOpenCVStreamerService.h"
+#include <memory>
 
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
@@ -57,7 +58,7 @@ StreamerPtr OpenCVStreamerService::createStreamer(QDomElement root)
 
 	else
 	{
-		boost::shared_ptr<ImageStreamerOpenCV> streamer(new ImageStreamerOpenCV());
+		std::shared_ptr<ImageStreamerOpenCV> streamer(new ImageStreamerOpenCV());
 		streamer->initialize(args);
 		return streamer;
 	}

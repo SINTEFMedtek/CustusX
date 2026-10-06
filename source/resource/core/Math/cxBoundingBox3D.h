@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 #include "cxPrecompiledHeader.h"
 
-#include "boost/array.hpp"
+#include <array>
 #include "cxVector3D.h"
 #include "cxTransform3D.h"
 #include <vector>
@@ -36,7 +36,7 @@ namespace cx
  *  The data are stored as {xmin,xmax,ymin,ymax,zmin,zmax}, 
  *  in order to simplify communication with vtk.  
  */
-class cxResource_EXPORT IntBoundingBox3D: public boost::array<int, 6>
+class cxResource_EXPORT IntBoundingBox3D: public std::array<int, 6>
 {
 public:
 	IntBoundingBox3D();
@@ -61,7 +61,7 @@ cxResource_EXPORT std::ostream& operator<<(std::ostream& s, const IntBoundingBox
  *  The data are stored as {xmin,xmax,ymin,ymax,zmin,zmax}, 
  *  in order to simplify communication with vtk.  
  */
-class cxResource_EXPORT DoubleBoundingBox3D: public boost::array<double, 6>
+class cxResource_EXPORT DoubleBoundingBox3D: public std::array<double, 6>
 {
 public:
 	DoubleBoundingBox3D();

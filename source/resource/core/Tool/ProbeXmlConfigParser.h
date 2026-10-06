@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <math.h>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QDomDocument>
 #include "cxXmlOptionItem.h"
 
@@ -97,6 +97,6 @@ public:
   virtual Configuration getConfiguration(QString scanner, QString probe, QString rtsource, QString configId) = 0; ///< get a easy-to-work-with struct of a specific config
 
 };
-typedef boost::shared_ptr<ProbeXmlConfigParser> ProbeXmlConfigParserPtr;
+typedef std::shared_ptr<ProbeXmlConfigParser> ProbeXmlConfigParserPtr;
 
 #endif /* PROBEXMLCONFIGPARSER_H_ */

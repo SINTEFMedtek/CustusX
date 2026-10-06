@@ -35,7 +35,7 @@
 // ctkDICOMCore includes
 #include "cxDICOMModel.h"
 #include "ctkLogger.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "ctkDICOMDatabase.h"
 //#include "cxDicomImageReader.h"
 #include "cxDicomModelNode.h"

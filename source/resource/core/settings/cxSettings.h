@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QObject>
 #include <QSettings>
 
@@ -26,7 +26,7 @@ namespace cx
 * @{
 */
 
-typedef boost::shared_ptr<class QSettings> QSettingsPtr;
+typedef std::shared_ptr<class QSettings> QSettingsPtr;
 
 /**
  * \brief Customized interface for setting values in QSettings

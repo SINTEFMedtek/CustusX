@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxFilterImpl.h"
+#include <memory>
 
 #include "cxImage.h"
 #include "cxSelectDataStringProperty.h"
@@ -105,7 +106,7 @@ ImagePtr FilterImpl::getCopiedInputImage(int index)
 {
 	if (mCopiedInput.size() < index+1)
 		return ImagePtr();
-	return boost::dynamic_pointer_cast<Image>(mCopiedInput[index]);
+	return std::dynamic_pointer_cast<Image>(mCopiedInput[index]);
 }
 
 void FilterImpl::updateThresholdFromImageChange(QString uid, DoublePropertyPtr threshold)

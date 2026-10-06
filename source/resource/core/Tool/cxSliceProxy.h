@@ -15,10 +15,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include "cxDefinitions.h"
-#include "boost/scoped_ptr.hpp"
 #include "cxTransform3D.h"
 #include "cxIndent.h"
 #include "cxSliceComputer.h"
@@ -28,8 +27,8 @@ namespace cx
 {
 class SliceComputer;
 // forward declarations
-typedef boost::shared_ptr<class Tool> ToolPtr;
-typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
+typedef std::shared_ptr<class Tool> ToolPtr;
+typedef std::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
 
 /**
 * \file
@@ -67,8 +66,8 @@ public:
 	Transform3D m_sMr;
 };
 
-typedef boost::shared_ptr<class SimpleSliceProxy> SimpleSliceProxyPtr;
-typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef std::shared_ptr<class SimpleSliceProxy> SimpleSliceProxyPtr;
+typedef std::shared_ptr<class SliceProxy> SliceProxyPtr;
 
 /**\brief Provides a slice matrix based on definition and tool
  *
@@ -133,7 +132,7 @@ private:
 	void initCutplane();
 
 	ToolPtr mTool;
-	boost::scoped_ptr<SliceComputer> mCutplane;
+	std::unique_ptr<SliceComputer> mCutplane;
 	Vector3D mDefaultCenter; ///< use this center when no tool is available
 	bool mAlwaysUseDefaultCenter; ///< use def center anyway
 //	QString mName; ///< for debug

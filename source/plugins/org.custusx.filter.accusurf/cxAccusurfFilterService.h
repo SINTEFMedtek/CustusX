@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXACCUSURFFILTER_H
 
 #include "org_custusx_filter_accusurf_Export.h"
+#include <memory>
 
 #include "cxPatientModelService.h"
 #include "cxFilterImpl.h"
@@ -30,7 +31,7 @@ namespace cx
  */
 
 
-typedef boost::shared_ptr<class Accusurf> AccusurfPtr;
+typedef std::shared_ptr<class Accusurf> AccusurfPtr;
 
 class org_custusx_filter_accusurf_EXPORT AccusurfFilter : public FilterImpl
 {
@@ -65,7 +66,7 @@ private:
 	vtkPolyDataPtr mOutput;
     vtkImageDataPtr mAccusurfImage;
 };
-typedef boost::shared_ptr<class AccusurfFilter> AccusurfFilterPtr;
+typedef std::shared_ptr<class AccusurfFilter> AccusurfFilterPtr;
 
 
 } // namespace cx

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLOGFILEWATCHER_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxLog.h"
 
@@ -31,7 +32,7 @@ class QTextStream;
 namespace cx
 {
 
-typedef boost::shared_ptr<class LogFileWatcher> LogFileWatcherPtr;
+typedef std::shared_ptr<class LogFileWatcher> LogFileWatcherPtr;
 
 /**
  * \author Christian Askeland, SINTEF

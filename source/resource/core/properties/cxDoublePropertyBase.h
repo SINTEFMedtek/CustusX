@@ -21,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QString>
 #include <QObject>
 #include "cxDoubleRange.h"
@@ -129,7 +129,7 @@ protected:
     GuiRepresentation mGuiRepresentation;
 
 };
-typedef boost::shared_ptr<DoublePropertyBase> DoublePropertyBasePtr;
+typedef std::shared_ptr<DoublePropertyBase> DoublePropertyBasePtr;
 
 /** Dummy implementation */
 class cxResource_EXPORT DoublePropertyNull: public DoublePropertyBase

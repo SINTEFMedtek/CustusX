@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREPCONTAINER_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <QObject>
 #include <map>
@@ -22,7 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class Rep> RepPtr;
+typedef std::shared_ptr<class Rep> RepPtr;
 
 typedef std::map<QString, RepPtr> RepMap;
 typedef std::map<QString, VolumetricBaseRepPtr> VolumetricRepMap;
@@ -42,50 +43,50 @@ public:
 	RepContainer(std::vector<RepPtr> reps) : mReps(reps) {}
 
 	template<class REP>
-	boost::shared_ptr<REP> findFirst(ToolPtr tool)
+	std::shared_ptr<REP> findFirst(ToolPtr tool)
 	{
 		for (unsigned i = 0; i < mReps.size(); ++i)
 		{
-			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(mReps[i]);
+			std::shared_ptr<REP> rep = std::dynamic_pointer_cast<REP>(mReps[i]);
 			if (rep && rep->hasTool(tool))
 			{
 				return rep;
 			}
 		}
-		return boost::shared_ptr<REP>();
+		return std::shared_ptr<REP>();
 	}
 
 	template<class REP>
-	boost::shared_ptr<REP> findFirst(DataPtr data)
+	std::shared_ptr<REP> findFirst(DataPtr data)
 	{
 		for (unsigned i = 0; i < mReps.size(); ++i)
 		{
-			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(mReps[i]);
+			std::shared_ptr<REP> rep = std::dynamic_pointer_cast<REP>(mReps[i]);
 			if (rep && rep->hasData(data))
 				return rep;
 		}
-		return boost::shared_ptr<REP>();
+		return std::shared_ptr<REP>();
 	}
 
 	template<class REP>
-	boost::shared_ptr<REP> findFirst()
+	std::shared_ptr<REP> findFirst()
 	{
 		for (unsigned i = 0; i < mReps.size(); ++i)
 		{
-			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(mReps[i]);
+			std::shared_ptr<REP> rep = std::dynamic_pointer_cast<REP>(mReps[i]);
 			if (rep)
 				return rep;
 		}
-		return boost::shared_ptr<REP>();
+		return std::shared_ptr<REP>();
 	}
 
 	template<class REP>
-	static std::vector<boost::shared_ptr<REP> > findReps(std::vector<RepPtr> reps)
+	static std::vector<std::shared_ptr<REP> > findReps(std::vector<RepPtr> reps)
 	{
-		std::vector<boost::shared_ptr<REP> > retval;
+		std::vector<std::shared_ptr<REP> > retval;
 		for (unsigned i = 0; i < reps.size(); ++i)
 		{
-			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
+			std::shared_ptr<REP> rep = std::dynamic_pointer_cast<REP>(reps[i]);
 			if (rep)
 				retval.push_back(rep);
 		}
@@ -93,17 +94,17 @@ public:
 	}
 
 	template<class REP>
-	boost::shared_ptr<REP> findManualToolRep()
+	std::shared_ptr<REP> findManualToolRep()
 	{
 		for (unsigned i = 0; i < mReps.size(); ++i)
 		{
-			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(mReps[i]);
+			std::shared_ptr<REP> rep = std::dynamic_pointer_cast<REP>(mReps[i]);
 			if (rep && rep->getTool()->hasType(Tool::TOOL_MANUAL))
 			{
 				return rep;
 			}
 		}
-		return boost::shared_ptr<REP>();
+		return std::shared_ptr<REP>();
 	}
 
 private:

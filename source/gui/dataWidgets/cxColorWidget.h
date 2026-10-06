@@ -13,12 +13,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCOLORWIDGET_H_
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class ActiveData> ActiveDataPtr;
+typedef std::shared_ptr<class ActiveData> ActiveDataPtr;
 
 /**
  * \file

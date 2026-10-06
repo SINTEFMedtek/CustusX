@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMHDIMAGESTREAMER_H_
 
 #include "cxGrabberExport.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <vtkImageData.h>
 #include "cxStreamer.h"
 #include "cxForwardDeclarations.h"
@@ -24,8 +24,8 @@ class QDomElement;
 namespace cx
 {
 
-typedef boost::shared_ptr<struct Package> PackagePtr;
-typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef std::shared_ptr<struct Package> PackagePtr;
+typedef std::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 
 vtkImageDataPtr loadImage(QString filename);
 vtkLookupTablePtr createLookupTable(int numberOfTableValues);
@@ -47,11 +47,11 @@ public:
 	static PackagePtr createPackage(ImageTestData* data);
 
 	vtkImageDataPtr mImageData;
-	boost::shared_ptr<class SplitFramesContainer> mDataSource;
+	std::shared_ptr<class SplitFramesContainer> mDataSource;
 	int mCurrentFrame;
 	QString mRawUid;
 };
-typedef boost::shared_ptr<class ImageTestData> ImageTestDataPtr;
+typedef std::shared_ptr<class ImageTestData> ImageTestDataPtr;
 
 /**
  */
@@ -111,7 +111,7 @@ private:
 	ImageTestData mPrimaryDataSource;
 	ImageTestData mSecondaryDataSource;
 };
-typedef boost::shared_ptr<class DummyImageStreamer> DummyImageStreamerPtr;
+typedef std::shared_ptr<class DummyImageStreamer> DummyImageStreamerPtr;
 
 }
 

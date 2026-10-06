@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxUsReconstructionServiceProxy.h"
+#include <functional>
 
 #include <boost/bind/bind.hpp>
 //#include <QString.h>
@@ -43,7 +44,7 @@ void UsReconstructionServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<UsReconstructionService>(
 								 mPluginContext,
 								 boost::bind(&UsReconstructionServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (UsReconstructionService*)>(),
+								 std::function<void (UsReconstructionService*)>(),
 								 boost::bind(&UsReconstructionServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

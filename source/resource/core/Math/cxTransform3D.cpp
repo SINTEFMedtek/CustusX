@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxTransform3D.h"
+#include <array>
 
 #include <sstream>
 #include <vector>
@@ -24,10 +25,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx_transform3D_internal
 {
 
-boost::array<double, 16> flatten(const Eigen::Affine3d* self)
+std::array<double, 16> flatten(const Eigen::Affine3d* self)
 {
-	boost::array<double, 16> retval;
-	boost::array<double, 16>::iterator raw = retval.begin();
+	std::array<double, 16> retval;
+	std::array<double, 16>::iterator raw = retval.begin();
 
 	for (int r = 0; r < 4; ++r)
 		for (int c = 0; c < 4; ++c)
@@ -135,8 +136,8 @@ namespace cx
 
 bool similar(const Transform3D& a, const Transform3D& b, double tol)
 {
-	boost::array<double, 16> m = a.flatten();
-	boost::array<double, 16> n = b.flatten();
+	std::array<double, 16> m = a.flatten();
+	std::array<double, 16> n = b.flatten();
 	for (int j = 0; j < 16; ++j)
 	{
 		if (!similar(n[j], m[j], tol))

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxCameraStyleForView.h"
+#include <memory>
 
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
@@ -335,7 +336,7 @@ Vector3D CameraStyleForView::smoothZoomedCameraPosition(Vector3D pos)
 RegionOfInterest CameraStyleForView::getROI(QString uid) const
 {
 	DataPtr data = mBackend->patient()->getData(uid);
-	RegionOfInterestMetricPtr roi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
+	RegionOfInterestMetricPtr roi = std::dynamic_pointer_cast<RegionOfInterestMetric>(data);
 	if (roi)
 		return roi->getROI();
 	return RegionOfInterest();

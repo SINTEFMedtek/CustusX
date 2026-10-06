@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWSFIXTURE_H
 
 #include "cxtest_org_custusx_core_view_export.h"
+#include <memory>
 
 #include "cxtestVisServices.h"
 #include "cxMessageListener.h"
@@ -43,7 +44,7 @@ public:
 	double alpha;
 };
 
-typedef boost::shared_ptr<class ViewsWindow> ViewsWindowPtr;
+typedef std::shared_ptr<class ViewsWindow> ViewsWindowPtr;
 
 /** Test class  with convenience methods for defining views.
  *

@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGENERICSCRIPTFILTER_H
 
 #include "cxFilterImpl.h"
+#include <memory>
 #include "cxSettings.h"
 #include "cxProcessWrapper.h"
 #include <QColor>
@@ -24,7 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class Raidionics> RaidionicsPtr;
+typedef std::shared_ptr<class Raidionics> RaidionicsPtr;
 
 struct cxResourceFilter_EXPORT CommandStringVariables
 {
@@ -207,7 +208,7 @@ protected slots:
 	bool deleteProcess();
 	bool disconnectProcess();
 };
-typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
+typedef std::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
 
 } // namespace cx

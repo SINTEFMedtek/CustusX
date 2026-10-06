@@ -15,6 +15,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXANGLEMETRIC_H_
 
 #include "cxResourceExport.h"
+#include <memory>
+#include <array>
 #include "cxPrecompiledHeader.h"
 
 #include "cxDataMetric.h"
@@ -30,7 +32,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
+typedef std::shared_ptr<class AngleMetric> AngleMetricPtr;
 
 /** \brief Data class that represents an angle between two lines.
  *
@@ -78,7 +80,7 @@ private slots:
 	void resetCachedValues();
 private:
 	AngleMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
-	boost::array<DataPtr, 4> mArgument;
+	std::array<DataPtr, 4> mArgument;
 	MetricReferenceArgumentListPtr mArguments;
 	bool mUseSimpleVisualization;
 	mutable OptionalValue<std::vector<Vector3D> > mCachedEndPoints;

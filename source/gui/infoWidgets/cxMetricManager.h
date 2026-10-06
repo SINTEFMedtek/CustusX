@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMETRICMANAGER_H
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include "cxForwardDeclarations.h"
 #include "cxDataMetric.h"
@@ -23,8 +24,8 @@ class QDomElement;
 
 namespace cx
 {
-typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
-typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
+typedef std::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
+typedef std::shared_ptr<class MetricManager> MetricManagerPtr;
 
 /** 
  *

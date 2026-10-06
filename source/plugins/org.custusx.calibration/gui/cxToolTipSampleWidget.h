@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLTIPSAMPLEWIDGET_H_
 
 #include "org_custusx_calibration_Export.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include "cxCoordinateSystemHelpers.h"
@@ -24,9 +25,9 @@ class QLineEdit;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class StringPropertySelectCoordinateSystem> StringPropertySelectCoordinateSystemPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
+typedef std::shared_ptr<class StringPropertySelectCoordinateSystem> StringPropertySelectCoordinateSystemPtr;
 class LabeledComboBoxWidget;
 
 /**

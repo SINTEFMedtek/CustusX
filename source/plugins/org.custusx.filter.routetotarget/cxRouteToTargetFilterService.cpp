@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxRouteToTargetFilterService.h"
+#include <memory>
 
 #include <vtkImageData.h>
 
@@ -203,11 +204,11 @@ bool RouteToTargetFilter::execute()
 		extraAirwayPoints = mServices->patient()->getDataOfTypeWithUidContaining<PointMetric>(RouteToTargetFilter::getExtraAirwayPointUidPrefix());
 	}
 
-	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+	MeshPtr mesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	if (!mesh)
 		return false;
 
-	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
+	PointMetricPtr targetPoint = std::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
 	if (!targetPoint)
 		return false;
 
@@ -246,7 +247,7 @@ bool RouteToTargetFilter::execute()
 	{
 		ImagePtr bloodVesselVolume = this->getCopiedInputImage(3);
 
-		MeshPtr bloodVesselCenterline = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
+		MeshPtr bloodVesselCenterline = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
 		if (bloodVesselCenterline)
 		{
 			if (bloodVesselVolume)
@@ -264,11 +265,11 @@ bool RouteToTargetFilter::execute()
 bool RouteToTargetFilter::postProcess()
 {
 
-	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+	MeshPtr inputMesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	if (!inputMesh)
 		return false;
 
-	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
+	PointMetricPtr targetPoint = std::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
 	if (!targetPoint)
 		return false;
 
@@ -306,7 +307,7 @@ bool RouteToTargetFilter::postProcess()
 	if(mOutputTypes.size() > 1)
 		mOutputTypes[1]->setValue(outputCenterlineExt->getUid());
 
-	MeshPtr bloodVesselCenterlineMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
+	MeshPtr bloodVesselCenterlineMesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
 	if(mBloodVesselRoute && bloodVesselCenterlineMesh && getBloodVesselOption(mOptions)->getValue())
 		postProcessBloodVessels();
 
@@ -323,13 +324,13 @@ bool RouteToTargetFilter::postProcess()
 
 bool RouteToTargetFilter::postProcessBloodVessels()
 {
-	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
-	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
+	MeshPtr inputMesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+	PointMetricPtr targetPoint = std::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
 	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
 	QString nameOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
 
-	MeshPtr bloodVesselCenterlineMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
+	MeshPtr bloodVesselCenterlineMesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
 
 	QString uidCenterlineBV = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixBloodVessel();
 	QString nameCenterlineBV = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixBloodVessel();

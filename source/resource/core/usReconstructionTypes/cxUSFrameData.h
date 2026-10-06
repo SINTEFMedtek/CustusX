@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSFRAMEDATA_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxProbeSector.h"
 #include "cxUSReconstructInputData.h"
@@ -21,8 +22,8 @@ typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ImageDataContainer> ImageDataContainerPtr;
-typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
+typedef std::shared_ptr<class ImageDataContainer> ImageDataContainerPtr;
+typedef std::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
 }
 
 namespace cx
@@ -34,8 +35,8 @@ namespace cx
  * \{
  */
 
-typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
-//typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
+typedef std::shared_ptr<class USFrameData> USFrameDataPtr;
+//typedef std::shared_ptr<class TimedPosition> TimedPositionPtr;
 
 /** Output from the reconstruct preprocessing and is input to the reconstruction.
   *
@@ -63,7 +64,7 @@ private:
 	QString mPath;
 	QString mUid;
 };
-typedef boost::shared_ptr<ProcessedUSInputData> ProcessedUSInputDataPtr;
+typedef std::shared_ptr<ProcessedUSInputData> ProcessedUSInputDataPtr;
 
 
 /**\brief Helper class encapsulating a 2S US data set.

@@ -13,14 +13,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXWEBSERVERGUIEXTENDERSERVICE_H_
 
 #include "cxGUIExtenderService.h"
+#include <memory>
 #include "org_custusx_webserver_Export.h"
 class ctkPluginContext;
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
-typedef boost::shared_ptr<class HttpRequestHandler> HttpRequestHandlerPtr;
+typedef std::shared_ptr<class RemoteAPI> RemoteAPIPtr;
+typedef std::shared_ptr<class HttpRequestHandler> HttpRequestHandlerPtr;
 
 /**
  * Implementation of WebServer service.
@@ -42,7 +43,7 @@ public:
 private:
 	VisServicesPtr mVisServices;
 };
-typedef boost::shared_ptr<WebServerGUIExtenderService> WebServerGUIExtenderServicePtr;
+typedef std::shared_ptr<WebServerGUIExtenderService> WebServerGUIExtenderServicePtr;
 
 } /* namespace cx */
 

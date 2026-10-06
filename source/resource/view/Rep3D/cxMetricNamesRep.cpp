@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxMetricNamesRep.h"
+#include <memory>
 
 #include <vtkRenderer.h>
 #include <vtkActor2D.h>
@@ -94,7 +95,7 @@ std::vector<DataMetricPtr> MetricNamesRep::convertToMetrics(std::vector<DataPtr>
 	std::vector<DataMetricPtr> metrics;
 	for (unsigned i=0; i<data.size(); ++i)
 	{
-		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data[i]);
+		DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(data[i]);
 		if (metric)
 			metrics.push_back(metric);
 	}

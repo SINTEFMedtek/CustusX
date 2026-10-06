@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSRECONSTRUCTIONIMPLSERVICE_H
 
 #include "org_custusx_usreconstruction_Export.h"
+#include <memory>
 #include "cxUsReconstructionService.h"
 
 #include "cxUSReconstructInputData.h"
@@ -119,7 +120,7 @@ private:
 	XmlOptionFile mSettings;
 	QString mShaderPath; ///< name of shader folder
 
-	boost::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> > mServiceListener;
 	std::vector<ReconstructionExecuterPtr> mExecuters;
 
 	PatientModelServicePtr mPatientModelService;

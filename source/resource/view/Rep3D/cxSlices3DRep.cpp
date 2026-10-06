@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxSlices3DRep.h"
+#include <memory>
 
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
@@ -42,9 +43,9 @@ Slice3DProxy::~Slice3DProxy()
 {
 }
 
-boost::shared_ptr<Slice3DProxy> Slice3DProxy::New()
+std::shared_ptr<Slice3DProxy> Slice3DProxy::New()
 {
-	return boost::shared_ptr<Slice3DProxy>(new Slice3DProxy());
+	return std::shared_ptr<Slice3DProxy>(new Slice3DProxy());
 }
 
 vtkImageSlicePtr Slice3DProxy::getActor()

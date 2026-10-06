@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGRAPHICALTORUS3D_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 #include "vtkForwardDeclarations.h"
 #include "cxGraphicalObjectWithDirection.h"
 
@@ -37,7 +38,7 @@ public:
     void setThickness(double radius);
     void setColor(QColor color);
 };
-typedef boost::shared_ptr<GraphicalTorus3D> GraphicalTorus3DPtr;
+typedef std::shared_ptr<GraphicalTorus3D> GraphicalTorus3DPtr;
 
 
 } // namespace cx

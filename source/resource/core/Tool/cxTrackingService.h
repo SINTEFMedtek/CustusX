@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxTransform3D.h"
 #include "cxTool.h"
 
@@ -27,16 +27,16 @@ namespace cx
 {
 
 typedef std::map<double, Transform3D> TimedTransformMap;
-typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef std::shared_ptr<class Tool> ToolPtr;
 typedef std::map<ToolPtr, TimedTransformMap> SessionToolHistoryMap;
-typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
-typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
-typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
+typedef std::shared_ptr<class Landmarks> LandmarksPtr;
+typedef std::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef std::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
 
-typedef boost::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class DummyTool> DummyToolPtr;
-typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
+typedef std::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
+typedef std::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef std::shared_ptr<class DummyTool> DummyToolPtr;
+typedef std::shared_ptr<class ManualTool> ManualToolPtr;
 
 /**
  * \brief Service providing tools and tracking systems.

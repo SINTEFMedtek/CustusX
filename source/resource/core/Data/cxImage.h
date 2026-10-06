@@ -17,13 +17,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPrecompiledHeader.h"
 
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxBoundingBox3D.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxData.h"
 
-typedef boost::shared_ptr<std::map<int, int> > HistogramMapPtr;
+typedef std::shared_ptr<std::map<int, int> > HistogramMapPtr;
 
 class QDomNode;
 class QDomDocument;

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXBOOLPROPERTYBASE_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxProperty.h"
 
@@ -57,7 +58,7 @@ public:
 	//signals:
 	//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 };
-typedef boost::shared_ptr<BoolPropertyBase> BoolPropertyBasePtr;
+typedef std::shared_ptr<BoolPropertyBase> BoolPropertyBasePtr;
 
 }
 

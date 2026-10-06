@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxShowDataTreeNode.h"
+#include <memory>
 #include "cxPatientModelService.h"
 #include "cxDefinitions.h"
 #include "cxData.h"
@@ -95,7 +96,7 @@ void ShowDataTreeNodeBase::setViewGroupVisibility(int index, bool value)
 	group->setProperties(mData->getUid(), props);
 }
 
-boost::shared_ptr<QWidget> ShowDataTreeNodeBase::createPropertiesWidget() const
+std::shared_ptr<QWidget> ShowDataTreeNodeBase::createPropertiesWidget() const
 {
 	return this->getParent()->createPropertiesWidget();
 }

@@ -14,11 +14,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 //#include "cxStringPropertyBase.h"
 #include "cxFilePathPropertyBase.h"
+#include <memory>
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
+typedef std::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
 
 /**
  * \class FilePreviewProperty

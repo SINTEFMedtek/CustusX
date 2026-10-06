@@ -12,10 +12,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSELECTDATASTRINGPROPERTY_H_
 
 #include "cxSelectDataStringPropertyBase.h"
+#include <memory>
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertyActiveData> StringPropertyActiveDataPtr;
+typedef std::shared_ptr<class StringPropertyActiveData> StringPropertyActiveDataPtr;
 /** Property that connects to the current active data.
  * Example: Active data: [DataName]
  * where active data is the value
@@ -39,7 +40,7 @@ protected:
 	StringPropertyActiveData(PatientModelServicePtr patientModelService, QString typeRegexp = ".*");
 };
 
-typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
+typedef std::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
 /** Property that connects to the current active image.
  * Example: Active image: [DataName]
  * where active image is the value
@@ -64,7 +65,7 @@ protected:
 };
 
 
-typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
+typedef std::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
 /** Property that selects and stores an image.
  * The image is stored internally in the property.
  * Use setValue/getValue plus changed() to access it.
@@ -89,7 +90,7 @@ private:
   QString mImageUid;
 };
 
-typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
+typedef std::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
 /** Property that selects and stores a data.
  * The data is stored internally in the property.
  * Use setValue/getValue plus changed() to access it.
@@ -119,7 +120,7 @@ private:
 
 };
 
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef std::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
 /** Property that selects and stores a mesh.
  * The mesh is stored internally in the property.
  * Use setValue/getValue plus changed() to access it.
@@ -144,7 +145,7 @@ private:
   QString mMeshUid;
 };
 
-typedef boost::shared_ptr<class StringPropertySelectTrackedStream> StringPropertySelectTrackedStreamPtr;
+typedef std::shared_ptr<class StringPropertySelectTrackedStream> StringPropertySelectTrackedStreamPtr;
 /** Property that selects and stores a TrackedStream.
  * The stream is stored internally in the property.
  * Use setValue/getValue plus changed() to access it.

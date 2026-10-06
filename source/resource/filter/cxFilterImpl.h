@@ -18,11 +18,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QObject>
 #include "cxFilter.h"
 #include <QDomElement>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /** Helper implementation for Filter.
  *

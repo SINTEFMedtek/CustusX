@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECORDTRACKINGWIDGET_H
 
 #include <QPushButton>
+#include <memory>
 #include <QDomElement>
 #include <QDateTime>
 #include "cxForwardDeclarations.h"
@@ -23,14 +24,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 class WidgetObscuredListener;
-typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef std::shared_ptr<class Acquisition> AcquisitionPtr;
+typedef std::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef std::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 class RecordSessionWidget;
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-//typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
+typedef std::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+//typedef std::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
-typedef boost::shared_ptr<class SelectRecordSession> SelectRecordSessionPtr;
+typedef std::shared_ptr<class SelectRecordSession> SelectRecordSessionPtr;
 
 #define ADJUST_TRACKING_DATA_OFFSET 10 //seconds
 
@@ -92,7 +93,7 @@ private:
 	DoublePairPropertyPtr mAdjustTrackingDataTimeInterval;
 	std::pair<QDateTime, QDateTime> mStartStopTimeBeforeAdjustment;
 
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+	std::shared_ptr<WidgetObscuredListener> mObscuredListener;
 
 	ToolRep3DPtr getToolRepIn3DView();
 	void onToolChanged();

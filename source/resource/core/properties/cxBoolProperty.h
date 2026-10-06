@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXBOOLPROPERTY_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QDomElement>
 
@@ -31,7 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
+typedef std::shared_ptr<class BoolProperty> BoolPropertyPtr;
 
 /** Property for boolean values.
  *

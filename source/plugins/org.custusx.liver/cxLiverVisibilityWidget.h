@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLIVERVISIBILITYWIDGET_H_
 
 #include "org_custusx_liver_Export.h"
+#include <memory>
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"
@@ -25,7 +26,7 @@ class QComboBox;
 namespace cx
 {
 
-typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
+typedef std::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
 
 struct org_custusx_liver_EXPORT SelectableLiverStructure
 {

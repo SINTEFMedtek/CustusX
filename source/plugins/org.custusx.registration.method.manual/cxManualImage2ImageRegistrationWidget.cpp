@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxManualImage2ImageRegistrationWidget.h"
+#include <memory>
 #include "cxRegistrationService.h"
 #include "cxData.h"
 #include "cxImage.h"
@@ -162,8 +163,8 @@ void    ManualImage2ImageRegistrationWidget::updateAverageAccuracyLabel()
 {
     QString fixedName;
     QString movingName;
-    DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mServices->registration()->getFixedData());
-    DataPtr movingData = boost::dynamic_pointer_cast<Data>(mServices->registration()->getMovingData());
+    DataPtr fixedData = std::dynamic_pointer_cast<Data>(mServices->registration()->getFixedData());
+    DataPtr movingData = std::dynamic_pointer_cast<Data>(mServices->registration()->getMovingData());
     if (fixedData)
         fixedName = fixedData->getName();
     if (movingData)

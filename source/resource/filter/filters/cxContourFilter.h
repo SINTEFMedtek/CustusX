@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCONTOURFILTER_H
 
 #include "cxFilterImpl.h"
+#include <memory>
 class QColor;
 
 namespace cx
@@ -88,7 +89,7 @@ private:
 	vtkPolyDataPtr mRawResult;
 	ImagePtr mPreviewImage;
 };
-typedef boost::shared_ptr<class ContourFilter> ContourFilterPtr;
+typedef std::shared_ptr<class ContourFilter> ContourFilterPtr;
 
 
 } // namespace cx

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGRAPHICALAXES3D_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <vector>
 #include "cxRepImpl.h"
@@ -21,8 +22,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
-typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
+typedef std::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
+typedef std::shared_ptr<class ViewportListener> ViewportListenerPtr;
 }
 
 namespace cx

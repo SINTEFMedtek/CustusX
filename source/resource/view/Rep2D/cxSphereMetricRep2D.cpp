@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxSphereMetricRep2D.h"
+#include <memory>
 
 #include "boost/bind/bind.hpp"
 
@@ -55,7 +56,7 @@ void SphereMetricRep2D::clear()
 
 SphereMetricPtr SphereMetricRep2D::getSphereMetric()
 {
-	return boost::dynamic_pointer_cast<SphereMetric>(mMetric);
+	return std::dynamic_pointer_cast<SphereMetric>(mMetric);
 }
 
 void SphereMetricRep2D::onModifiedStartRender()

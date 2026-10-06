@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxSelectDataStringPropertyBase.h"
+#include <memory>
 #include "cxPatientModelService.h"
 #include "cxData.h"
 #include "cxImageAlgorithms.h"
@@ -82,7 +83,7 @@ std::map<QString, DataPtr> SelectDataStringPropertyBase::filterImagesOn2D(std::m
 	for (iter=input.begin(); iter!=input.end(); )
 	{
 		current = iter++; // increment iterator before erasing!
-		ImagePtr image = boost::dynamic_pointer_cast<Image>(current->second);
+		ImagePtr image = std::dynamic_pointer_cast<Image>(current->second);
 		if(image && !image->is2D())
 			input.erase(current);
 	}

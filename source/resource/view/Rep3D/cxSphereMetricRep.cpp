@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxSphereMetricRep.h"
+#include <memory>
 
 #include "cxView.h"
 
@@ -46,7 +47,7 @@ void SphereMetricRep::clear()
 
 SphereMetricPtr SphereMetricRep::getSphereMetric()
 {
-	return boost::dynamic_pointer_cast<SphereMetric>(mMetric);
+	return std::dynamic_pointer_cast<SphereMetric>(mMetric);
 }
 
 void SphereMetricRep::onModifiedStartRender()

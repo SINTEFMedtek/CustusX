@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLMANUALCALIBRATIONWIDGET_H_
 
 #include "org_custusx_calibration_Export.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include "cxTransform3DWidget.h"
@@ -19,7 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 /**
  * \file
  * \addtogroup org_custusx_calibration

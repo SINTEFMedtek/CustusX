@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXHELPWIDGET_H
 
 #include "cxBaseWidget.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "org_custusx_help_Export.h"
 class QTabWidget;
 class QAction;
@@ -20,7 +20,7 @@ class QSplitter;
 
 namespace cx
 {
-typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+typedef std::shared_ptr<class HelpEngine> HelpEnginePtr;
 class HelpSearchWidget;
 class HelpIndexWidget;
 

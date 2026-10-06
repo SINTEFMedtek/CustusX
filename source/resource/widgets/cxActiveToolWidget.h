@@ -13,13 +13,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXACTIVETOOLWIDGET_H_
 
 #include "cxResourceWidgetsExport.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef std::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
 
 /**
  * \class ActiveToolWidget

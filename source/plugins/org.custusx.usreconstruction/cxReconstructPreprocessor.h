@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECONSTRUCTPREPROCESSOR_H_
 
 #include "org_custusx_usreconstruction_Export.h"
+#include <memory>
 
 #include "cxBoundingBox3D.h"
 #include "cxReconstructedOutputVolumeParams.h"
@@ -21,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
+typedef std::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
 
 /** \brief Algorithm part of reconstruction -
  * no dependencies on parameter classes.

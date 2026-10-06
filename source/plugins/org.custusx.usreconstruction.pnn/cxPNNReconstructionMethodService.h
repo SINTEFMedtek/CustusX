@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPNNRECONSTRUCTIONMETHODSERVICE_H_
 
 #include "cxReconstructionMethodService.h"
+#include <memory>
 #include "org_custusx_usreconstruction_pnn_Export.h"
 #include "cxTransform3D.h"
 class ctkPluginContext;
@@ -62,7 +63,7 @@ private:
 
 
 };
-//typedef boost::shared_ptr<PNNReconstructionMethodService> PNNReconstructionMethodService*;
+//typedef std::shared_ptr<PNNReconstructionMethodService> PNNReconstructionMethodService*;
 
 } /* namespace cx */
 

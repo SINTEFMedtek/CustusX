@@ -69,7 +69,7 @@ Names
 4. Member variables in a class are usually prefixed with "m". The rest of the name is in camel case. 
 5. Use accessors named getCamelCase() for get, setCamelCase() for set.. 
 6. All functions shall be named in lowerCamelCase(). 
-7. Smart pointer typedefs append Ptr to the class name. e.g. typedef boost::shared_ptr FooPtr; 
+7. Smart pointer typedefs append Ptr to the class name. e.g. `typedef std::shared_ptr<Foo> FooPtr;`
 8. All new libraries shall have its name prefixed with the namespace. Example: cxUtilities.so 
 
 Comments
@@ -87,7 +87,7 @@ Structure
 2. Remove unused code from production code. Do not litter the code with commented out code sections. 
 3. Do not use globals. 
 4. Use pointer ('*') rather than reference ('&') to pass a return value from a function. 
-5. Avoid the use of the operator delete, use Qt/VTK-specific allocation methods, or smart pointers (e.g. boost::shared_ptr).
+5. Avoid the use of the operator delete, use Qt/VTK-specific allocation methods, or smart pointers (e.g. std::shared_ptr).
 6. Use const where possible.
 7. Organize includes starting with the most general library down to the closest neighbours.
 8. Do not add unnecessary headers in a header file, use forward declarations instead. 

@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSMOOTHINGIMAGEFILTER_H
 
 #include "cxFilterImpl.h"
+#include <memory>
 
 namespace cx
 {
@@ -53,7 +54,7 @@ private slots:
 private:
 	vtkImageDataPtr mRawResult;
 };
-typedef boost::shared_ptr<class SmoothingImageFilter> SmoothingImageFilterPtr;
+typedef std::shared_ptr<class SmoothingImageFilter> SmoothingImageFilterPtr;
 
 
 } // namespace cx

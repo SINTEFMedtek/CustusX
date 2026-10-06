@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioBaseConverter.h"
 
 #include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QThread>
 
 #include "cxNetworkHandler.h"
@@ -23,10 +23,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
-typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
-typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
+typedef std::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
+typedef std::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
+typedef std::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef std::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
 
 /**
  * Activator for the OpenIGTLink service

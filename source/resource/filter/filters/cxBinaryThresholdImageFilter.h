@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSBINARYTHRESHOLDIMAGEFILTER_H_
 
 #include "cxFilterImpl.h"
+#include <memory>
 
 namespace cx
 {
@@ -74,7 +75,7 @@ private:
 protected:
 	ImagePtr mPreviewImage;
 };
-typedef boost::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
+typedef std::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
 
 
 /**

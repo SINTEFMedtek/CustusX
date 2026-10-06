@@ -20,8 +20,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDateTime>
 #include <QFile>
 #include <QPointer>
-#include "boost/shared_ptr.hpp"
-#include "boost/function.hpp"
+#include <memory>
+#include <functional>
 #include "cxDefinitions.h"
 #include "cxAudio.h"
 #include <sstream>
@@ -46,8 +46,8 @@ class QTextStream;
 
 namespace cx
 {
-typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
-typedef boost::shared_ptr<class MessageRepository> MessageRepositoryPtr;
+typedef std::shared_ptr<class MessageObserver> MessageObserverPtr;
+typedef std::shared_ptr<class MessageRepository> MessageRepositoryPtr;
 class LogFile;
 
 
@@ -60,7 +60,7 @@ class ThreadMethodInvoker : public QObject
     Q_OBJECT
 
 public:
-    typedef boost::function<void()> ActionType;
+    typedef std::function<void()> ActionType;
 
     ThreadMethodInvoker(QObject* parent);
     void callInLogThread(ActionType action);
@@ -84,7 +84,7 @@ private:
 class LogThread : public QObject
 {
 	Q_OBJECT
-    typedef boost::function<void()> ActionType;
+    typedef std::function<void()> ActionType;
 
 public:
 	LogThread(QObject* parent = NULL);

@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTransform3D.h"
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "iir/Butterworth.h"
 
 namespace cx
@@ -51,7 +51,7 @@ private:
 	Iir::Butterworth::LowPass<mFilterOrder> fy;
 	Iir::Butterworth::LowPass<mFilterOrder> fz;
 };
-typedef boost::shared_ptr<TrackingPositionFilter> TrackingPositionFilterPtr;
+typedef std::shared_ptr<TrackingPositionFilter> TrackingPositionFilterPtr;
 
 } // namespace cx
 

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxBinaryThresholdImageFilter.h"
+#include <memory>
 
 #include <vtkImageData.h>
 
@@ -145,7 +146,7 @@ void BinaryThresholdImageFilter::thresholdSlot()
 {
 	if (mActive)
 	{
-		mPreviewImage = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
+		mPreviewImage = std::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
 		if(!mPreviewImage)
 			return;
 		Eigen::Vector2d threshold = Eigen::Vector2d(mThresholdOption->getValue()[0],  mThresholdOption->getValue()[1]);

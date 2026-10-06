@@ -34,13 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXBRONCHOSCOPYNAVIGATIONPLUGINACTIVATOR_H_
 
 #include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class BronchoscopyNavigationGUIExtenderService> BronchoscopyNavigationGUIExtenderServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef std::shared_ptr<class BronchoscopyNavigationGUIExtenderService> BronchoscopyNavigationGUIExtenderServicePtr;
+typedef std::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for the bronchoscopynavigation plugin

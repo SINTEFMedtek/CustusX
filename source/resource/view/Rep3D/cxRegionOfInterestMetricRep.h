@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGIONOFINTERESTMETRICREP_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
@@ -25,8 +26,8 @@ typedef vtkSmartPointer<vtkTextActor> vtkTextActorPtr;
 namespace cx
 {
 
-typedef boost::shared_ptr<class RegionOfInterestMetricRep> RegionOfInterestMetricRepPtr;
-typedef boost::shared_ptr<class GraphicalBox> GraphicalBoxPtr;
+typedef std::shared_ptr<class RegionOfInterestMetricRep> RegionOfInterestMetricRepPtr;
+typedef std::shared_ptr<class GraphicalBox> GraphicalBoxPtr;
 
 /** \brief Rep for visualizing a RegionOfInterestMetric.
  *

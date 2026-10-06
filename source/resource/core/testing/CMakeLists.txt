@@ -49,6 +49,7 @@ if(BUILD_TESTING)
         cxTestFrameForest.cpp
         cxtestRegistrationHistory.cpp
         cxtestMouseWheelWidgetAdjustmentGuard.cpp
+        cxtestManualToolAdapter.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS

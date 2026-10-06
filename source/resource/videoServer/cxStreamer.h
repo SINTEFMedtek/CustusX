@@ -20,14 +20,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTimer>
 
 #include <map>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <iostream>
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class Sender> SenderPtr;
-typedef boost::shared_ptr<class Streamer> StreamerPtr;
+typedef std::shared_ptr<class Sender> SenderPtr;
+typedef std::shared_ptr<class Streamer> StreamerPtr;
 
 /**\brief
  *
@@ -100,7 +100,7 @@ protected slots:
 protected:
 	StringMap mArguments;
 };
-typedef boost::shared_ptr<CommandLineStreamer> CommandLineStreamerPtr;
+typedef std::shared_ptr<CommandLineStreamer> CommandLineStreamerPtr;
 }
 
 #endif /* CXSTREAMER_H_ */

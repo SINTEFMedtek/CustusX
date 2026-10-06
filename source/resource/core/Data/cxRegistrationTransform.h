@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include <QDateTime>
 
@@ -83,7 +83,7 @@ public:
 cxResource_EXPORT bool operator<(const ParentSpace& lhs, const ParentSpace& rhs);
 cxResource_EXPORT bool operator==(const ParentSpace& lhs, const ParentSpace& rhs);
 
-typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
+typedef std::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
 /**\brief A history of registration events.
  *

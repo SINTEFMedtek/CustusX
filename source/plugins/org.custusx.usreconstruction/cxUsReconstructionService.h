@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_usreconstruction_Export.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <set>
 #include <vector>
 #include <QObject>
@@ -31,19 +31,19 @@ class XmlOptionFile;
 class OutputVolumeParams;
 class ReconstructionMethodService;
 
-typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
-typedef boost::shared_ptr<class CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
-typedef boost::shared_ptr<class ReconstructionManager> ReconstructionManagerPtr;
-typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
-typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
-typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
+typedef std::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
+typedef std::shared_ptr<class CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
+typedef std::shared_ptr<class ReconstructionManager> ReconstructionManagerPtr;
+typedef std::shared_ptr<class ReconstructCore> ReconstructCorePtr;
+typedef std::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
+typedef std::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
+typedef std::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
+typedef std::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
+typedef std::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
 
-typedef boost::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPtr;
+typedef std::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPtr;
 
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 
 /**
  * \ingroup org_custusx_usreconstruction

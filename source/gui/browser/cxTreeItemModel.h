@@ -2,6 +2,7 @@
 #define CXTREEITEMMODEL_H
 
 #include "cxBaseWidget.h"
+#include <memory>
 
 #include <QtGui>
 #include "cxImage.h"
@@ -18,8 +19,8 @@ class QTreeView;
 namespace cx
 {
 
-typedef boost::shared_ptr<class StringListProperty> StringListPropertyPtr;
-typedef boost::shared_ptr<class TreeRepository> TreeRepositoryPtr;
+typedef std::shared_ptr<class StringListProperty> StringListPropertyPtr;
+typedef std::shared_ptr<class TreeRepository> TreeRepositoryPtr;
 
 /**
  * \ingroup cxGUI

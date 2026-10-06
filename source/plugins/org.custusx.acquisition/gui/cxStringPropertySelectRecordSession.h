@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTRINGPROPERTYSELECTRECORDSESSION_H_
 
 #include "org_custusx_acquisition_Export.h"
+#include <memory>
 
 //#include "cxDataInterface.h"
 #include "cxRecordSession.h"
@@ -44,10 +45,10 @@ public: // optional methods
 protected:
   AcquisitionDataPtr mPluginData;
 };
-typedef boost::shared_ptr<class StringPropertySelectRecordSessionBase> StringPropertySelectRecordSessionBasePtr;
+typedef std::shared_ptr<class StringPropertySelectRecordSessionBase> StringPropertySelectRecordSessionBasePtr;
 
 
-typedef boost::shared_ptr<class StringPropertySelectRecordSession> StringPropertySelectRecordSessionPtr;
+typedef std::shared_ptr<class StringPropertySelectRecordSession> StringPropertySelectRecordSessionPtr;
 
 /** Adapter that selects and stores a tool.
  * The tool is stored internally in the adapter.

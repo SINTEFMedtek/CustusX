@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxAccusurfFilterService.h"
+#include <memory>
 
 #include <vtkImageData.h>
 
@@ -102,7 +103,7 @@ bool AccusurfFilter::execute()
 {
     mAccusurf.reset(new Accusurf());
 
-	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+	MeshPtr mesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 
     ImagePtr inputImage = this->getCopiedInputImage(1);
     if (!inputImage)
