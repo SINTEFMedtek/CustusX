@@ -1,4 +1,5 @@
 #include "SeansVesselReg.hxx"
+#include <memory>
 #include "HackTPSTransform.hxx"
 
 #include <iostream>

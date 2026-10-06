@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSMOOTHINGIMAGEFILTER_H
 
 #include "cxFilterImpl.h"
+#include <memory>
 
 namespace cx
 {

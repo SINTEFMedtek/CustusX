@@ -21,6 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCROSSHAIRREP2D_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 //#include <vtkSmartPointer.h>
 #include "cxRepImpl.h"

@@ -1,4 +1,6 @@
 #include "cxToolProxy.h"
+#include <memory>
+#include <functional>
 #include "boost/bind/bind.hpp"
 #include "cxNullDeleter.h"
 #include "cxTrackingService.h"

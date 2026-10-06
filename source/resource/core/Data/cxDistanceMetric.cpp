@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxDistanceMetric.h"
+#include <memory>
 #include "cxBoundingBox3D.h"
 #include "cxTypeConversions.h"
 #include "cxPlaneMetric.h"

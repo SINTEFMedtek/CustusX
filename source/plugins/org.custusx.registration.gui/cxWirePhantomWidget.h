@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXWIREPHANTOMWIDGET_H_
 
 #include "org_custusx_registration_gui_Export.h"
+#include <memory>
 #include "cxRegistrationBaseWidget.h"
 #include "cxPipeline.h"
 #include "cxFilter.h"

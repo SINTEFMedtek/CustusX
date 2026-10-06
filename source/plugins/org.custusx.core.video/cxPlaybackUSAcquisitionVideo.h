@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPLAYBACKUSACQUISITIONVIDEO_H_
 
 #include "org_custusx_core_video_Export.h"
+#include <memory>
 
 #include <QObject>
 #include <QFuture>

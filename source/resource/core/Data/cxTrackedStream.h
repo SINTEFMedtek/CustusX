@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKEDSTREAM_H
 
 #include "cxImage.h"
+#include <memory>
 
 namespace cx
 {

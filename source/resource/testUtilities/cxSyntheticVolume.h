@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define SYNTHETIC_VOLUME_HPP
 
 #include "cxtestutilities_export.h"
+#include <memory>
 
 #include "cxUSFrameData.h"
 #include <vector>

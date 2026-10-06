@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTATESERVICEPROXY_H
 
 #include "cxStateService.h"
+#include <memory>
 #include "cxServiceTrackerListener.h"
 
 namespace cx

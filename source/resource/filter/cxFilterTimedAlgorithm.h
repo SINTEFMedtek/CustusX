@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFILTERTIMEDALGORITHM_H
 
 #include "cxResourceFilterExport.h"
+#include <memory>
 
 #include "cxThreadedTimedAlgorithm.h"
 

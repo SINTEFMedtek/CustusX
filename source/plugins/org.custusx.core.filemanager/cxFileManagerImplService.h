@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFILEMANAGERIMPLSERVICE_H
 
 #include "cxFileManagerServiceBase.h"
+#include <memory>
 #include "cxFileReaderWriterService.h"
 #include "org_custusx_core_filemanager_Export.h"
 #include "cxServiceTrackerListener.h"

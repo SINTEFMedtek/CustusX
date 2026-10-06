@@ -52,6 +52,14 @@ INCLUDE_REPLACEMENTS = {
     'boost/unordered_map.hpp': 'unordered_map',
 }
 
+STD_HEADER_USAGE = [
+    ('memory', r'\bstd::(shared_ptr|weak_ptr|unique_ptr|enable_shared_from_this|make_shared|dynamic_pointer_cast|static_pointer_cast|const_pointer_cast)\b'),
+    ('functional', r'\bstd::function\b'),
+    ('array', r'\bstd::array\b'),
+    ('unordered_map', r'\bstd::unordered_map\b'),
+    ('cstdint', r'\bstd::u?int(8|16|32|64)_t\b'),
+]
+
 INCLUDE_PATTERN = re.compile(r'^([ \t]*)#[ \t]*include[ \t]*[<"]([^>"]+)[>"][^\n]*$', re.MULTILINE)
 
 
@@ -87,8 +95,40 @@ def replaceIncludes(text):
     return '\n'.join(lines)
 
 
+def findIncludeInsertLine(lines):
+    '''Return the line index to insert a new include at: after the first include, else after the include guard.'''
+    for i, line in enumerate(lines):
+        if INCLUDE_PATTERN.match(line):
+            return i + 1
+    for i, line in enumerate(lines):
+        if re.match(r'^[ \t]*#[ \t]*define\b', line) and i > 0 and re.match(r'^[ \t]*#[ \t]*ifndef\b', lines[i - 1]):
+            return i + 1
+    return 0
+
+
+def addMissingIncludes(text):
+    '''Include the std header for every std type used, as Boost headers may have provided it indirectly.'''
+    included = set(match.group(2) for match in INCLUDE_PATTERN.finditer(text))
+    missing = []
+    for header, pattern in STD_HEADER_USAGE:
+        if header not in included and header not in missing and re.search(pattern, text):
+            missing.append(header)
+    if not missing:
+        return text
+    lines = text.split('\n')
+    lineEnd = '\r' if lines[0].endswith('\r') else ''
+    index = findIncludeInsertLine(lines)
+    lines[index:index] = ['#include <%s>%s' % (header, lineEnd) for header in missing]
+    return '\n'.join(lines)
+
+
 def convertText(text):
-    return replaceIncludes(replaceIdentifiers(text))
+    converted = replaceIdentifiers(text)
+    identifiersReplaced = converted != text
+    converted = replaceIncludes(converted)
+    if identifiersReplaced:
+        converted = addMissingIncludes(converted)
+    return converted
 
 
 def convertFile(path):

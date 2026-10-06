@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWPORTLISTENER_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <functional>
 #include "vtkForwardDeclarations.h"

@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXROUTETOTARGETFILTER_H
 
 #include "org_custusx_filter_routetotarget_Export.h"
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxPatientModelService.h"
 #include "cxFilterImpl.h"

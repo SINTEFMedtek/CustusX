@@ -15,6 +15,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXANGLEMETRIC_H_
 
 #include "cxResourceExport.h"
+#include <memory>
+#include <array>
 #include "cxPrecompiledHeader.h"
 
 #include "cxDataMetric.h"

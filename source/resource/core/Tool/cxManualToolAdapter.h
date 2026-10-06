@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMANUALTOOLADAPTER_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxManualTool.h"
 #include <QTimer>

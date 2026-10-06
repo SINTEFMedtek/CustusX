@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVLCPROCESS_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QString>
 #include "cxProcessWrapper.h"

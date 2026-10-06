@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXELASTIXPARAMETERS_H
 
 #include <QObject>
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
 #include "cxStringProperty.h"

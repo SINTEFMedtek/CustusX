@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxPatientModelServiceNull.h"
+#include <memory>
 #include <QDomElement>
 #include <map>
 #include "cxImage.h"

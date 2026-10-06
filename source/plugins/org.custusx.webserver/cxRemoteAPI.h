@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREMOTEAPI_H
 
 #include <QObject>
+#include <memory>
 #include "cxVisServices.h"
 
 #include "org_custusx_webserver_Export.h"

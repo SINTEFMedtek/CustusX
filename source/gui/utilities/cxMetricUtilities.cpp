@@ -1,4 +1,5 @@
 #include "cxMetricUtilities.h"
+#include <memory>
 
 #include "cxFrameMetricWrapper.h"
 #include "cxToolMetricWrapper.h"

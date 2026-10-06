@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSESSIONSTORAGESERVICEPROXY_H
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxSessionStorageService.h"
 
 #include "cxServiceTrackerListener.h"

@@ -1,3 +1,4 @@
+#include <array>
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
 

@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIDEOGRAPHICS_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"

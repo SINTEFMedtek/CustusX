@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTSYNTHETICRECONSTRUCTINPUT_H
 
 #include "cxtestutilities_export.h"
+#include <memory>
 #include "cxSimpleSyntheticVolume.h"
 #include "cxtestSyntheticVolumeComparer.h"
 

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxLayoutInteractor.h"
+#include <memory>
 #include "cxLayoutEditorWidget.h"
 #include <QMenu>
 #include <QMessageBox>

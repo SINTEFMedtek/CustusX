@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxDataRepContainer.h"
+#include <memory>
 
 #include "cxView.h"
 #include "cxSliceProxy.h"

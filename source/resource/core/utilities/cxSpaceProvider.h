@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSPACEPROVIDER_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxTransform3D.h"
 #include "cxCoordinateSystemHelpers.h"

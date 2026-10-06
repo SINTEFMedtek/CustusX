@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTMETRICFIXTURE_H_
 
 #include "cxtest_org_custusx_core_patientmodel_export.h"
+#include <memory>
 
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"

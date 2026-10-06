@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGSYSTEMPLAYBACKSERVICE_H
 
 #include "org_custusx_core_tracking_Export.h"
+#include <memory>
 #include "cxTrackingSystemService.h"
 
 namespace cx

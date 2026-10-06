@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPIPELINE_H
 
 #include "cxResourceFilterExport.h"
+#include <memory>
 
 #include "cxFilter.h"
 #include "cxFilterGroup.h"

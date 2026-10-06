@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTREAMREP3D_H
 
 #include "cxVolumetricRep.h"
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
 

@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCAMERACONTROL_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <vector>
 #include <vtkCamera.h>

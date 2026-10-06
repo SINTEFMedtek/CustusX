@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTFASTPATIENTREGISTRATIONWIDGETFIXTURE_H
 
 #include "cxFastPatientRegistrationWidget.h"
+#include <memory>
 #include "cxtest_org_custusx_registration_method_landmark_export.h"
 
 namespace cx

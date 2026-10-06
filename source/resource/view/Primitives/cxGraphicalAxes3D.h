@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGRAPHICALAXES3D_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <vector>
 #include "cxRepImpl.h"

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxFileManagerServiceProxy.h"
+#include <functional>
 #include "boost/bind/bind.hpp"
 #include "cxNullDeleter.h"
 

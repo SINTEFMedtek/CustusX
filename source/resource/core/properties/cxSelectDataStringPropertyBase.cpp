@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxSelectDataStringPropertyBase.h"
+#include <memory>
 #include "cxPatientModelService.h"
 #include "cxData.h"
 #include "cxImageAlgorithms.h"

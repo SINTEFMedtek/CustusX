@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSRECONSTRUCTIONSERVICEPROXY_H
 
 #include "org_custusx_usreconstruction_Export.h"
+#include <memory>
 
 #include "cxUsReconstructionService.h"
 #include "cxServiceTrackerListener.h"

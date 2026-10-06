@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXBRONCHOSCOPYNAVIGATIONWIDGET_H_
 
 #include <QtWidgets>
+#include <memory>
 #include <QWidget>
 #include <QPushButton>
 #include "qdom.h"

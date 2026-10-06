@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONWIDGET_H_
 
 #include "org_custusx_registration_gui_Export.h"
+#include <memory>
 #include "cxTabbedWidget.h"
 #include "cxServiceTrackerListener.h"
 #include "cxRegistrationMethodService.h"

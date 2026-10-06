@@ -1,4 +1,5 @@
 #include "cxErrorObserver.h"
+#include <memory>
 
 namespace cx {
 

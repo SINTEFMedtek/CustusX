@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxContourFilter.h"
+#include <memory>
 
 #include <vtkImageShrink3D.h>
 #include <vtkMarchingCubes.h>

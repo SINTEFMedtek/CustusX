@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxDistanceMetricRep2D.h"
+#include <memory>
 #include "boost/bind/bind.hpp"
 
 #include <vtkActor.h>

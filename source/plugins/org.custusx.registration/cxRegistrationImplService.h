@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONIMPLSERVICE_H_
 
 #include "cxRegistrationService.h"
+#include <memory>
 #include <vector>
 #include "org_custusx_registration_Export.h"
 #include "qdatetime.h"

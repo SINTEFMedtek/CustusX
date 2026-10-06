@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSACQUSITIONWIDGET_H_
 
 #include "cxBaseWidget.h"
+#include <memory>
 #include "cxAcquisitionService.h"
 #include "org_custusx_acquisition_Export.h"
 

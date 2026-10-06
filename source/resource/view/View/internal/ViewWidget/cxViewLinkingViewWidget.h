@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWLINKINGVIEWWIDGET_H_
 
 #include "cxView.h"
+#include <memory>
 #include "cxViewWidget.h"
 #include <QPointer>
 #include "cxBoundingBox3D.h"

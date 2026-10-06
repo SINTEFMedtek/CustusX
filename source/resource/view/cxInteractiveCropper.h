@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXINTERACTIVECROPPER_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <QObject>
 #include <QPointer>

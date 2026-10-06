@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxNIfTIReader.h"
+#include <memory>
 
 #include <QFileInfo>
 #include "vtkNIFTIImageReader.h"

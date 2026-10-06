@@ -26,7 +26,8 @@ class TestConvertText(unittest.TestCase):
                 'ImagePtr i = boost::dynamic_pointer_cast<Image>(data);\n'
                 'ImagePtr j = boost::static_pointer_cast<Image>(data);\n'
                 'ImagePtr k = boost::make_shared<Image>();\n')
-        expected = ('typedef std::shared_ptr<class Image> ImagePtr;\n'
+        expected = ('#include <memory>\n'
+                    'typedef std::shared_ptr<class Image> ImagePtr;\n'
                     'std::weak_ptr<Image> w;\n'
                     'ImagePtr i = std::dynamic_pointer_cast<Image>(data);\n'
                     'ImagePtr j = std::static_pointer_cast<Image>(data);\n'
@@ -34,11 +35,12 @@ class TestConvertText(unittest.TestCase):
         self.assertEqual(self.convert(text), expected)
 
     def test_scoped_ptr_becomes_unique_ptr(self):
-        self.assertEqual(self.convert('boost::scoped_ptr<A> mA;'), 'std::unique_ptr<A> mA;')
+        self.assertEqual(self.convert('boost::scoped_ptr<A> mA;'), '#include <memory>\nstd::unique_ptr<A> mA;')
 
     def test_function_array_integers_unordered_map(self):
         text = 'boost::function<void()> f; boost::array<int,3> a; boost::uint64_t t; boost::int32_t s; boost::unordered_map<int,int> m;'
-        expected = 'std::function<void()> f; std::array<int,3> a; std::uint64_t t; std::int32_t s; std::unordered_map<int,int> m;'
+        expected = ('#include <functional>\n#include <array>\n#include <unordered_map>\n#include <cstdint>\n'
+                    'std::function<void()> f; std::array<int,3> a; std::uint64_t t; std::int32_t s; std::unordered_map<int,int> m;')
         self.assertEqual(self.convert(text), expected)
 
     def test_other_boost_left_unchanged(self):
@@ -67,6 +69,25 @@ class TestConvertText(unittest.TestCase):
     def test_crlf_line_endings_kept(self):
         text = '#include <boost/shared_ptr.hpp>\r\nboost::shared_ptr<A> a;\r\n'
         self.assertEqual(self.convert(text), '#include <memory>\r\nstd::shared_ptr<A> a;\r\n')
+
+    def test_missing_std_header_added_after_first_include(self):
+        text = '#include "cxA.h"\n#include "cxB.h"\ntypedef boost::shared_ptr<class A> APtr;\n'
+        expected = '#include "cxA.h"\n#include <memory>\n#include "cxB.h"\ntypedef std::shared_ptr<class A> APtr;\n'
+        self.assertEqual(self.convert(text), expected)
+
+    def test_missing_std_header_added_after_include_guard(self):
+        text = '#ifndef CXA_H\n#define CXA_H\ntypedef boost::shared_ptr<class A> APtr;\n#endif\n'
+        expected = '#ifndef CXA_H\n#define CXA_H\n#include <memory>\ntypedef std::shared_ptr<class A> APtr;\n#endif\n'
+        self.assertEqual(self.convert(text), expected)
+
+    def test_file_without_boost_left_unchanged(self):
+        text = '#include "cxA.h"\nstd::shared_ptr<A> a;\n'
+        self.assertEqual(self.convert(text), text)
+
+    def test_add_missing_includes_on_already_converted_text(self):
+        text = '#include "cxA.h"\nstd::shared_ptr<A> a; std::function<void()> f;\n'
+        expected = '#include "cxA.h"\n#include <memory>\n#include <functional>\nstd::shared_ptr<A> a; std::function<void()> f;\n'
+        self.assertEqual(cxConvertBoostToStd.addMissingIncludes(text), expected)
 
     def test_conversion_is_idempotent(self):
         text = '#include <boost/shared_ptr.hpp>\nboost::shared_ptr<A> a;\n'
@@ -98,7 +119,7 @@ class TestConvertFiles(unittest.TestCase):
         script = self.write('src/b.py', 'boost::shared_ptr\n')
         gitFile = self.write('.git/c.h', 'boost::shared_ptr<A> a;\n')
         cxConvertBoostToStd.main([self.dir])
-        self.assertEqual(self.read(header), 'std::shared_ptr<A> a;\n')
+        self.assertEqual(self.read(header), '#include <memory>\nstd::shared_ptr<A> a;\n')
         self.assertEqual(self.read(script), 'boost::shared_ptr\n')
         self.assertEqual(self.read(gitFile), 'boost::shared_ptr<A> a;\n')
 

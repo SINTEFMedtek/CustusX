@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxCgeoReaderWriter.h"
+#include <memory>
 
 #include <QDir>
 #include <iostream>

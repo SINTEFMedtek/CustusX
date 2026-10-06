@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLIVERSEGMENTATIONRUNNER_H_
 
 #include <QObject>
+#include <memory>
 #include <QList>
 #include <QString>
 #include "org_custusx_liver_Export.h"

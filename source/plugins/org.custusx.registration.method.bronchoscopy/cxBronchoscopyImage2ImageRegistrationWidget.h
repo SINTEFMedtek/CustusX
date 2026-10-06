@@ -2,6 +2,7 @@
 #define CXBRONCHOSCOPYIMAGE2IMAGEREGISTRATIONWIDGET_H
 
 #include <QPushButton>
+#include <memory>
 #include <QDomElement>
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"

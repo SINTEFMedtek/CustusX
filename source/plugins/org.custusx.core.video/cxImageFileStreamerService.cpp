@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxImageFileStreamerService.h"
+#include <memory>
 
 #include <QFileInfo>
 #include "cxStringProperty.h"

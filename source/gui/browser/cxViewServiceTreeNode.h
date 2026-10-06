@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWSERVICETREENODE_H
 
 #include "cxTreeNodeImpl.h"
+#include <memory>
 #include "cxGroupTreeNode.h"
 
 namespace cx

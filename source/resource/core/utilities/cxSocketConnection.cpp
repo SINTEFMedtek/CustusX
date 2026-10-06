@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxSocketConnection.h"
+#include <functional>
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QNetworkInterface>

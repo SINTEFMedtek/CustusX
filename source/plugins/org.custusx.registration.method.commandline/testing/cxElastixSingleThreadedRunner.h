@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXELASTIXSINGLETHREADEDRUNNER_H_
 
 #include "cxtest_org_custusx_registration_method_commandline_export.h"
+#include <memory>
 
 #include <QObject>
 #include "cxTransform3D.h"

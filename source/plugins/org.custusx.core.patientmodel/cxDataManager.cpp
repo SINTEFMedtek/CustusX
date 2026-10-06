@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxDataManager.h"
+#include <memory>
 
 #include "cxTransferFunctions3DPresets.h"
 #include "cxMesh.h"

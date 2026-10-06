@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxTreeRepository.h"
+#include <memory>
 #include "cxPatientModelService.h"
 #include "cxDefinitions.h"
 #include "cxData.h"

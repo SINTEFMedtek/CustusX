@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxFrame3D.h"
+#include <array>
 #include "catch.hpp"
 
 using namespace cx;

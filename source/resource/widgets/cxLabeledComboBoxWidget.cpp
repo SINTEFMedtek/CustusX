@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxLabeledComboBoxWidget.h"
+#include <memory>
 #include <iostream>
 #include "cxTypeConversions.h"
 #include "cxHelperWidgets.h"

@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREPIMPL_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 //With VTK 9 most reps need a lot of VTK includes on Windows
 #include <vtkActor2D.h>

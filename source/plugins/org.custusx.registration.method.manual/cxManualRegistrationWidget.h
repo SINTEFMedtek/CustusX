@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMANUALREGISTRATIONWIDGET_H_
 
 #include "org_custusx_registration_method_manual_Export.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include "cxTransform3D.h"

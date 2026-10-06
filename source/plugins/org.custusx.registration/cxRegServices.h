@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONMETHODSERVICES_H
 
 #include "org_custusx_registration_Export.h"
+#include <memory>
 
 #include "cxVisServices.h"
 

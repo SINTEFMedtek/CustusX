@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSACQUISITION_H_
 
 #include "org_custusx_acquisition_Export.h"
+#include <memory>
 
 #include <vector>
 #include "cxForwardDeclarations.h"

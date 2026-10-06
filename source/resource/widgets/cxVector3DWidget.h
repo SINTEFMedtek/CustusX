@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVECTOR3DWIDGET_H_
 
 #include "cxResourceWidgetsExport.h"
+#include <array>
 
 #include "cxVector3D.h"
 #include <QWidget>

@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLPROXY_H
 
 #include "cxTool.h"
+#include <memory>
 #include "cxServiceTrackerListener.h"
 
 class ctkPluginContext;

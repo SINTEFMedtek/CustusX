@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxMetricManager.h"
+#include <memory>
 #include "cxManualTool.h"
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"

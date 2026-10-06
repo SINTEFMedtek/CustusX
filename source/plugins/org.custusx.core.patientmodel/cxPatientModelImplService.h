@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPATIENTMODELIMPLSERVICE_H_
 
 #include "org_custusx_core_patientmodel_Export.h"
+#include <memory>
 class ctkPluginContext;
 
 #include "cxPatientModelService.h"

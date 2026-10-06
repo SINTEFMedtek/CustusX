@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define Centerline
 
 #include <QPushButton>
+#include <memory>
 #include <QDomElement>
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"

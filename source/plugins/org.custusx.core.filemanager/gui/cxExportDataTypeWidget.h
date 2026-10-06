@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXEXPORTDATATYPEWIDGET_H
 
 #include "org_custusx_core_filemanager_Export.h"
+#include <memory>
 #include "cxBaseWidget.h"
 #include <QPushButton>
 #include <QCheckBox>

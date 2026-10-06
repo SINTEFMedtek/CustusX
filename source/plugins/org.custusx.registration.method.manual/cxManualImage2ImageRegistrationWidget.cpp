@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxManualImage2ImageRegistrationWidget.h"
+#include <memory>
 #include "cxRegistrationService.h"
 #include "cxData.h"
 #include "cxImage.h"

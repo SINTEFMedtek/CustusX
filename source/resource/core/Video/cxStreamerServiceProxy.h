@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTREAMERINTERFACEPROXY_H
 
 #include "cxStreamerService.h"
+#include <memory>
 #include "cxServiceTrackerListener.h"
 
 namespace cx

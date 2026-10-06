@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXACTIVETOOLPROXY_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxTool.h"
 
 namespace cx

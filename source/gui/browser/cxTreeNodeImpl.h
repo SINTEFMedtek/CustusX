@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTREENODEIMPL_H
 
 #include "cxTreeNode.h"
+#include <memory>
 #include "cxCoordinateSystemHelpers.h"
 #include <QVariant>
 

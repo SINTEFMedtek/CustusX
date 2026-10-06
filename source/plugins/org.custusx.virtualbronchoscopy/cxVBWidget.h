@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVBWIDGET_H_
 
 #include <QWidget>
+#include <memory>
 
 #include "ctkPluginContext.h"
 

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONSERVICEADAPTER_H
 
 #include "cxRegistrationService.h"
+#include <memory>
 #include <QObject>
 #include "cxServiceTrackerListener.h"
 #include "cxTransform3D.h"

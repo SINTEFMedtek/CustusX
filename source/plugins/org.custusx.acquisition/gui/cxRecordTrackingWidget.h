@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECORDTRACKINGWIDGET_H
 
 #include <QPushButton>
+#include <memory>
 #include <QDomElement>
 #include <QDateTime>
 #include "cxForwardDeclarations.h"

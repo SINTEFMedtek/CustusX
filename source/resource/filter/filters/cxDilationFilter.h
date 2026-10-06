@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CX_DILATION_FILTER_H
 
 #include "cxFilterImpl.h"
+#include <memory>
 
 namespace cx {
 class cxResourceFilter_EXPORT DilationFilter : public FilterImpl

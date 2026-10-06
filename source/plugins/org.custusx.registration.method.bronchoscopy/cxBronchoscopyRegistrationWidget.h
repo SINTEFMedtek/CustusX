@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXBRONCHOSCOPYREGISTRATIONWIDGET_H
 
 #include <QPushButton>
+#include <memory>
 #include <QDomElement>
 #include "cxVector3D.h"
 #include "cxRegistrationBaseWidget.h"

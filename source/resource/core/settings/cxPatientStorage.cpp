@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxPatientStorage.h"
+#include <functional>
 #include "cxSessionStorageService.h"
 #include "cxXMLNodeWrapper.h"
 

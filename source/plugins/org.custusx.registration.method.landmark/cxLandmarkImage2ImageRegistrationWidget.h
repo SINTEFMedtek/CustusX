@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLANDMARKIMAGE2IMAGEREGISTRATIONWIDGET_H_
 
 #include "cxLandmarkRegistrationWidget.h"
+#include <memory>
 
 class QVBoxLayout;
 class QComboBox;

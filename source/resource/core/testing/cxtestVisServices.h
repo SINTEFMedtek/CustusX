@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTDUMMYDATAMANAGER_H
 
 #include "cxtestresource_export.h"
+#include <memory>
 
 #include <QStringList>
 #include "cxForwardDeclarations.h"

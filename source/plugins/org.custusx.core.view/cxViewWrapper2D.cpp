@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxViewWrapper2D.h"
+#include <memory>
 #include <vector>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>

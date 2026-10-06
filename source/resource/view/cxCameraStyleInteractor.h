@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <QPointer>
 #include "cxTransform3D.h"

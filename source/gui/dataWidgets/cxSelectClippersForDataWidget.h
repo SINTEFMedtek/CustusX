@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSELECTCLIPPERSFORDATAWIDGET_H
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"

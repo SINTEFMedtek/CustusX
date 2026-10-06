@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTRENDERSPEED_H_
 
 #include "cxtestresourcevisualization_export.h"
+#include <memory>
 
 #include "cxView.h"
 #include <QTime>

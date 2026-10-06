@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWIMPLSERVICE_H_
 
 #include "cxViewService.h"
+#include <memory>
 #include "org_custusx_core_view_Export.h"
 class ctkPluginContext;
 class QDomElement;

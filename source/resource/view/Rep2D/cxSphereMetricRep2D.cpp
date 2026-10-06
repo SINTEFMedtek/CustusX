@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxSphereMetricRep2D.h"
+#include <memory>
 
 #include "boost/bind/bind.hpp"
 

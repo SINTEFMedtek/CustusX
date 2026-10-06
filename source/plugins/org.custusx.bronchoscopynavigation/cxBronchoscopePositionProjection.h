@@ -2,6 +2,7 @@
 #define CXBRONCHOSCOPEPOSITIONPROJECTION_H
 
 #include "org_custusx_bronchoscopynavigation_Export.h"
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxMesh.h"
 #include <QDomElement>

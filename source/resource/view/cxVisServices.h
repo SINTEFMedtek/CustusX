@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVISSERVICES_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxCoreServices.h"
 

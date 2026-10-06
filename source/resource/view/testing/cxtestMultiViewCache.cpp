@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "catch.hpp"
+#include <memory>
 #include "cxMultiViewCache.h"
 #include "cxViewWidget.h"
 #include "cxViewCollectionWidget.h"

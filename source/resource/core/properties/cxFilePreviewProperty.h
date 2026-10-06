@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 //#include "cxStringPropertyBase.h"
 #include "cxFilePathPropertyBase.h"
+#include <memory>
 
 namespace cx
 {

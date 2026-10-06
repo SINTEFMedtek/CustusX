@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDOUBLEWIDGETS_H_
 
 #include "cxResourceWidgetsExport.h"
+#include <memory>
 
 #include <QWidget>
 #include <QSlider>

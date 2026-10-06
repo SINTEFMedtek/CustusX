@@ -39,6 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef CX_WIN32
 #include "vtkSonixVideoSource.h"
+#include <memory>
 
 #include "vtkImageData.h"
 #include "vtkCriticalSection.h"

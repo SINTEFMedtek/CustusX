@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGSYSTEMSERVICE_H
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxTool.h"
 
 #define TrackingSystemService_iid "cx::TrackingSystemService"

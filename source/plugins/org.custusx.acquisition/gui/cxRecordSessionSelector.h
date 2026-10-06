@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECORDSESSIONSELECTOR_H_
 
 #include <QPushButton>
+#include <memory>
 #include <QDomElement>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"

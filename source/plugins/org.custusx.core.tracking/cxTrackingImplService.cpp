@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define _USE_MATH_DEFINES
 
 #include "cxTrackingImplService.h"
+#include <memory>
 
 #include "boost/bind/bind.hpp"
 

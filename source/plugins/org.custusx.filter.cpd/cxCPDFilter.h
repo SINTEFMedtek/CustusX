@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCPDFILTER_H
 
 #include "org_custusx_filter_cpd_Export.h"
+#include <memory>
 
 #include "cxFilterImpl.h"
 #include "cxTransform3D.h"

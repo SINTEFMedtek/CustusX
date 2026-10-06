@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMESHINVIEW_H
 
 #include "cxForwardDeclarations.h"
+#include <memory>
 #include "org_custusx_registration_method_vessel_Export.h"
 
 namespace cx

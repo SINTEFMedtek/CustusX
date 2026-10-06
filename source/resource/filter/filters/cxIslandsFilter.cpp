@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include <random>
+#include <memory>
 #include <cmath>
 
 #include <vtkCellData.h>

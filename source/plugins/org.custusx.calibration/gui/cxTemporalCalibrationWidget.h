@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTEMPORALCALIBRATIONWIDGET_H_
 
 #include "org_custusx_calibration_Export.h"
+#include <memory>
 
 #include <QFuture>
 #include <QFutureWatcher>

@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXTRACKINGSYSTEMBRONCHOSCOPYSERVICE_H
 
 #include "org_custusx_bronchoscopynavigation_Export.h"
+#include <memory>
 #include "cxTrackingSystemService.h"
 #include "cxTrackingService.h"
 #include "cxBronchoscopePositionProjection.h"

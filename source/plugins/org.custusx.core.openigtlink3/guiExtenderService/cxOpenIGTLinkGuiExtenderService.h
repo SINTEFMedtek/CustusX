@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXOPENIGTLINKGUIEXTENDERSERVICE_H
 
 #include "org_custusx_core_openigtlink3_Export.h"
+#include <memory>
 #include "cxGUIExtenderService.h"
 class ctkPluginContext;
 

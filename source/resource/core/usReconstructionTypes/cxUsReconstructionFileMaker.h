@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSRECONSTRUCTIONFILEMAKER_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 class QTextStream;
 class QDir;

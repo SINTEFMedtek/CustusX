@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTRINGPROPERTYSELECTCOORDINATESYSTEM_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"

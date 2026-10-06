@@ -2,6 +2,7 @@
 #define _QT_CONNECTION_FACTORIES_H_
 
 #include <iostream>
+#include <functional>
 
 #include <libQtSignalAdapters/Qt2Func.h>
 

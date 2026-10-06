@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXBROWSERWIDGET_H_
 
 #include "cxBaseWidget.h"
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxPopupToolbarWidget.h"
 #include "cxXmlOptionItem.h"

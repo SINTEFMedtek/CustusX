@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxMetricReferenceArgumentList.h"
+#include <memory>
 #include "cxData.h"
 #include "cxPointMetric.h"
 #include <QDomNode>

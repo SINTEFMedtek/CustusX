@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONPROPERTIES_H_
 
 #include "cxSelectDataStringPropertyBase.h"
+#include <memory>
 #include "org_custusx_registration_Export.h"
 
 namespace cx

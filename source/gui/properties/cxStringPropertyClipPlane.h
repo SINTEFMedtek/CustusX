@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTRINGPROPERTYCLIPPLANE_H
 
 #include "cxGuiExport.h"
+#include <memory>
 #include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
 #include "cxInteractiveClipper.h"

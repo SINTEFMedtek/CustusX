@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXWEBSERVERWIDGET_H_
 
 #include "cxWebServerWidgetBase.h"
+#include <memory>
 
 class QHttpServer;
 class QHttpRequest;

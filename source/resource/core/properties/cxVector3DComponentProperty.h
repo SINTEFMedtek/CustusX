@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVECTOR3DCOMPONENTPROPERTY_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxDoublePropertyBase.h"
 #include "cxVector3DPropertyBase.h"

@@ -21,6 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPROBEIMPL_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxProbe.h"
 #include <map>

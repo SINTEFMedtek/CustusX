@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxSlices3DRep.h"
+#include <memory>
 
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>

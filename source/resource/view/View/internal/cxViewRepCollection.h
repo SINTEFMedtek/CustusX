@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWREPCOLLECTION_H
 
 #include <QObject>
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxView.h"
 #include <QColor>

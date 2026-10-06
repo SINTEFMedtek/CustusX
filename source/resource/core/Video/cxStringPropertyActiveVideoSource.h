@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTRINGPROPERTYACTIVEVIDEOSOURCE_H
 
 #include "cxStringPropertyBase.h"
+#include <memory>
 #include "cxResourceExport.h"
 
 namespace cx

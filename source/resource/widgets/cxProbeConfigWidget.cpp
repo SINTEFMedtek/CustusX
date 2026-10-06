@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include <cxProbeConfigWidget.h>
+#include <memory>
 #include <QGroupBox>
 #include <QInputDialog>
 #include <QMessageBox>

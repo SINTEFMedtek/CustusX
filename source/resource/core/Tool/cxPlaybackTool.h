@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPLAYBACKTOOL_H_
 
 #include "cxToolImpl.h"
+#include <memory>
 
 #include "cxResourceExport.h"
 

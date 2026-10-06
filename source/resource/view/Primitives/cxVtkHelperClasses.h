@@ -14,6 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVTKHELPERCLASSES_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
+#include <array>
 
 #include "cxTransform3D.h"
 #include "cxGraphicalPrimitives.h"

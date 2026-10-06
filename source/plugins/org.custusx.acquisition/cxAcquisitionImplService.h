@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXACQUISITIONIMPLSERVICE_H
 
 #include "cxAcquisitionService.h"
+#include <memory>
 class ctkPluginContext;
 class QDomElement;
 

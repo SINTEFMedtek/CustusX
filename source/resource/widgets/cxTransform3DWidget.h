@@ -12,6 +12,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRANSFORM3DWIDGET_H_
 
 #include "cxResourceWidgetsExport.h"
+#include <memory>
+#include <array>
 
 #include "cxBaseWidget.h"
 #include "cxTransform3D.h"

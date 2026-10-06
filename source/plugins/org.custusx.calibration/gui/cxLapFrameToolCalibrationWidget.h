@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
 
 #include "org_custusx_calibration_Export.h"
+#include <memory>
 
 #include "cxTransform3D.h"
 #include "cxVector3D.h"

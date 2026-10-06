@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxFilterImpl.h"
+#include <memory>
 
 #include "cxImage.h"
 #include "cxSelectDataStringProperty.h"

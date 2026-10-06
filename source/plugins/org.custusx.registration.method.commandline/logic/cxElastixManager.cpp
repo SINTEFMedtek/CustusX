@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxElastixManager.h"
+#include <memory>
 
 #include <QDir>
 

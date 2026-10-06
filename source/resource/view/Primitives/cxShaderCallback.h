@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSINGLEVOLUMEPAINTERHELPER_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include <vtkCommand.h>
 

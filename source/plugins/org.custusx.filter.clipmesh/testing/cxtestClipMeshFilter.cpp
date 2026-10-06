@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "catch.hpp"
+#include <memory>
 
 #include "cxClipMeshFilter.h"
 #include "cxMesh.h"

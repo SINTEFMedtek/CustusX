@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTCUSTUSXCONTROLLER_H_
 
 #include "cxtestgui_export.h"
+#include <memory>
 
 #include <QApplication>
 #include "cxMainWindow.h"

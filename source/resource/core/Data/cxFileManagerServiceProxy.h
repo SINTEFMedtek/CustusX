@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFILEMANAGERSERVICEPROXY_H
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxFileManagerService.h"
 #include "cxServiceTrackerListener.h"
 

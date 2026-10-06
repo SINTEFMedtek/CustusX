@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QDomElement>
 #include <QStringList>

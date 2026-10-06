@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxFileManagerImplService.h"
+#include <functional>
 #include <QFileInfo>
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"

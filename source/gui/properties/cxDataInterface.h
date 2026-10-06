@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDATAINTERFACE_H_
 
 #include "cxGuiExport.h"
+#include <memory>
 #include "cxDoublePropertyBase.h"
 #include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"

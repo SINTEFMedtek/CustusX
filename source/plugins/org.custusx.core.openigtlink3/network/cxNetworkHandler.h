@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CX_NETWORKHANDLER_H_
 
 #include "org_custusx_core_openigtlink3_Export.h"
+#include <memory>
 #include "qfuturewatcher.h"
 #include "igtlioLogic.h"
 #include "igtlioSession.h"

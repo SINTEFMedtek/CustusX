@@ -2,6 +2,7 @@
 #define CXOPERATINGTABLEWIDGET_H
 
 #include "cxPreferenceTab.h"
+#include <memory>
 #include "cxCoreServices.h"
 #include "cxVector3D.h"
 

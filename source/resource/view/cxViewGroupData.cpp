@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxViewGroupData.h"
+#include <memory>
 
 #include <QMenu>
 #include <vtkCamera.h>

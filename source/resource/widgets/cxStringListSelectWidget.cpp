@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxStringListSelectWidget.h"
+#include <functional>
 
 #include <iostream>
 #include "cxTypeConversions.h"

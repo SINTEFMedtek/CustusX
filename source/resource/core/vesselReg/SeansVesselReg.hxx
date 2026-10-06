@@ -2,6 +2,7 @@
 #define SeansVesselSegmentation_hxx
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"

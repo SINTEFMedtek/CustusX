@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWCOLLECTIONWIDGETMIXED_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxViewCollectionWidgetUsingViewWidgets.h"
 #include "cxView.h"

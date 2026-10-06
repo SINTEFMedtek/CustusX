@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXAIRWAYSFROMCENTERLINE_H
 
 #include "cxMesh.h"
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include <QDomElement>
 #include "org_custusx_filter_airwaysfromcenterline_Export.h"

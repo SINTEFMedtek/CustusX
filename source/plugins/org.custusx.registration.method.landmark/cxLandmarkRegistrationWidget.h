@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLANDMARKREGISTRATIONWIDGET_H_
 
 #include "org_custusx_registration_method_landmarkExport.h"
+#include <memory>
 
 #include <map>
 #include "cxTransform3D.h"

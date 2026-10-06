@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <memory>
 #include "cxSlider2D.h"
 #include "cxtestVisServices.h"
 #include "cxImage.h"

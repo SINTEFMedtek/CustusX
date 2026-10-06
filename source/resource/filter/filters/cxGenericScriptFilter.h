@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGENERICSCRIPTFILTER_H
 
 #include "cxFilterImpl.h"
+#include <memory>
 #include "cxSettings.h"
 #include "cxProcessWrapper.h"
 #include <QColor>

@@ -2,6 +2,7 @@
 #define CXACCUSURF_H
 
 #include "cxMesh.h"
+#include <memory>
 #include <QDomElement>
 #include "org_custusx_filter_accusurf_Export.h"
 

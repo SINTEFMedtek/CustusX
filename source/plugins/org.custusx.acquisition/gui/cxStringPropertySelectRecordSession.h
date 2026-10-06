@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTRINGPROPERTYSELECTRECORDSESSION_H_
 
 #include "org_custusx_acquisition_Export.h"
+#include <memory>
 
 //#include "cxDataInterface.h"
 #include "cxRecordSession.h"

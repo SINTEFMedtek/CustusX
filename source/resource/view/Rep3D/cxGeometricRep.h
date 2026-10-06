@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "vtkForwardDeclarations.h"
+#include <memory>
 #include "cxRepImpl.h"
 #include "cxVector3D.h"
 #include "cxGraphicalPrimitives.h"

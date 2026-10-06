@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLFILEPARSER_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QDomDocument>
 #include "cxTransform3D.h"

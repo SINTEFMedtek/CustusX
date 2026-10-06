@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMESHESFROMLABELSFILTER_H
 
 #include "cxFilterImpl.h"
+#include <memory>
 class QColor;
 
 namespace cx

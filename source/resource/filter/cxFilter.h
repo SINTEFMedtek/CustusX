@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFILTER_H
 
 #include "cxResourceFilterExport.h"
+#include <memory>
 
 #include <vector>
 #include <QObject>

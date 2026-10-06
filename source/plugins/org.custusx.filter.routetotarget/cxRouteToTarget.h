@@ -2,6 +2,7 @@
 #define CXROUTETOTARGET_H
 
 #include "org_custusx_filter_routetotarget_Export.h"
+#include <memory>
 
 #include "cxMesh.h"
 #include <QDomElement>

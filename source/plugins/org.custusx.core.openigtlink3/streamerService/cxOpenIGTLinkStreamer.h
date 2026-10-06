@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXOPENIGTLINKSTREAMER_H
 
 #include "org_custusx_core_openigtlink3_Export.h"
+#include <memory>
 #include "cxStreamer.h"
 
 #include "cxImage.h"

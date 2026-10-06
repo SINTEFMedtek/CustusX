@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLIVERSEGMENTATIONWIDGET_H_
 
 #include "org_custusx_liver_Export.h"
+#include <memory>
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"

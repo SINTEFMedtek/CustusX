@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPLUSCONNECTWIDGET_H
 
 #include <QProcess>
+#include <memory>
 #include "cxTabbedWidget.h"
 
 class QPushButton;

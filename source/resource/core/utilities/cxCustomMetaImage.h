@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCUSTOMMETAIMAGE_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QString>
 #include "cxTransform3D.h"

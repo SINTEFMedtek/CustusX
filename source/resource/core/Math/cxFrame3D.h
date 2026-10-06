@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFRAME3D_H_
 
 #include "cxResourceExport.h"
+#include <array>
 #include "cxPrecompiledHeader.h"
 
 #include "cxTransform3D.h"

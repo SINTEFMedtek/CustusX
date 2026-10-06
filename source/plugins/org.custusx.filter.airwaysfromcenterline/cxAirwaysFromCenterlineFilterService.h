@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXAIRWAYSFROMCENTERLINEFILTER_H
 
 #include "org_custusx_filter_airwaysfromcenterline_Export.h"
+#include <memory>
 
 #include "cxPatientModelService.h"
 #include "cxFilterImpl.h"

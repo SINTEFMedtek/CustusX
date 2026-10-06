@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGSYSTEMIGSTKSERVICE_H
 
 #include "org_custusx_core_tracking_system_igstk_Export.h"
+#include <memory>
 
 #include "cxTrackingSystemService.h"
 #include "vtkForwardDeclarations.h"

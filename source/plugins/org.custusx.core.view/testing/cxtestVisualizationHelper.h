@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTVISIALIZATIONHELPER_H
 
 #include "cxViewWrapper2D.h"
+#include <memory>
 #include "cxViewsFixture.h"
 
 namespace cxtest

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDICOMCONVERTER_H_
 
 #include "cxImage.h"
+#include <memory>
 #include "org_custusx_dicom_Export.h"
 class ctkDICOMDatabase;
 

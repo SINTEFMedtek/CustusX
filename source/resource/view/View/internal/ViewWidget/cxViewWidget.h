@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWWIDGET_H_
 
 #include <QVTKOpenGLNativeWidget.h>
+#include <memory>
 
 #include "cxTransform3D.h"
 #include "cxView.h"

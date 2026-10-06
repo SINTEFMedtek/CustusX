@@ -2,6 +2,7 @@
 #define CXTREEITEMMODEL_H
 
 #include "cxBaseWidget.h"
+#include <memory>
 
 #include <QtGui>
 #include "cxImage.h"

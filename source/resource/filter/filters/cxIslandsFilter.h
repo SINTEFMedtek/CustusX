@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXISLANDSFILTER_H
 
 #include <random>
+#include <memory>
 #include "cxFilterImpl.h"
 
 namespace cx

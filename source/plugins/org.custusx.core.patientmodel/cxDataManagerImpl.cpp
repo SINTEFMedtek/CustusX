@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxDataManagerImpl.h"
+#include <memory>
 
 #include <QtCore>
 #include <QDomDocument>
