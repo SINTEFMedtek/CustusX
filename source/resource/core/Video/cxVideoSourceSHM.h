@@ -25,7 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <map>
 #include <stdint.h>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "vtkSmartPointer.h"
 
@@ -110,7 +110,7 @@ private slots:
 	void serverPollSlot();
 };
 
-typedef boost::shared_ptr<VideoSourceSHM> VideoSourceSHMPtr;
+typedef std::shared_ptr<VideoSourceSHM> VideoSourceSHMPtr;
 
 } // namespace cx
 

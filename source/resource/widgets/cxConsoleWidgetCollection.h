@@ -14,14 +14,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QMainWindow>
 #include "cxXmlOptionItem.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 class QMenu;
 
 #include "cxResourceWidgetsExport.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class Log> LogPtr;
+typedef std::shared_ptr<class Log> LogPtr;
 
 class cxResourceWidgets_EXPORT ConsoleWidgetCollection : public QMainWindow
 {

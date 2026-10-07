@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define SYNTHETIC_VOLUME_HPP
 
 #include "cxtestutilities_export.h"
+#include <memory>
 
 #include "cxUSFrameData.h"
 #include <vector>
@@ -115,7 +116,7 @@ protected:
 
 };
 
-typedef boost::shared_ptr<cxSyntheticVolume> cxSyntheticVolumePtr;
+typedef std::shared_ptr<cxSyntheticVolume> cxSyntheticVolumePtr;
 
 CXTESTUTILITIES_EXPORT double calculateRMSError(vtkImageDataPtr a, vtkImageDataPtr b);
 CXTESTUTILITIES_EXPORT cx::Vector3D calculateCentroid(cx::ImagePtr image);

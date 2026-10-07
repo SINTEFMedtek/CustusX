@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSenderImpl.h"
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxImage.h"
 #include "cxTool.h"
 #include "cxIGTLinkImageMessage.h"
@@ -54,7 +54,7 @@ private:
 	ProbeDefinitionPtr mUSStatus;
 
 };
-typedef boost::shared_ptr<DirectlyLinkedSender> DirectlyLinkedSenderPtr;
+typedef std::shared_ptr<DirectlyLinkedSender> DirectlyLinkedSenderPtr;
 
 }//namespace cx
 #endif /* CXDirectlyLinkedSender_H_ */

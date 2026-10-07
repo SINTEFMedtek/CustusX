@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxContourFilter.h"
+#include <memory>
 
 #include <vtkImageShrink3D.h>
 #include <vtkMarchingCubes.h>
@@ -200,7 +201,7 @@ void ContourFilter::thresholdSlot()
 {
 	if (mActive)
 	{
-		mPreviewImage = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
+		mPreviewImage = std::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
 		if(mPreviewImage)
 		{
 			Eigen::Vector2d threshold = Eigen::Vector2d(mSurfaceThresholdOption->getValue(),  mPreviewImage->getMax());

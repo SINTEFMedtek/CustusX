@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QObject>
 #include <vtkSmartPointer.h>
 #include "cxProperty.h"
-#include  "boost/shared_ptr.hpp"
+#include <memory>
 
 
 class QDomElement;
@@ -30,17 +30,17 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
-typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
-typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
+typedef std::shared_ptr<class DoubleProperty> DoublePropertyPtr;
+typedef std::shared_ptr<class BoolProperty> BoolPropertyPtr;
+typedef std::shared_ptr<class Image> ImagePtr;
+typedef std::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
 
 /**
  * \addtogroup org_custusx_usreconstruction
  * \{
  */
 
-typedef boost::shared_ptr<class ReconstructionMethodService> ReconstructionMethodServicePtr;
+typedef std::shared_ptr<class ReconstructionMethodService> ReconstructionMethodServicePtr;
 
 /**
  * \brief Abstract interface for reconstruction algorithm.

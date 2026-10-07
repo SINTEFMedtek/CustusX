@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPOINTMETRIC_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxPrecompiledHeader.h"
 
 #include "cxDataMetric.h"
@@ -30,7 +31,7 @@ struct CoordinateSystem;
  * @{
  */
 
-typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
+typedef std::shared_ptr<class PointMetric> PointMetricPtr;
 
 /** \brief Data class that represents a single point.
  *

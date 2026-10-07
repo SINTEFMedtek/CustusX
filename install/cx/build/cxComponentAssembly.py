@@ -49,7 +49,6 @@ class LibraryAssembly(object):
             self.addComponent(cxComponents.IGSTK())
         else:
             self.addComponent(cxComponents.VTK())
-            self.addComponent(cxComponents.ITK())
         self.addComponent(cxComponents.OpenCV())
         self.addComponent(cxComponents.OpenIGTLink())
         self.addComponent(cxComponents.CTK())

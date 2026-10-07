@@ -28,12 +28,12 @@ IntBoundingBox3D::IntBoundingBox3D()
 }
 IntBoundingBox3D::IntBoundingBox3D(int x0, int x1, int y0, int y1, int z0, int z1)
 {
-	elems[0] = x0;
-	elems[1] = x1;
-	elems[2] = y0;
-	elems[3] = y1;
-	elems[4] = z0;
-	elems[5] = z1;
+	(*this)[0] = x0;
+	(*this)[1] = x1;
+	(*this)[2] = y0;
+	(*this)[3] = y1;
+	(*this)[4] = z0;
+	(*this)[5] = z1;
 }
 /**Create a bounding box describing the volume spanned by the two points a and b.
  */
@@ -46,12 +46,12 @@ IntBoundingBox3D::IntBoundingBox3D(const Vector3D& a, const Vector3D& b)
 		tr[i] = std::max(a[i], b[i]);
 	}
 
-	elems[0] = static_cast<int> (bl[0]);
-	elems[1] = static_cast<int> (tr[0]);
-	elems[2] = static_cast<int> (bl[1]);
-	elems[3] = static_cast<int> (tr[1]);
-	elems[4] = static_cast<int> (bl[2]);
-	elems[5] = static_cast<int> (tr[2]);
+	(*this)[0] = static_cast<int> (bl[0]);
+	(*this)[1] = static_cast<int> (tr[0]);
+	(*this)[2] = static_cast<int> (bl[1]);
+	(*this)[3] = static_cast<int> (tr[1]);
+	(*this)[4] = static_cast<int> (bl[2]);
+	(*this)[5] = static_cast<int> (tr[2]);
 }
 
 IntBoundingBox3D::IntBoundingBox3D(const Eigen::Vector3i& a, const Eigen::Vector3i& b)
@@ -63,32 +63,32 @@ IntBoundingBox3D::IntBoundingBox3D(const Eigen::Vector3i& a, const Eigen::Vector
 		tr[i] = std::max(a[i], b[i]);
 	}
 
-	elems[0] = static_cast<int> (bl[0]);
-	elems[1] = static_cast<int> (tr[0]);
-	elems[2] = static_cast<int> (bl[1]);
-	elems[3] = static_cast<int> (tr[1]);
-	elems[4] = static_cast<int> (bl[2]);
-	elems[5] = static_cast<int> (tr[2]);
+	(*this)[0] = static_cast<int> (bl[0]);
+	(*this)[1] = static_cast<int> (tr[0]);
+	(*this)[2] = static_cast<int> (bl[1]);
+	(*this)[3] = static_cast<int> (tr[1]);
+	(*this)[4] = static_cast<int> (bl[2]);
+	(*this)[5] = static_cast<int> (tr[2]);
 }
 
 IntBoundingBox3D::IntBoundingBox3D(const double* data)
 {
 	for (unsigned i = 0; i < size(); ++i)
-		elems[i] = static_cast<int> (data[i]);
+		(*this)[i] = static_cast<int> (data[i]);
 	//	std::copy(data, data+size(), elems); 
 }
 IntBoundingBox3D::IntBoundingBox3D(const int* data)
 {
-	std::copy(data, data + size(), elems);
+	std::copy(data, data + size(), this->begin());
 }
 // --------------------------------------------------------
 Eigen::Vector3i IntBoundingBox3D::bottomLeft() const
 {
-	return Eigen::Vector3i(elems[0], elems[2], elems[4]);
+	return Eigen::Vector3i((*this)[0], (*this)[2], (*this)[4]);
 }
 Eigen::Vector3i IntBoundingBox3D::topRight() const
 {
-	return Eigen::Vector3i(elems[1], elems[3], elems[5]);
+	return Eigen::Vector3i((*this)[1], (*this)[3], (*this)[5]);
 }
 Eigen::Vector3i IntBoundingBox3D::center() const
 {
@@ -105,9 +105,9 @@ Eigen::Vector3i IntBoundingBox3D::range() const
 Eigen::Vector3i IntBoundingBox3D::corner(int x, int y, int z) const
 {
 	Eigen::Vector3i c;
-	c[0] = x ? elems[1] : elems[0];
-	c[1] = y ? elems[3] : elems[2];
-	c[2] = z ? elems[5] : elems[4];
+	c[0] = x ? (*this)[1] : (*this)[0];
+	c[1] = y ? (*this)[3] : (*this)[2];
+	c[2] = z ? (*this)[5] : (*this)[4];
 	return c;
 }
 // --------------------------------------------------------
@@ -118,7 +118,7 @@ bool IntBoundingBox3D::contains(const Eigen::Vector3i& p) const
 {
 	bool inside = true;
 	for (unsigned i = 0; i < 3; ++i)
-		inside &= ((elems[2 * i] <= p[i]) && (p[i] <= elems[2 * i + 1]));
+		inside &= (((*this)[2 * i] <= p[i]) && (p[i] <= (*this)[2 * i + 1]));
 	return inside;
 }
 
@@ -135,12 +135,12 @@ DoubleBoundingBox3D::DoubleBoundingBox3D()
 }
 DoubleBoundingBox3D::DoubleBoundingBox3D(double x0, double x1, double y0, double y1, double z0, double z1)
 {
-	elems[0] = x0;
-	elems[1] = x1;
-	elems[2] = y0;
-	elems[3] = y1;
-	elems[4] = z0;
-	elems[5] = z1;
+	(*this)[0] = x0;
+	(*this)[1] = x1;
+	(*this)[2] = y0;
+	(*this)[3] = y1;
+	(*this)[4] = z0;
+	(*this)[5] = z1;
 }
 /**Create a bounding box describing the volume spanned by the two points a and b.
  */
@@ -153,26 +153,26 @@ DoubleBoundingBox3D::DoubleBoundingBox3D(const Vector3D& a, const Vector3D& b)
 		tr[i] = std::max(a[i], b[i]);
 	}
 
-	elems[0] = bl[0];
-	elems[1] = tr[0];
-	elems[2] = bl[1];
-	elems[3] = tr[1];
-	elems[4] = bl[2];
-	elems[5] = tr[2];
+	(*this)[0] = bl[0];
+	(*this)[1] = tr[0];
+	(*this)[2] = bl[1];
+	(*this)[3] = tr[1];
+	(*this)[4] = bl[2];
+	(*this)[5] = tr[2];
 }
 DoubleBoundingBox3D::DoubleBoundingBox3D(const double* data)
 {
-	std::copy(data, data + size(), elems);
+	std::copy(data, data + size(), this->begin());
 }
 DoubleBoundingBox3D::DoubleBoundingBox3D(const int* data)
 {
-	std::copy(data, data + size(), elems);
+	std::copy(data, data + size(), this->begin());
 }
 DoubleBoundingBox3D::DoubleBoundingBox3D(const IntBoundingBox3D& bb)
 {
 	for (unsigned i = 0; i < size(); ++i)
 	{
-		elems[i] = bb.elems[i];
+		(*this)[i] = bb[i];
 	}
 }
 // --------------------------------------------------------
@@ -187,11 +187,11 @@ DoubleBoundingBox3D DoubleBoundingBox3D::fromViewport(const double* data)
 
 Vector3D DoubleBoundingBox3D::bottomLeft() const
 {
-	return Vector3D(elems[0], elems[2], elems[4]);
+	return Vector3D((*this)[0], (*this)[2], (*this)[4]);
 }
 Vector3D DoubleBoundingBox3D::topRight() const
 {
-	return Vector3D(elems[1], elems[3], elems[5]);
+	return Vector3D((*this)[1], (*this)[3], (*this)[5]);
 }
 Vector3D DoubleBoundingBox3D::center() const
 {
@@ -208,9 +208,9 @@ Vector3D DoubleBoundingBox3D::range() const
 Vector3D DoubleBoundingBox3D::corner(int x, int y, int z) const
 {
 	Vector3D c;
-	c[0] = x ? elems[1] : elems[0];
-	c[1] = y ? elems[3] : elems[2];
-	c[2] = z ? elems[5] : elems[4];
+	c[0] = x ? (*this)[1] : (*this)[0];
+	c[1] = y ? (*this)[3] : (*this)[2];
+	c[2] = z ? (*this)[5] : (*this)[4];
 	return c;
 }
 // --------------------------------------------------------
@@ -221,7 +221,7 @@ bool DoubleBoundingBox3D::contains(const Vector3D& p) const
 {
 	bool inside = true;
 	for (unsigned i = 0; i < 3; ++i)
-		inside &= ((elems[2 * i] <= p[i]) && (p[i] <= elems[2 * i + 1]));
+		inside &= (((*this)[2 * i] <= p[i]) && (p[i] <= (*this)[2 * i + 1]));
 	return inside;
 }
 
@@ -289,12 +289,12 @@ void DoubleBoundingBox3D::translate(Transform3D translation)
 {
 	Vector3D translatedTopRight = translation * topRight();
 	Vector3D translatedBottomLeft = translation * bottomLeft();
-	elems[0] = translatedBottomLeft[0];
-	elems[1] = translatedTopRight[0];
-	elems[2] = translatedBottomLeft[1];
-	elems[3] = translatedTopRight[1];
-	elems[4] = translatedBottomLeft[2];
-	elems[5] = translatedTopRight[2];
+	(*this)[0] = translatedBottomLeft[0];
+	(*this)[1] = translatedTopRight[0];
+	(*this)[2] = translatedBottomLeft[1];
+	(*this)[3] = translatedTopRight[1];
+	(*this)[4] = translatedBottomLeft[2];
+	(*this)[5] = translatedTopRight[2];
 }
 
 DoubleBoundingBox3D intersection(DoubleBoundingBox3D a, DoubleBoundingBox3D b)

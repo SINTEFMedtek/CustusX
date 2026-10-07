@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLAYOUTINTERACTOR_H
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include <QObject>
 #include <QAction>
@@ -66,7 +67,7 @@ private:
 
 };
 
-typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
+typedef std::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
 
 
 } // namespace cx

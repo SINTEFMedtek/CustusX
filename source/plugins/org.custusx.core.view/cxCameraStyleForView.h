@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCameraStyleForViewFORVIEW_H
 
 #include "org_custusx_core_view_Export.h"
+#include <memory>
 
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
@@ -27,10 +28,10 @@ class vtkInteractorStyle;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
 
-typedef boost::shared_ptr<class CameraStyleForView> CameraStyleForViewPtr;
+typedef std::shared_ptr<class CameraStyleForView> CameraStyleForViewPtr;
 using cx::Transform3D;
 
 /**

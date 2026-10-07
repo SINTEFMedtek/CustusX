@@ -12,13 +12,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSRECONSTRUCTIONGUIEXTENDERSERVICE_H_
 
 #include "org_custusx_usreconstruction_Export.h"
+#include <memory>
 
 #include "cxGUIExtenderService.h"
 
 namespace cx
 {
-//typedef boost::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+//typedef std::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 
 /**
  * \brief Us Reconstruction framework with widgets.
@@ -41,7 +42,7 @@ private:
 
 };
 
-//typedef boost::shared_ptr<UsReconstructionPlugin> UsReconstructionPluginPtr;
+//typedef std::shared_ptr<UsReconstructionPlugin> UsReconstructionPluginPtr;
 
 }//cx
 

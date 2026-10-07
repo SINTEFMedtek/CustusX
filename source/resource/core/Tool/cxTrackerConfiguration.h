@@ -14,14 +14,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QStringList>
 
 #include "cxToolConfigurationParser.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
+typedef std::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
 
 /** Tracker and Tool configuration info
  *

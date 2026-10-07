@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <memory>
 #include "cxTrackingSystemService.h"
 
 class TrackingSystemServiceMoc : public cx::TrackingSystemService
@@ -68,7 +69,7 @@ bool TrackingSystemServiceMoc::isTracking() const
 	return cx::TrackingSystemService::isTracking();
 }
 
-typedef boost::shared_ptr<TrackingSystemServiceMoc> TrackingSystemServiceMocPtr;
+typedef std::shared_ptr<TrackingSystemServiceMoc> TrackingSystemServiceMocPtr;
 
 namespace cxtest
 {

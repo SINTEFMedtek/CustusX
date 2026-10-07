@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFiltersWidget_H_
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include "cxFilter.h"
@@ -22,7 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxServiceTrackerListener.h"
 
 namespace cx {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /** Widget for selecting and running a Filter.
  *
@@ -80,7 +81,7 @@ private:
 	FilterTimedAlgorithmPtr mThread;
 	FilterSetupWidget* mSetupWidget;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
-	boost::shared_ptr<ServiceTrackerListener<Filter> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<Filter> > mServiceListener;
 };
 
 } /* namespace cx */

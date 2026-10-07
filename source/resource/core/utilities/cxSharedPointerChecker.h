@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QString>
 
 namespace cx
@@ -34,7 +34,7 @@ cxResource_EXPORT void requireUnique(int use_count, QString objectName);
  * \author christiana
   */
 template<class T>
-void requireUnique(const boost::shared_ptr<T>& object, QString objectName)
+void requireUnique(const std::shared_ptr<T>& object, QString objectName)
 {
 	requireUnique(object.use_count(), objectName);
 }

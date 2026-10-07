@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxSessionStorageServiceProxy.h"
+#include <functional>
 #include "boost/bind/bind.hpp"
 #include "cxNullDeleter.h"
 
@@ -33,7 +34,7 @@ void SessionStorageServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<SessionStorageService>(
 								 mPluginContext,
 								 boost::bind(&SessionStorageServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (SessionStorageService*)>(),
+								 std::function<void (SessionStorageService*)>(),
 								 boost::bind(&SessionStorageServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

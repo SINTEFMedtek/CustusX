@@ -6,7 +6,7 @@
 #include <QObject>
 #include <map>
 #include <set>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 class QAction;
 class QMenu;
@@ -17,9 +17,9 @@ class QDir;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
-typedef boost::shared_ptr<class ScreenShotImageWriter> ScreenShotImageWriterPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
+typedef std::shared_ptr<class ScreenShotImageWriter> ScreenShotImageWriterPtr;
 
 /**
  * Contains the actions previously located inside the

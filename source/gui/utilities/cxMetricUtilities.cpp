@@ -1,4 +1,5 @@
 #include "cxMetricUtilities.h"
+#include <memory>
 
 #include "cxFrameMetricWrapper.h"
 #include "cxToolMetricWrapper.h"
@@ -11,20 +12,20 @@
 namespace
 {
 template<class T, class SUPER>
-boost::shared_ptr<T> castTo(boost::shared_ptr<SUPER> data)
+std::shared_ptr<T> castTo(std::shared_ptr<SUPER> data)
 {
-	return boost::dynamic_pointer_cast<T>(data);
+	return std::dynamic_pointer_cast<T>(data);
 }
 
 template<class T, class SUPER>
-bool isType(boost::shared_ptr<SUPER> data)
+bool isType(std::shared_ptr<SUPER> data)
 {
 	return (castTo<T>(data) ? true : false);
 }
 template<class WRAPPER, class METRIC, class SUPER>
-boost::shared_ptr<WRAPPER> createMetricWrapperOfType(cx::VisServicesPtr services, boost::shared_ptr<SUPER> data)
+std::shared_ptr<WRAPPER> createMetricWrapperOfType(cx::VisServicesPtr services, std::shared_ptr<SUPER> data)
 {
-	return boost::shared_ptr<WRAPPER>(new WRAPPER(services, castTo<METRIC>(data)));
+	return std::shared_ptr<WRAPPER>(new WRAPPER(services, castTo<METRIC>(data)));
 }
 }
 

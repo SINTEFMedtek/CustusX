@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QObject>
 #include "cxResourceExport.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxData.h"
 
 #define FileReaderWriterService_iid "cx::FileReaderWriterService"
@@ -24,7 +24,7 @@ class ctkPluginContext;
 namespace cx
 {
 
-typedef boost::shared_ptr<class FileReaderWriterService> FileReaderWriterServicePtr;
+typedef std::shared_ptr<class FileReaderWriterService> FileReaderWriterServicePtr;
 
 
 class cxResource_EXPORT FileReaderWriterService : public QObject

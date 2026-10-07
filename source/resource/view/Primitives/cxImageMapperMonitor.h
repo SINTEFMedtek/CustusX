@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <set>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vtkSmartPointer.h>
 #include <QObject>
 #include "cxForwardDeclarations.h"
@@ -24,7 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
+typedef std::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 
 /** Helper class that uses the stored clip planes in a Image to clip it in a mapper.
  *

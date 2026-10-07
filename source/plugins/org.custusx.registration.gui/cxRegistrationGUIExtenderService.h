@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONGUIEXTENDERSERVICE_H_
 
 #include "org_custusx_registration_gui_Export.h"
+#include <memory>
 #include "cxGUIExtenderService.h"
 class ctkPluginContext;
 
@@ -40,7 +41,7 @@ private:
   ctkPluginContext* mContext;
 
 };
-//typedef boost::shared_ptr<ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
+//typedef std::shared_ptr<ExampleGUIExtenderService> ExampleGUIExtenderServicePtr;
 
 } /* namespace cx */
 

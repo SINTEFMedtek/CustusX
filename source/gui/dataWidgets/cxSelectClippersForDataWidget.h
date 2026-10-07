@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSELECTCLIPPERSFORDATAWIDGET_H
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
@@ -21,7 +22,7 @@ class QTableWidget;
 namespace cx
 {
 
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+typedef std::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
 /**\brief Turn clippers on/off for a spesific data structure.
  *

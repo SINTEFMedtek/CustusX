@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_core_state_Export.h"
 
 #include <QObject>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxWorkflowStateMachine.h"
 
 namespace cx
@@ -38,7 +38,7 @@ public:
 
 };
 
-typedef boost::shared_ptr<CustusXWorkflowStateMachine> CustusXWorkflowStateMachinePtr;
+typedef std::shared_ptr<CustusXWorkflowStateMachine> CustusXWorkflowStateMachinePtr;
 }
 
 #endif /* CXCUSTUSXWORKFLOWSTATEMACHINE_H_ */

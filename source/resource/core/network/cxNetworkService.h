@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxResourceExport.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QString>
 #include <QStringList>
 #include <QObject>
@@ -22,8 +22,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
-typedef boost::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
+typedef std::shared_ptr<class NetworkServiceImpl> NetworkServiceImplPtr;
+typedef std::shared_ptr<class NetworkConnectionHandle> NetworkConnectionHandlePtr;
 
 /**
  * Manages all network connections in CustusX.

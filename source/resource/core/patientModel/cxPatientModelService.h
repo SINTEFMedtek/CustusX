@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QObject>
 #include <map>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
@@ -27,8 +27,8 @@ class QDomElement;
 
 namespace cx
 {
-typedef boost::shared_ptr<class Data> DataPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
+typedef std::shared_ptr<class Data> DataPtr;
+typedef std::shared_ptr<class Image> ImagePtr;
 }
 
 #define PatientModelService_iid "cx::PatientModelService"
@@ -38,10 +38,10 @@ namespace cx
 
 class RegistrationTransform;
 class LandmarkProperty;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
-typedef boost::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
-typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class Landmarks> LandmarksPtr;
+typedef std::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
+typedef std::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
 /**
  * @brief The OperatingTable class
@@ -109,16 +109,16 @@ public:
 
 	// extended Data interface
 	template <class DATA>
-	std::map<QString, boost::shared_ptr<DATA> > getDataOfType(ORGAN_TYPE organtype = organtypeCOUNT) const;
+	std::map<QString, std::shared_ptr<DATA> > getDataOfType(ORGAN_TYPE organtype = organtypeCOUNT) const;
 	template <class DATA>
-	std::map<QString, boost::shared_ptr<DATA> > getDataOfTypeWithUidContaining(QString uidPart) const;
+	std::map<QString, std::shared_ptr<DATA> > getDataOfTypeWithUidContaining(QString uidPart) const;
 	DataPtr getData(const QString& uid) const;
 	template <class DATA>
-	boost::shared_ptr<DATA> getData(ORGAN_TYPE organtype) const;
+	std::shared_ptr<DATA> getData(ORGAN_TYPE organtype) const;
 	template <class DATA>
-	boost::shared_ptr<DATA> getData(const QString& uid) const;
+	std::shared_ptr<DATA> getData(const QString& uid) const;
 	template<class DATA>
-	boost::shared_ptr<DATA> createSpecificData(QString uid, QString name="");
+	std::shared_ptr<DATA> createSpecificData(QString uid, QString name="");
 
 	// streams
 	virtual std::map<QString, VideoSourcePtr> getStreams() const = 0;
@@ -184,13 +184,13 @@ signals:
 
 
 template <class DATA>
-std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfType(ORGAN_TYPE organtype) const
+std::map<QString, std::shared_ptr<DATA> > PatientModelService::getDataOfType(ORGAN_TYPE organtype) const
 {
 	std::map<QString, DataPtr> data = this->getDatas();
-	std::map<QString, boost::shared_ptr<DATA> > retval;
+	std::map<QString, std::shared_ptr<DATA> > retval;
 	for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
 	{
-		boost::shared_ptr<DATA> val = boost::dynamic_pointer_cast<DATA>(i->second);
+		std::shared_ptr<DATA> val = std::dynamic_pointer_cast<DATA>(i->second);
 		if (val)
 			if(organtype == organtypeCOUNT || organtype == val->getOrganType())
 				retval[val->getUid()] = val;
@@ -199,11 +199,11 @@ std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfType(O
 }
 
 template <class DATA>
-std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfTypeWithUidContaining(QString uidPart) const
+std::map<QString, std::shared_ptr<DATA> > PatientModelService::getDataOfTypeWithUidContaining(QString uidPart) const
 {
-	std::map<QString, boost::shared_ptr<DATA> > data = this->getDataOfType<DATA>();
-	std::map<QString, boost::shared_ptr<DATA> > retval;
-	for (typename std::map<QString, boost::shared_ptr<DATA> >::const_iterator i=data.begin(); i!=data.end(); ++i)
+	std::map<QString, std::shared_ptr<DATA> > data = this->getDataOfType<DATA>();
+	std::map<QString, std::shared_ptr<DATA> > retval;
+	for (typename std::map<QString, std::shared_ptr<DATA> >::const_iterator i=data.begin(); i!=data.end(); ++i)
 	{
 		if (i->first.contains(uidPart))
 		{
@@ -214,26 +214,26 @@ std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfTypeWi
 }
 
 template <class DATA>
-boost::shared_ptr<DATA> PatientModelService::getData(ORGAN_TYPE organtype) const
+std::shared_ptr<DATA> PatientModelService::getData(ORGAN_TYPE organtype) const
 {
-	std::map<QString, boost::shared_ptr<DATA>> data = this->getDataOfType<DATA>(organtype);
+	std::map<QString, std::shared_ptr<DATA>> data = this->getDataOfType<DATA>(organtype);
 	if(data.empty())
-		return boost::shared_ptr<DATA>();
+		return std::shared_ptr<DATA>();
 
 	return data.begin()->second;
 }
 
 template <class DATA>
-boost::shared_ptr<DATA> PatientModelService::getData(const QString& uid) const
+std::shared_ptr<DATA> PatientModelService::getData(const QString& uid) const
 {
-	return boost::dynamic_pointer_cast<DATA>(this->getData(uid));
+	return std::dynamic_pointer_cast<DATA>(this->getData(uid));
 }
 
 template<class DATA>
-boost::shared_ptr<DATA> PatientModelService::createSpecificData(QString uid, QString name)
+std::shared_ptr<DATA> PatientModelService::createSpecificData(QString uid, QString name)
 {
 	DataPtr retval = this->createData(DATA::getTypeName(), uid, name);
-	return boost::dynamic_pointer_cast<DATA>(retval);
+	return std::dynamic_pointer_cast<DATA>(retval);
 }
 
 } // namespace cx

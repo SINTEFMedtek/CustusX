@@ -11,8 +11,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "matrixInterpolation.h"
 //#include <vector>
-//#include "itkArray.h"
-//#include "itkArray2D.h"
 #include <iostream>
 //#include "vnl/vnl_matrix.h"
 //#include "vnl/vnl_vector.h"

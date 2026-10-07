@@ -13,12 +13,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRAININGGUIEXTENDERSERVICE_H_
 
 #include "cxGUIExtenderService.h"
+#include <memory>
 #include "org_custusx_training_Export.h"
 class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrainingEngine> TrainingEnginePtr;
+typedef std::shared_ptr<class TrainingEngine> TrainingEnginePtr;
 
 /**
  * Implementation of Training service.
@@ -40,7 +41,7 @@ public:
 private:
   ctkPluginContext* mContext;
 };
-typedef boost::shared_ptr<TrainingGUIExtenderService> TrainingGUIExtenderServicePtr;
+typedef std::shared_ptr<TrainingGUIExtenderService> TrainingGUIExtenderServicePtr;
 
 } /* namespace cx */
 

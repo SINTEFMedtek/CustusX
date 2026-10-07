@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDISTANCEMETRIC_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxPrecompiledHeader.h"
 
 #include "cxDataMetric.h"
@@ -28,7 +29,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class DistanceMetric> DistanceMetricPtr;
+typedef std::shared_ptr<class DistanceMetric> DistanceMetricPtr;
 
 /**\brief Data class that represents a distance between two points,
  * or a point and a plane.

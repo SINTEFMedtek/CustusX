@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxViewsFixture.h"
+#include <memory>
 
 #include "vtkLookupTable.h"
 #include "cxtestUtilities.h"
@@ -78,12 +79,12 @@ void ViewsFixture::addFileReaderWriter(cx::FileReaderWriterServicePtr service)
 
 cxtest::PatientModelServiceMockPtr ViewsFixture::getPatientModelService()
 {
-	return boost::dynamic_pointer_cast<PatientModelServiceMock>(mServices->patient());
+	return std::dynamic_pointer_cast<PatientModelServiceMock>(mServices->patient());
 }
 
 cx::DummyToolPtr ViewsFixture::dummyTool()
 {
-	return boost::dynamic_pointer_cast<cx::DummyTool>(mServices->tracking()->getActiveTool());
+	return std::dynamic_pointer_cast<cx::DummyTool>(mServices->tracking()->getActiveTool());
 }
 
 void ViewsFixture::clear()
@@ -124,11 +125,11 @@ cx::ImagePtr ViewsFixture::loadImage(const QString& imageFilename)
 {
 	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
 	QString dummy;
-	cx::DataPtr data = boost::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(mServices->patient())->importDataMock(filename, dummy, mFilemanager);
+	cx::DataPtr data = std::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(mServices->patient())->importDataMock(filename, dummy, mFilemanager);
 	if (!data)
 		return cx::ImagePtr();
 
-	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(data);
+	cx::ImagePtr image = std::dynamic_pointer_cast<cx::Image>(data);
 	cx::Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
 	mServices->patient()->setCenter(center);

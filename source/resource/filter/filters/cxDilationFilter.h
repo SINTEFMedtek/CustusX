@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CX_DILATION_FILTER_H
 
 #include "cxFilterImpl.h"
+#include <memory>
 
 namespace cx {
 class cxResourceFilter_EXPORT DilationFilter : public FilterImpl
@@ -29,6 +30,8 @@ public:
 
 	bool preProcess();
 	virtual bool execute();
+	/** Dilate the voxels equal to 1 with a ball of the given radius in mm. Output is 0/1 unsigned char. */
+	static vtkImageDataPtr dilate(vtkImageDataPtr image, double radius);
 	virtual bool postProcess();
 
 	// extensions:
@@ -46,7 +49,7 @@ private:
 	vtkImageDataPtr mRawResult;
 	vtkPolyDataPtr mRawContour;
 };
-typedef boost::shared_ptr<class DilationFilter> DilationFilterPtr;
+typedef std::shared_ptr<class DilationFilter> DilationFilterPtr;
 
 } // namespace cx
 

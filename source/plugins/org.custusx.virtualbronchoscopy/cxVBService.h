@@ -13,12 +13,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVBSERVICE_H_
 
 #include "cxGUIExtenderService.h"
+#include <memory>
 #include "org_custusx_virtualbronchoscopy_Export.h"
 class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * Virtual Bronchoscopy service interface.
@@ -40,7 +41,7 @@ public:
 private:
 	VisServicesPtr mServices;
 };
-typedef boost::shared_ptr<VBGUIExtenderService> VBGUIExtenderServicePtr;
+typedef std::shared_ptr<VBGUIExtenderService> VBGUIExtenderServicePtr;
 
 } /* namespace cx */
 

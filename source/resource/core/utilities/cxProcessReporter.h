@@ -14,14 +14,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QProcess>
 #include <QString>
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class ProcessReporter> ProcessReporterPtr;
+typedef std::shared_ptr<class ProcessReporter> ProcessReporterPtr;
 
 /**
  * Listens to events from QProcess and redirects them to the Reporter.

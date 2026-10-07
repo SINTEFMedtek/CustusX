@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXORIENTATIONANNOTATION2DREP_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 #include <vtkCornerAnnotation.h>
 
 #include "cxRepImpl.h"
@@ -26,7 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
+typedef std::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
 
 /** \brief A class that annotated 2D views with otientation information.
  * \ingroup cx_resource_view

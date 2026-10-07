@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxDonutMetricRep.h"
+#include <memory>
 
 #include "cxView.h"
 
@@ -51,7 +52,7 @@ void DonutMetricRep::clear()
 
 DonutMetricPtr DonutMetricRep::getDonutMetric()
 {
-	return boost::dynamic_pointer_cast<DonutMetric>(mMetric);
+	return std::dynamic_pointer_cast<DonutMetric>(mMetric);
 }
 
 void DonutMetricRep::onModifiedStartRender()

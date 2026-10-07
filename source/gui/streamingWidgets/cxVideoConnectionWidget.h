@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBaseWidget.h"
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QProcess>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
@@ -37,11 +37,11 @@ class FileInputWidget;
 class StreamerService;
 class XmlOptionFile;
 class DetailedLabeledComboBoxWidget;
-typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
-typedef boost::shared_ptr<class StringPropertyActiveVideoSource> StringPropertyActiveVideoSourcePtr;
-typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
-typedef boost::shared_ptr<class Tool> ToolPtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
+typedef std::shared_ptr<class StringPropertyActiveVideoSource> StringPropertyActiveVideoSourcePtr;
+typedef std::shared_ptr<class StringProperty> StringPropertyPtr;
+typedef std::shared_ptr<class Tool> ToolPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \brief GUI for setting up a connection to a video stream

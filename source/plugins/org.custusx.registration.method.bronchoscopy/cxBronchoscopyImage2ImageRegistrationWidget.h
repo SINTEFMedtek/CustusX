@@ -2,6 +2,7 @@
 #define CXBRONCHOSCOPYIMAGE2IMAGEREGISTRATIONWIDGET_H
 
 #include <QPushButton>
+#include <memory>
 #include <QDomElement>
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
@@ -11,8 +12,8 @@
 namespace cx
 {
 class WidgetObscuredListener;
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
-typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
+typedef std::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef std::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 
 /**
  * BronchoscopyImage2ImageRegistrationWidget

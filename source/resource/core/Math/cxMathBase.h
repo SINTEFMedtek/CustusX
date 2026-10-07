@@ -32,7 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 // necessary includes for the addons
-#include <boost/array.hpp>
+#include <array>
 class QString;
 class QStringList;
 #include <QStringList> // can be removed by moving impl of Vector3D::fromString to cpp file, as done with Transform3D.

@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "vtkForwardDeclarations.h"
+#include <memory>
 #include "cxRepImpl.h"
 #include "cxVector3D.h"
 #include "cxGraphicalPrimitives.h"
@@ -22,9 +23,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class Mesh> MeshPtr;
-typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
-typedef boost::shared_ptr<class GraphicalGeometric> GraphicalGeometricPtr;
+typedef std::shared_ptr<class Mesh> MeshPtr;
+typedef std::shared_ptr<class GeometricRep> GeometricRepPtr;
+typedef std::shared_ptr<class GraphicalGeometric> GraphicalGeometricPtr;
 
 /** \brief Display one Mesh in 3D.
  *

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWREPCOLLECTION_H
 
 #include <QObject>
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxView.h"
 #include <QColor>
@@ -20,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class ViewRepCollection> ViewRepCollectionPtr;
+typedef std::shared_ptr<class ViewRepCollection> ViewRepCollectionPtr;
 
 /**
  * \ingroup cx_resource_view_internal
@@ -72,7 +73,7 @@ public:
 	std::vector<RepPtr> mReps; ///< Storage for internal reps.
 	typedef std::vector<RepPtr>::iterator RepsIter; ///< Iterator typedef for the internal rep vector.
 	View::Type mType;
-	boost::weak_ptr<class View> mSelf;
+	std::weak_ptr<class View> mSelf;
 };
 
 } // namespace cx

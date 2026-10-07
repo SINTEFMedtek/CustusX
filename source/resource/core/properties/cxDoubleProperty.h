@@ -21,6 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDOUBLEPROPERTY_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QDomElement>
 #include <QStringList>
@@ -31,7 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
+typedef std::shared_ptr<class DoubleProperty> DoublePropertyPtr;
 
 /** Implementation of DoublePropertyBase.
  *

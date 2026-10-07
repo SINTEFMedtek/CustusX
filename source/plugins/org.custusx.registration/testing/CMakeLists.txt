@@ -10,6 +10,7 @@ if(BUILD_TESTING)
         cxtestSeansVesselRegFixture.cpp
         cxtestCatchSeansVesselReg.cpp
         cxtestRegistrationServiceProxy.cpp
+        cxtestLandmarkTranslationRegistration.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_MOC_SOURCE_FILES ${CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_MOC_SOURCE_FILES})

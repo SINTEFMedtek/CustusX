@@ -12,13 +12,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXHELPBROWSER_H
 #define CXHELPBROWSER_H
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QTextBrowser>
 #include "org_custusx_help_Export.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+typedef std::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 /**
  *

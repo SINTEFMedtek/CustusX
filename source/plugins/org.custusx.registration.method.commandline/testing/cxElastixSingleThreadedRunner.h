@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXELASTIXSINGLETHREADEDRUNNER_H_
 
 #include "cxtest_org_custusx_registration_method_commandline_export.h"
+#include <memory>
 
 #include <QObject>
 #include "cxTransform3D.h"
@@ -22,8 +23,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
-typedef boost::shared_ptr<class ElastixParameters> ElastixParametersPtr;
+typedef std::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
+typedef std::shared_ptr<class ElastixParameters> ElastixParametersPtr;
 
 
 /** Helper class for running ElastixExecuter in a test.

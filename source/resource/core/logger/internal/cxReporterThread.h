@@ -21,8 +21,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QMutex>
 #include <QDateTime>
 #include <QFile>
-#include "boost/shared_ptr.hpp"
-#include "boost/function.hpp"
+#include <memory>
+#include <functional>
 #include "cxDefinitions.h"
 #include "cxAudio.h"
 #include <sstream>
@@ -80,7 +80,7 @@ private:
 	void sendToFile(Message message);
 	void sendToCout(Message message);
 
-	typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
+	typedef std::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
 	SingleStreamerImplPtr mCout;
 	SingleStreamerImplPtr mCerr;
 

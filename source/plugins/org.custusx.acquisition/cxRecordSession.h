@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QString>
 #include <map>
 #include <QDateTime>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
 #include "cxTool.h"
@@ -32,7 +32,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+typedef std::shared_ptr<class RecordSession> RecordSessionPtr;
 typedef std::map<double, Transform3D> TimedTransformMap;
 typedef std::pair<QDateTime, QDateTime> IntervalType;
 

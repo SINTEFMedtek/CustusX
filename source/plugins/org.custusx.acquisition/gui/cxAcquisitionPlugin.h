@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXACQUISITIONPLUGIN_H_
 
 #include "org_custusx_acquisition_Export.h"
+#include <memory>
 
 #include "cxGUIExtenderService.h"
 class QDomNode;
@@ -19,11 +20,11 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
-typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+typedef std::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef std::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 
 /**

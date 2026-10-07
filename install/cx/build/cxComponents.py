@@ -593,7 +593,11 @@ class CustusX(CppComponent):
         add = builder.addCMakeOption
         append = builder.appendCMakeOption
         add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
-        add('ITK_DIR:PATH', self._createSibling(ITK4).configPath())
+        # Only IGSTK builds, or an application assembly that adds ITK() for its own plugins, use ITK.
+        useITK = any(lib.name() == 'ITK' for lib in self.assembly.libraries)
+        add('CX_USE_ITK:BOOL', useITK)
+        if useITK:
+            add('ITK_DIR:PATH', self._createSibling(ITK4).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenIGTLinkIO_DIR:PATH', self._createSibling(OpenIGTLinkIO).configPath())

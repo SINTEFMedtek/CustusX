@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QObject>
 
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <igstkLogger.h>
 #include <igstkTracker.h>
 #include <igstkPolarisTracker.h>
@@ -43,8 +43,8 @@ namespace cx
  */
 
 class IgstkTool;
-typedef boost::shared_ptr<IgstkTool> IgstkToolPtr;
-typedef boost::weak_ptr<IgstkTool> IgstkToolWeakPtr;
+typedef std::shared_ptr<IgstkTool> IgstkToolPtr;
+typedef std::weak_ptr<IgstkTool> IgstkToolWeakPtr;
 
 /**
  * \brief Class representing the navigation system.
@@ -154,8 +154,8 @@ protected:
 private:
 	IgstkTracker() {} ///< do not use this one
 };
-typedef boost::shared_ptr<IgstkTracker> TrackerPtr;
-typedef boost::weak_ptr<IgstkTracker> TrackerWeakPtr;
+typedef std::shared_ptr<IgstkTracker> TrackerPtr;
+typedef std::weak_ptr<IgstkTracker> TrackerWeakPtr;
 
 /**
  * @}

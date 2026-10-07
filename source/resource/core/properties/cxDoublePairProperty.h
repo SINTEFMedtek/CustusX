@@ -13,13 +13,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDOUBLEPAIRPROPERTY_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxDoublePairPropertyBase.h"
 #include "cxXmlOptionItem.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
+typedef std::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
 
 /**
  * \brief Implementation of DoublePairPropertyBase.

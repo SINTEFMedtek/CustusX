@@ -20,7 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <map>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxXmlOptionItem.h"
 #include "cxDefinitions.h"
 
@@ -78,7 +78,7 @@ private:
 	IMAGE_MODALITY mId;
 };
 
-typedef boost::shared_ptr<class Presets> PresetsPtr;
+typedef std::shared_ptr<class Presets> PresetsPtr;
 
 } /* namespace cx */
 #endif /* CXPRESETS_H_ */

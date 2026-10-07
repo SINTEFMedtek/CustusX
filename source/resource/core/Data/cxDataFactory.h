@@ -12,13 +12,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDATAFACTORY_H
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxPrecompiledHeader.h"
 
 #include "cxForwardDeclarations.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 
 /** Factory for creating cx::Data objects
@@ -36,10 +37,10 @@ public:
 	DataPtr create(QString type, QString uid, QString name="");
 
 	template<class T>
-	boost::shared_ptr<T> createSpecific(QString uid, QString name="")
+	std::shared_ptr<T> createSpecific(QString uid, QString name="")
 	{
 		DataPtr retval = this->create(T::getTypeName(), uid, name);
-		return boost::dynamic_pointer_cast<T>(retval);
+		return std::dynamic_pointer_cast<T>(retval);
 	}
 private:
 	DataPtr createRaw(QString type, QString uid);
@@ -48,7 +49,7 @@ private:
 	SpaceProviderPtr mSpaceProvider;
 
 };
-typedef boost::shared_ptr<DataFactory> DataFactoryPtr;
+typedef std::shared_ptr<DataFactory> DataFactoryPtr;
 
 
 } // namespace cx

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDOUBLEPAIRPROPERTYBASE_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxProperty.h"
 #include "cxDoubleRange.h"
@@ -83,7 +84,7 @@ public:
 	} ///< number of relevant decimals in value
 
 };
-typedef boost::shared_ptr<DoublePairPropertyBase> DoublePairPropertyBasePtr;
+typedef std::shared_ptr<DoublePairPropertyBase> DoublePairPropertyBasePtr;
 
 /** Dummy implementation */
 class cxResource_EXPORT DoubleSpanSliderAdapterNull: public DoublePairPropertyBase

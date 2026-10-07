@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build System
 
-CustusX uses a **superbuild** via Python scripts that download and build all dependencies (Qt, VTK, ITK, Eigen, OpenCV, OpenIGTLink, CTK, DCMTK, Boost, etc.).
+CustusX uses a **superbuild** via Python scripts that download and build all dependencies (Qt, VTK, Eigen, OpenCV, OpenIGTLink, CTK, DCMTK, Boost, etc.; ITK only for IGSTK builds).
 
 **Full build from scratch (Linux/Mac):**
 ```bash
@@ -83,7 +83,7 @@ Application (CustusX main)
         └── Logic Layer (source/logic/) — LogicManager, plugin lifecycle
             └── Plugin Framework (CTK OSGi) — ~37 plugins in source/plugins/
                 └── Resource Layer (source/resource/) — shared libraries & utilities
-                    └── External Libraries (Qt, VTK, ITK, ...)
+                    └── External Libraries (Qt, VTK, CTK, ...)
 ```
 
 **Core services** (all plugin-based, discovered at runtime):
@@ -172,6 +172,12 @@ Always commit to a branch other than `develop`/`master` in any of these repos: C
 **Only push when explicitly told to**
 
 Never run `git push` in any of these repos unless the user explicitly says to push. Permission covers that one push only and does not carry over to later commits in the same session. Being asked to put changes on a branch means commit locally. After committing, say the commit is ready to push and wait.
+
+Waiting also keeps GitLab runner load down, since every push to a branch can start a pipeline.
+
+**One commit per repo for small fixes**
+
+For a small fix, keep all its changes in one commit per repo: until the user says to push, fold follow-up changes into that commit (`git commit --amend`, see below) and keep its message describing the whole change. GitLab uses the last commit's message for a new merge request, so one well-described commit makes the MR easy to create. Larger features may keep several commits.
 
 **Review before a merge request**
 

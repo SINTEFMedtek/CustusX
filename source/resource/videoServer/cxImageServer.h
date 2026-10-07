@@ -17,11 +17,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTcpServer>
 #include <QTimer>
 #include <QPointer>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 namespace cx
 {
-typedef boost::shared_ptr<class Streamer> StreamerPtr;
+typedef std::shared_ptr<class Streamer> StreamerPtr;
 
 /**
  * \brief ImageServer

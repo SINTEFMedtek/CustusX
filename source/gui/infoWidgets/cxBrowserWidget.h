@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXBROWSERWIDGET_H_
 
 #include "cxBaseWidget.h"
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxPopupToolbarWidget.h"
 #include "cxXmlOptionItem.h"
@@ -31,8 +32,8 @@ namespace cx
 class PopupToolbarWidget;
 class TreeItemModel;
 class EraseDataToolButton;
-typedef boost::shared_ptr<class TreeNode> TreeNodePtr;
-typedef boost::shared_ptr<class TreeRepository> TreeRepositoryPtr;
+typedef std::shared_ptr<class TreeNode> TreeNodePtr;
+typedef std::shared_ptr<class TreeRepository> TreeRepositoryPtr;
 
 
 /**

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSESSIONSTORAGESERVICEPROXY_H
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxSessionStorageService.h"
 
 #include "cxServiceTrackerListener.h"
@@ -45,7 +46,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	SessionStorageServicePtr mService;
-	boost::shared_ptr<ServiceTrackerListener<SessionStorageService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<SessionStorageService> > mServiceListener;
 };
 
 } // namespace cx

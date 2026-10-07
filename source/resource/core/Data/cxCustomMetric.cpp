@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxCustomMetric.h"
+#include <memory>
 
 #include <vtkImageData.h>
 #include "cxBoundingBox3D.h"
@@ -535,7 +536,7 @@ Transform3D CustomMetric::calculateTransformTo2DImageCenter() const
 	if(this->modelIsImage())
 	{
 		DataPtr model = this->getModel();
-		ImagePtr imageModel = boost::dynamic_pointer_cast<Image>(model);
+		ImagePtr imageModel = std::dynamic_pointer_cast<Image>(model);
 		vtkImageDataPtr vtkImage = imageModel->getBaseVtkImageData();
 		int xSize = vtkImage->GetExtent()[1] - vtkImage->GetExtent()[0];
 		int ySize = vtkImage->GetExtent()[3] - vtkImage->GetExtent()[2];

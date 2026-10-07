@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxViewWrapper2D.h"
+#include <memory>
 #include <vector>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
@@ -542,9 +543,9 @@ void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 
 void ViewWrapper2D::dataAdded(DataPtr data)
 {
-	if (boost::dynamic_pointer_cast<Image>(data))
+	if (std::dynamic_pointer_cast<Image>(data))
 	{
-		this->imageAdded(boost::dynamic_pointer_cast<Image>(data));
+		this->imageAdded(std::dynamic_pointer_cast<Image>(data));
 	}
 	else
 	{

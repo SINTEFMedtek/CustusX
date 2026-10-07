@@ -12,18 +12,20 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGENERICSCRIPTFILTER_H
 
 #include "cxFilterImpl.h"
+#include <memory>
 #include "cxSettings.h"
 #include "cxProcessWrapper.h"
 #include <QColor>
 #include <QMap>
 #include <QMutex>
 #include <QAtomicInt>
+#include <QAtomicInteger>
 #include "cxSelectDataStringProperty.h"
 
 
 namespace cx
 {
-typedef boost::shared_ptr<class Raidionics> RaidionicsPtr;
+typedef std::shared_ptr<class Raidionics> RaidionicsPtr;
 
 struct cxResourceFilter_EXPORT CommandStringVariables
 {
@@ -123,6 +125,8 @@ protected:
 	QString createImageName(QString parentName, QString filePath);
 	int countPlannedMeshes(QStringList createOutputMeshList) const;
 	void appendToLineBuffer(const QString& newData);
+	void flushLineBuffer();
+	void reportLine(const QString& line);
 	QStringList extractCompleteLines(QString& buffer) const;
 	void createOutputVolume();
 	void deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume);
@@ -162,15 +166,17 @@ protected:
 
 	vtkImageDataPtr mRawResult;
 	QString mOutputChannelName;
-	// mCommandLine is read from the main thread (requestStop(), and the
-	// processXxx() slots invoked via queued connections) while it is
-	// created/reset from the worker thread (createProcess()/deleteProcess(),
-	// called from execute()). All access goes through
-	// getCommandLine()/setCommandLine() so the shared_ptr's own read/write
-	// is never racy; the ProcessWrapper it points to is not otherwise
-	// protected, since only one thread ever owns it at a time.
+	// mCommandLine is created, used and reset on the worker thread running
+	// execute(): createProcess(), deleteProcess(), and the process slots, which
+	// use direct connections for this reason. The main thread never holds a
+	// reference to it, so the ProcessWrapper is always destroyed on the worker
+	// thread; requestStop() uses mProcessId instead. All access goes through
+	// getCommandLine()/setCommandLine() so the shared_ptr's own read/write is
+	// never racy.
 	ProcessWrapperPtr mCommandLine;
 	QMutex mCommandLineMutex;
+	// PID of the running script (0 when none), for requestStop() on the main thread.
+	QAtomicInteger<qint64> mProcessId;
 	// Set by requestStop() (main thread), read by execute() (worker thread)
 	// after the process exits, so a script that catches SIGTERM and exits
 	// 0 is still treated as stopped rather than as a successful run.
@@ -202,7 +208,7 @@ protected slots:
 	bool deleteProcess();
 	bool disconnectProcess();
 };
-typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
+typedef std::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
 
 } // namespace cx

@@ -12,12 +12,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXHELPINDEXWIDGET_H
 
 #include <QWidget>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 class QLineEdit;
 
 namespace cx
 {
-typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+typedef std::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 /**
  *

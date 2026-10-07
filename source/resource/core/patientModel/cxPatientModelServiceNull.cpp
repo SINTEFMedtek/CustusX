@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxPatientModelServiceNull.h"
+#include <memory>
 #include <QDomElement>
 #include <map>
 #include "cxImage.h"
@@ -51,7 +52,7 @@ std::map<QString, DataPtr> PatientModelServiceNull::getChildren(QString parent_u
 LandmarksPtr PatientModelServiceNull::getPatientLandmarks() const
 {
 	printWarning();
-	return boost::shared_ptr<Landmarks>();
+	return std::shared_ptr<Landmarks>();
 }
 
 

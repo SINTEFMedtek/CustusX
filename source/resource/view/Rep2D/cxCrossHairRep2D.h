@@ -21,6 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCROSSHAIRREP2D_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 //#include <vtkSmartPointer.h>
 #include "cxRepImpl.h"
@@ -28,11 +29,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
-typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
+typedef std::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef std::shared_ptr<class CrossHair2D> CrossHair2DPtr;
 
-typedef boost::shared_ptr<class CrossHairRep2D> CrossHairRep2DPtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class CrossHairRep2D> CrossHairRep2DPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
 /**\brief Display the Tool in 2D as a crosshair in the tool tip position.
  *

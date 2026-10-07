@@ -9,7 +9,7 @@ They are listed here:
 | CMake             | <http://cmake.org>
 | Qt                | <http://qt-project.org/>
 | VTK               | <http://vtk.org>
-| ITK               | <http://itk.org>
+| ITK               | <http://itk.org> (only with IGSTK)
 | CTK               | <http://commontk.org>
 | Eigen             | <http://eigen.tuxfamily.org>
 | OpenCV            | <http://opencv.org>

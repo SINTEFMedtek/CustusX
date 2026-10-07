@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXFILEMANAGERSERVICEPLUGINACTIVATOR_H
 #define CXFILEMANAGERSERVICEPLUGINACTIVATOR_H
 #include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxRegisteredService.h"
 
 namespace cx

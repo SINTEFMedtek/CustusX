@@ -1,11 +1,11 @@
 #include "cxViewImplService.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxViewCollectionWidget.h"
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class ViewServiceMock> ViewServiceMockPtr;
+typedef std::shared_ptr<class ViewServiceMock> ViewServiceMockPtr;
 
 class ViewServiceMock : public cx::ViewImplService
 {

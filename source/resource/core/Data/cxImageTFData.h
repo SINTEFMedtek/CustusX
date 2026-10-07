@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPrecompiledHeader.h"
 
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include <QColor>
 #include "vtkForwardDeclarations.h"
@@ -32,10 +32,10 @@ namespace cx
 {
 typedef std::map<int, int> IntIntMap;
 typedef std::map<int, QColor> ColorMap;
-typedef boost::shared_ptr<IntIntMap> OpacityMapPtr;
-typedef boost::shared_ptr<ColorMap> ColorMapPtr;
+typedef std::shared_ptr<IntIntMap> OpacityMapPtr;
+typedef std::shared_ptr<ColorMap> ColorMapPtr;
 
-typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
+typedef std::shared_ptr<class ImageTFData> ImageTFDataPtr;
 
 
 /** \brief Data class for Transfer Function info, either 2D or 3D.

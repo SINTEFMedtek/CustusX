@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGSYSTEMSERVICE_H
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxTool.h"
 
 #define TrackingSystemService_iid "cx::TrackingSystemService"
@@ -20,8 +21,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
-typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
+typedef std::shared_ptr<class TrackingSystemService> TrackingSystemServicePtr;
+typedef std::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
 
 /** \brief Tracking System Service
  *

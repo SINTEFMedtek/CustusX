@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceVisualizationExport.h"
 
 #include "cxConfig.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "vtkForwardDeclarations.h"
 #include <QVTKOpenGLNativeWidget.h>
 #include "cxLayoutData.h"
@@ -26,7 +26,7 @@ class QGridLayout;
 namespace cx
 {
 class ViewItem;
-typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+typedef std::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 
 /**
  * More advanced N:1 combination of SSC Views and Qt Widgets
@@ -85,7 +85,7 @@ private:
 //	std::map<QString, vtkRenderWindowPtr> mCachedRenderWindows; // swap between off/onscreen rw's, but dont delete them.
 	bool mOffScreenRendering;
 };
-typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
+typedef std::shared_ptr<ViewContainer> ViewContainerPtr;
 
 
 } /* namespace cx */

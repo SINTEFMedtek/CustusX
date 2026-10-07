@@ -10,8 +10,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <functional>
+#include <memory>
 #include <QDir>
 #include <QElapsedTimer>
+#include <QMutex>
+#include <QThread>
 #include "cxGenericScriptFilter.h"
 #include "cxtestVisServices.h"
 #include "cxProperty.h"
@@ -30,7 +34,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class TestGenericScriptFilter> TestGenericScriptFilterPtr;
+typedef std::shared_ptr<class TestGenericScriptFilter> TestGenericScriptFilterPtr;
 
 class TestGenericScriptFilter : public cx::GenericScriptFilter
 {
@@ -72,6 +76,14 @@ public:
 	cx::ProcessWrapperPtr getProcessWrapper()
 	{
 		return mCommandLine;
+	}
+	qint64 getProcessId()
+	{
+		return mProcessId.loadAcquire();
+	}
+	void testFlushLineBuffer()
+	{
+		flushLineBuffer();
 	}
 	void connectTestSlotsAndTurnOffOtherReporting()
 	{
@@ -415,11 +427,11 @@ TEST_CASE("GenericScriptFilter: Detailed test of option adapters", "[unit]")
 
 	cx::PropertyPtr option = options[0];
 	REQUIRE(option->getUid() == "scriptSelector");
-	cx::FilePathPropertyPtr scriptSelectorOption = boost::dynamic_pointer_cast<cx::FilePathProperty>(option);
+	cx::FilePathPropertyPtr scriptSelectorOption = std::dynamic_pointer_cast<cx::FilePathProperty>(option);
 	REQUIRE(scriptSelectorOption);
 
 	option = options[1];
-	cx::FilePreviewPropertyPtr filePreviewOption = boost::dynamic_pointer_cast<cx::FilePreviewProperty>(option);
+	cx::FilePreviewPropertyPtr filePreviewOption = std::dynamic_pointer_cast<cx::FilePreviewProperty>(option);
 	REQUIRE(scriptSelectorOption);
 }
 
@@ -456,6 +468,131 @@ TEST_CASE("GenericScriptFilter: Get output from process", "[unit]")
 	REQUIRE(filter->testRunCommandString(validCommand));
 	CHECK(filter->mGotOutput);
 	REQUIRE(filter->testDeleteProcess());
+}
+
+namespace
+{
+class FunctionThread : public QThread
+{
+public:
+	explicit FunctionThread(std::function<void()> function) : mFunction(function) {}
+protected:
+	void run() override
+	{
+		mFunction();
+	}
+private:
+	std::function<void()> mFunction;
+};
+}
+
+TEST_CASE("GenericScriptFilter: Script output is read on the worker thread running the script", "[unit][not_win64]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	QMutex mutex;
+	QStringList lines;
+	QList<QThread*> outputThreads;
+	QObject::connect(filter.get(), &cx::GenericScriptFilter::scriptOutput, [&](const QString& line)
+	{
+		QMutexLocker lock(&mutex);
+		lines << line;
+		outputThreads << QThread::currentThread();
+	});
+
+	bool created = false;
+	bool ran = false;
+	bool deleted = false;
+	std::unique_ptr<FunctionThread> worker(new FunctionThread([&]()
+	{
+		created = filter->testCreateProcess();
+		ran = filter->testRunCommandString("echo test");
+		deleted = filter->testDeleteProcess();
+	}));
+	worker->start();
+	bool finished = worker->wait(30000);
+	if (!finished)
+	{
+		filter->requestStop();
+		worker->wait();
+	}
+	REQUIRE(finished);
+
+	CHECK(created);
+	CHECK(ran);
+	CHECK(deleted);
+	QMutexLocker lock(&mutex);
+	CHECK(lines.contains("test"));
+	REQUIRE_FALSE(outputThreads.isEmpty());
+	for (QThread* thread : outputThreads)
+	{
+		CHECK(thread == worker.get());
+	}
+}
+
+TEST_CASE("GenericScriptFilter: flushLineBuffer() reports a final line without a trailing newline", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	filter->testAppendToLineBuffer("complete\npartial");
+	CHECK(filter->mCapturedLines == QStringList({"complete"}));
+
+	filter->testFlushLineBuffer();
+	CHECK(filter->mCapturedLines == QStringList({"complete", "partial"}));
+
+	filter->testFlushLineBuffer();
+	CHECK(filter->mCapturedLines.size() == 2);
+}
+
+TEST_CASE("GenericScriptFilter: Script output without a trailing newline is not lost", "[unit][not_win64]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	REQUIRE(filter->testCreateProcess());
+	REQUIRE(filter->testRunCommandString("printf partial"));
+	REQUIRE(filter->testDeleteProcess());
+
+	CHECK(filter->mCapturedLines.contains("partial"));
+}
+
+TEST_CASE("GenericScriptFilter: execute() without input doesn't leave a process behind", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	CHECK_FALSE(filter->execute());
+	CHECK_FALSE(filter->getProcessWrapper());
+}
+
+TEST_CASE("GenericScriptFilter: requestStop() stops a script running on the worker thread", "[unit][not_win64]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	std::unique_ptr<FunctionThread> worker(new FunctionThread([&]()
+	{
+		filter->testCreateProcess();
+		filter->testRunCommandString("sleep 30");
+		filter->testDeleteProcess();
+	}));
+	worker->start();
+
+	QElapsedTimer timer;
+	timer.start();
+	while (filter->getProcessId() == 0 && timer.elapsed() < 10000)
+	{
+		QThread::msleep(10);
+	}
+	CHECK(filter->getProcessId() > 0);
+
+	filter->requestStop();
+	bool finished = worker->wait(10000);
+	if (!finished)
+	{
+		worker->wait();
+	}
+
+	CHECK(finished);
+	CHECK(filter->getProcessId() == 0);
+	CHECK_FALSE(filter->getProcessWrapper());
 }
 
 TEST_CASE("GenericScriptFilter: Read generated file fails with no input", "[unit]")

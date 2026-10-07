@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXHELPSEARCHWIDGET_H
 
 #include <QWidget>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 QT_BEGIN_NAMESPACE
 class QHelpSearchEngine;
@@ -21,7 +21,7 @@ QT_END_NAMESPACE;
 
 namespace cx
 {
-typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+typedef std::shared_ptr<class HelpEngine> HelpEnginePtr;
 
 /**
  *

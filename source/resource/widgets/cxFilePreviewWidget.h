@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFILEPREVIEWWIDGET_H_
 
 #include "cxResourceWidgetsExport.h"
+#include <memory>
 
 #include "cxFileWatcherWidget.h"
 class QTextDocument;
@@ -22,7 +23,7 @@ class QPushButton;
 
 namespace cx
 {
-typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
+typedef std::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
 
 /**
  *
@@ -71,7 +72,7 @@ private:
 	QPushButton* 							mSaveButton;
 
 	//QFileSystemWatcher*				mFileSystemWatcher;
-	//boost::shared_ptr<QFile>	mCurrentFile;
+	//std::shared_ptr<QFile>	mCurrentFile;
 };
 
 }

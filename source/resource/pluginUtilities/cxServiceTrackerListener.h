@@ -13,8 +13,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSERVICETRACKERLISTENER_H_
 
 #include <QSharedDataPointer>
-#include <boost/function.hpp>
-#include <boost/shared_ptr.hpp>
+#include <functional>
+#include <memory>
 #undef REGISTERED //Needed on windows to avoid compiler error. Not sure why.
 #include <ctkServiceEvent.h>
 #include "ctkServiceTracker.h"
@@ -35,7 +35,7 @@ namespace cx
  * NB: This class can only be used with a valid plugin context.
  * And plugin contexts are only valid when the plugin framework is in one of these states: ACTIVE, STARTING and STOPPING
  *
- *  boost::shared_ptr<ServiceTrackerListener<ReconstructionService> > mServiceListener;
+ *  std::shared_ptr<ServiceTrackerListener<ReconstructionService> > mServiceListener;
  *  mServiceListener.reset(new ServiceTrackerListener<ReconstructionService>(
  *          LogicManager::getInstance()->getPluginFramework(),
  *          boost::bind(&ReconstructManager::onServiceAdded, this, boost::placeholders::_1),
@@ -55,11 +55,11 @@ class ServiceTrackerListener
 
 public:
 	ServiceTrackerListener(ctkPluginContext* context,
-						   boost::function<void (T*)> serviceAdded,
-						   boost::function<void (T*)> serviceModified,
-							 boost::function<void (T*)> serviceRemoved)
+						   std::function<void (T*)> serviceAdded,
+						   std::function<void (T*)> serviceModified,
+							 std::function<void (T*)> serviceRemoved)
 	{
-		boost::shared_ptr<ServiceTrackerCustomizer<T> > customizer(new ServiceTrackerCustomizer<T>);
+		std::shared_ptr<ServiceTrackerCustomizer<T> > customizer(new ServiceTrackerCustomizer<T>);
 		mServiceTrackerCustomizer = customizer;
 		mServiceTrackerCustomizer->setServiceAddedCallback(serviceAdded);
 		mServiceTrackerCustomizer->setServiceModifiedCallback(serviceModified);
@@ -94,8 +94,8 @@ public:
 	}
 
 private:
-	boost::shared_ptr<ServiceTrackerCustomizer<T> > mServiceTrackerCustomizer;
-	boost::shared_ptr<ctkServiceTracker<T*> > mServiceTracker;
+	std::shared_ptr<ServiceTrackerCustomizer<T> > mServiceTrackerCustomizer;
+	std::shared_ptr<ctkServiceTracker<T*> > mServiceTracker;
 };
 }//namespace cx
 

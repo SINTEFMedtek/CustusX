@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXAUDIOIMPL_H_
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include "cxAudio.h"
 #include <QObject>
@@ -73,7 +74,7 @@ public:
   virtual void playSampleSound();
 
 private:
-  boost::shared_ptr<AudioInternal> mInternal;
+  std::shared_ptr<AudioInternal> mInternal;
 };
 
 }//namespace cx

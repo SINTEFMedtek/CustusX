@@ -15,10 +15,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "vtkSmartPointer.h"
 #include <stdint.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include <QDateTime>
-#include <boost/array.hpp>
+#include <array>
 class QTimer;
 
 #include "cxVideoSource.h"
@@ -103,7 +103,7 @@ private:
 	QTimer* mTimeoutTimer;
 };
 
-typedef boost::shared_ptr<BasicVideoSource> BasicVideoSourcePtr;
+typedef std::shared_ptr<BasicVideoSource> BasicVideoSourcePtr;
 
 } // namespace cx
 

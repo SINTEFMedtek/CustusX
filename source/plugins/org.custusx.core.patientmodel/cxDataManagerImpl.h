@@ -25,7 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMesh.h"
 #include "cxDataManager.h"
 #include <QFileInfo>
-#include "boost/scoped_ptr.hpp"
+#include <memory>
 #include "cxPatientModelService.h"
 
 class QDomElement;
@@ -33,8 +33,8 @@ class QDomElement;
 namespace cx
 {
 
-typedef boost::shared_ptr<class DataManager> DataServicePtr;
-typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
+typedef std::shared_ptr<class DataManager> DataServicePtr;
+typedef std::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
 
 /** Default implementation of DataManager.
  *

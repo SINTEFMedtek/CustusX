@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDATAMETRICWRAPPERS_H_
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include <vector>
 #include <QtWidgets>
@@ -48,7 +49,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class MetricBase> MetricBasePtr;
+typedef std::shared_ptr<class MetricBase> MetricBasePtr;
 
 class cxGui_EXPORT MetricBase : public QObject
 {

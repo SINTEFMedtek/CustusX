@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMANUALTOOL_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QMutex>
 #include "cxToolImpl.h"
@@ -68,7 +69,7 @@ private:
 	void update3DCrossHair(double toolTipOffset) const;
 };
 
-typedef boost::shared_ptr<ManualTool> ManualToolPtr;
+typedef std::shared_ptr<ManualTool> ManualToolPtr;
 
 }// end namespace
 

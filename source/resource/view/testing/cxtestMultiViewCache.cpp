@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "catch.hpp"
+#include <memory>
 #include "cxMultiViewCache.h"
 #include "cxViewWidget.h"
 #include "cxViewCollectionWidget.h"
@@ -31,7 +32,7 @@ TEST_CASE("MultiViewCache retrieveView 3D", "[opengl][resource][visualization][i
 
 	viewCache->clearCache();
 
-	boost::shared_ptr<cx::ViewCollectionWidget> mainWidget;
+	std::shared_ptr<cx::ViewCollectionWidget> mainWidget;
 	mainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(NULL/*need QApplication??*/).data());
 
 	cx::ViewWidget* view = viewCache->retrieveView(mainWidget.get(), cx::View::VIEW_3D, false);
@@ -45,7 +46,7 @@ TEST_CASE("MultiViewCache retrieveView 2D", "[opengl][resource][visualization][i
 
 	viewCache->clearCache();
 
-	boost::shared_ptr<cx::ViewCollectionWidget> mainWidget;
+	std::shared_ptr<cx::ViewCollectionWidget> mainWidget;
 	mainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(NULL/*need QApplication??*/).data());
 
 	cx::ViewWidget* view = viewCache->retrieveView(mainWidget.get(), cx::View::VIEW_2D, false);

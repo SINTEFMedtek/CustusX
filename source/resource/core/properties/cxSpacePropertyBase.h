@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -80,7 +80,7 @@ public:
 
 
 };
-typedef boost::shared_ptr<SpacePropertyBase> SpacePropertyBasePtr;
+typedef std::shared_ptr<SpacePropertyBase> SpacePropertyBasePtr;
 
 } // namespace cx
 

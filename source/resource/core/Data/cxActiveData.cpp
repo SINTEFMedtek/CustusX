@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxActiveData.h"
+#include <memory>
 #include "cxImage.h"
 #include "cxTrackedStream.h"
 #include "cxPatientStorage.h"
@@ -140,11 +141,11 @@ ImagePtr ActiveData::getDerivedActiveImage() const
 {
 	DataPtr activeData = this->getActiveUsingRegexp("image|trackedStream");
 	ImagePtr retval;
-	TrackedStreamPtr stream = boost::dynamic_pointer_cast<TrackedStream>(activeData);
+	TrackedStreamPtr stream = std::dynamic_pointer_cast<TrackedStream>(activeData);
 	if(stream)
 		retval = stream->getChangingImage();
 	else
-		retval = boost::dynamic_pointer_cast<Image>(activeData);
+		retval = std::dynamic_pointer_cast<Image>(activeData);
 	return retval;
 }
 

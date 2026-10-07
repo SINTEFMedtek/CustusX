@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxLabeledComboBoxWidget.h"
+#include <memory>
 #include <iostream>
 #include "cxTypeConversions.h"
 #include "cxHelperWidgets.h"
@@ -100,7 +101,7 @@ void LabeledComboBoxWidget::prePaintEvent()
 
 QIcon LabeledComboBoxWidget::getIcon(QString uid)
 {
-	SelectDataStringPropertyBasePtr dataProperty = boost::dynamic_pointer_cast<SelectDataStringPropertyBase>(mData);
+	SelectDataStringPropertyBasePtr dataProperty = std::dynamic_pointer_cast<SelectDataStringPropertyBase>(mData);
 	if(!dataProperty)
 		return QIcon();
 

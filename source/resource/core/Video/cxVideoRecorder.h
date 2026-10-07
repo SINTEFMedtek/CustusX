@@ -23,7 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include "vtkSmartPointer.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include <QDateTime>
 #include "cxVideoSource.h"
@@ -66,7 +66,7 @@ private:
 	double mSyncShift;
 };
 
-typedef boost::shared_ptr<VideoRecorder> VideoRecorderPtr;
+typedef std::shared_ptr<VideoRecorder> VideoRecorderPtr;
 
 }
 

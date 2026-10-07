@@ -11,8 +11,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxSmoothingImageFilter.h"
 
-#include "cxAlgorithmHelpers.h"
-#include <itkSmoothingRecursiveGaussianImageFilter.h>
+#include <vtkImageData.h>
+
+#include <vtkImageCast.h>
+#include <vtkImageGaussianSmooth.h>
 #include "cxSelectDataStringProperty.h"
 
 #include "cxUtilHelpers.h"
@@ -49,17 +51,15 @@ QString SmoothingImageFilter::getHelp() const
 {
 	return "<html>"
 	        "<h3>Smoothing.</h3>"
-	        "<p>Wrapper for a itk::SmoothingRecursiveGaussianImageFilter.</p>"
 	        "<p>Computes the smoothing of an image by convolution with "
-	        "the Gaussian kernels implemented as IIR filters."
-	        "This filter is implemented using the recursive gaussian filters.</p>"
+	        "a Gaussian kernel. Sigma is the standard deviation in mm.</p>"
 	        "</html>";
 }
 
 DoublePropertyPtr SmoothingImageFilter::getSigma(QDomElement root)
 {
 	return DoubleProperty::initialize("Smoothing sigma", "",
-	                                             "Used for smoothing the segmented volume. Measured in units of image spacing.",
+	                                             "Standard deviation of the Gaussian kernel, in mm.",
 	                                             0.10, DoubleRange(0, 5, 0.01), 2, root);
 }
 
@@ -96,26 +96,24 @@ bool SmoothingImageFilter::execute()
 
 	DoublePropertyPtr sigma = this->getSigma(mCopiedOptions);
 
-	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
-
-	typedef itk::SmoothingRecursiveGaussianImageFilter<itkImageType, itkImageType> smoothingFilterType;
-	smoothingFilterType::Pointer smoohingFilter = smoothingFilterType::New();
-	smoohingFilter->SetSigma(sigma->getValue());
-	smoohingFilter->SetInput(itkImage);
-	smoohingFilter->Update();
-	itkImage = smoohingFilter->GetOutput();
-
-	//Convert ITK to VTK
-	itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
-	itkToVtkFilter->SetInput(itkImage);
-	itkToVtkFilter->Update();
-
-	vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-	rawResult->DeepCopy(itkToVtkFilter->GetOutput());
-	// TODO: possible memory problem here - check debug mem system of itk/vtk
-
-	mRawResult =  rawResult;
+	mRawResult = smooth(input->getBaseVtkImageData(), sigma->getValue());
 	return true;
+}
+
+vtkImageDataPtr SmoothingImageFilter::smooth(vtkImageDataPtr image, double sigma)
+{
+	vtkImageCastPtr cast = vtkImageCastPtr::New();
+	cast->SetInputData(image);
+	cast->SetOutputScalarTypeToShort();
+
+	const double* spacing = image->GetSpacing();
+	vtkSmartPointer<vtkImageGaussianSmooth> smoothing = vtkSmartPointer<vtkImageGaussianSmooth>::New();
+	smoothing->SetInputConnection(cast->GetOutputPort());
+	smoothing->SetDimensionality(3);
+	smoothing->SetStandardDeviations(sigma/spacing[0], sigma/spacing[1], sigma/spacing[2]);
+	smoothing->SetRadiusFactors(3, 3, 3);
+	smoothing->Update();
+	return smoothing->GetOutput();
 }
 
 bool SmoothingImageFilter::postProcess()

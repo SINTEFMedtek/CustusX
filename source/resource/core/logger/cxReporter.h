@@ -19,8 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QMutex>
 #include <QDateTime>
 #include <QFile>
-#include "boost/shared_ptr.hpp"
-#include "boost/weak_ptr.hpp"
+#include <memory>
 #include "cxDefinitions.h"
 #include "cxAudio.h"
 #include <sstream>
@@ -43,7 +42,7 @@ class QTextStream;
 
 namespace cx
 {
-typedef boost::shared_ptr<class Reporter> ReporterPtr;
+typedef std::shared_ptr<class Reporter> ReporterPtr;
 
 /** \brief Logging service.
  *
@@ -115,8 +114,8 @@ private:
   AudioPtr mAudioSource;
 
 //  static Reporter *mTheInstance; // global variable
-  static boost::weak_ptr<Reporter> mWeakInstance; // global variable
-  static boost::shared_ptr<Reporter> mPersistentInstance; // global variable
+  static std::weak_ptr<Reporter> mWeakInstance; // global variable
+  static std::shared_ptr<Reporter> mPersistentInstance; // global variable
 };
 
 /**Shortcut for accessing the message manager instance.

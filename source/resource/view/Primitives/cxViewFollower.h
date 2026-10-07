@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceVisualizationExport.h"
 
-#include "boost/scoped_ptr.hpp"
+#include <memory>
 #include <QObject>
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
@@ -24,8 +24,8 @@ namespace cx
 {
 
 class SliceAutoViewportCalculator;
-typedef boost::shared_ptr<class RegionOfInterestMetric> RegionOfInterestMetricPtr;
-typedef boost::shared_ptr<class ViewFollower> ViewFollowerPtr;
+typedef std::shared_ptr<class RegionOfInterestMetric> RegionOfInterestMetricPtr;
+typedef std::shared_ptr<class ViewFollower> ViewFollowerPtr;
 
 
 
@@ -61,7 +61,7 @@ private:
 	PatientModelServicePtr mDataManager;
 	QString mRoi;
 
-	boost::scoped_ptr<SliceAutoViewportCalculator> mCalculator;
+	std::unique_ptr<SliceAutoViewportCalculator> mCalculator;
 
 	Vector3D findVirtualTooltip_s();
 	DoubleBoundingBox3D getROI_BB_s();

@@ -13,16 +13,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceWidgetsExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxBaseWidget.h"
 #include <QMouseEvent>
 
 
 namespace cx
 {
-typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
-typedef boost::shared_ptr<class ViewService> ViewServicePtr;
+typedef std::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef std::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+typedef std::shared_ptr<class ViewService> ViewServicePtr;
 class EraseDataToolButton;
 
 /** Widget for selecting/showing/removing a Data.

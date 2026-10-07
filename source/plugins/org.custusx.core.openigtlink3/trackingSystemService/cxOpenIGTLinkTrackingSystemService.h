@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXOPENIGTLINKTRACKINGSYSTEMSERVICE_H_
 
 #include "org_custusx_core_openigtlink3_Export.h"
+#include <memory>
 
 #include <QThread>
 #include <map>
@@ -23,8 +24,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
-typedef boost::shared_ptr<class OpenIGTLinkTool> OpenIGTLinkToolPtr;
+typedef std::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
+typedef std::shared_ptr<class OpenIGTLinkTool> OpenIGTLinkToolPtr;
 
 /**
  * Tracking system service that gets tracking information from an OpenIGTLink source
@@ -84,7 +85,7 @@ private:
 signals:
 	void setInternalState(const Tool::State val);
 };
-typedef boost::shared_ptr<OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
+typedef std::shared_ptr<OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 
 } /* namespace cx */
 

@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxGrabberExport.h"
 
 #include "cxSender.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace cxtest {
 
@@ -48,7 +48,7 @@ private:
 	cx::PackagePtr mPackage;
 
 };
-typedef boost::shared_ptr<TestSender> TestSenderPtr;
+typedef std::shared_ptr<TestSender> TestSenderPtr;
 
 } /* namespace cxtest */
 #endif /* CXTESTSENDER_H_ */

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxAirwaysFilterService.h"
+#include <memory>
 
 #include <QTimer>
 
@@ -88,7 +89,7 @@ Vector3D AirwaysFilter::getSeedPointFromTool(SpaceProviderPtr spaceProvider, Dat
 			spaceProvider->getD(data));
 
 	// Have to multiply by the inverse of the spacing to get the voxel position
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 	double spacingX, spacingY, spacingZ;
 	image->getBaseVtkImageData()->GetSpacing(spacingX, spacingY, spacingZ);
 	point(0) = point(0) * (1.0 / spacingX);
@@ -103,7 +104,7 @@ Vector3D AirwaysFilter::getSeedPointFromTool(SpaceProviderPtr spaceProvider, Dat
 
 int * getImageSize(DataPtr inputImage)
 {
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(inputImage);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(inputImage);
 	return image->getBaseVtkImageData()->GetDimensions();
 }
 
@@ -644,7 +645,7 @@ void AirwaysFilter::createColoredAirways()
 		return;
 	
 	ColorVariationFilterPtr coloringFilter = ColorVariationFilterPtr(new ColorVariationFilter(mServices));
-	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mOutputTypes[3])->getMesh();
+	MeshPtr mesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mOutputTypes[3])->getMesh();
 	double globaleVariance = 50.0;
 	double localeVariance = 5.0;
 	int smoothingIterations = 5;

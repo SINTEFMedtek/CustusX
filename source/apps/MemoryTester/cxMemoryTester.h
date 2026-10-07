@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <vector>
 #include "vtkForwardDeclarations.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace cx
 {
@@ -69,7 +69,7 @@ private:
 
     QAction* mCrashAct;
 
-	boost::shared_ptr<MemHolder> mMemory;
+	std::shared_ptr<MemHolder> mMemory;
 };
 
 

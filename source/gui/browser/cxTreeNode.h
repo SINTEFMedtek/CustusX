@@ -13,8 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTREENODE_H
 
 #include <vector>
-#include <boost/weak_ptr.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QString>
 #include <QObject>
 #include "cxForwardDeclarations.h"
@@ -25,10 +24,10 @@ namespace cx
 {
 
 class TreeNode;
-typedef boost::weak_ptr<TreeNode> TreeNodeWeakPtr;
-typedef boost::shared_ptr<TreeNode> TreeNodePtr;
-typedef boost::weak_ptr<class TreeRepository> TreeRepositoryWeakPtr;
-typedef boost::shared_ptr<class TreeRepository> TreeRepositoryPtr;
+typedef std::weak_ptr<TreeNode> TreeNodeWeakPtr;
+typedef std::shared_ptr<TreeNode> TreeNodePtr;
+typedef std::weak_ptr<class TreeRepository> TreeRepositoryWeakPtr;
+typedef std::shared_ptr<class TreeRepository> TreeRepositoryPtr;
 
 
 class TreeNode : public QObject
@@ -46,7 +45,7 @@ public:
 	virtual QIcon getIcon() const = 0;
 	virtual QVariant getViewGroupVisibility(int index) const = 0;
 	virtual void setViewGroupVisibility(int index, bool value) = 0;
-	virtual boost::shared_ptr<QWidget> createPropertiesWidget() const = 0;
+	virtual std::shared_ptr<QWidget> createPropertiesWidget() const = 0;
 	virtual QVariant getColor() const = 0;
 	virtual bool  useColoredName() const = 0;
 	virtual QVariant getFont() const = 0;
@@ -83,7 +82,7 @@ public:
 	virtual QIcon getIcon() const { return mBase->getIcon(); }
 	virtual QVariant getViewGroupVisibility(int index) const { return mBase->getViewGroupVisibility(index); }
 	virtual void setViewGroupVisibility(int index, bool value) { mBase->setViewGroupVisibility(index, value); }
-	virtual boost::shared_ptr<QWidget> createPropertiesWidget() const { return mBase->createPropertiesWidget(); }
+	virtual std::shared_ptr<QWidget> createPropertiesWidget() const { return mBase->createPropertiesWidget(); }
 	virtual QVariant getColor() const { return mBase->getColor(); }
 	virtual bool  useColoredName() const { return mBase->useColoredName(); }
 	virtual QVariant getFont() const { return mBase->getFont(); }

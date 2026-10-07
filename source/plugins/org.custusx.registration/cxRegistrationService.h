@@ -16,14 +16,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_registration_Export.h"
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxTransform3D.h"
 
 class QDateTime;
 
 namespace cx
 {
-typedef boost::shared_ptr<class Data> DataPtr;
+typedef std::shared_ptr<class Data> DataPtr;
 }
 
 #define RegistrationService_iid "cx::RegistrationService"
@@ -31,7 +31,7 @@ typedef boost::shared_ptr<class Data> DataPtr;
 namespace cx
 {
 class RegistrationTransform;
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef std::shared_ptr<class RegistrationService> RegistrationServicePtr;
 
 /** \brief Registration services
  *

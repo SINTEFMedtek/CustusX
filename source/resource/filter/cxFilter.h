@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFILTER_H
 
 #include "cxResourceFilterExport.h"
+#include <memory>
 
 #include <vector>
 #include <QObject>
@@ -25,9 +26,9 @@ class QDomElement;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+typedef std::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
-typedef boost::shared_ptr<class Filter> FilterPtr;
+typedef std::shared_ptr<class Filter> FilterPtr;
 
 
 /** Base class for CustusX filters/algorithms

@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXLOGIOSTREAMREDIRECTER_H
 #define CXLOGIOSTREAMREDIRECTER_H
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxDefinitions.h"
 
 /**
@@ -30,7 +30,7 @@ namespace cx
 class SingleStreamerImpl
 {
 private:
-  boost::shared_ptr<class MyStreamBuf> StreamBuf;
+  std::shared_ptr<class MyStreamBuf> StreamBuf;
   std::streambuf *OrigBuf;
   std::ostream& mStream;
 public:

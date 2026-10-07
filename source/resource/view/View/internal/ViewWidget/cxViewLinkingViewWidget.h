@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWLINKINGVIEWWIDGET_H_
 
 #include "cxView.h"
+#include <memory>
 #include "cxViewWidget.h"
 #include <QPointer>
 #include "cxBoundingBox3D.h"
@@ -31,7 +32,7 @@ class ViewLinkingViewWidget : public ViewRepCollection
 public:
 	static ViewRepCollectionPtr create(ViewWidget* base, vtkRenderWindowPtr renderWindow)
 	{
-		boost::shared_ptr<ViewLinkingViewWidget> retval(new ViewLinkingViewWidget(base, renderWindow));
+		std::shared_ptr<ViewLinkingViewWidget> retval(new ViewLinkingViewWidget(base, renderWindow));
 		retval->mSelf = retval;
 		return retval;
 	}

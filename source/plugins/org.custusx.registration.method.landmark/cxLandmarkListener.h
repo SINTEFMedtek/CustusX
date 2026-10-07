@@ -15,15 +15,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_registration_method_landmarkExport.h"
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxRegServices.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
-typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
-typedef boost::shared_ptr<class Data> DataPtr;
+typedef std::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
+typedef std::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
+typedef std::shared_ptr<class Data> DataPtr;
 
 
 class org_custusx_registration_method_landmark_EXPORT LandmarkListener : public QObject

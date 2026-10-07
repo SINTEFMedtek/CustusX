@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxAcquisitionServiceProxy.h"
+#include <functional>
 
 #include <boost/bind/bind.hpp>
 #include <ctkPluginContext.h>
@@ -36,7 +37,7 @@ void AcquisitionServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<AcquisitionService>(
 								 mPluginContext,
 								 boost::bind(&AcquisitionServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (AcquisitionService*)>(),
+								 std::function<void (AcquisitionService*)>(),
 								 boost::bind(&AcquisitionServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

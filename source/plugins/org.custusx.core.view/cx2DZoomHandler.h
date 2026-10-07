@@ -13,13 +13,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CX2DZOOMHANDLER_H
 
 #include "org_custusx_core_view_Export.h"
+#include <memory>
 
 #include "cxViewGroupData.h"
 #include <QMenu>
 
 namespace cx
 {
-typedef boost::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
+typedef std::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
 
 /** 
  *

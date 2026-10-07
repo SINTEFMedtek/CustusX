@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxApplication.h"
 #include "cxtestCatchImpl.h"
-#include "boost/function.hpp"
+#include <functional>
 
 namespace cxtest
 {

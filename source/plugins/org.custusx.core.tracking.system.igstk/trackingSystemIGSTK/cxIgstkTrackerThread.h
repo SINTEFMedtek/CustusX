@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXIGSTKTRACKERTHREAD_H_
 
 #include "org_custusx_core_tracking_system_igstk_Export.h"
+#include <memory>
 
 #include <map>
 #include <vector>
@@ -77,7 +78,7 @@ private:
 
 	IgstkToolManagerPtr mManager;
 };
-typedef boost::shared_ptr<IgstkTrackerThread> IgstkTrackerThreadPtr;
+typedef std::shared_ptr<IgstkTrackerThread> IgstkTrackerThreadPtr;
 
 /**
  * @}

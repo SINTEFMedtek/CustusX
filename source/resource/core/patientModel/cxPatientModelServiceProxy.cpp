@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxPatientModelServiceProxy.h"
+#include <functional>
 
 #include <boost/bind/bind.hpp>
 #include <QDomElement>
@@ -43,7 +44,7 @@ void PatientModelServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<PatientModelService>(
 								 mPluginContext,
 								 boost::bind(&PatientModelServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (PatientModelService*)>(),
+								 std::function<void (PatientModelService*)>(),
 								 boost::bind(&PatientModelServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

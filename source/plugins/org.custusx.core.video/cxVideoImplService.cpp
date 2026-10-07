@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxVideoImplService.h"
+#include <functional>
 
 #include <ctkPluginContext.h>
 #include "boost/bind/bind.hpp"
@@ -327,7 +328,7 @@ void VideoImplService::initServiceListener()
     mStreamerServiceListener.reset(new ServiceTrackerListener<StreamerService>(
                                mBackend->mContext,
                                boost::bind(&VideoImplService::onStreamerServiceAdded, this, boost::placeholders::_1),
-                               boost::function<void (StreamerService*)>(),
+                               std::function<void (StreamerService*)>(),
                                boost::bind(&VideoImplService::onStreamerServiceRemoved, this, boost::placeholders::_1)
                                ));
     mStreamerServiceListener->open();

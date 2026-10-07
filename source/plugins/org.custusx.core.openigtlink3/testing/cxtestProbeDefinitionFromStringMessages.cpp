@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "catch.hpp"
+#include <memory>
 
 #include "cxProbeDefinitionFromStringMessages.h"
 #include "cxtestUtilities.h"
@@ -18,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class ProbeDefinitionFromStringMessagesTest> ProbeDefinitionFromStringMessagesTestPtr;
+typedef std::shared_ptr<class ProbeDefinitionFromStringMessagesTest> ProbeDefinitionFromStringMessagesTestPtr;
 
 class ProbeDefinitionFromStringMessagesTest : public cx::ProbeDefinitionFromStringMessages
 {

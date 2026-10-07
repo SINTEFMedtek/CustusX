@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSBINARYTHRESHOLDIMAGEFILTER_H_
 
 #include "cxFilterImpl.h"
+#include <memory>
 
 namespace cx
 {
@@ -22,7 +23,7 @@ namespace cx
  * @{
  */
 
-/** Filter wrapping a itk::BinaryThresholdImageFilter.
+/** Binary threshold filter.
  *
  * \ingroup cx_resource_filter
  * \date Nov 21, 2012
@@ -43,6 +44,8 @@ public:
 
 	bool preProcess();
 	virtual bool execute();
+	/** Voxels whose first component is in [lower, upper] become 1, the rest 0, as unsigned char. */
+	static vtkImageDataPtr threshold(vtkImageDataPtr image, double lower, double upper);
 	virtual bool postProcess();
 
 	// extensions:
@@ -72,7 +75,7 @@ private:
 protected:
 	ImagePtr mPreviewImage;
 };
-typedef boost::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
+typedef std::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
 
 
 /**

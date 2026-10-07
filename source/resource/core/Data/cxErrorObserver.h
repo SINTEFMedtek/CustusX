@@ -3,7 +3,7 @@
 
 #include "cxResourceExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <vtkCommand.h>
 #include <vtkSmartPointer.h>
 #include <vtkAlgorithm.h>
@@ -31,7 +31,7 @@ public:
 	StaticMutexVtkLocker();
 	~StaticMutexVtkLocker();
 private:
-	static boost::shared_ptr<QMutex> mMutex;
+	static std::shared_ptr<QMutex> mMutex;
 };
 
 

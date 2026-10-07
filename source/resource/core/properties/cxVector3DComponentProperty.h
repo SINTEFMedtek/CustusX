@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVECTOR3DCOMPONENTPROPERTY_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxDoublePropertyBase.h"
 #include "cxVector3DPropertyBase.h"
@@ -53,7 +54,7 @@ public: // optional methods
   QString mName;
   QString mHelp;
 };
-typedef boost::shared_ptr<Vector3DComponentProperty> Vector3DComponentPropertyPtr;
+typedef std::shared_ptr<Vector3DComponentProperty> Vector3DComponentPropertyPtr;
 
 
 /**

@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QObject>
 #include <QDomElement>
 #include "cxProperty.h"
@@ -27,9 +27,9 @@ namespace cx
 
 // Use of smart pointer not possible for plugin service. Replace with serviceAdded and serviceRemoved signals using regular pointers
 // The smart pointer can still be used if StreamerService is coming from another source than a ctk plugin
-typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
-typedef boost::shared_ptr<class Streamer> StreamerPtr;
-typedef boost::shared_ptr<class Receiver> ReceiverPtr;
+typedef std::shared_ptr<class StreamerService> StreamerServicePtr;
+typedef std::shared_ptr<class Streamer> StreamerPtr;
+typedef std::shared_ptr<class Receiver> ReceiverPtr;
 
 /**
  * \brief Abstract class. Interface to Streamers

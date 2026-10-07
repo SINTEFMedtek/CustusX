@@ -15,8 +15,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 #include "cxPrecompiledHeader.h"
 
-#include <boost/array.hpp>
-#include <boost/shared_ptr.hpp>
+#include <array>
+#include <memory>
 #include <QString>
 #include "cxVector3D.h"
 #include "cxDefinitions.h"
@@ -29,7 +29,7 @@ namespace cx_transform3D_internal
 {
 /** provide an array of the transform indices, vtk / row-major ordering
  */
-cxResource_EXPORT boost::array<double, 16> flatten(const Eigen::Affine3d* self);
+cxResource_EXPORT std::array<double, 16> flatten(const Eigen::Affine3d* self);
 
 cxResource_EXPORT void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m);
 cxResource_EXPORT void fill(Eigen::Affine3d* self, float m[4][4]);
@@ -77,7 +77,7 @@ Transform<_Scalar, _Dim, _Mode, _Options> Transform<_Scalar, _Dim, _Mode, _Optio
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
-boost::array<double, 16> Transform<_Scalar, _Dim, _Mode, _Options>::flatten() const
+std::array<double, 16> Transform<_Scalar, _Dim, _Mode, _Options>::flatten() const
 {
 	return cx_transform3D_internal::flatten(this);
 }
@@ -222,7 +222,7 @@ cxResource_EXPORT Transform3D createTransformFromReferenceToExternal(PATIENT_COO
 
 
 // --------------------------------------------------------
-typedef boost::shared_ptr<Transform3D> Transform3DPtr;
+typedef std::shared_ptr<Transform3D> Transform3DPtr;
 
 /**
  * Utility function used to convert Transform3D to a single line string.

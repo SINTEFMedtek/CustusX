@@ -13,14 +13,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSELECTDATASTRINGPROPERTYBASE_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
 /** Base class for all Properties that selects a Data or descendants.
  *

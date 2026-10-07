@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDICOMGUIEXTENDERSERVICE_H_
 
 #include "cxGUIExtenderService.h"
+#include <memory>
 #include "org_custusx_dicom_Export.h"
 
 class ctkPluginContext;
@@ -38,7 +39,7 @@ public:
 	std::vector<CategorizedWidget> createWidgets() const;
 	ctkPluginContext* mContext;
 };
-typedef boost::shared_ptr<DicomGUIExtenderService> DicomGUIExtenderServicePtr;
+typedef std::shared_ptr<DicomGUIExtenderService> DicomGUIExtenderServicePtr;
 
 } /* namespace cx */
 

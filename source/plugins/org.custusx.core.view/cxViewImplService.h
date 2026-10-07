@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWIMPLSERVICE_H_
 
 #include "cxViewService.h"
+#include <memory>
 #include "org_custusx_core_view_Export.h"
 class ctkPluginContext;
 class QDomElement;
@@ -22,10 +23,10 @@ class ctkDoubleSlider;
 namespace cx
 {
 class ViewCollectionWidget;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
-typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
-typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class SyncedValue> SyncedValuePtr;
+typedef std::shared_ptr<class RenderLoop> RenderLoopPtr;
+typedef std::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 
 
 /**
@@ -195,7 +196,7 @@ private:
 	bool mCenterToTool2D = true;
 
 };
-typedef boost::shared_ptr<ViewImplService> ViewImplServicePtr;
+typedef std::shared_ptr<ViewImplService> ViewImplServicePtr;
 
 } /* namespace cx */
 

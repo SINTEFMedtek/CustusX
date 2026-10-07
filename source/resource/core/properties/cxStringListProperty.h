@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTRINGLISTPROPERTY_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QDomElement>
 #include <QStringList>
@@ -22,7 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class StringListProperty> StringListPropertyPtr;
+typedef std::shared_ptr<class StringListProperty> StringListPropertyPtr;
 
 /**
  * \brief Represents one collection of strings.

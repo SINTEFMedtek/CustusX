@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxRegionOfInterestMetricRep.h"
+#include <memory>
 #include "cxView.h"
 
 #include <vtkVectorText.h>
@@ -43,7 +44,7 @@ void RegionOfInterestMetricRep::clear()
 
 RegionOfInterestMetricPtr RegionOfInterestMetricRep::getRegionOfInterestMetric()
 {
-	return boost::dynamic_pointer_cast<RegionOfInterestMetric>(mMetric);
+	return std::dynamic_pointer_cast<RegionOfInterestMetric>(mMetric);
 }
 
 void RegionOfInterestMetricRep::onModifiedStartRender()

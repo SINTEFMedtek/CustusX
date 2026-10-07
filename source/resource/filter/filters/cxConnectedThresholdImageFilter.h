@@ -13,12 +13,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCONNECTEDTHRESHOLDIMAGEFILTER_H_
 
 #include "cxThreadedTimedAlgorithm.h"
+#include <memory>
 #include "cxResourceFilterExport.h"
-#include "cxAlgorithmHelpers.h"
+#include "cxVector3D.h"
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * \file
@@ -44,7 +46,10 @@ public:
 	ConnectedThresholdImageFilter(VisServicesPtr services);
 	virtual ~ConnectedThresholdImageFilter();
 
-	void setInput(ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed);
+	void setInput(ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, Eigen::Array3i seed);
+	/** Voxels in [lower, upper] that are face connected to the seed voxel get replaceValue, the rest 0, as short.
+	 * Values are converted to short first. Returns null if the seed is outside the image. */
+	static vtkImageDataPtr segment(vtkImageDataPtr image, double lower, double upper, int replaceValue, Eigen::Array3i seed);
 	virtual void execute() { throw "not implemented!!"; }
 	ImagePtr getOutput();
 
@@ -62,7 +67,7 @@ private:
 	float           mLowerThreshold;
 	float           mUpperTheshold;
 	int             mReplaceValue;
-	itkImageType::IndexType mSeed;
+	Eigen::Array3i mSeed;
 };
 
 /**

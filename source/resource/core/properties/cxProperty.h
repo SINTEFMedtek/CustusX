@@ -14,16 +14,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 #include <QString>
 #include <QObject>
 #include <QVariant>
 
 namespace cx {
-typedef boost::shared_ptr<class Property> PropertyPtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class ViewService> ViewServicePtr;
+typedef std::shared_ptr<class Property> PropertyPtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class ViewService> ViewServicePtr;
 
 /**\brief Superclass for all data adapters.
  *

@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUNSIGNEDDERIVEDIMAGE_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxPrecompiledHeader.h"
 
 #include "cxImage.h"
@@ -74,7 +75,7 @@ private:
     vtkImageDataPtr convertImage();
     void convertTransferFunctions();
 
-    boost::weak_ptr<Image> mBase;
+    std::weak_ptr<Image> mBase;
 };
 
 }

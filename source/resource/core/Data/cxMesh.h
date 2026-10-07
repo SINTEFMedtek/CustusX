@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMeshTextureData.h"
 
 #include <set>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxPatientModelService.h"
 #include "cxSpaceProvider.h"
 
@@ -128,7 +128,7 @@ private:
 	double mVolumeSizeMl = 0.0;
 };
 
-typedef boost::shared_ptr<Mesh> MeshPtr;
+typedef std::shared_ptr<Mesh> MeshPtr;
 
 } // namespace cx
 

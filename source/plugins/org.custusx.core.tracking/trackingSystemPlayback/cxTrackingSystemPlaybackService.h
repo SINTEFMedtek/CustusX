@@ -12,12 +12,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGSYSTEMPLAYBACKSERVICE_H
 
 #include "org_custusx_core_tracking_Export.h"
+#include <memory>
 #include "cxTrackingSystemService.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
-typedef boost::shared_ptr<class PlaybackTool> PlaybackToolPtr;
+typedef std::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef std::shared_ptr<class PlaybackTool> PlaybackToolPtr;
 
 /**
  * \brief Interface towards a playback tracking system.

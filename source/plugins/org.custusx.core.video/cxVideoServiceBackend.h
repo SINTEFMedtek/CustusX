@@ -14,16 +14,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_core_video_Export.h"
 #include <QSharedPointer>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxForwardDeclarations.h"
 class ctkPluginFramework;
 class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 
-typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
+typedef std::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 /**
  *
  *

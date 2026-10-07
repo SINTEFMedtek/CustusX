@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxDistanceMetricRep.h"
+#include <memory>
 
 #include <vtkVectorText.h>
 #include <vtkFollower.h>
@@ -42,7 +43,7 @@ void DistanceMetricRep::clear()
 
 DistanceMetricPtr DistanceMetricRep::getDistanceMetric()
 {
-    return boost::dynamic_pointer_cast<DistanceMetric>(mMetric);
+    return std::dynamic_pointer_cast<DistanceMetric>(mMetric);
 }
 
 void DistanceMetricRep::onModifiedStartRender()

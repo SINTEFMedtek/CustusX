@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxMeshTextureWidget.h"
+#include <memory>
 #include "cxMesh.h"
 
 
@@ -49,7 +50,7 @@ void MeshTextureWidget::meshSelectedSlot()
 	if (mMesh == mMeshSelector->getData())
 		return;
 
-	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+	mMesh = std::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
 	this->setupUI();
 	mOptionsWidget->rebuild();

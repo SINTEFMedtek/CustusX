@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include "cxPatientModelService.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxServiceTrackerListener.h"
 class ctkPluginContext;
 
@@ -90,7 +90,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	PatientModelServicePtr mPatientModelService;
-	boost::shared_ptr<ServiceTrackerListener<PatientModelService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<PatientModelService> > mServiceListener;
 };
 
 } // cx

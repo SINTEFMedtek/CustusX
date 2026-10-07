@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceWidgetsExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <set>
 #include <QWidget>
 class QProgressBar;
@@ -22,7 +22,7 @@ class QLabel;
 
 namespace cx
 {
-typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
+typedef std::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
 class DisplayTimerWidget;
 
 /**
