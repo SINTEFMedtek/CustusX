@@ -12,6 +12,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "catch.hpp"
 
 #include <memory>
+#include <QFile>
+#include <QTemporaryDir>
 #include "cxNdiTrackerManager.h"
 #include "cxNdiFrameRateEstimator.h"
 #include "cxtestNdiFakeDevice.h"
@@ -294,6 +296,51 @@ TEST_CASE("NdiTrackerManager: a tool plugged in while tracking is set up when tr
 	fixture.manager->trackSlot(false);
 	fixture.manager->trackSlot(true);
 	CHECK(fixture.pointer()->getPortHandle() == newPointerHandle);
+}
+
+TEST_CASE("NdiTrackerManager: a tool removed while tracking is not initialized after the new tool setup", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	ManagerFixture fixture;
+	fixture.startTracking();
+	REQUIRE(fixture.pointer()->isInitialized());
+
+	fixture.device->handles.erase(ManagerFixture::kPointerHandle);
+	fixture.device->setNextFrame(1, {createSample(ManagerFixture::kReferenceHandle, true)});
+	fixture.device->nextFrame.systemStatus = 0x0080;
+	fixture.manager->poll();
+	fixture.manager->trackSlot(false);
+	fixture.manager->trackSlot(true);
+
+	CHECK_FALSE(fixture.pointer()->isInitialized());
+	CHECK(fixture.pointer()->getPortHandle() == -1);
+}
+
+TEST_CASE("NdiTrackerManager: the wireless port handles are freed before a new tool setup", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	std::shared_ptr<FakeNdiDevice> device(new FakeNdiDevice());
+	cx::ToolFileParser::TrackerInternalStructure tracker;
+	tracker.mType = cx::tsPOLARIS;
+	QTemporaryDir folder;
+	QFile rom(folder.path() + "/pointer.rom");
+	REQUIRE(rom.open(QIODevice::WriteOnly));
+	rom.close();
+	cx::ToolFileParser::ToolInternalStructurePtr pointer = createAuroraTool("pointer", 0);
+	pointer->mSROMFilename = rom.fileName();
+	cx::NdiTrackerManager manager(tracker, {pointer}, cx::ToolFileParser::ToolInternalStructurePtr(), device);
+	manager.initializeSlot(true);
+	manager.trackSlot(true);
+	int firstHandle = manager.getTools()["pointer"]->getPortHandle();
+	REQUIRE(firstHandle >= 0);
+
+	device->setNextFrame(1, {createSample(firstHandle, true)});
+	device->nextFrame.systemStatus = 0x0020;
+	manager.poll();
+	manager.trackSlot(false);
+	manager.trackSlot(true);
+
+	CHECK(device->freed.count(firstHandle) == 1);
+	CHECK(manager.getTools()["pointer"]->getPortHandle() != firstHandle);
+	CHECK(manager.getTools()["pointer"]->isInitialized());
 }
 
 TEST_CASE("NdiTrackerManager: only new tool change bits trigger a new tool setup", "[unit][org.custusx.core.tracking.system.ndi]")

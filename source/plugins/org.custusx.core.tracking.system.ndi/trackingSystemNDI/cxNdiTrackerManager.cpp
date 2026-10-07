@@ -142,7 +142,7 @@ void NdiTrackerManager::trackSlot(bool on)
 	{
 		if (mToolsChanged)
 		{
-			this->setupTools(); // set up tools plugged in while tracking
+			this->setupToolsAgain(); // set up tools plugged in while tracking
 			mToolsChanged = false;
 		}
 		if (mDevice->startTracking())
@@ -423,6 +423,11 @@ bool NdiTrackerManager::setupTools()
 	QMutexLocker locker(&mToolMutex);
 	mPortHandleToTool.clear();
 	mPortHandles.clear();
+	for (std::pair<const QString, NdiToolPtr>& entry : mTools)
+	{
+		entry.second->setPortHandle(-1); // a tool missing from this setup has no port handle
+		entry.second->setInitialized(false);
+	}
 	for (const std::pair<const int, QString>& entry : result.portHandleToUid)
 	{
 		NdiToolPtr tool = mTools[entry.second];
@@ -441,6 +446,24 @@ bool NdiTrackerManager::setupTools()
 		reportError("NDI Tracker: None of the configured tools could be set up.");
 	}
 	return result.success();
+}
+
+void NdiTrackerManager::setupToolsAgain()
+{
+	if (isPolaris(mTrackerStructure.mType))
+	{
+		// The setup requests a new port handle for each wireless tool: free the old ones
+		std::vector<int> portHandles;
+		{
+			QMutexLocker locker(&mToolMutex);
+			portHandles = mPortHandles;
+		}
+		for (int portHandle : portHandles)
+		{
+			mDevice->freePortHandle(portHandle);
+		}
+	}
+	this->setupTools();
 }
 
 void NdiTrackerManager::disconnectFromDevice()

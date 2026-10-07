@@ -43,7 +43,8 @@ NdiCapiDevice::NdiCapiDevice() :
 	mRequestMarkerInfo(false),
 	mMarkerInfoConfirmed(false),
 	mLastBXHasMarkerInfo(false),
-	mMarkerInfoFailures(0)
+	mMarkerInfoFailures(0),
+	mResponding(true)
 {
 }
 
@@ -55,6 +56,7 @@ NdiCapiDevice::~NdiCapiDevice()
 bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 {
 	this->close();
+	mResponding = true;
 	mRequestMarkerInfo = settings.requestMarkerInfo;
 	mMarkerInfoConfirmed = false;
 	mMarkerInfoFailures = 0;
@@ -248,13 +250,16 @@ void NdiCapiDevice::close()
 {
 	if (mDevice)
 	{
-		if (mTracking)
+		if (mTracking && mResponding)
 		{
 			this->stopTracking();
 		}
 		if (this->isSerial())
 		{
-			this->command("COMM:00000"); // back to 9600 baud, so the next connection finds the device
+			if (mResponding)
+			{
+				this->command("COMM:00000"); // back to 9600 baud, so the next connection finds the device
+			}
 			ndiCloseSerial(mDevice);
 		}
 		else
@@ -265,6 +270,11 @@ void NdiCapiDevice::close()
 		this->log("Closed connection");
 	}
 	mLogFile.close();
+}
+
+bool NdiCapiDevice::isLostDeviceError(int ndiError)
+{
+	return (ndiError == NDI_TIMEOUT) || (ndiError == NDI_WRITE_ERROR) || (ndiError == NDI_READ_ERROR);
 }
 
 bool NdiCapiDevice::isOpen() const
@@ -301,6 +311,7 @@ bool NdiCapiDevice::command(const char* format, ...)
 		const char* reply = ndiCommand(mDevice, "%s", commandText);
 		int error = ndiGetError(mDevice);
 		success = (error == NDI_OKAY);
+		mResponding = mResponding && !isLostDeviceError(error);
 		if (!success)
 		{
 			mLastError = QString("%1 failed: %2").arg(commandText).arg(ndiErrorString(error));

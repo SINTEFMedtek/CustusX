@@ -61,6 +61,7 @@ public:
 	static int illuminatorRateToNdiCode(int rate_Hz); ///< -1 if not supported
 	static std::vector<int> getBaudRatesToTry(int requested); ///< The requested rate, then slower standard rates
 	static bool isSlowerBaudRateWorthTrying(int ndiError); ///< After a failed COMM
+	static bool isLostDeviceError(int ndiError); ///< The device didn't answer, or the connection is gone
 	static int countUsedMarkers(const char markerInfo[10]); ///< From the 10 marker bytes in a BX reply, 4 bits per marker
 
 private:
@@ -84,6 +85,7 @@ private:
 	bool mMarkerInfoConfirmed; ///< BX with marker information has worked at least once
 	bool mLastBXHasMarkerInfo;
 	int mMarkerInfoFailures;
+	bool mResponding; ///< False after the device stopped answering: don't wait for it when closing
 	QString mLastError;
 	QString mLastReply; ///< Reply to the last text (non-binary) command
 	QString mDescription;

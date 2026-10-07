@@ -93,6 +93,7 @@ private:
 	bool connectToDevice();
 	void disconnectFromDevice();
 	bool setupTools();
+	void setupToolsAgain(); ///< After tools were plugged in or removed
 	void distributeFrame(const NdiFrame& frame, double timestamp);
 	void setAllToolsInvisible();
 	void reportSystemStatus(int status);

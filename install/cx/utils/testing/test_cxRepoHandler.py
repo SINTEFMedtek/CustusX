@@ -415,6 +415,19 @@ class PluginMovedIntoRepoTest(unittest.TestCase):
         with open(os.path.join(self.nested, 'plugin.txt')) as f:
             self.assertEqual(f.read(), 'local work')
 
+    def test_nested_clone_with_ignored_local_files_is_kept(self):
+        _commit(self.plugin_upstream, filename='.gitignore', content='local.cfg\n', message='ignore local.cfg')
+        _git(['pull', '-q'], self.nested)
+        with open(os.path.join(self.nested, 'local.cfg'), 'w') as f:
+            f.write('local settings')
+
+        handler = _make_handler(self.clone, main_branch='moved')
+        with self.assertRaises(SystemExit):
+            handler.syncToGitRef()
+
+        with open(os.path.join(self.nested, 'local.cfg')) as f:
+            self.assertEqual(f.read(), 'local settings')
+
     def test_nested_clone_with_unpushed_commit_is_kept(self):
         _commit(self.nested, filename='local.txt', content='unpushed', message='local commit')
         local_sha = _head_sha(self.nested)

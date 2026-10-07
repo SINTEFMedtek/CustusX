@@ -287,7 +287,7 @@ class RepoHandler(object):
 
     def _isNestedRepoSafeToRemove(self, path):
         '''True if removing the clone loses nothing: it can be cloned again from its remote.'''
-        clean = runShell('git status --porcelain', path) == ''
+        clean = runShell('git status --porcelain --ignored', path) == ''  # ignored files would be lost too
         no_stash = runShell('git stash list', path) == ''
         no_unpushed = runShell('git log --branches --not --remotes --oneline', path) == ''
         head_on_remote = bool(runShell('git branch -r --contains HEAD', path))

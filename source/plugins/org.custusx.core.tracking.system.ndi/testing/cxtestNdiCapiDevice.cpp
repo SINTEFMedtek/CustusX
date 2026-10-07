@@ -11,6 +11,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 
+#include <QCoreApplication>
+#include <QElapsedTimer>
+#include <QFile>
+#include <QTemporaryDir>
+#include "cxDataLocations.h"
+
 #include "cxNdiCapiDevice.h"
 #include "ndicapi.h"
 #include "cxNdiTool.h"
@@ -67,6 +73,15 @@ TEST_CASE("NdiCapiDevice: baud rates to try, fastest first", "[unit][org.custusx
 	CHECK(cx::NdiCapiDevice::getBaudRatesToTry(115200) == std::vector<int>({115200, 57600, 38400, 19200, 9600}));
 	CHECK(cx::NdiCapiDevice::getBaudRatesToTry(9600) == std::vector<int>({9600}));
 	CHECK(cx::NdiCapiDevice::getBaudRatesToTry(12345) == std::vector<int>({115200, 57600, 38400, 19200, 9600}));
+}
+
+TEST_CASE("NdiCapiDevice: timeouts and I/O errors mean the device is lost", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiCapiDevice::isLostDeviceError(NDI_TIMEOUT));
+	CHECK(cx::NdiCapiDevice::isLostDeviceError(NDI_WRITE_ERROR));
+	CHECK(cx::NdiCapiDevice::isLostDeviceError(NDI_READ_ERROR));
+	CHECK_FALSE(cx::NdiCapiDevice::isLostDeviceError(NDI_OKAY));
+	CHECK_FALSE(cx::NdiCapiDevice::isLostDeviceError(NDI_COMM_FAIL));
 }
 
 TEST_CASE("NdiCapiDevice: a slower baud rate is tried when this computer or the device can't use the rate", "[unit][org.custusx.core.tracking.system.ndi]")
@@ -185,6 +200,60 @@ TEST_CASE("TrackingSystemNDIService: handles ndi configurations, and igstk ones 
 	CHECK(cx::TrackingSystemNDIService::handlesImplementation("igstk", false));
 	CHECK_FALSE(cx::TrackingSystemNDIService::handlesImplementation("igstk", true));
 	CHECK_FALSE(cx::TrackingSystemNDIService::handlesImplementation("openigtlink", false));
+}
+
+namespace
+{
+
+/** An NDI Aurora tool configuration in folder, with the tools on the given ports (1-4). */
+QString writeAuroraConfiguration(QString folder, QString name, QStringList ports)
+{
+	QString root = "Shared/";
+	QStringList toolFiles = {"Reference_AURORA_port1/Reference_AURORA_port1.xml", "Pointer_AURORA_port2/Pointer_AURORA_port2.xml",
+							 "Sensor_AURORA_port3/Sensor_AURORA_port3.xml", "Sensor_AURORA_port4/Sensor_AURORA_port4.xml"};
+	QString tools;
+	for (const QString& port : ports)
+	{
+		tools += QString("<toolfile reference=\"%1\">%2</toolfile>").arg(port == "1" ? "yes" : "no").arg(root + toolFiles[port.toInt() - 1]);
+	}
+	QString filename = folder + "/" + name;
+	QFile file(filename);
+	file.open(QIODevice::WriteOnly);
+	file.write(QString("<?xml version=\"1.0\"?><configuration clinical_app=\"Laboratory\"><trackingsystemimplementation type=\"ndi\">"
+					   "<tracker type=\"aurora\">%1</tracker></trackingsystemimplementation></configuration>").arg(tools).toUtf8());
+	return filename;
+}
+
+/** Configuring finishes when the tracker thread's signal is processed. */
+bool waitUntilConfigured(cx::TrackingSystemNDIService& service)
+{
+	QElapsedTimer timer;
+	timer.start();
+	while (service.getState() < cx::Tool::tsCONFIGURED && timer.elapsed() < 5000)
+	{
+		QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+	}
+	return service.getState() >= cx::Tool::tsCONFIGURED;
+}
+
+} // namespace
+
+TEST_CASE("TrackingSystemNDIService: a new tool configuration replaces the configured one", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	cx::DataLocations::setTestMode();
+	QTemporaryDir folder;
+	QString fourTools = writeAuroraConfiguration(folder.path(), "four.xml", {"1", "2", "3", "4"});
+	QString twoTools = writeAuroraConfiguration(folder.path(), "two.xml", {"1", "2"});
+
+	cx::TrackingSystemNDIService service;
+	service.setConfigurationFile(fourTools);
+	service.setState(cx::Tool::tsCONFIGURED);
+	REQUIRE(waitUntilConfigured(service));
+	size_t configuredTools = service.getTools().size();
+
+	service.setConfigurationFile(twoTools);
+	REQUIRE(waitUntilConfigured(service));
+	CHECK(service.getTools().size() == configuredTools - 2);
 }
 
 } // namespace cxtest

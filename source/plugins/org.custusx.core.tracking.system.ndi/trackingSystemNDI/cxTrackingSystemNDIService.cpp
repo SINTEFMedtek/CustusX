@@ -27,6 +27,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+namespace
+{
+const int kThreadStopTimeout_ms = 15000; ///< Longer than a few unanswered commands while closing the device
+}
+
 TrackingSystemNDIService::TrackingSystemNDIService()
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
@@ -282,13 +287,12 @@ void TrackingSystemNDIService::setConfigurationFile(QString configurationFile)
 	if (configurationFile == mConfigurationFilePath)
 		return;
 
+	mConfigurationFilePath = configurationFile; // before deconfigure(): it reconfigures at once
 	if (this->isConfigured())
 	{
 		connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()), Qt::UniqueConnection);
 		this->deconfigure();
 	}
-
-	mConfigurationFilePath = configurationFile;
 }
 
 void TrackingSystemNDIService::setLoggingFolder(QString loggingFolder)
@@ -296,12 +300,12 @@ void TrackingSystemNDIService::setLoggingFolder(QString loggingFolder)
 	if (mLoggingFolder == loggingFolder)
 		return;
 
+	mLoggingFolder = loggingFolder; // before deconfigure(): it reconfigures at once
 	if (this->isConfigured())
 	{
 		connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()), Qt::UniqueConnection);
 		this->deconfigure();
 	}
-	mLoggingFolder = loggingFolder;
 }
 
 TrackerConfigurationPtr TrackingSystemNDIService::getConfiguration()
@@ -373,9 +377,10 @@ void TrackingSystemNDIService::destroyTrackerThread()
 	if (mTrackerThread)
 	{
 		mTrackerThread->quit();
-		mTrackerThread->wait(2000);
+		mTrackerThread->wait(kThreadStopTimeout_ms); // closing the device can take a few seconds
 		if (mTrackerThread->isRunning())
 		{
+			reportError("NDI Tracking: The tracker thread did not stop, terminating it.");
 			mTrackerThread->terminate();
 			mTrackerThread->wait();
 		}
