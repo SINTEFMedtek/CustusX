@@ -2,13 +2,14 @@
 #define CXOPERATINGTABLEWIDGET_H
 
 #include "cxPreferenceTab.h"
+#include <memory>
 #include "cxCoreServices.h"
 #include "cxVector3D.h"
 
 namespace cx
 {
 class Transform3DWidget;
-typedef boost::shared_ptr<class Vector3DProperty> Vector3DPropertyPtr;
+typedef std::shared_ptr<class Vector3DProperty> Vector3DPropertyPtr;
 
 
 /**

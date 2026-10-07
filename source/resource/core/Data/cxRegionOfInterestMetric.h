@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGIONOFINTERESTMETRIC_H
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxPrecompiledHeader.h"
 
 #include "cxDataMetric.h"
@@ -55,7 +56,7 @@ private:
 	std::vector<Vector3D> transform(const std::vector<Vector3D> &points, Transform3D M) const;
 };
 
-typedef boost::shared_ptr<class RegionOfInterestMetric> RegionOfInterestMetricPtr;
+typedef std::shared_ptr<class RegionOfInterestMetric> RegionOfInterestMetricPtr;
 
 /**
  * Description of a region of interest, defined by a collection of other Data.

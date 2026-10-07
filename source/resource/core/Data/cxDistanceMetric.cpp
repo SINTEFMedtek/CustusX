@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxDistanceMetric.h"
+#include <memory>
 #include "cxBoundingBox3D.h"
 #include "cxTypeConversions.h"
 #include "cxPlaneMetric.h"
@@ -106,14 +107,14 @@ void DistanceMetric::getEndpointsUncached(std::vector<Vector3D> *endpoints, Vect
 
 	if ((a0->getType() == PointMetric::getTypeName()) && (a1->getType() == PointMetric::getTypeName()))
 	{
-		retval[0] = boost::dynamic_pointer_cast<PointMetric>(a0)->getRefCoord();
-		retval[1] = boost::dynamic_pointer_cast<PointMetric>(a1)->getRefCoord();
+		retval[0] = std::dynamic_pointer_cast<PointMetric>(a0)->getRefCoord();
+		retval[1] = std::dynamic_pointer_cast<PointMetric>(a1)->getRefCoord();
 		dir = (retval[1] - retval[0]).normal();
 	}
 	else if ((a0->getType() == PlaneMetric::getTypeName()) && (a1->getType() == PointMetric::getTypeName()))
 	{
-		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(a0)->getRefPlane();
-		Vector3D p = boost::dynamic_pointer_cast<PointMetric>(a1)->getRefCoord();
+		Plane3D plane = std::dynamic_pointer_cast<PlaneMetric>(a0)->getRefPlane();
+		Vector3D p = std::dynamic_pointer_cast<PointMetric>(a1)->getRefCoord();
 
 		retval[0] = plane.projection(p);
 		retval[1] = p;
@@ -121,8 +122,8 @@ void DistanceMetric::getEndpointsUncached(std::vector<Vector3D> *endpoints, Vect
 	}
 	else if ((a0->getType() == PointMetric::getTypeName()) && (a1->getType() == PlaneMetric::getTypeName()))
 	{
-		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(a1)->getRefPlane();
-		Vector3D p = boost::dynamic_pointer_cast<PointMetric>(a0)->getRefCoord();
+		Plane3D plane = std::dynamic_pointer_cast<PlaneMetric>(a1)->getRefPlane();
+		Vector3D p = std::dynamic_pointer_cast<PointMetric>(a0)->getRefCoord();
 
 		retval[1] = plane.projection(p);
 		retval[0] = p;

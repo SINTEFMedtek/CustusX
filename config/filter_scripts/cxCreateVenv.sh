@@ -32,19 +32,13 @@ if [[ $reqPath == *"."* ]] || [[ $reqPath == *"/"* ]]; then # If using requireme
   pip install --upgrade pip;
   python -m pip install -r "$reqPath/requirements.txt";
 elif [[ $reqPath == "TotalSegmentator" ]]; then
-  # TotalSegmentator requires Python >= 3.9. Ubuntu 20.04 ships python3.8, which
-  # is too old, so pull in python3.10 via deadsnakes there. 22.04 (python3.10)
-  # and 24.04 (python3.12) already satisfy this with their own system python3,
-  # so use that directly instead of forcing a specific version that may not
-  # exist/be installable on newer distros.
+  # TotalSegmentator needs Python >= 3.9: the system python3 on Ubuntu 22.04 (3.10) and 24.04 (3.12)
   pythonBin="python3"
   pythonMinor="$(python3 -c 'import sys; print(sys.version_info.minor)')"
   if [ "$pythonMinor" -lt 9 ]; then
-    echo "System python3 (3.$pythonMinor) is too old for TotalSegmentator (needs >=3.9) - installing python3.10 via deadsnakes"
-    sudo apt install -y software-properties-common #Needed for the deadsnakes PPA
-    sudo add-apt-repository ppa:deadsnakes/ppa -y
-    sudo apt install -y python3.10-venv #Also pulls in the python3.10 interpreter itself
-    pythonBin="python3.10"
+    echo "ERROR: System python3 (3.$pythonMinor) is too old for TotalSegmentator (needs >= 3.9)."
+    echo "Ubuntu 20.04 is not supported. Please use Ubuntu 22.04 or 24.04."
+    exit 1
   fi
 
   if ! "$pythonBin" -m venv .; then

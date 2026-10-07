@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QWidget>
 #include <QVBoxLayout>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <iostream>
 
 namespace cx
@@ -33,10 +33,10 @@ public:
 	}
 	~ReplacableContentWidget()
 	{
-		this->setWidget(boost::shared_ptr<QWidget>()); // Delete objects in correct order
+		this->setWidget(std::shared_ptr<QWidget>()); // Delete objects in correct order
 	}
 
-	void setWidget(boost::shared_ptr<QWidget> widget)
+	void setWidget(std::shared_ptr<QWidget> widget)
 	{
 		this->setWidgetDontDeleteOld(widget.get());
 		mWidgetBoostPointer = widget;
@@ -56,7 +56,7 @@ public:
 private:
 	QVBoxLayout* mLayout;
 	QWidget* mWidget;
-	boost::shared_ptr<QWidget> mWidgetBoostPointer;
+	std::shared_ptr<QWidget> mWidgetBoostPointer;
 
 	void setWidgetDontDeleteOld(QWidget* widget)
 	{

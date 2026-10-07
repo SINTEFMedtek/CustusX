@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxLocalServerStreamerServer.h"
+#include <memory>
 
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
@@ -96,7 +97,7 @@ StreamerPtr LocalServerStreamer::createStreamerIfEnabled(QDomElement root, Strin
 
 	FilePathPropertyPtr localServerProp = LocalServerStreamerArguments().getLocalServerNameOption(root);
 	QString localServer = localServerProp->getEmbeddedPath().getAbsoluteFilepath();
-	boost::shared_ptr<LocalServerStreamer> streamer;
+	std::shared_ptr<LocalServerStreamer> streamer;
 	streamer.reset(new LocalServerStreamer(localServer, cmdlineArguments.join(" ")));
 
 	return streamer;
@@ -108,7 +109,7 @@ LocalServerStreamer::LocalServerStreamer(QString serverName, QString serverArgum
 {
 	mLocalVideoServerProcess.reset(new ProcessWrapper(QString("Local Video Server: %1").arg(mServerName)));
 
-	boost::shared_ptr<IGTLinkClientStreamer> igtLinkStreamer(new IGTLinkClientStreamer());
+	std::shared_ptr<IGTLinkClientStreamer> igtLinkStreamer(new IGTLinkClientStreamer());
 	int defaultport = 18333;
 	igtLinkStreamer->setAddress("Localhost", defaultport);
 	mBase = igtLinkStreamer;

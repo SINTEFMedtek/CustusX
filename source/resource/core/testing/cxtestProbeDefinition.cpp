@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 #include <QSize>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxProbeDefinition.h"
 #include "cxVector3D.h"
 #include "cxBoundingBox3D.h"

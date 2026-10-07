@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECORDSESSIONWIDGET_H_
 
 #include "org_custusx_acquisition_Export.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include "cxAcquisitionService.h"
@@ -29,8 +30,8 @@ namespace cx
 * @{
 */
 
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-typedef boost::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
+typedef std::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef std::shared_ptr<class RecordSessionWidget> RecordSessionWidgetPtr;
 
 /**
  * \class RecordSessionWidget

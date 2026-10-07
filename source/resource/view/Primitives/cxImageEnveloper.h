@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMULTIVOLUMEBOUNDINGBOX_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"
@@ -23,7 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class ImageEnveloper> ImageEnveloperPtr;
+typedef std::shared_ptr<class ImageEnveloper> ImageEnveloperPtr;
 
 /**
  * Generate a total bounding volume from a set of volumes.

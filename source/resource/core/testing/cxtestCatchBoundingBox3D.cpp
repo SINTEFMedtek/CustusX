@@ -35,6 +35,40 @@ TEST_CASE("DoubleBoundingBox3D: Constructors OK", "[unit][resource][core]")
   CHECK( similar(bb0, bb2) );
 }
 
+TEST_CASE("IntBoundingBox3D: Constructors OK", "[unit][resource][core]")
+{
+  int data[6] = { -1, 2, -3, 4, -5, 6 };
+  double doubleData[6] = { -1, 2, -3, 4, -5, 6 };
+  IntBoundingBox3D fromValues(data[0], data[1], data[2], data[3], data[4], data[5]);
+  IntBoundingBox3D fromInts(data);
+  IntBoundingBox3D fromDoubles(doubleData);
+  IntBoundingBox3D fromVectors(Vector3D(2, 4, 6), Vector3D(-1, -3, -5));
+  IntBoundingBox3D fromIntVectors(Eigen::Vector3i(2, 4, 6), Eigen::Vector3i(-1, -3, -5));
+
+  for (int i=0; i<6; ++i)
+  {
+	CHECK( fromValues[i] == data[i] );
+	CHECK( fromInts[i] == data[i] );
+	CHECK( fromDoubles[i] == data[i] );
+	CHECK( fromVectors[i] == data[i] );
+	CHECK( fromIntVectors[i] == data[i] );
+  }
+}
+
+TEST_CASE("DoubleBoundingBox3D: Constructed from int values OK", "[unit][resource][core]")
+{
+  int data[6] = { -1, 2, -3, 4, -5, 6 };
+  DoubleBoundingBox3D fromInts(data);
+  IntBoundingBox3D intBox(data);
+  DoubleBoundingBox3D fromIntBox(intBox);
+
+  for (int i=0; i<6; ++i)
+  {
+	CHECK( similar(fromInts[i], data[i]) );
+	CHECK( similar(fromIntBox[i], data[i]) );
+  }
+}
+
 TEST_CASE("DoubleBoundingBox3D: Getters OK", "[unit][resource][core]")
 {
   double data0[6] = { 0, 1, 0, 1, 0, 1 };

@@ -12,13 +12,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_
 
 #include "org_custusx_usreconstruction_Export.h"
+#include <memory>
 
 #include "cxDoublePropertyBase.h"
 
 namespace cx
 {
-//typedef boost::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+//typedef std::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
 class OutputVolumeParams;
 
 /**

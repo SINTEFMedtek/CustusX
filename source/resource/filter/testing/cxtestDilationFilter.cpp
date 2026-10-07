@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <memory>
 #include <ctkPluginContext.h>
 #include "cxDilationFilter.h"
 #include "cxDataLocations.h"
@@ -42,7 +43,7 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 
 		QString filename = cx::DataLocations::getTestDataPath()+ "/testing/DilationFilter/helix_seg.mhd";
 		QString info;
-		cx::DataPtr data = boost::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(dummyservices->patient())->importDataMock(filename, info, filemanager);
+		cx::DataPtr data = std::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(dummyservices->patient())->importDataMock(filename, info, filemanager);
 		REQUIRE(data);
 
 		//set input

@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxRegistrationWidget.h"
 #include <boost/bind/bind.hpp>
-#include <boost/function.hpp>
+#include <functional>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QGroupBox>
@@ -173,7 +173,7 @@ void RegistrationWidget::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<RegistrationMethodService>(
 							   mPluginContext,
 							   boost::bind(&RegistrationWidget::onServiceAdded, this, boost::placeholders::_1),
-							   boost::function<void (RegistrationMethodService*)>(),
+							   std::function<void (RegistrationMethodService*)>(),
 							   boost::bind(&RegistrationWidget::onServiceRemoved, this, boost::placeholders::_1)
 							   ));
 	mServiceListener->open();

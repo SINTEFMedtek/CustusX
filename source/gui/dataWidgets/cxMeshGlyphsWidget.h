@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMESHGLYPHSWIDGET_H
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include <vector>
 #include <QtWidgets>
@@ -23,7 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+typedef std::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
 /**
  * \class MeshGlyphsWidget

@@ -10,13 +10,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include <iostream>
+#include <array>
 #include <string>
 #include <vector>
 #include <sstream>
 
 #include <QtWidgets>
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <limits>
 
 #include "cxTransform3D.h"
@@ -56,16 +57,16 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-  boost::uint64_t tsModifier = 0;
+  std::uint64_t tsModifier = 0;
   if (reader.version() == 1)
   {
     QDateTime startTime = QDateTime::fromString(startTS, EVENT_DATE_FORMAT);
-    boost::uint64_t ret64 = startTime.toTime_t();
+    std::uint64_t ret64 = startTime.toTime_t();
     ret64 *= 1000;
 
     // workaround for compilling 32 bit version:
-    tsModifier = ret64 & (std::numeric_limits<boost::uint64_t>::max() ^ 0xffffffff); // ffffffffffffffff XOR 00000000ffffffff = ffffffff00000000
-    //boost::uint64_t tsModifier = ret64 & 0xffffffff00000000;
+    tsModifier = ret64 & (std::numeric_limits<std::uint64_t>::max() ^ 0xffffffff); // ffffffffffffffff XOR 00000000ffffffff = ffffffff00000000
+    //std::uint64_t tsModifier = ret64 & 0xffffffff00000000;
     std::cout << "Start time: " << startTS << ", converted to " << startTime.toString(EVENT_DATE_FORMAT) << std::endl;
   }
 
@@ -75,7 +76,7 @@ int main(int argc, char **argv)
 	QString toolIndex;
 	
 //  QDateTime now = QDateTime::currentDateTime();
-//  boost::uint64_t now_t64 = now.toTime_t();
+//  std::uint64_t now_t64 = now.toTime_t();
 //  now_t64 *= 1000;
 //  now_t64 += now.time().msec();
 //
@@ -107,7 +108,7 @@ int main(int argc, char **argv)
         break;
     }
 
-		boost::uint64_t ts64 = (boost::uint64_t)timestamp;
+		std::uint64_t ts64 = (std::uint64_t)timestamp;
 		if (reader.version() == 1)
 		{
 			ts64 |= tsModifier;
@@ -127,7 +128,7 @@ int main(int argc, char **argv)
 		{		
       std::cout << "[" << index << "]" << '\t';
 	  std::cout << cx::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\t';
-			boost::array<double, 16>  val = T.flatten();
+			std::array<double, 16>  val = T.flatten();
 			cx::stream_range(std::cout, val.begin(), val.end(), ' ');
       std::cout << '\t' << toolIndex.toStdString();
 			std::cout << std::endl;

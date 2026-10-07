@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include <random>
+#include <memory>
 #include <cmath>
 
 #include <vtkCellData.h>
@@ -94,7 +95,7 @@ void IslandsFilter::createOutputTypes()
 
 bool IslandsFilter::execute()
 {
-	ImagePtr inputImage = boost::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[0])->getImage();
+	ImagePtr inputImage = std::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[0])->getImage();
 	if (!inputImage)
 		return false;
 	

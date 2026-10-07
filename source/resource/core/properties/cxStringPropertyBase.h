@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -122,7 +122,7 @@ protected:
 	GuiRepresentation mGuiRepresentation;
 
 };
-typedef boost::shared_ptr<StringPropertyBase> StringPropertyBasePtr;
+typedef std::shared_ptr<StringPropertyBase> StringPropertyBasePtr;
 
 } // namespace cx
 

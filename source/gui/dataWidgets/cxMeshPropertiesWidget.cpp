@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxMeshPropertiesWidget.h"
+#include <memory>
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -58,7 +59,7 @@ void MeshPropertiesWidget::meshSelectedSlot()
 	// clear gui, ready for next modified
 	this->clearUI();
 
-	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+	mMesh = std::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 	this->setModified();
 }
 

@@ -13,16 +13,17 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSACQUSITIONWIDGET_H_
 
 #include "cxBaseWidget.h"
+#include <memory>
 #include "cxAcquisitionService.h"
 #include "org_custusx_acquisition_Export.h"
 
 
 namespace cx
 {
-typedef boost::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class StringPropertyActiveProbeConfiguration> StringPropertyActiveProbeConfigurationPtr;
+typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef std::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class StringPropertyActiveProbeConfiguration> StringPropertyActiveProbeConfigurationPtr;
 class TimedAlgorithmProgressBar;
 class DisplayTimerWidget;
 class RecordSessionWidget;

@@ -13,12 +13,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPATIENTLANDMARKSWIDGET_H
 
 #include "cxLandmarkRegistrationWidget.h"
+#include <memory>
 #include "org_custusx_registration_method_landmark_Export.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
+typedef std::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
 
 /**
  * \class PatientLandMarksWidget

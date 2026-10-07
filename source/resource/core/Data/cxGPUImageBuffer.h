@@ -16,8 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 #include "cxPrecompiledHeader.h"
 
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
 #include <map>
 #include <list>
 #include "vtkForwardDeclarations.h"
@@ -65,8 +64,8 @@ public:
 	//virtual vtkImageDataPtr getVtkImageData() = 0;
 };
 
-typedef boost::shared_ptr<GPUImageDataBuffer> GPUImageDataBufferPtr;
-typedef boost::weak_ptr<GPUImageDataBuffer> GPUImageDataBufferWeakPtr;
+typedef std::shared_ptr<GPUImageDataBuffer> GPUImageDataBufferPtr;
+typedef std::weak_ptr<GPUImageDataBuffer> GPUImageDataBufferWeakPtr;
 
 cxResource_EXPORT GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume);
 
@@ -98,8 +97,8 @@ public:
 	virtual int getLutSize() const = 0;
 };
 
-typedef boost::shared_ptr<GPUImageLutBuffer> GPUImageLutBufferPtr;
-typedef boost::weak_ptr<GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
+typedef std::shared_ptr<GPUImageLutBuffer> GPUImageLutBufferPtr;
+typedef std::weak_ptr<GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
 
 cxResource_EXPORT GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume);
 cxResource_EXPORT GPUImageLutBufferPtr createGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);

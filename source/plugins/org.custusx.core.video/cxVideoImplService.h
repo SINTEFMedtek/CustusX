@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGIMPLSERVICE_H_
 
 #include "cxVideoService.h"
+#include <memory>
 #include "org_custusx_core_video_Export.h"
 #include "cxServiceTrackerListener.h"
 
@@ -20,8 +21,8 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
-typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
+typedef std::shared_ptr<class VideoConnection> VideoConnectionPtr;
+typedef std::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
  * Implementation of VideoService.
@@ -94,12 +95,12 @@ private:
 	void onStreamerServiceAdded(StreamerService *service);
 	void onStreamerServiceRemoved(StreamerService *service);
 
-	boost::shared_ptr<ServiceTrackerListener<StreamerService> > mStreamerServiceListener;
+	std::shared_ptr<ServiceTrackerListener<StreamerService> > mStreamerServiceListener;
 
 private:
 	ctkPluginContext *mContext;
 };
-typedef boost::shared_ptr<VideoImplService> VideoImplServicePtr;
+typedef std::shared_ptr<VideoImplService> VideoImplServicePtr;
 
 } /* namespace cx */
 

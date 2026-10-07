@@ -13,9 +13,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRAININGWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "org_custusx_training_Export.h"
-#include <boost/function.hpp>
+#include <functional>
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"
 class ctkPluginContext;
@@ -23,7 +23,7 @@ class QPushButton;
 
 namespace cx {
 
-typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+typedef std::shared_ptr<class HelpEngine> HelpEnginePtr;
 class HelpBrowser;
 
 
@@ -47,7 +47,7 @@ public:
 protected:
     void resetSteps();
 
-    typedef boost::function<void(void)> func_t;
+    typedef std::function<void(void)> func_t;
     typedef std::vector<func_t> funcs_t;
     void registrateTransition( func_t transition);
 

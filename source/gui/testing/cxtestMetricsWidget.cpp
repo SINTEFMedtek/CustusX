@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <memory>
 #include <queue>
 #include <vtkMNITagPointReader.h>
 #include <vtkStringArray.h>
@@ -196,7 +197,7 @@ TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widg
 
 //    //scope here to delete the metric manager before shutting down the logic manager.
 //    {
-//        typedef boost::shared_ptr<class cx::PointMetric> PointMetricPtr;
+//        typedef std::shared_ptr<class cx::PointMetric> PointMetricPtr;
 //        QString dataPath = cx::DataLocations::getTestDataPath();
 //        TestMetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(),
 //                                  cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
@@ -223,7 +224,7 @@ TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widg
 //        // Check that imported coordinates and label names are correct
 //        for(; iter_metrics!=metrics.end();++iter_metrics)
 //        {
-//            PointMetricPtr  point_metric = boost::static_pointer_cast<cx::PointMetric>(iter_metrics->second);
+//            PointMetricPtr  point_metric = std::static_pointer_cast<cx::PointMetric>(iter_metrics->second);
 //            cx::Vector3D importedCoordinates = point_metric->getRefCoord();
 //            cx::Vector3D spesifiedCoordinates = metricData.coordinates_in_REF_coordinateSystem.front();
 //            metricData.coordinates_in_REF_coordinateSystem.pop();
@@ -249,7 +250,7 @@ TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widg
 
 //    //scope here to delete the metric manager before shutting down the logic manager.
 //    {
-//        typedef boost::shared_ptr<class cx::PointMetric> PointMetricPtr;
+//        typedef std::shared_ptr<class cx::PointMetric> PointMetricPtr;
 //        QString dataPath = cx::DataLocations::getTestDataPath();
 //        TestMetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(),
 //                                  cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
@@ -276,7 +277,7 @@ TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widg
 //        // Check that imported coordinates and label names are correct
 //        for(; iter_metrics!=metrics.end();++iter_metrics)
 //        {
-//            PointMetricPtr  point_metric = boost::static_pointer_cast<cx::PointMetric>(iter_metrics->second);
+//            PointMetricPtr  point_metric = std::static_pointer_cast<cx::PointMetric>(iter_metrics->second);
 //            cx::Vector3D importedCoordinates = point_metric->getRefCoord();
 //            cx::Vector3D spesifiedCoordinates = metricData.coordinates_in_REF_coordinateSystem.front();
 //            metricData.coordinates_in_REF_coordinateSystem.pop();
@@ -313,7 +314,7 @@ TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widg
 
 //    //scope here to delete the metric manager before shutting down the logic manager.
 //    {
-//        typedef boost::shared_ptr<class cx::PointMetric> PointMetricPtr;
+//        typedef std::shared_ptr<class cx::PointMetric> PointMetricPtr;
 //        QString dataPath = cx::DataLocations::getTestDataPath();
 //        TestMetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(),
 //                                  cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
@@ -340,7 +341,7 @@ TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widg
 //        // Check that imported coordinates and label names are correct
 //        for(; iter_metrics!=metrics.end();++iter_metrics)
 //        {
-//            PointMetricPtr  point_metric = boost::static_pointer_cast<cx::PointMetric>(iter_metrics->second);
+//            PointMetricPtr  point_metric = std::static_pointer_cast<cx::PointMetric>(iter_metrics->second);
 //            cx::Vector3D importedCoordinates = point_metric->getRefCoord();
 //            cx::Vector3D spesifiedCoordinates = coordinates_RAS_in_REF_coordinateSystem.front();
 //            coordinates_RAS_in_REF_coordinateSystem.pop();

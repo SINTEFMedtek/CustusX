@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxFileManagerImplService.h"
+#include <functional>
 #include <QFileInfo>
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
@@ -36,7 +37,7 @@ void FileManagerImpService::initServiceListener(ctkPluginContext *context)
 	mServiceListener.reset(new ServiceTrackerListener<FileReaderWriterService>(
 								 context,
 								 boost::bind(&FileManagerImpService::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (FileReaderWriterService*)>(),
+								 std::function<void (FileReaderWriterService*)>(),
 								 boost::bind(&FileManagerImpService::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

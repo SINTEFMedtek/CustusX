@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGPLUGINACTIVATOR_H_
 
 #include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 namespace cx
 {
@@ -28,7 +28,7 @@ namespace cx
  */
 
 
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef std::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for the IGSTK Tracking plugin

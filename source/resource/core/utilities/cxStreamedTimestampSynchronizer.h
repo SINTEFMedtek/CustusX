@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include <vector>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QDateTime>
 #include "cxForwardDeclarations.h"
 

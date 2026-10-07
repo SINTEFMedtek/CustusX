@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDUMMYTOOLMANAGER_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxTrackingService.h"
 #include "cxDummyTool.h"
@@ -33,7 +34,7 @@ class cxResource_EXPORT DummyToolManager : public TrackingService
 	Q_OBJECT
 
 public:
-	typedef boost::shared_ptr<DummyToolManager> DummyToolManagerPtr;
+	typedef std::shared_ptr<DummyToolManager> DummyToolManagerPtr;
 	static DummyToolManagerPtr create();
 
 	virtual ~DummyToolManager();

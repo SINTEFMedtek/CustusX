@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTMETRICFIXTURE_H_
 
 #include "cxtest_org_custusx_core_patientmodel_export.h"
+#include <memory>
 
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
@@ -115,9 +116,9 @@ public:
 	bool inputEqualsMetric(ToolMetricWithInput data);
 
 	template<class METRIC_TYPE>
-	boost::shared_ptr<METRIC_TYPE> createTestMetric(QString uid="")
+	std::shared_ptr<METRIC_TYPE> createTestMetric(QString uid="")
 	{
-		boost::shared_ptr<METRIC_TYPE> retval;
+		std::shared_ptr<METRIC_TYPE> retval;
 		retval = mServices->patient()->createSpecificData<METRIC_TYPE>(uid);
 		return retval;
 	}

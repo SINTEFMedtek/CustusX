@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxToolUsingIGSTK.h"
 
 #include <limits.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <igstkPolarisTrackerTool.h>
 #include <igstkAuroraTrackerTool.h>
 #include <igstkTransform.h>
@@ -38,8 +38,8 @@ namespace cx
  */
 
 class IgstkTool;
-typedef boost::shared_ptr<IgstkTool> IgstkToolPtr;
-typedef boost::weak_ptr<IgstkTool> IgstkToolWeakPtr;
+typedef std::shared_ptr<IgstkTool> IgstkToolPtr;
+typedef std::weak_ptr<IgstkTool> IgstkToolWeakPtr;
 
 /**
  * \brief  Class for controlling the igstk tracking (hardware) interface.

@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxDataTreeNode.h"
+#include <memory>
 #include "cxPatientModelService.h"
 #include "cxDefinitions.h"
 #include "cxData.h"
@@ -70,11 +71,11 @@ bool DataTreeNode::isVisibleNode() const
 	if (!hasData)
 		return false;
 
-	if (boost::dynamic_pointer_cast<Mesh>(mData) && !visible.contains("model"))
+	if (std::dynamic_pointer_cast<Mesh>(mData) && !visible.contains("model"))
 		return false;
-	if (boost::dynamic_pointer_cast<Image>(mData) && !visible.contains("image"))
+	if (std::dynamic_pointer_cast<Image>(mData) && !visible.contains("image"))
 		return false;
-	if (boost::dynamic_pointer_cast<DataMetric>(mData) && !visible.contains("metric"))
+	if (std::dynamic_pointer_cast<DataMetric>(mData) && !visible.contains("metric"))
 		return false;
 
 	return true;
@@ -100,7 +101,7 @@ void DataTreeNode::activate()
 
 QIcon DataTreeNode::getIcon() const
 {
-	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(mData);
+	DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(mData);
 	if (metric)
 		return this->addBackgroundColorToIcon(mData->getIcon(), metric->getColor());
 	return mData->getIcon();
@@ -108,10 +109,10 @@ QIcon DataTreeNode::getIcon() const
 
 QVariant DataTreeNode::getColor() const
 {
-	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(mData);
+	DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(mData);
 	if (metric)
 		return metric->getColor();
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mData);
+	MeshPtr mesh = std::dynamic_pointer_cast<Mesh>(mData);
 	if (mesh)
 		return mesh->getColor();
 	return QVariant();
@@ -158,13 +159,13 @@ void DataTreeNode::setViewGroupVisibility(int index, bool value)
 		this->getServices()->view()->getGroup(index)->setProperties(mData->getUid(), DataViewProperties());
 }
 
-boost::shared_ptr<QWidget> DataTreeNode::createPropertiesWidget() const
+std::shared_ptr<QWidget> DataTreeNode::createPropertiesWidget() const
 {
 	WidgetTypeRepositoryPtr wrepo = this->repo()->getWidgetTypeRepository();
 
-	if (boost::dynamic_pointer_cast<Mesh>(mData))
+	if (std::dynamic_pointer_cast<Mesh>(mData))
 	{
-		boost::shared_ptr<AllMeshPropertiesWidget> widget = wrepo->find<AllMeshPropertiesWidget>();
+		std::shared_ptr<AllMeshPropertiesWidget> widget = wrepo->find<AllMeshPropertiesWidget>();
 		if (!widget)
 		{
 			StringPropertySelectMeshPtr meshSelector = StringPropertySelectMesh::New(this->getServices()->patient());
@@ -176,9 +177,9 @@ boost::shared_ptr<QWidget> DataTreeNode::createPropertiesWidget() const
 		widget->getSelector()->setValue(mData->getUid());
 		return widget;
 	}
-	if (boost::dynamic_pointer_cast<Image>(mData))
+	if (std::dynamic_pointer_cast<Image>(mData))
 	{
-		boost::shared_ptr<ImagePropertiesWidget> widget = wrepo->find<ImagePropertiesWidget>();
+		std::shared_ptr<ImagePropertiesWidget> widget = wrepo->find<ImagePropertiesWidget>();
 		if (!widget)
 		{
 			widget.reset (new ImagePropertiesWidget(this->getServices(), NULL));
@@ -186,9 +187,9 @@ boost::shared_ptr<QWidget> DataTreeNode::createPropertiesWidget() const
 		}
 		return widget;
 	}
-	if(boost::dynamic_pointer_cast<DataMetric>(mData))
+	if(std::dynamic_pointer_cast<DataMetric>(mData))
 	{
-		boost::shared_ptr<QWidget> widget = wrepo->findMetricWidget(mData);
+		std::shared_ptr<QWidget> widget = wrepo->findMetricWidget(mData);
 		if(!widget)
 		{
 			MetricUtilities utilities(this->getServices());
@@ -198,7 +199,7 @@ boost::shared_ptr<QWidget> DataTreeNode::createPropertiesWidget() const
 		return widget;
 
 	}
-	return boost::shared_ptr<QWidget>(new QLabel(QString("Data widget %1 ").arg(mData->getName())));
+	return std::shared_ptr<QWidget>(new QLabel(QString("Data widget %1 ").arg(mData->getName())));
 }
 
 

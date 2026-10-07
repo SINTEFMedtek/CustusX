@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-/** Filter implementation of the itk::BinaryThinningImageFilter3D
+/** Centerline filter: one voxel wide skeleton of a binary volume (BinaryThinning3D), converted to a mesh
  *
  *
  * \ingroup cx_resource_filter

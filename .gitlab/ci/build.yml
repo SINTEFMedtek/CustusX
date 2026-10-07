@@ -30,11 +30,24 @@
       - $OS/package_artefacts/html_pure/
       - $OS/package_artefacts/html_dev/
 
+# Ubuntu 20.04 CI is retired (CustusX#51): remove its persistent build folders on the runners,
+# once nothing in them has changed for 14 days (release branches may still build Ubuntu 20.04).
+.remove-retired-ubuntu2004-folders:
+  script:
+    - |
+      for d in /builds/Ubuntu2004* /builds/*/Ubuntu2004*; do
+        if [ -d "$d" ] && [ -z "$(find "$d" -mmin -20160 -print -quit 2>/dev/null)" ]; then
+          echo "Removing retired Ubuntu 20.04 build folder $d (unchanged for 14 days)"
+          rm -rf "$d"
+        fi
+      done
+
 .reuse-build:
   extends:
     - .build-variables
     - .create-installer
   before_script:
+  - !reference [.remove-retired-ubuntu2004-folders, script]
   - ls $BASE_DIR
   # Manual escape hatch: set FORCE_CLEAN_APP_BUILD=true (CI/CD > Run pipeline variables)
   # to wipe this runner's incrementally-reused CustusX build tree and force a from-scratch

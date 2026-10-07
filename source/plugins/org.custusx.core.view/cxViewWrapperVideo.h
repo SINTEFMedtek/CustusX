@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWWRAPPERRTSTREAM_H_
 
 #include "org_custusx_core_view_Export.h"
+#include <memory>
 
 #include <vector>
 #include <QPointer>
@@ -69,7 +70,7 @@ private:
 	ViewPtr mView;
 	ToolPtr mTool;
 };
-typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
+typedef std::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 
 /**
 * @}

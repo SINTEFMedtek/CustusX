@@ -13,11 +13,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTVISIALIZATIONHELPER_H
 
 #include "cxViewWrapper2D.h"
+#include <memory>
 #include "cxViewsFixture.h"
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class ViewWrapper2DFixture> ViewWrapper2DFixturePtr;
+typedef std::shared_ptr<class ViewWrapper2DFixture> ViewWrapper2DFixturePtr;
 struct ViewWrapper2DFixture : public cx::ViewWrapper2D
 {
 	ViewWrapper2DFixture(cx::ViewPtr view, cx::VisServicesPtr services);

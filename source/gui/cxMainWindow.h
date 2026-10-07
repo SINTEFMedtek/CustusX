@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QMainWindow>
 #include <map>
 #include <set>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxGUIExtenderService.h"
 #include <QPointer>
 #include "cxServiceTrackerListener.h"
@@ -36,9 +36,9 @@ class ConsoleWidget;
 class DynamicMainWindowWidgets;
 class MainWindowActions;
 
-typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
-typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
+typedef std::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
+typedef std::shared_ptr<class VisServices> VisServicesPtr;
+typedef std::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
 
 
 /**
@@ -148,7 +148,7 @@ private:
 	QToolBar* mScreenshotToolBar;
 	QToolBar* mSpacerToolBar;
 
-	boost::shared_ptr<ServiceTrackerListener<GUIExtenderService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<GUIExtenderService> > mServiceListener;
 
 	//widgets
 	QPointer<class SecondaryMainWindow> mControlPanel;

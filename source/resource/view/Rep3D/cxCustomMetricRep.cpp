@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxCustomMetricRep.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 #include <vtkSelectVisiblePoints.h>
@@ -50,7 +50,7 @@ void CustomMetricRep::clear()
 
 CustomMetricPtr CustomMetricRep::getCustomMetric()
 {
-	return boost::dynamic_pointer_cast<CustomMetric>(mMetric);
+	return std::dynamic_pointer_cast<CustomMetric>(mMetric);
 }
 
 void CustomMetricRep::onModifiedStartRender()
@@ -86,7 +86,7 @@ void CustomMetricRep::updateModel()
 
 void CustomMetricRep::updateImageModel(DataPtr model)
 {
-	ImagePtr imageModel = boost::dynamic_pointer_cast<Image>(model);
+	ImagePtr imageModel = std::dynamic_pointer_cast<Image>(model);
 
 	if(!imageModel || !imageModel->is2D())
 		return;
@@ -110,7 +110,7 @@ void CustomMetricRep::updateImageModel(DataPtr model)
 
 void CustomMetricRep::updateMeshModel(DataPtr model)
 {
-	MeshPtr meshModel = boost::dynamic_pointer_cast<Mesh>(model);
+	MeshPtr meshModel = std::dynamic_pointer_cast<Mesh>(model);
 
 	CustomMetricPtr custom = this->getCustomMetric();
 	std::vector<Transform3D> pos = custom->calculateOrientations();

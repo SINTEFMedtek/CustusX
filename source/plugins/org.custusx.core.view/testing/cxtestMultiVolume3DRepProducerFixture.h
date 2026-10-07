@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTMULTIVOLUME3DREPPRODUCERFIXTURE_H
 
 #include "cxtest_org_custusx_core_view_export.h"
+#include <memory>
 
 #include <vtkGPUVolumeRayCastMapper.h>
 #include <vtkVolume.h>
@@ -37,9 +38,9 @@ public:
 	void initializeVisualizerAndImages(QString type, int imageCount=1);
 
 	template<class REP>
-	boost::shared_ptr<REP> downcastRep(int i)
+	std::shared_ptr<REP> downcastRep(int i)
 	{
-		return boost::dynamic_pointer_cast<REP>(mBase.getAllReps()[i]);
+		return std::dynamic_pointer_cast<REP>(mBase.getAllReps()[i]);
 	}
 
 	cx::MultiVolume3DRepProducer mBase;

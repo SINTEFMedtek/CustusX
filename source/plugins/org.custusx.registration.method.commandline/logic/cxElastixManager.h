@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXELASTIXMANAGER_H_
 
 #include <QObject>
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
 #include "cxBoolProperty.h"
@@ -29,7 +30,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
+typedef std::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
 
 /**
  * \brief Manager for interfacing to the ElastiX registration package.
@@ -78,7 +79,7 @@ private:
 	QString mDesc;
 	ImagePtr mLastNonLonearImage;
 };
-typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;
+typedef std::shared_ptr<ElastixManager> ElastixManagerPtr;
 
 /**
  * @}

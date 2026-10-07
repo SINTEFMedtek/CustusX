@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCOLORVARIATIONFILTER_H
 
 #include <random>
+#include <memory>
 #include "cxFilterImpl.h"
 
 namespace cx
@@ -77,7 +78,7 @@ private:
 	std::mt19937 m_gen{m_rd()};
 };
 
-typedef boost::shared_ptr<ColorVariationFilter> ColorVariationFilterPtr;
+typedef std::shared_ptr<ColorVariationFilter> ColorVariationFilterPtr;
 
 } // namespace cx
 

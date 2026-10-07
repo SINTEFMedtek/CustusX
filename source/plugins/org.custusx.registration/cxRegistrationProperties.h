@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONPROPERTIES_H_
 
 #include "cxSelectDataStringPropertyBase.h"
+#include <memory>
 #include "org_custusx_registration_Export.h"
 
 namespace cx
@@ -22,10 +23,10 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
 
-typedef boost::shared_ptr<class StringPropertyRegistrationFixedImage> StringPropertyRegistrationFixedImagePtr;
+typedef std::shared_ptr<class StringPropertyRegistrationFixedImage> StringPropertyRegistrationFixedImagePtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
 class org_custusx_registration_EXPORT StringPropertyRegistrationFixedImage : public SelectDataStringPropertyBase
@@ -45,7 +46,7 @@ private:
 };
 
 
-typedef boost::shared_ptr<class StringPropertyRegistrationMovingImage> StringPropertyRegistrationMovingImagePtr;
+typedef std::shared_ptr<class StringPropertyRegistrationMovingImage> StringPropertyRegistrationMovingImagePtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
 class org_custusx_registration_EXPORT StringPropertyRegistrationMovingImage : public SelectDataStringPropertyBase

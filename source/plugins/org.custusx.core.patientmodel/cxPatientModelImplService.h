@@ -13,16 +13,17 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPATIENTMODELIMPLSERVICE_H_
 
 #include "org_custusx_core_patientmodel_Export.h"
+#include <memory>
 class ctkPluginContext;
 
 #include "cxPatientModelService.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
-typedef boost::shared_ptr<class PatientData> PatientDataPtr;
-typedef boost::shared_ptr<class DataManager> DataServicePtr;
-typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
+typedef std::shared_ptr<class DataManagerImpl> DataManagerImplPtr;
+typedef std::shared_ptr<class PatientData> PatientDataPtr;
+typedef std::shared_ptr<class DataManager> DataServicePtr;
+typedef std::shared_ptr<class DataFactory> DataFactoryPtr;
 
 /**
  * Implementation of PatientModelService.
@@ -113,7 +114,7 @@ private:
 	void disconnectProbes();
 	void connectProbes();
 };
-typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
+typedef std::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 
 } /* namespace cx */
 

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxLiverVisibilityWidget.h"
+#include <memory>
 
 #include <QPushButton>
 #include <QGridLayout>
@@ -126,7 +127,7 @@ void LiverVisibilityWidget::addStructureButton(ORGAN_TYPE organType, QString lab
 
 ImagePtr LiverVisibilityWidget::sourceImage() const
 {
-	return boost::dynamic_pointer_cast<Image>(mSourceImageSelector->getData());
+	return std::dynamic_pointer_cast<Image>(mSourceImageSelector->getData());
 }
 
 MeshPtr LiverVisibilityWidget::findMeshForSourceImage(ORGAN_TYPE organType, ImagePtr sourceImage) const

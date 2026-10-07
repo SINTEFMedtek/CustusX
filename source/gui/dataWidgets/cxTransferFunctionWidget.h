@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRANSFERFUNCTIONWIDGET_H_
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 #include <QCheckBox>
@@ -59,9 +60,9 @@ protected:
 	ImageTFDataPtr mImageTFData;
 	ImagePtr mImage;
 };
-typedef boost::shared_ptr<DoublePropertyImageTFDataBase> DoublePropertyImageTFDataBasePtr;
-typedef boost::shared_ptr<class DoublePropertyImageTFSlider> DoublePropertyImageTFSliderPtr;
-typedef boost::shared_ptr<class DoublePropertyImageTFSlider2DAnd3D> DoublePropertyImageTFSlider2DAnd3DPtr;
+typedef std::shared_ptr<DoublePropertyImageTFDataBase> DoublePropertyImageTFDataBasePtr;
+typedef std::shared_ptr<class DoublePropertyImageTFSlider> DoublePropertyImageTFSliderPtr;
+typedef std::shared_ptr<class DoublePropertyImageTFSlider2DAnd3D> DoublePropertyImageTFSlider2DAnd3DPtr;
 
 
 /**DataInterface implementation for the tf window value

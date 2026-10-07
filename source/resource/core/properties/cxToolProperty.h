@@ -13,13 +13,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLPROPERTY_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxStringPropertyBase.h"
 #include "cxTool.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef std::shared_ptr<class TrackingService> TrackingServicePtr;
 
 /**
  * \file
@@ -52,7 +53,7 @@ private:
 };
 
 
-typedef boost::shared_ptr<class StringPropertyActiveProbeConfiguration> StringPropertyActiveProbeConfigurationPtr;
+typedef std::shared_ptr<class StringPropertyActiveProbeConfiguration> StringPropertyActiveProbeConfigurationPtr;
 
 /** Adapter that connects to the current active probe.
  *  It will stick to the probe as much as possible,

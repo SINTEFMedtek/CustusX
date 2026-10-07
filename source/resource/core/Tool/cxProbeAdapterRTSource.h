@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPROBEADAPTERRTSOURCE_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
@@ -73,7 +74,7 @@ private:
 	vtkImageChangeInformationPtr mRedirecter;
 };
 
-typedef boost::shared_ptr<ProbeAdapterRTSource> ProbeAdapterRTSourcePtr;
+typedef std::shared_ptr<ProbeAdapterRTSource> ProbeAdapterRTSourcePtr;
 
 } // cx
 

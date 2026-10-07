@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxGPUImageBuffer.h"
+#include <memory>
 
 #include <QString>
 
@@ -20,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedShortArray.h>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include "cxGLHelpers.h"
 #include "cxLogger.h"
 
@@ -128,9 +129,9 @@ public:
 		mMTime = mTexture->GetMTime();
 		//vtkgl::ActiveTexture(getGLTextureForVolume(textureUnitIndex)); //TODO is this OK?
 		GLenum size,internalType;
-		boost::uint32_t dimx = mTexture ->GetDimensions( )[0];
-		boost::uint32_t dimy = mTexture ->GetDimensions( )[1];
-		boost::uint32_t dimz = mTexture ->GetDimensions( )[2];
+		std::uint32_t dimx = mTexture ->GetDimensions( )[0];
+		std::uint32_t dimy = mTexture ->GetDimensions( )[1];
+		std::uint32_t dimz = mTexture ->GetDimensions( )[2];
 		mMemorySize = dimx * dimy * dimz;
 
 
@@ -386,20 +387,20 @@ GPUImageLutBufferPtr createGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut)
 }
 
 template<class BUFFER, class DATA_PTR>
-boost::shared_ptr<BUFFER> createGPUImageBuffer(DATA_PTR val);
+std::shared_ptr<BUFFER> createGPUImageBuffer(DATA_PTR val);
 
 template<>
-boost::shared_ptr<GPUImageDataBuffer> createGPUImageBuffer<GPUImageDataBuffer>(vtkImageDataPtr val);
+std::shared_ptr<GPUImageDataBuffer> createGPUImageBuffer<GPUImageDataBuffer>(vtkImageDataPtr val);
 template<>
-boost::shared_ptr<GPUImageLutBuffer> createGPUImageBuffer<GPUImageLutBuffer>(vtkUnsignedCharArrayPtr val);
+std::shared_ptr<GPUImageLutBuffer> createGPUImageBuffer<GPUImageLutBuffer>(vtkUnsignedCharArrayPtr val);
 
 template<>
-boost::shared_ptr<GPUImageDataBuffer> createGPUImageBuffer<GPUImageDataBuffer,vtkImageDataPtr>(vtkImageDataPtr val)
+std::shared_ptr<GPUImageDataBuffer> createGPUImageBuffer<GPUImageDataBuffer,vtkImageDataPtr>(vtkImageDataPtr val)
 {
 	return createGPUImageDataBuffer(val);
 }
 template<>
-boost::shared_ptr<GPUImageLutBuffer> createGPUImageBuffer<GPUImageLutBuffer>(vtkUnsignedCharArrayPtr val)
+std::shared_ptr<GPUImageLutBuffer> createGPUImageBuffer<GPUImageLutBuffer>(vtkUnsignedCharArrayPtr val)
 {
 	return createGPUImageLutBuffer(val);
 }
@@ -413,8 +414,8 @@ template<class DATA_PTR, class BUFFER>
 class BufferQueue
 {
 public:
-	typedef boost::shared_ptr<BUFFER> BufferPtr;
-	typedef boost::weak_ptr<BUFFER> BufferWeakPtr;
+	typedef std::shared_ptr<BUFFER> BufferPtr;
+	typedef std::weak_ptr<BUFFER> BufferWeakPtr;
 
 	struct BufferStore
 	{

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLIVERSEGMENTATIONWIDGET_H_
 
 #include "org_custusx_liver_Export.h"
+#include <memory>
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"
@@ -31,9 +32,9 @@ class QDoubleSpinBox;
 namespace cx
 {
 
-typedef boost::shared_ptr<class LiverSegmentationRunner> LiverSegmentationRunnerPtr;
-typedef boost::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
-typedef boost::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
+typedef std::shared_ptr<class LiverSegmentationRunner> LiverSegmentationRunnerPtr;
+typedef std::shared_ptr<class StringPropertyActiveImage> StringPropertyActiveImagePtr;
+typedef std::shared_ptr<class StringPropertySelectImage> StringPropertySelectImagePtr;
 
 /**
  * Widget for selecting and running one or more of the liver segmentation

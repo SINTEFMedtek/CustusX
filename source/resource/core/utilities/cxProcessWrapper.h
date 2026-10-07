@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include <QObject>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QStringList>
 #include <QString>
 #include <QProcess>
@@ -31,7 +31,7 @@ namespace cx
 * @{
 */
 
-typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
+typedef std::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
 
 /**
  * Wraps a QProcess and supplies a interface that integrates nicely with the rest of CustusX.

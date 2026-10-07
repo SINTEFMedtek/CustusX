@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREPIMPL_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 //With VTK 9 most reps need a lot of VTK includes on Windows
 #include <vtkActor2D.h>
@@ -46,7 +47,7 @@ typedef vtkSmartPointer<class vtkCallbackCommand> vtkCallbackCommandPtr;
 
 namespace cx
 {
-typedef boost::weak_ptr<class View> ViewWeakPtr;
+typedef std::weak_ptr<class View> ViewWeakPtr;
 
 /**\brief Default implementation of Rep.
  *
@@ -80,9 +81,9 @@ public:
 	  *  static REPPtr New(QString uid="") { return wrap_new(new REP(), uid); }
 	  */
 	template<class REP>
-	static boost::shared_ptr<REP> wrap_new(REP* object, QString uid)
+	static std::shared_ptr<REP> wrap_new(REP* object, QString uid)
 	{
-		boost::shared_ptr<REP> retval(object);
+		std::shared_ptr<REP> retval(object);
 		if (uid.isEmpty())
 			uid = retval->getType() + "_" + reinterpret_cast<long long>(retval.get());
 		retval->mUid = uid;

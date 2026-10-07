@@ -21,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 #include "cxLogger.h"
 #include <QApplication>
-#include "boost/function.hpp"
+#include <functional>
 #include "boost/bind/bind.hpp"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;

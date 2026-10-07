@@ -13,10 +13,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCOMPOSITETIMEDALGORITHM_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxTimedAlgorithm.h"
 
-#include <boost/function.hpp>
+#include <functional>
 
 namespace cx
 {
@@ -34,7 +35,7 @@ public:
 protected:
 	std::vector<TimedAlgorithmPtr> mChildren;
 };
-typedef boost::shared_ptr<CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
+typedef std::shared_ptr<CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
 
 
 
@@ -67,7 +68,7 @@ private slots:
 private:
 	int mCurrent;
 };
-typedef boost::shared_ptr<CompositeSerialTimedAlgorithm> CompositeSerialTimedAlgorithmPtr;
+typedef std::shared_ptr<CompositeSerialTimedAlgorithm> CompositeSerialTimedAlgorithmPtr;
 
 
 
@@ -97,7 +98,7 @@ private slots:
 	void oneFinished();
 
 };
-typedef boost::shared_ptr<CompositeParallelTimedAlgorithm> CompositeParallelTimedAlgorithmPtr;
+typedef std::shared_ptr<CompositeParallelTimedAlgorithm> CompositeParallelTimedAlgorithmPtr;
 
 
 }

@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCUSTOMMETRIC_H
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxPrecompiledHeader.h"
 
 #include "cxDataMetric.h"
@@ -26,7 +27,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class CustomMetric> CustomMetricPtr;
+typedef std::shared_ptr<class CustomMetric> CustomMetricPtr;
 
 /** \brief Data class that represents a custom.
  *

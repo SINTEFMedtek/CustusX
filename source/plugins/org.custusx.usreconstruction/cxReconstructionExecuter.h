@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_usreconstruction_Export.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QObject>
 #include <set>
 #include <vtkPolyData.h>
@@ -26,8 +26,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
-typedef boost::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPtr;
+typedef std::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
+typedef std::shared_ptr<class ReconstructionExecuter> ReconstructionExecuterPtr;
 
 /**
  * \ingroup org_custusx_usreconstruction

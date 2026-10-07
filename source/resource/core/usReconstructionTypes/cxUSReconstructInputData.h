@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSRECONSTRUCTINPUTDATA_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <vector>
 #include "cxProbeSector.h"
@@ -21,15 +22,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
+typedef std::shared_ptr<class USFrameData> USFrameDataPtr;
+typedef std::shared_ptr<class Image> ImagePtr;
 
 /**
  * \addtogroup cx_resource_usreconstructiontypes
  * \{
  */
 
-typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
+typedef std::shared_ptr<class TimedPosition> TimedPositionPtr;
 
 /** \brief One position with timestamp
  */

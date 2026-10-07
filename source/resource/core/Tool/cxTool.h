@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <string>
 #include <map>
 #include <set>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include <QDomNode>
 #include "vtkForwardDeclarations.h"
@@ -30,11 +30,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef std::shared_ptr<class Tool> ToolPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
 typedef std::map<double, Transform3D> TimedTransformMap;
-typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
-typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
+typedef std::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
+typedef std::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
 
 /**
  * Additional information describing each tool position,

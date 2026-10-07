@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 namespace cx
 {
@@ -44,7 +44,7 @@ public:
 	virtual void playSampleSound() = 0;
 };
 
-typedef boost::shared_ptr<Audio> AudioPtr;
+typedef std::shared_ptr<Audio> AudioPtr;
 }
 
 #endif /* CXAUDIO_H_ */

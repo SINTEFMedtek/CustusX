@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxVideoServiceProxy.h"
+#include <functional>
 
 #include <boost/bind/bind.hpp>
 #include <ctkPluginContext.h>
@@ -38,7 +39,7 @@ void VideoServiceProxy::initServiceListener()
 	mVideoServiceListener.reset(new ServiceTrackerListener<VideoService>(
 								 mPluginContext,
 								 boost::bind(&VideoServiceProxy::onVideoServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (VideoService*)>(),
+								 std::function<void (VideoService*)>(),
 								 boost::bind(&VideoServiceProxy::onVideoServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mVideoServiceListener->open();

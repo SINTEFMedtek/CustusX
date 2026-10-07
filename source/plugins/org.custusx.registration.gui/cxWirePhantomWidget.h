@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXWIREPHANTOMWIDGET_H_
 
 #include "org_custusx_registration_gui_Export.h"
+#include <memory>
 #include "cxRegistrationBaseWidget.h"
 #include "cxPipeline.h"
 #include "cxFilter.h"
@@ -26,7 +27,7 @@ class QTextEdit;
 
 namespace cx
 {
-typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+typedef std::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 
 /**
  * \brief Probe accuracy measurements using the Wire Phantom.

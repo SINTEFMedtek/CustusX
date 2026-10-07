@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxMetricReferenceArgumentList.h"
+#include <memory>
 #include "cxData.h"
 #include "cxPointMetric.h"
 #include <QDomNode>
@@ -80,7 +81,7 @@ std::vector<Vector3D> MetricReferenceArgumentList::getRefCoords() const
 	std::vector<Vector3D> p(this->getCount());
 	for (unsigned i = 0; i < p.size(); ++i)
 	{
-		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(mArgument[i]);
+		DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(mArgument[i]);
 		if (!metric)
 			return std::vector<Vector3D>();
 		p[i] = metric->getRefCoord();
@@ -93,7 +94,7 @@ std::vector<Transform3D> MetricReferenceArgumentList::getRefFrames() const
     std::vector<Transform3D> p(this->getCount());
     for (unsigned i = 0; i < p.size(); ++i)
     {
-        DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(mArgument[i]);
+        DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(mArgument[i]);
         if (!metric)
             return std::vector<Transform3D>();
         p[i] = metric->getRefFrame();

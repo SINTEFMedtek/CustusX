@@ -21,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QObject>
 #include <QDateTime>
 #include "cxVector3D.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 class QDomNode;
 
@@ -59,7 +59,7 @@ typedef std::map<QString, Landmark> LandmarkMap;
 
 cxResource_EXPORT bool operator<(const Landmark& lhs, const Landmark& rhs);
 
-typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
+typedef std::shared_ptr<class Landmarks> LandmarksPtr;
 /** A collection of all landmarks in a given space.
   */
 class cxResource_EXPORT Landmarks : public QObject

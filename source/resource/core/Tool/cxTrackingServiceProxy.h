@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGSERVICEPROXY_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxTrackingService.h"
 #include "cxServiceTrackerListener.h"
@@ -69,7 +70,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	TrackingServicePtr mTrackingService;
-	boost::shared_ptr<ServiceTrackerListener<TrackingService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<TrackingService> > mServiceListener;
 };
 } //cx
 #endif // CXTRACKINGSERVICEPROXY_H

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <memory>
 
 #include <QCheckBox>
 
@@ -21,8 +22,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace
 {
-typedef boost::shared_ptr<class ViewServiceMock> ViewServiceFixturePtr;
-typedef boost::shared_ptr<class TestRegServices> TestRegServicesPtr;
+typedef std::shared_ptr<class ViewServiceMock> ViewServiceFixturePtr;
+typedef std::shared_ptr<class TestRegServices> TestRegServicesPtr;
 class ViewServiceMock : public cx::ViewServiceNull
 {
 public:

@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxGenericScriptFilter.h"
+#include <memory>
 
 namespace cx
 {
@@ -54,6 +55,6 @@ protected:
 	QStringList mTargets;
 };
 
-typedef boost::shared_ptr<class Raidionics> RaidionicsPtr;
+typedef std::shared_ptr<class Raidionics> RaidionicsPtr;
 }//cx
 #endif // CXRAIDIONICS_H

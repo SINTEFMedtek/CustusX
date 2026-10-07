@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QObject> //needed for the mocer when OpenCv is not used...
 #include "cxVideoServerConfig.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QTcpSocket>
 #include <QDateTime>
 #include <QSize>
@@ -38,11 +38,11 @@ namespace cv
 
 namespace cx
 {
-typedef boost::shared_ptr<class Property> PropertyPtr;
-typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
-typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
+typedef std::shared_ptr<class Property> PropertyPtr;
+typedef std::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
+typedef std::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
 
-typedef boost::shared_ptr<cv::VideoCapture> VideoCapturePtr;
+typedef std::shared_ptr<cv::VideoCapture> VideoCapturePtr;
 
 /**
  */

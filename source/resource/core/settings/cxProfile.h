@@ -15,20 +15,20 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QString>
 #include <QObject>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 class QSettings;
 
 namespace cx
 {
-typedef boost::shared_ptr<class QSettings> QSettingsPtr;
-typedef boost::shared_ptr<class Settings> SettingsPtr;
-typedef boost::shared_ptr<class StringProperty> StringPropertyPtr;
+typedef std::shared_ptr<class QSettings> QSettingsPtr;
+typedef std::shared_ptr<class Settings> SettingsPtr;
+typedef std::shared_ptr<class StringProperty> StringPropertyPtr;
 
 class XmlOptionFile;
 class Settings;
 
-typedef boost::shared_ptr<class Profile> ProfilePtr;
+typedef std::shared_ptr<class Profile> ProfilePtr;
 
 /** Access to profile-specific data.
  *

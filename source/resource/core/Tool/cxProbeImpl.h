@@ -21,6 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPROBEIMPL_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxProbe.h"
 #include <map>
@@ -34,7 +35,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
+typedef std::shared_ptr<class ProbeImpl> ProbeImplPtr;
 
 /**
  * \ingroup cx_resource_core_tool

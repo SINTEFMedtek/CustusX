@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSHADINGWIDGET_H_
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include <QWidget>
 #include <QCheckBox>
@@ -35,7 +36,7 @@ class QStringList;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ImageRenderPropertiesWidget> ImageRenderPropertiesWidgetPtr;
+typedef std::shared_ptr<class ImageRenderPropertiesWidget> ImageRenderPropertiesWidgetPtr;
 
 class cxGui_EXPORT ImageRenderPropertiesWidget : public BaseWidget
 {

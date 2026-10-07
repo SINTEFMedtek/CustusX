@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxPlaneMetricRep.h"
+#include <memory>
 
 #include "cxView.h"
 #include <vtkCamera.h>
@@ -52,7 +53,7 @@ void PlaneMetricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 
 PlaneMetricPtr PlaneMetricRep::getPlaneMetric()
 {
-	return boost::dynamic_pointer_cast<PlaneMetric>(mMetric);
+	return std::dynamic_pointer_cast<PlaneMetric>(mMetric);
 }
 
 void PlaneMetricRep::onModifiedStartRender()

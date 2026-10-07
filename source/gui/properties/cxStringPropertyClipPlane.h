@@ -13,13 +13,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTRINGPROPERTYCLIPPLANE_H
 
 #include "cxGuiExport.h"
+#include <memory>
 #include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
 #include "cxInteractiveClipper.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
+typedef std::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
 
 /** Adapter that connects to the current active image.
  */

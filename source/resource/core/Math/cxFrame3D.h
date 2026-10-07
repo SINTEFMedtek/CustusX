@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFRAME3D_H_
 
 #include "cxResourceExport.h"
+#include <array>
 #include "cxPrecompiledHeader.h"
 
 #include "cxTransform3D.h"
@@ -76,8 +77,8 @@ public:
 	void put(std::ostream& s) const;
 	void test();
 
-	boost::array<double, 6> getCompactAxisAngleRep() const;
-	static Frame3D fromCompactAxisAngleRep(const boost::array<double, 6>& rep);
+	std::array<double, 6> getCompactAxisAngleRep() const;
+	static Frame3D fromCompactAxisAngleRep(const std::array<double, 6>& rep);
 
 	Vector3D getEulerXYZ() const;
 	void setEulerXYZ(const Vector3D& xyz);

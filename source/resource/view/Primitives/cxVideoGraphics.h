@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIDEOGRAPHICS_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
@@ -25,7 +26,7 @@ typedef vtkSmartPointer<class UltrasoundSectorSource> UltrasoundSectorSourcePtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
+typedef std::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
 /** \brief Wrap vtkActor displaying a video image, possibly clipped by a sector.
  *
@@ -102,7 +103,7 @@ private:
 	vtkImageThresholdPtr mMapZeroToOne;
 	vtkImageMaskPtr mMaskFilter;
 };
-typedef boost::shared_ptr<VideoGraphics> VideoGraphicsPtr;
+typedef std::shared_ptr<VideoGraphics> VideoGraphicsPtr;
 
 } // namespace cx
 

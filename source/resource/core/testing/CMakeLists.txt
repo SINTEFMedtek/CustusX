@@ -16,6 +16,7 @@ if(BUILD_TESTING)
         cxtestCatchVector3D.cpp
         cxtestImageParameters.cpp
         cxtestCatchImageAlgorithms.cpp
+        cxtestBinaryThinning3D.cpp
         cxtestCatchProcessWrapper.cpp
         cxtestProcessWrapperFixture.h
         cxtestProcessWrapperFixture.cpp
@@ -48,6 +49,7 @@ if(BUILD_TESTING)
         cxTestFrameForest.cpp
         cxtestRegistrationHistory.cpp
         cxtestMouseWheelWidgetAdjustmentGuard.cpp
+        cxtestManualToolAdapter.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS

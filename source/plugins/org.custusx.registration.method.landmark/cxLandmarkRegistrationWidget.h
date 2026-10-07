@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLANDMARKREGISTRATIONWIDGET_H_
 
 #include "org_custusx_registration_method_landmarkExport.h"
+#include <memory>
 
 #include <map>
 #include "cxTransform3D.h"
@@ -29,8 +30,8 @@ class QTableWidgetItem;
 namespace cx
 {
 typedef std::map<QString, class Landmark> LandmarkMap;
-typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
-typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
+typedef std::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+typedef std::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
 
 /**
  * \file

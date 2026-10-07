@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSPHEREMETRICREP2D_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
@@ -21,9 +22,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
-typedef boost::shared_ptr<class SphereMetricRep2D> SphereMetricRep2DPtr;
-typedef boost::shared_ptr<class SphereMetric> SphereMetricPtr;
+typedef std::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
+typedef std::shared_ptr<class SphereMetricRep2D> SphereMetricRep2DPtr;
+typedef std::shared_ptr<class SphereMetric> SphereMetricPtr;
 
 /**
  *

@@ -14,14 +14,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourcePluginUtilitiesExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <ctkPluginActivator.h>
 
-typedef boost::shared_ptr<class QObject> QObjectPtr;
+typedef std::shared_ptr<class QObject> QObjectPtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef std::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for the registration plugin

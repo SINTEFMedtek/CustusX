@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxTrackingServiceProxy.h"
+#include <functional>
 
 #include <boost/bind/bind.hpp>
 #include <ctkPluginContext.h>
@@ -36,7 +37,7 @@ void TrackingServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<TrackingService>(
 								 mPluginContext,
 								 boost::bind(&TrackingServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (TrackingService*)>(),
+								 std::function<void (TrackingService*)>(),
 								 boost::bind(&TrackingServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

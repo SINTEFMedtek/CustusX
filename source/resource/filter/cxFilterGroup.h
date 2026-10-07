@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFILTERGROUP_H_
 
 #include "cxResourceFilterExport.h"
+#include <memory>
 
 #include <vector>
 #include "cxFilter.h"
@@ -62,7 +63,7 @@ private:
     std::vector<FilterPtr> mFilters;
     XmlOptionFile mOptions;
 };
-typedef boost::shared_ptr<FilterGroup> FilterGroupPtr;
+typedef std::shared_ptr<FilterGroup> FilterGroupPtr;
 
 } //namespace cx
 

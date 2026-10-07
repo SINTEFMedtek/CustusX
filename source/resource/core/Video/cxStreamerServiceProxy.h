@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTREAMERINTERFACEPROXY_H
 
 #include "cxStreamerService.h"
+#include <memory>
 #include "cxServiceTrackerListener.h"
 
 namespace cx
@@ -44,7 +45,7 @@ private:
     ctkPluginContext *mPluginContext;
     QString mServiceName;
     StreamerServicePtr mStreamerService;
-    boost::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
+    std::shared_ptr<ServiceTrackerListener<StreamerService> > mServiceListener;
 };
 
 } //end namespace cx

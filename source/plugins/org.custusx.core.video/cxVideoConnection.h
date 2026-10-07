@@ -12,15 +12,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXOPENIGTLINKRTSOURCE_H_
 
 #include "org_custusx_core_video_Export.h"
+#include <memory>
 
 #include <vector>
 #include <map>
-#include <boost/array.hpp>
+#include <array>
 #include "cxForwardDeclarations.h"
 
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
-typedef boost::shared_ptr<QThread> QThreadPtr;
+typedef std::shared_ptr<QThread> QThreadPtr;
 
 namespace cx
 {
@@ -30,11 +31,11 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class ProbeDefinition> ProbeDefinitionPtr;
-typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
-typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
-typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
-typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
+typedef std::shared_ptr<class ProbeDefinition> ProbeDefinitionPtr;
+typedef std::shared_ptr<class StreamerService> StreamerServicePtr;
+typedef std::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
+typedef std::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
+typedef std::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /** \brief Represent one video grabber connection.
  *
@@ -98,7 +99,7 @@ private:
 	VideoServiceBackendPtr mBackend;
 	StreamerServicePtr mStreamerInterface;
 };
-typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
+typedef std::shared_ptr<VideoConnection> VideoConnectionPtr;
 
 /**
  * @}

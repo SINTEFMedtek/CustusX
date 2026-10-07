@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_dicom_Export.h"
 
 #include "cxBaseWidget.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 class QItemSelection;
 //class ctkDICOMBrowser;
 class ctkDICOMAppWidget;
@@ -25,7 +25,7 @@ class ctkDICOMDatabase;
 namespace cx
 {
 class DICOMAppWidget;
-typedef boost::shared_ptr<class Image> ImagePtr;
+typedef std::shared_ptr<class Image> ImagePtr;
 
 /**
  * Widget for dicom interaction

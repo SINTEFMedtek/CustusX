@@ -42,11 +42,8 @@ Resample the volume into the space of the reference volume. Also crop to the sam
 \addindex smoothing_image_filter
 Smoothing Image Filter {#org_custusx_resource_filter_smoothing_image}
 ===========================================================
-*Wrapper for a itk::SmoothingRecursiveGaussianImageFilter.*
-
-Computes the smoothing of an image by convolution with
-the Gaussian kernels implemented as IIR filters.
-This filter is implemented using the recursive gaussian filters.
+Computes the smoothing of an image by convolution with a Gaussian kernel.
+Sigma is the standard deviation of the kernel in mm.
 
 
 
@@ -66,12 +63,7 @@ Values equal to either threshold is considered to be between the thresholds.
 \addindex binary_thinning_image_filter_3d_filter
 Centerline Filter {#org_custusx_resource_filter_binary_thinning_image}
 ===========================================================
-*Wrapper for a itk::BinaryThinningImageFilter3D.*
-
 This filter computes one-pixel-wide skeleton of a 3D input image.
-
-This class is parametrized over the type of the input image 
-and the type of the output image.
 
 The input is assumed to be a binary image, if labeled volume option is
 not selected. All non-zero valued voxels are set to 1 internally to

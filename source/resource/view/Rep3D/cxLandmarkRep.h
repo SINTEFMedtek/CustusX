@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLANDMARKREP_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxRepImpl.h"
 
@@ -31,7 +32,7 @@ class View;
 namespace cx
 {
 class Reporter;
-typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
+typedef std::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 
 /**
  * \addtogroup cx_resource_view
@@ -48,9 +49,9 @@ public:
 	virtual Vector3D getTextPos(Vector3D p_l) const = 0;signals:
 	void changed();
 };
-typedef boost::shared_ptr<LandmarksSource> LandmarksSourcePtr;
+typedef std::shared_ptr<LandmarksSource> LandmarksSourcePtr;
 
-typedef boost::shared_ptr<class PatientLandmarksSource> PatientLandmarksSourcePtr;
+typedef std::shared_ptr<class PatientLandmarksSource> PatientLandmarksSourcePtr;
 
 class cxResourceVisualization_EXPORT PatientLandmarksSource: public LandmarksSource
 {
@@ -65,7 +66,7 @@ private:
 	PatientModelServicePtr mDataManager;
 };
 
-typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
+typedef std::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
 
 class cxResourceVisualization_EXPORT ImageLandmarksSource: public LandmarksSource
 {

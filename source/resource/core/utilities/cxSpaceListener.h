@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSPACELISTENER_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxCoordinateSystemHelpers.h"
 #include <QObject>
@@ -38,7 +39,7 @@ public:
 signals:
 	void changed();
 };
-typedef boost::shared_ptr<SpaceListener> SpaceListenerPtr;
+typedef std::shared_ptr<SpaceListener> SpaceListenerPtr;
 
 } // namespace cx
 

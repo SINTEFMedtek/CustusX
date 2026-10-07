@@ -15,13 +15,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include <QStringList>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxFilePathPropertyBase.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef std::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 
 /**
  * \ingroup cx_resource_core_properties

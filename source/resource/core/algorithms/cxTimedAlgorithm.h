@@ -20,10 +20,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QObject>
 #include <QDateTime>
 #include <QTimer>
-#include <boost/function.hpp>
+#include <functional>
 #include <vector>
 #include <iostream>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 namespace cx
 {
@@ -91,7 +91,7 @@ private:
   QTimer*    mTimer;
   QDateTime mStartTime;
 };
-typedef boost::shared_ptr<TimedBaseAlgorithm> TimedAlgorithmPtr;
+typedef std::shared_ptr<TimedBaseAlgorithm> TimedAlgorithmPtr;
 
 }//namespace
 

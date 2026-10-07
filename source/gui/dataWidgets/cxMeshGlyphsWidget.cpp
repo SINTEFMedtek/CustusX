@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxMeshGlyphsWidget.h"
+#include <memory>
 
 #include <QVBoxLayout>
 #include "cxImage.h"
@@ -63,7 +64,7 @@ void MeshGlyphsWidget::meshSelectedSlot()
 		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
 	}
 
-	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+	mMesh = std::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
 	mGlyphOrientationArrayAdapter->setData(mMesh);
 	mGlyphColorArrayAdapter->setData(mMesh);

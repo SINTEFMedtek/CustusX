@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXWORKFLOWSTATEMACHINE_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QStateMachine>
 #include <QActionGroup>
@@ -70,7 +71,7 @@ private:
 	bool mStarted;
 };
 
-typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
+typedef std::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
 }
 
 #endif /* CXWORKFLOWSTATEMACHINE_H_ */

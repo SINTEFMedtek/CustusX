@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QString>
 #include <QObject>
 #include "cxForwardDeclarations.h"
@@ -25,7 +25,7 @@ class QDomElement;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
 /** Persistent storage for the current session.
  *

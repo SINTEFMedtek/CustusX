@@ -21,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QAction>
 #include "cxTypeConversions.h"
 #include "cxRequestEnterStateTransition.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxForwardDeclarations.h"
 
 

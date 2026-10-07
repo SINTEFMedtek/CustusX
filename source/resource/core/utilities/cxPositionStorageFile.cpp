@@ -10,8 +10,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxPositionStorageFile.h"
+#include <array>
 #include <QDateTime>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <iostream>
 #include "cxFrame3D.h"
 #include "cxTime.h"
@@ -158,7 +159,7 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
 
 Frame3D PositionStorageReader::frameFromStream()
 {
-  boost::array<double, 6> rep;
+  std::array<double, 6> rep;
   stream >> rep[0] >> rep[1] >> rep[2] >> rep[3] >> rep[4] >> rep[5];
   Frame3D retval = Frame3D::fromCompactAxisAngleRep(rep);
   return retval;
@@ -175,7 +176,7 @@ bool PositionStorageReader::atEnd() const
 QString PositionStorageReader::timestampToString(double timestamp)
 {
   QDateTime retval;
-  boost::uint64_t ts = static_cast<boost::uint64_t>(timestamp);
+  std::uint64_t ts = static_cast<std::uint64_t>(timestamp);
   retval.setTime_t(ts/1000);
   retval = retval.addMSecs(ts%1000);
   return retval.toString(timestampMilliSecondsFormatNice());
@@ -238,7 +239,7 @@ void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, QStrin
   else
   {
     Frame3D frame = Frame3D::create(matrix);
-    boost::array<double, 6> rep = frame.getCompactAxisAngleRep();
+    std::array<double, 6> rep = frame.getCompactAxisAngleRep();
 
     stream << (quint8)3;  // Type -
     stream << (quint8)(8+6*10); // Size of data following this point

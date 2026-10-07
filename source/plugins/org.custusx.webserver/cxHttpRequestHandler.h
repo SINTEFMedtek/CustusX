@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXHTTPREQUESTHANDLER_H
 
 #include <QObject>
+#include <memory>
 #include "cxVisServices.h"
 
 #include "org_custusx_webserver_Export.h"
@@ -21,7 +22,7 @@ class QHttpResponse;
 
 namespace cx
 {
-typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
+typedef std::shared_ptr<class RemoteAPI> RemoteAPIPtr;
 
 /**
  *

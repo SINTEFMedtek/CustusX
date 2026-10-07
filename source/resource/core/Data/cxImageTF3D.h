@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 #include "cxPrecompiledHeader.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include "vtkForwardDeclarations.h"
 
@@ -25,13 +25,12 @@ class QDomDocument;
 class QDomNode;
 
 #include <map>
-#include <boost/shared_ptr.hpp>
 #include "cxImageTFData.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
+typedef std::shared_ptr<class ImageTF3D> ImageTF3DPtr;
 
 
 /** \brief Handler for the transfer functions used in 3d image volumes.

@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXIGTLINKCLIENTSTREAMER_H
 
 #include "cxStreamer.h"
+#include <memory>
 #include "org_custusx_core_video_Export.h"
 #include <QAbstractSocket>
 #include "cxIGTLinkImageMessage.h"
@@ -72,13 +73,13 @@ private:
 	QString mAddress;
 	int mPort;
     StreamedTimestampSynchronizer mStreamSynchronizer;
-    boost::shared_ptr<QTcpSocket> mSocket;
+    std::shared_ptr<QTcpSocket> mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;
 	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 
 
 };
-typedef boost::shared_ptr<class IGTLinkClientStreamer> IGTLinkClientStreamerPtr;
+typedef std::shared_ptr<class IGTLinkClientStreamer> IGTLinkClientStreamerPtr;
 
 } // namespace cx
 

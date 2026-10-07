@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXISLANDSFILTER_H
 
 #include <random>
+#include <memory>
 #include "cxFilterImpl.h"
 
 namespace cx
@@ -58,7 +59,7 @@ private:
 	std::vector<double> mIslandSizes;
 };
 
-typedef boost::shared_ptr<IslandsFilter> IslandsFilterPtr;
+typedef std::shared_ptr<IslandsFilter> IslandsFilterPtr;
 
 } // namespace cx
 

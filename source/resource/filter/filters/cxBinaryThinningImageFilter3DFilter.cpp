@@ -11,8 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxBinaryThinningImageFilter3DFilter.h"
 
-#include <itkBinaryThinningImageFilter3D.h>
-#include <itkBinaryThresholdImageFilter.h>
+#include <vtkImageData.h>
 
 #include "cxLogger.h"
 #include "cxRegistrationTransform.h"
@@ -21,7 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxColorProperty.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "cxSelectDataStringProperty.h"
-#include "cxAlgorithmHelpers.h"
+#include "cxBinaryThinning3D.h"
 #include "cxPatientModelService.h"
 #include "cxVolumeHelpers.h"
 #include "cxVisServices.h"
@@ -47,12 +46,9 @@ QString BinaryThinningImageFilter3DFilter::getType() const
 QString BinaryThinningImageFilter3DFilter::getHelp() const
 {
 	return "<html>"
-	        "<h3>itk::BinaryThinningImageFilter3D</h3>"
+	        "<h3>Centerline</h3>"
 	        "<p>"
 	        "This filter computes one-pixel-wide skeleton of a 3D input image."
-	        "</p><p>"
-	        "This class is parametrized over the type of the input image "
-	        "and the type of the output image."
 	        "</p><p>"
 	        "The input is assumed to be a binary image. All non-zero valued voxels "
 	        "are set to 1 internally to simplify the computation. The filter will "
@@ -154,8 +150,6 @@ std::vector<vtkImageDataPtr> BinaryThinningImageFilter3DFilter::execute(ImagePtr
 
 	std::vector<vtkImageDataPtr> retval;
 
-	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
-
 	int minValue = input->getMin();
 	int maxValue = input->getMax();
 	int numberOfLabels = maxValue - (minValue - 1);
@@ -173,33 +167,9 @@ std::vector<vtkImageDataPtr> BinaryThinningImageFilter3DFilter::execute(ImagePtr
 	else if(numberOfLabels >= 50)
 		CX_LOG_WARNING() << "Many labes found in centerline filter (" << numberOfLabels << " labels).";
 
-	typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
-	thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
-	thresholdFilter->SetInput(itkImage);
-	thresholdFilter->SetOutsideValue(0);
-	thresholdFilter->SetInsideValue(1);
 	for(int value=minValue+1; value<=maxValue; value++)
 	{
-		thresholdFilter->SetLowerThreshold(value);
-		thresholdFilter->SetUpperThreshold(value);
-		thresholdFilter->Update();
-		itkImageType::ConstPointer itkBinaryImage = thresholdFilter->GetOutput();
-
-		//Centerline extraction
-		typedef itk::BinaryThinningImageFilter3D<itkImageType, itkImageType> centerlineFilterType;
-		centerlineFilterType::Pointer centerlineFilter = centerlineFilterType::New();
-		centerlineFilter->SetInput(itkBinaryImage);
-		centerlineFilter->Update();
-		itkImageType::ConstPointer itkOutputImage = centerlineFilter->GetOutput();
-
-		//Convert ITK to VTK
-		itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
-		itkToVtkFilter->SetInput(itkOutputImage);
-		itkToVtkFilter->Update();
-
-		vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-		rawResult->DeepCopy(itkToVtkFilter->GetOutput());
-		retval.push_back(rawResult);
+		retval.push_back(BinaryThinning3D::skeleton(input->getBaseVtkImageData(), value));
 	}
 
 	return retval;

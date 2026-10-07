@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPLANEMETRICREP_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
@@ -23,7 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class PlaneMetricRep> PlaneMetricRepPtr;
+typedef std::shared_ptr<class PlaneMetricRep> PlaneMetricRepPtr;
 
 /** \brief Rep for visualizing a PlaneMetric.
  *

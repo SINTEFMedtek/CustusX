@@ -10,7 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxGenericScriptFilter.h"
-#include <itkSmoothingRecursiveGaussianImageFilter.h>
+#include <memory>
 #include <QTimer>
 #include <QFileInfo>
 #include <QDir>
@@ -27,7 +27,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <sys/types.h>
 #endif //CX_WINDOWS
 
-#include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
@@ -224,9 +223,24 @@ void GenericScriptFilter::appendToLineBuffer(const QString& newData)
 	mLineBuffer += newData;
 	for (const QString& line : extractCompleteLines(mLineBuffer))
 	{
-		CX_LOG_CHANNEL_INFO(mOutputChannelName) << line;
-		emit scriptOutput(line);
+		this->reportLine(line);
 	}
+}
+
+void GenericScriptFilter::flushLineBuffer()
+{
+	QString line = mLineBuffer.trimmed();
+	mLineBuffer.clear();
+	if (!line.isEmpty())
+	{
+		this->reportLine(line);
+	}
+}
+
+void GenericScriptFilter::reportLine(const QString& line)
+{
+	CX_LOG_CHANNEL_INFO(mOutputChannelName) << line;
+	emit scriptOutput(line);
 }
 
 void GenericScriptFilter::processReadyReadError()
@@ -581,6 +595,7 @@ bool GenericScriptFilter::createVenv(QString createCommand, QString command)
 	if(!this->createProcess())
 		return false;
 	runCommandStringAndWait(createCommand);
+	this->deleteProcess();
 	return true;
 }
 
@@ -701,7 +716,16 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 
 	bool success = commandLine->launch(command);
 	if(success)
-		return commandLine->waitForFinished(1000*60*30);//Wait at least 30 min
+	{
+		mProcessId.storeRelease(commandLine->getProcess()->processId());
+		if (mStopRequested.loadAcquire())
+		{
+			this->requestStop();
+		}
+		bool finished = commandLine->waitForFinished(1000*60*30);//Wait at least 30 min
+		mProcessId.storeRelease(0);
+		return finished;
+	}
 	else
 	{
 		CX_LOG_WARNING() << "GenericScriptFilter::runCommandStringAndWait: Cannot start command!";
@@ -726,20 +750,11 @@ void GenericScriptFilter::requestStop()
 	// that happens to exit 0 on its own - see the exitCode() check there.
 	mStopRequested.storeRelease(1);
 
-	// mCommandLine is created/reset on the worker thread (createProcess()/
-	// deleteProcess(), called from execute()) while requestStop() runs on
-	// the main thread; getCommandLine() takes a local shared_ptr copy under
-	// mCommandLineMutex so the ProcessWrapper stays alive for this call even
-	// if the worker thread resets mCommandLine concurrently.
-	ProcessWrapperPtr commandLine = this->getCommandLine();
-	if (!commandLine || !commandLine->getProcess())
-		return;
-
-	// QProcess::terminate() is not safe to invoke cross-thread here, and
-	// queuing it via QMetaObject::invokeMethod is not reliable either, so
-	// send the OS signal directly via the process' PID instead. POSIX only.
+	// Uses the PID rather than mCommandLine: holding a reference here could make
+	// the main thread destroy the ProcessWrapper. QProcess::terminate() isn't
+	// safe cross-thread either, so signal the process directly. POSIX only.
 #ifndef CX_WINDOWS
-	qint64 pid = commandLine->getProcess()->processId();
+	qint64 pid = mProcessId.loadAcquire();
 	if (pid > 0)
 		::kill(pid, SIGTERM);
 #endif //CX_WINDOWS
@@ -771,12 +786,12 @@ void GenericScriptFilter::createOutputTypes()
 
 bool GenericScriptFilter::execute()
 {
-	if (!createProcess())
-		return false;
-
 	ImagePtr input = this->getCopiedInputImage();
 	// get output also?
 	if (!input)
+		return false;
+
+	if (!createProcess())
 		return false;
 
 	// Parse .ini file, create command string to run
@@ -844,13 +859,15 @@ bool GenericScriptFilter::createProcess()
 	}
 	commandLine->getProcess()->setProcessEnvironment(env);
 
-	connect(commandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
+	// Direct connections: the process is owned and waited on by the worker thread running
+	// execute(), and QProcess isn't thread-safe, so its output must be read on that thread too.
+	connect(commandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged, Qt::DirectConnection);
 	/**************************************************************************
 	* NB: For Python output to be written Python buffering must be turned off:
 	* E.g. Use python -u
 	**************************************************************************/
 	//Show output from process
-	connect(commandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
+	connect(commandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead, Qt::DirectConnection);
 
 	this->setCommandLine(commandLine);
 	return true;
@@ -858,6 +875,7 @@ bool GenericScriptFilter::createProcess()
 
 bool GenericScriptFilter::deleteProcess()
 {
+	this->flushLineBuffer();
 	disconnectProcess();
 	CX_LOG_DEBUG() << "deleteProcess";
 	if(this->getCommandLine())
@@ -1222,7 +1240,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 		{
 			QFileInfo fileInfoOutput(filePath);
 			QString uid = changeExtension(fileInfoOutput.fileName(), "");
-			ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
+			ImagePtr newImage = std::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
 			if(!newImage)
 			{
 				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFiles: No new image file created";
@@ -1299,7 +1317,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 					outputColor = getDefaultColor();
 
 				QString info;
-				MeshPtr outputMesh = boost::dynamic_pointer_cast<Mesh>(patientService()->importData(filePath, info));
+				MeshPtr outputMesh = std::dynamic_pointer_cast<Mesh>(patientService()->importData(filePath, info));
 				outputMesh->setColor(outputColor);
 				mServices->view()->autoShowData(outputMesh);
 				ImagePtr inputImage = this->getCopiedInputImage();

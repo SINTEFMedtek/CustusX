@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_core_openigtlink3_Export.h"
 #include "igtlioLogic.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 #include "cxProbeDefinition.h"
 #include "cxImage.h"
@@ -113,8 +113,8 @@ struct SectorInfo
 	}
 };
 
-typedef boost::shared_ptr<SectorInfo> SectorInfoPtr;
-typedef boost::shared_ptr<class ProbeDefinitionFromStringMessages> ProbeDefinitionFromStringMessagesPtr;
+typedef std::shared_ptr<SectorInfo> SectorInfoPtr;
+typedef std::shared_ptr<class ProbeDefinitionFromStringMessages> ProbeDefinitionFromStringMessagesPtr;
 
 /**
  * Create a ProbeDefinition based on BK String messages from Plus.

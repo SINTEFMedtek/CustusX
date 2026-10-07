@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTCUSTUSXCONTROLLER_H_
 
 #include "cxtestgui_export.h"
+#include <memory>
 
 #include <QApplication>
 #include "cxMainWindow.h"
@@ -48,7 +49,7 @@ public slots:
 
 private:
 	typedef cx::MainWindowApplicationComponent<cx::MainWindow> MainWindowComponent;
-	boost::shared_ptr<MainWindowComponent> mApplicationComponent;
+	std::shared_ptr<MainWindowComponent> mApplicationComponent;
 
     int mNumInitialRenders;
 };

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "boost/bind/bind.hpp"
+#include <functional>
 #include <QListWidget>
 #include <QTableWidget>
 #include <QGroupBox>
@@ -250,7 +251,7 @@ void ClipperWidget::createNewCheckboxesBasedOnData()
 		QTableWidgetItem *descriptionItem = new QTableWidgetItem(data->getName());
 		mDataTableWidget->setItem(row++, 1, descriptionItem);
 
-		boost::function<void()> func = boost::bind(&ClipperWidget::dataSelectorClicked, this, checkbox, data);
+		std::function<void()> func = boost::bind(&ClipperWidget::dataSelectorClicked, this, checkbox, data);
 		connect(checkbox, &QCheckBox::clicked, this, func);
 		this->updateCheckBoxFromClipper(checkbox, data);
 	}

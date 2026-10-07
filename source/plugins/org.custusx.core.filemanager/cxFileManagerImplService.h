@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFILEMANAGERIMPLSERVICE_H
 
 #include "cxFileManagerServiceBase.h"
+#include <memory>
 #include "cxFileReaderWriterService.h"
 #include "org_custusx_core_filemanager_Export.h"
 #include "cxServiceTrackerListener.h"
@@ -39,11 +40,11 @@ private:
 	void onServiceAdded(FileReaderWriterService *service);
 	void onServiceRemoved(FileReaderWriterService *service);
 
-	boost::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
 
 };
 
-typedef boost::shared_ptr<FileManagerImpService> FileManagerImplServicePtr;
+typedef std::shared_ptr<FileManagerImpService> FileManagerImplServicePtr;
 
 } //cx
 

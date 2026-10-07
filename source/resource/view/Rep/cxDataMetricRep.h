@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDATAMETRICREP_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxRepImpl.h"
 #include "cxVector3D.h"
@@ -21,8 +22,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class CaptionText3D> CaptionText3DPtr;
-typedef boost::shared_ptr<class DataMetric> DataMetricPtr;
+typedef std::shared_ptr<class CaptionText3D> CaptionText3DPtr;
+typedef std::shared_ptr<class DataMetric> DataMetricPtr;
 
 /**
  * \brief Base class for all Data Metric reps.
@@ -70,7 +71,7 @@ protected:
 private:
 	CaptionText3DPtr mText;
 };
-typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
+typedef std::shared_ptr<class DataMetricRep> DataMetricRepPtr;
 
 }
 

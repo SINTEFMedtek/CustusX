@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCLIPPERWIDGET_H
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include <QVBoxLayout>
 #include <QCheckBox>
@@ -24,8 +25,8 @@ class QTableWidget;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-typedef boost::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
+typedef std::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef std::shared_ptr<class StringPropertyClipPlane> StringPropertyClipPlanePtr;
 
 class LabeledComboBoxWidget;
 

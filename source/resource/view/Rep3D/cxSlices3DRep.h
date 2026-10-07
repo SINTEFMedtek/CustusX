@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSLICES3DREP_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <vector>
 #include "cxRepImpl.h"
@@ -23,10 +24,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
-typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
-typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
-typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
+typedef std::shared_ptr<class SliceProxyInterface> SliceProxyInterfacePtr;
+typedef std::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef std::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
+typedef std::shared_ptr<class Slices3DRep> Slices3DRepPtr;
 
 /**\brief Helper for rendering one slice of a 3D volume in 3D space.
  *
@@ -41,7 +42,7 @@ class cxResourceVisualization_EXPORT Slice3DProxy : public QObject
 {
 	Q_OBJECT
 public:
-	static boost::shared_ptr<Slice3DProxy> New();
+	static std::shared_ptr<Slice3DProxy> New();
 	~Slice3DProxy();
 
 	void setSliceProxy(SliceProxyPtr sliceProxy);
@@ -58,7 +59,7 @@ private:
 	SlicedImageProxyPtr mSlicer;
 	vtkImageSlicePtr mActor;
 };
-typedef boost::shared_ptr<Slice3DProxy> Slice3DProxyPtr;
+typedef std::shared_ptr<Slice3DProxy> Slice3DProxyPtr;
 
 /**\brief Display 2D slices from a 3D volume positioned in the 3D view.
  *

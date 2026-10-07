@@ -13,10 +13,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTESTSPACELISTENERMOCK_H
 
 #include "cxSpaceListener.h"
+#include <memory>
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class SpaceListenerMock> SpaceListenerMockPtr;
+typedef std::shared_ptr<class SpaceListenerMock> SpaceListenerMockPtr;
 
 class SpaceListenerMock: public cx::SpaceListener
 {

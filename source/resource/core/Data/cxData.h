@@ -19,8 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <string>
 #include <set>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
 
 #include <QObject>
 #include <QIcon>
@@ -36,9 +35,9 @@ class QDomNode;
 namespace cx
 {
 struct CoordinateSystem;
-typedef boost::weak_ptr<class Rep> RepWeakPtr;
-typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
-typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
+typedef std::weak_ptr<class Rep> RepWeakPtr;
+typedef std::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
+typedef std::shared_ptr<class Landmarks> LandmarksPtr;
 
 struct cxResource_EXPORT TimeInfo
 {
@@ -174,7 +173,7 @@ private:
 	void addPlane(vtkPlanePtr plane, std::vector<vtkPlanePtr> &planes);
 };
 
-typedef boost::shared_ptr<Data> DataPtr;
+typedef std::shared_ptr<Data> DataPtr;
 
 } // end namespace cx
 

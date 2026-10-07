@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <memory>
 
 #include "cxDataLocations.h"
 #include "cxPatientModelService.h"
@@ -57,9 +58,9 @@ void loadMeshAndTestRenderingWithTexture(QString& meshFile)
 	cx::DataPtr dataMesh = fixture.getPatientModelService()->importDataMock(meshFile, info, fixture.getFileManager());
 	REQUIRE(dataMesh);
 
-	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(dataImage);
+	cx::ImagePtr image = std::dynamic_pointer_cast<cx::Image>(dataImage);
 	REQUIRE(image);
-	cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(dataMesh);
+	cx::MeshPtr mesh = std::dynamic_pointer_cast<cx::Mesh>(dataMesh);
 	REQUIRE(mesh);
 
 	INFO("Create a rep with the mesh and add it to a view.");

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLFILEPARSER_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QDomDocument>
 #include "cxTransform3D.h"
@@ -97,7 +98,7 @@ public:
 		{}	///< sets up default values for all the members
 	};
 
-	typedef boost::shared_ptr<ToolInternalStructure> ToolInternalStructurePtr;
+	typedef std::shared_ptr<ToolInternalStructure> ToolInternalStructurePtr;
 
 public:
 	ToolFileParser(QString absoluteToolFilePath, QString loggingFolder = "");

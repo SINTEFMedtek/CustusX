@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECONSTRUCTTHREADS_H_
 
 #include "org_custusx_usreconstruction_Export.h"
+#include <memory>
 
 #include <QObject>
 #include <QThread>
@@ -21,8 +22,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
-typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
+typedef std::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
+typedef std::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 
 /**
  * \file
@@ -31,9 +32,9 @@ typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
  */
 
 
-typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
+typedef std::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
+typedef std::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
+typedef std::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
 
 /**
  * \brief Threading adapter for the reconstruction algorithm.

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVOLUMESLICESTREAMER_H
 
 #include "vtkSmartPointer.h"
+#include <memory>
 #include "cxTransform3D.h"
 #include "cxStreamer.h"
 #include "cxCyclicActionLogger.h"
@@ -67,7 +68,7 @@ private:
 
 	CyclicActionLoggerPtr mTimer;
 };
-typedef boost::shared_ptr<VolumeSliceStreamer> VolumeSliceStreamerPtr;
+typedef std::shared_ptr<VolumeSliceStreamer> VolumeSliceStreamerPtr;
 
 } /* namespace cx */
 #endif /* CXVOLUMESLICESTREAMER_H */

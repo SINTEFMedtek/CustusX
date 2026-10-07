@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVECTOR3DPROPERTY_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <QDomElement>
 #include <QStringList>
@@ -23,7 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class Vector3DProperty> Vector3DPropertyPtr;
+typedef std::shared_ptr<class Vector3DProperty> Vector3DPropertyPtr;
 
 /**\brief Represents one option of the double type.
  *

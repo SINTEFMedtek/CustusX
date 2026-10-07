@@ -34,14 +34,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXBRONCHOSCOPYTOOL_H_
 
 #include "cxToolImpl.h"
+#include <memory>
 
 #include "org_custusx_bronchoscopynavigation_Export.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class BronchoscopyTool> BronchoscopyToolPtr;
-typedef boost::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
+typedef std::shared_ptr<class BronchoscopyTool> BronchoscopyToolPtr;
+typedef std::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
 
 
 /** \brief A tool used during playback
