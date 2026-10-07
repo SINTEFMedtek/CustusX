@@ -27,7 +27,7 @@ struct org_custusx_core_tracking_system_ndi_EXPORT NdiConnectionSettings
 {
 	QString hostname; ///< Serial device (e.g. /dev/ttyUSB0, COM3) or network host/IP. Empty: probe the serial ports.
 	int networkPort = 8765; ///< Port for network connections (NDI default)
-	int baudRate = 115200; ///< Serial baud rate. 115200 is what the IGSTK plugin has always used.
+	int baudRate = 921600; ///< Serial baud rate. Falls back to slower rates if the device or the serial adapter can't use it.
 	QString communicationLogFile; ///< If not empty, log the commands and replies to this file.
 	bool requestMarkerInfo = false; ///< Request tool and marker information in BX (Polaris only). Set by NdiTrackerManager.
 	double maxErrorRMS_mm = 0.0; ///< Warn about the position above this RMS error. 0: default for the device type.
@@ -82,6 +82,7 @@ struct org_custusx_core_tracking_system_ndi_EXPORT NdiToolSample
 struct org_custusx_core_tracking_system_ndi_EXPORT NdiFrame
 {
 	unsigned long frameNumber = 0;
+	int systemStatus = 0; ///< BX system status bits, see NdiTrackerManager::describeSystemStatus()
 	std::vector<NdiToolSample> samples;
 };
 

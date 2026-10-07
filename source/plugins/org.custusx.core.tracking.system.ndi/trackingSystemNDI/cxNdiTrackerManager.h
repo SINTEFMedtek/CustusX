@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vector>
 #include <QObject>
 #include <QMutex>
+#include <QStringList>
 
 #include "cxNdiDevice.h"
 #include "cxNdiFrameRateEstimator.h"
@@ -55,6 +56,10 @@ public:
 
 	static NdiToolConfig createToolConfig(ToolFileParser::ToolInternalStructurePtr structure, TRACKING_SYSTEM trackerType);
 	static QString combinePositionWarnings(QString toolWarning, QString referenceWarning);
+	/** Messages for the system status bits that are set in status but not in previousStatus. */
+	static QStringList describeNewSystemStatus(int previousStatus, int status);
+	/** A tool was plugged in or removed: the tools are set up again before tracking starts the next time. */
+	static bool hasNewToolChange(int previousStatus, int status);
 	static double getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType);
 	static bool isPolaris(TRACKING_SYSTEM trackerType);
 	static const int kMaxConsecutiveReadFailures = 3;
@@ -69,15 +74,25 @@ public slots:
 	void trackSlot(bool on);      ///< Start/stop tracking mode
 	void poll();                  ///< Read one frame from the device. Called by the timer while tracking.
 
+public:
+	/** How long to wait before the next poll.
+	 *  A device whose BX reply waits for its next frame (Aurora) is polled again at once after a new
+	 *  frame: any wait would lose frames. A device that replies at once with the last frame gives
+	 *  repeated frames: after its next new frame, wait until shortly before the frame after that,
+	 *  so it isn't polled continuously. After a repeated frame, poll again soon. */
+	static int getPollInterval_ms(bool newFrame, int repeatsBeforeNewFrame, int waitBeforeNextFrame_ms);
+	int getCurrentPollInterval_ms() const;
+	static const int kNewFramePollInterval_ms = 0;
+	static const int kRepeatPollInterval_ms = 2;
+
 private:
 	bool connectToDevice();
 	void disconnectFromDevice();
 	bool setupTools();
 	void distributeFrame(const NdiFrame& frame, double timestamp);
 	void setAllToolsInvisible();
+	void reportSystemStatus(int status);
 	void setMaxErrorRMS(double maxErrorRMS_mm);
-	void startFastPoll();
-	void scheduleNextPoll(double now_ms);
 
 	NdiDevicePtr mDevice;
 	QMutex mConnectionMutex;
@@ -89,9 +104,11 @@ private:
 	NdiToolPtr mReferenceTool;
 	QTimer* mTimer;
 	unsigned long mLastFrameNumber;
-	NdiFrameRateEstimator mFrameRate;
-	bool mInFastPollMode;
 	int mConsecutiveReadFailures;
+	int mLastSystemStatus; ///< Kept while tracking is restarted: the device keeps reporting the same bits
+	bool mToolsChanged;
+	NdiFrameRateEstimator mFrameRate;
+	int mRepeatedFrames; ///< Polls that gave the last frame again, since the last new frame
 	ToolFileParser::TrackerInternalStructure mTrackerStructure;
 	bool mInitialized;
 	bool mTracking;

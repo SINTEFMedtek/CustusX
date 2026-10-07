@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTextStream>
 
 #include "ndicapi.h"
+#include "ndicapi_serial.h"
 #include "cxNdiTransformUtils.h"
 #include "cxLogger.h"
 
@@ -29,6 +30,8 @@ namespace
 {
 const int kFirstInitTimeout_ms = 5000; ///< The first INIT on a network device can take several seconds
 const int kCommandTimeout_ms = 1000;
+const int kSerialTimeout_ms = 5000; ///< ndicapi's default. Commands like INIT, PINIT and TSTART take up to a few seconds
+const int kTrackingSerialTimeout_ms = 500; ///< While tracking a frame comes every 15-50 ms: a lost device is found quickly
 const int kToolDefinitionRetries = 3;
 const int kMarkerInfoAttempts = 3; ///< BX with marker information fails this many times while BX without works: the device doesn't support it
 }
@@ -147,26 +150,63 @@ bool NdiCapiDevice::openSerial(QString device, int baudRate)
 
 bool NdiCapiDevice::setBaudRate(int baudRate)
 {
-	// Try the requested rate first, then fall back to slower ones (as PLUS does)
-	std::vector<int> rates = {baudRate, 115200, 57600, 38400, 19200, 9600};
 	bool success = false;
-	for (int rate : rates)
+	bool tryNext = true;
+	for (int rate : getBaudRatesToTry(baudRate))
 	{
-		int code = baudRateToNdiCode(rate);
-		if (!success && code >= 0)
+		if (tryNext)
 		{
-			ndiCommand(mDevice, "COMM:%X%03d%d", code, NDI_8N1, NDI_NOHANDSHAKE);
+			ndiCommand(mDevice, "COMM:%X%03d%d", baudRateToNdiCode(rate), NDI_8N1, NDI_NOHANDSHAKE);
 			int error = ndiGetError(mDevice);
+			if (error == NDI_OKAY && !this->command("VER:4"))
+			{
+				error = NDI_BAD_COMM; // e.g. a serial adapter that can't use the rate
+			}
 			success = (error == NDI_OKAY);
 			this->log(QString("COMM %1 baud: %2").arg(rate).arg(ndiErrorString(error)));
-			if (!success && error != NDI_COMM_FAIL)
+			tryNext = !success && isSlowerBaudRateWorthTrying(error);
+			if (tryNext && error == NDI_BAD_COMM)
+			{
+				tryNext = this->resetToDefaultBaudRate(); // the device switched, but this computer couldn't
+			}
+			if (!success && !tryNext)
 			{
 				mLastError = QString("Failed to set serial communication parameters: %1").arg(ndiErrorString(error));
-				break;
 			}
 		}
 	}
 	return success;
+}
+
+bool NdiCapiDevice::resetToDefaultBaudRate()
+{
+	ndiCommand(mDevice, nullptr); // serial break: the device resets to 9600 baud
+	int error = ndiGetError(mDevice);
+	this->log(QString("Reset with serial break: %1").arg(ndiErrorString(error)));
+	return (error == NDI_OKAY) && this->command("INIT:");
+}
+
+std::vector<int> NdiCapiDevice::getBaudRatesToTry(int requested)
+{
+	std::vector<int> retval;
+	bool supported = (baudRateToNdiCode(requested) >= 0);
+	if (supported)
+	{
+		retval.push_back(requested);
+	}
+	for (int rate : {115200, 57600, 38400, 19200, 9600})
+	{
+		if (rate < requested || !supported)
+		{
+			retval.push_back(rate);
+		}
+	}
+	return retval;
+}
+
+bool NdiCapiDevice::isSlowerBaudRateWorthTrying(int ndiError)
+{
+	return (ndiError == NDI_COMM_FAIL) || (ndiError == NDI_BAD_COMM);
 }
 
 int NdiCapiDevice::baudRateToNdiCode(int baudRate)
@@ -375,13 +415,26 @@ NdiPortLocation NdiCapiDevice::parsePortLocation(const char location[14])
 bool NdiCapiDevice::startTracking()
 {
 	mTracking = this->command("TSTART:");
+	if (mTracking)
+	{
+		this->setSerialTimeout(kTrackingSerialTimeout_ms);
+	}
 	return mTracking;
 }
 
 bool NdiCapiDevice::stopTracking()
 {
 	mTracking = false;
+	this->setSerialTimeout(kSerialTimeout_ms);
 	return this->command("TSTOP:");
+}
+
+void NdiCapiDevice::setSerialTimeout(int timeout_ms)
+{
+	if (this->isSerial())
+	{
+		ndiSerialTimeout(mDevice->SerialDevice, timeout_ms);
+	}
 }
 
 bool NdiCapiDevice::readFrame(const std::vector<int>& portHandles, NdiFrame& frame)
@@ -390,6 +443,7 @@ bool NdiCapiDevice::readFrame(const std::vector<int>& portHandles, NdiFrame& fra
 	if (success)
 	{
 		frame.frameNumber = 0;
+		frame.systemStatus = ndiGetBXSystemStatus(mDevice);
 		frame.samples.clear();
 		for (int portHandle : portHandles)
 		{

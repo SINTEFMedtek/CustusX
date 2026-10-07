@@ -19,6 +19,8 @@ if(BUILD_TESTING)
         PUBLIC
         .
         ${CMAKE_CURRENT_BINARY_DIR}
+        PRIVATE
+        $<TARGET_PROPERTY:cx_ndicapi,INTERFACE_INCLUDE_DIRECTORIES>
     )
 
     target_link_libraries(cxtest_org_custusx_core_tracking_system_ndi

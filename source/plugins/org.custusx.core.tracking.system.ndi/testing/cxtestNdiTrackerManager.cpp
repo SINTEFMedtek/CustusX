@@ -200,6 +200,30 @@ TEST_CASE("NdiTrackerManager: a brief dropout during tracking does not make the 
 	CHECK(visibilityChanges == 0);
 }
 
+TEST_CASE("NdiTrackerManager: poll interval for devices that wait for the next frame and devices that don't", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	// BX waits for the next frame (Aurora): poll again at once, waiting would lose frames
+	CHECK(cx::NdiTrackerManager::getPollInterval_ms(true, 0, 20) == cx::NdiTrackerManager::kNewFramePollInterval_ms);
+	// BX replied at once with the last frame: wait until shortly before the next frame
+	CHECK(cx::NdiTrackerManager::getPollInterval_ms(true, 3, 20) == 20);
+	CHECK(cx::NdiTrackerManager::getPollInterval_ms(false, 0, 20) == cx::NdiTrackerManager::kRepeatPollInterval_ms);
+	CHECK(cx::NdiTrackerManager::getPollInterval_ms(false, 5, 20) == cx::NdiTrackerManager::kRepeatPollInterval_ms);
+}
+
+TEST_CASE("NdiTrackerManager: polls again at once while every poll gives a new frame", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	ManagerFixture fixture;
+	fixture.startTracking();
+	for (unsigned long frame = 1; frame <= 3; ++frame)
+	{
+		fixture.device->setNextFrame(frame, {createSample(ManagerFixture::kPointerHandle, true), createSample(ManagerFixture::kReferenceHandle, true)});
+		fixture.manager->poll();
+		CHECK(fixture.manager->getCurrentPollInterval_ms() == cx::NdiTrackerManager::kNewFramePollInterval_ms);
+	}
+	fixture.manager->poll();
+	CHECK(fixture.manager->getCurrentPollInterval_ms() == cx::NdiTrackerManager::kRepeatPollInterval_ms);
+}
+
 TEST_CASE("NdiFrameRateEstimator: waits until shortly before the next expected frame", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	cx::NdiFrameRateEstimator estimator;
@@ -240,6 +264,45 @@ TEST_CASE("NdiFrameRateEstimator: ignores long gaps and clamps the estimate", "[
 		estimator.addFrame(50000.0 + i * 1.0);
 	}
 	CHECK(estimator.getEstimatedInterval_ms() == Approx(minInterval));
+}
+
+TEST_CASE("NdiTrackerManager: system status bits are described once, when they appear", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiTrackerManager::describeNewSystemStatus(0, 0).isEmpty());
+	CHECK(cx::NdiTrackerManager::describeNewSystemStatus(0, 0x0040) == QStringList({"A tool was plugged in. Restart tracking to use it."}));
+	CHECK(cx::NdiTrackerManager::describeNewSystemStatus(0x0040, 0x0040).isEmpty());
+	CHECK(cx::NdiTrackerManager::describeNewSystemStatus(0x0040, 0x0050) == QStringList({"Hardware failure"}));
+	CHECK(cx::NdiTrackerManager::describeNewSystemStatus(0, 0x0021).size() == 2);
+	CHECK(cx::NdiTrackerManager::describeNewSystemStatus(0, 0x8000).isEmpty());
+}
+
+TEST_CASE("NdiTrackerManager: a tool plugged in while tracking is set up when tracking starts again", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	ManagerFixture fixture;
+	fixture.startTracking();
+	REQUIRE(fixture.pointer()->getPortHandle() == ManagerFixture::kPointerHandle);
+
+	// The pointer is unplugged and plugged in again: it gets a new port handle
+	const int newPointerHandle = 0x0C;
+	fixture.device->handles.erase(ManagerFixture::kPointerHandle);
+	fixture.device->addWiredHandle(newPointerHandle, 0);
+	fixture.device->setNextFrame(1, {createSample(ManagerFixture::kReferenceHandle, true)});
+	fixture.device->nextFrame.systemStatus = 0x0040;
+	fixture.manager->poll();
+	CHECK(fixture.pointer()->getPortHandle() == ManagerFixture::kPointerHandle);
+
+	fixture.manager->trackSlot(false);
+	fixture.manager->trackSlot(true);
+	CHECK(fixture.pointer()->getPortHandle() == newPointerHandle);
+}
+
+TEST_CASE("NdiTrackerManager: only new tool change bits trigger a new tool setup", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiTrackerManager::hasNewToolChange(0, 0x0040));
+	CHECK(cx::NdiTrackerManager::hasNewToolChange(0, 0x0080));
+	CHECK(cx::NdiTrackerManager::hasNewToolChange(0, 0x0020));
+	CHECK_FALSE(cx::NdiTrackerManager::hasNewToolChange(0x0040, 0x0040));
+	CHECK_FALSE(cx::NdiTrackerManager::hasNewToolChange(0, 0x0002));
 }
 
 TEST_CASE("NdiTrackerManager: a repeated frame number is not distributed again", "[unit][org.custusx.core.tracking.system.ndi]")

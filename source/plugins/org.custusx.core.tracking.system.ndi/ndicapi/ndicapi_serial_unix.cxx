@@ -230,6 +230,9 @@ ndicapiExport int ndiSerialComm(int serial_port, int baud, const char mode[4], i
     case 230400:
       newbaud = B230400;
       break;
+    case 921600:
+      newbaud = B921600;
+      break;
     default:
       return -1;
   }

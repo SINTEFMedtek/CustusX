@@ -313,7 +313,7 @@ NdiConnectionSettings TrackingSystemNDIService::readConnectionSettings() const
 	// Hidden settings: set in the settings file if needed.
 	NdiConnectionSettings retval;
 	retval.hostname = settings()->value("ndiTrackingHostname", "").toString();
-	retval.baudRate = settings()->value("ndiTrackingBaudRate", 115200).toInt();
+	retval.baudRate = settings()->value("ndiTrackingBaudRate", 921600).toInt();
 	retval.maxErrorRMS_mm = settings()->value("ndiTrackingMaxErrorRMS", 0.0).toDouble();
 	if (settings()->value("ndiTrackingDebugLogging", false).toBool() && !mLoggingFolder.isEmpty())
 	{

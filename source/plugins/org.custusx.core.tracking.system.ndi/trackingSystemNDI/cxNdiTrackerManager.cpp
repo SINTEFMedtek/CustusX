@@ -20,6 +20,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+const int NdiTrackerManager::kNewFramePollInterval_ms;
+const int NdiTrackerManager::kRepeatPollInterval_ms;
+
 NdiTrackerManager::NdiTrackerManager(ToolFileParser::TrackerInternalStructure trackerStructure,
 									 std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures,
 									 ToolFileParser::ToolInternalStructurePtr referenceToolStructure,
@@ -27,8 +30,10 @@ NdiTrackerManager::NdiTrackerManager(ToolFileParser::TrackerInternalStructure tr
 	mDevice(device),
 	mTimer(new QTimer(this)),
 	mLastFrameNumber(0),
-	mInFastPollMode(true),
 	mConsecutiveReadFailures(0),
+	mLastSystemStatus(0),
+	mToolsChanged(false),
+	mRepeatedFrames(0),
 	mTrackerStructure(trackerStructure),
 	mInitialized(false),
 	mTracking(false)
@@ -103,6 +108,8 @@ void NdiTrackerManager::initializeSlot(bool on)
 {
 	if (on && !mInitialized)
 	{
+		mLastSystemStatus = 0;
+		mToolsChanged = false;
 		bool success = this->connectToDevice() && this->setupTools();
 		if (success)
 		{
@@ -131,13 +138,19 @@ void NdiTrackerManager::trackSlot(bool on)
 	}
 	else if (on && !mTracking)
 	{
+		if (mToolsChanged)
+		{
+			this->setupTools(); // set up tools plugged in while tracking
+			mToolsChanged = false;
+		}
 		if (mDevice->startTracking())
 		{
 			mTracking = true;
 			mLastFrameNumber = 0;
-			mConsecutiveReadFailures = 0;
+			mRepeatedFrames = 0;
 			mFrameRate.reset();
-			this->startFastPoll(); // switches to waiting for the next frame once the frame rate is known
+			mConsecutiveReadFailures = 0;
+			mTimer->start(kRepeatPollInterval_ms);
 			emit tracking(true);
 		}
 		else
@@ -183,40 +196,31 @@ void NdiTrackerManager::poll()
 	mConsecutiveReadFailures = 0;
 
 	bool newFrame = (frame.frameNumber == 0) || (frame.frameNumber != mLastFrameNumber);
+	double now = getMilliSecondsSinceEpoch();
 	if (newFrame)
 	{
-		double now = getMilliSecondsSinceEpoch();
 		mLastFrameNumber = frame.frameNumber;
 		mFrameRate.addFrame(now);
-		this->scheduleNextPoll(now);
+		this->reportSystemStatus(frame.systemStatus);
 		this->distributeFrame(frame, now);
 	}
-	else if (!mInFastPollMode)
-	{
-		this->startFastPoll(); // waited for the next frame, but it isn't there yet
-	}
+	mTimer->setInterval(getPollInterval_ms(newFrame, mRepeatedFrames, mFrameRate.getWaitBeforeNextPoll_ms(now)));
+	mRepeatedFrames = newFrame ? 0 : mRepeatedFrames + 1;
 }
 
-void NdiTrackerManager::startFastPoll()
+int NdiTrackerManager::getPollInterval_ms(bool newFrame, int repeatsBeforeNewFrame, int waitBeforeNextFrame_ms)
 {
-	mInFastPollMode = true;
-	mTimer->setSingleShot(false);
-	mTimer->start(NdiFrameRateEstimator::kFastPollInterval_ms);
+	int retval = kRepeatPollInterval_ms;
+	if (newFrame)
+	{
+		retval = (repeatsBeforeNewFrame > 0) ? waitBeforeNextFrame_ms : kNewFramePollInterval_ms;
+	}
+	return retval;
 }
 
-void NdiTrackerManager::scheduleNextPoll(double now_ms)
+int NdiTrackerManager::getCurrentPollInterval_ms() const
 {
-	int wait = mFrameRate.getWaitBeforeNextPoll_ms(now_ms);
-	if (wait > 0)
-	{
-		mInFastPollMode = false;
-		mTimer->setSingleShot(true);
-		mTimer->start(wait);
-	}
-	else
-	{
-		this->startFastPoll();
-	}
+	return mTimer->interval();
 }
 
 void NdiTrackerManager::distributeFrame(const NdiFrame& frame, double timestamp)
@@ -263,6 +267,45 @@ void NdiTrackerManager::distributeFrame(const NdiFrame& frame, double timestamp)
 		}
 		tool->updateTransform(prMt, timestamp, visible, sample);
 	}
+}
+
+void NdiTrackerManager::reportSystemStatus(int status)
+{
+	for (const QString& message : describeNewSystemStatus(mLastSystemStatus, status))
+	{
+		reportWarning("NDI Tracker: " + message);
+	}
+	mToolsChanged = mToolsChanged || hasNewToolChange(mLastSystemStatus, status);
+	mLastSystemStatus = status;
+}
+
+bool NdiTrackerManager::hasNewToolChange(int previousStatus, int status)
+{
+	const int toolChangeBits = 0x0020 | 0x0040 | 0x0080; // hardware change, port occupied, port unoccupied
+	return (status & ~previousStatus & toolChangeBits) != 0;
+}
+
+QStringList NdiTrackerManager::describeNewSystemStatus(int previousStatus, int status)
+{
+	static const std::vector<std::pair<int, QString> > descriptions = {
+		{0x0001, "Communication synchronization error"},
+		{0x0002, "Too much external infrared light"},
+		{0x0004, "Communication CRC error"},
+		{0x0008, "Recoverable system processing exception"},
+		{0x0010, "Hardware failure"},
+		{0x0020, "Hardware configuration changed"},
+		{0x0040, "A tool was plugged in. Restart tracking to use it."},
+		{0x0080, "A tool was removed"}};
+	QStringList retval;
+	int newBits = status & ~previousStatus;
+	for (const std::pair<int, QString>& description : descriptions)
+	{
+		if (newBits & description.first)
+		{
+			retval << description.second;
+		}
+	}
+	return retval;
 }
 
 QString NdiTrackerManager::combinePositionWarnings(QString toolWarning, QString referenceWarning)

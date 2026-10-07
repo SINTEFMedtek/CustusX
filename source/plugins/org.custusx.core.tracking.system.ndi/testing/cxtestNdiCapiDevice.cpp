@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "catch.hpp"
 
 #include "cxNdiCapiDevice.h"
+#include "ndicapi.h"
 #include "cxNdiTool.h"
 #include "cxToolUsingNDI.h"
 #include "cxTrackingSystemNDIService.h"
@@ -50,6 +51,21 @@ TEST_CASE("NdiCapiDevice: baud rates", "[unit][org.custusx.core.tracking.system.
 	CHECK(cx::NdiCapiDevice::baudRateToNdiCode(921600) == 6);
 	CHECK(cx::NdiCapiDevice::baudRateToNdiCode(230400) == 10);
 	CHECK(cx::NdiCapiDevice::baudRateToNdiCode(12345) == -1);
+}
+
+TEST_CASE("NdiCapiDevice: baud rates to try, fastest first", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiCapiDevice::getBaudRatesToTry(921600) == std::vector<int>({921600, 115200, 57600, 38400, 19200, 9600}));
+	CHECK(cx::NdiCapiDevice::getBaudRatesToTry(115200) == std::vector<int>({115200, 57600, 38400, 19200, 9600}));
+	CHECK(cx::NdiCapiDevice::getBaudRatesToTry(9600) == std::vector<int>({9600}));
+	CHECK(cx::NdiCapiDevice::getBaudRatesToTry(12345) == std::vector<int>({115200, 57600, 38400, 19200, 9600}));
+}
+
+TEST_CASE("NdiCapiDevice: a slower baud rate is tried when this computer or the device can't use the rate", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiCapiDevice::isSlowerBaudRateWorthTrying(NDI_COMM_FAIL));
+	CHECK(cx::NdiCapiDevice::isSlowerBaudRateWorthTrying(NDI_BAD_COMM));
+	CHECK_FALSE(cx::NdiCapiDevice::isSlowerBaudRateWorthTrying(NDI_TIMEOUT));
 }
 
 TEST_CASE("NdiCapiDevice: opening a device that isn't there fails cleanly", "[unit][org.custusx.core.tracking.system.ndi]")

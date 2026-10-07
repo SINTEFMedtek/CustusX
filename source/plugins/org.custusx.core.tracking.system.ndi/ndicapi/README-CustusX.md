@@ -11,8 +11,9 @@ Polaris devices.
   ndicapi_thread.*, LICENSE, ndicapi.txt. Not copied: the Python module, the
   applications and ndicapi's own CMake files (built by the plugin's CMakeLists.txt instead).
 - ndicapiExport.h is written for CustusX (static build) and replaces ndicapiExport.h.in.
-- No other changes. Update by copying the same files from a newer commit and
-  updating the commit above.
+- Changed for CustusX: ndicapi_serial_unix.cxx also sets 921600 baud on Linux
+  (CustusX#55). Keep this change when updating, unless ndicapi has added it.
+- Update by copying the same files from a newer commit and updating the commit above.
 
 Licenses
 --------

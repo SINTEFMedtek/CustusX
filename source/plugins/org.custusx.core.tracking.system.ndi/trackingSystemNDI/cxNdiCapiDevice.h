@@ -57,16 +57,20 @@ public:
 	static QStringList getSerialPortCandidates();
 	static NdiPortLocation parsePortLocation(const char location[14]);
 	static int baudRateToNdiCode(int baudRate);
+	static std::vector<int> getBaudRatesToTry(int requested); ///< The requested rate, then slower standard rates
+	static bool isSlowerBaudRateWorthTrying(int ndiError); ///< After a failed COMM
 	static int countUsedMarkers(const char markerInfo[10]); ///< From the 10 marker bytes in a BX reply, 4 bits per marker
 
 private:
 	bool openSerial(QString device, int baudRate);
 	bool openNetwork(QString hostname, int port);
 	bool setBaudRate(int baudRate);
+	bool resetToDefaultBaudRate();
 	QString findSerialDevice();
 	bool command(const char* format, ...);
 	void log(const QString& text);
 	bool isSerial() const;
+	void setSerialTimeout(int timeout_ms);
 	bool sendBX();
 	NdiToolSample getBXSample(int portHandle);
 	const char* findBXToolMarkerInformation(int portHandle) const; ///< Tool info byte + 10 marker bytes, or null
