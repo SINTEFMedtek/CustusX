@@ -11,10 +11,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 
+#include <QFile>
 #include <QFileInfo>
+#include <QTemporaryDir>
 #include "cxDataLocations.h"
 #include "cxToolConfigurationParser.h"
 #include "cxToolFileParser.h"
+#include "cxTrackerConfigurationImpl.h"
 
 namespace cxtest
 {
@@ -55,6 +58,41 @@ TEST_CASE("Tool configurations: Polaris SW tools are valid", "[unit][tool]")
 TEST_CASE("Tool configurations: Aurora tools on ports 1-4 are valid", "[unit][tool]")
 {
 	checkToolConfiguration("LabAuroraTools.xml", cx::tsAURORA, 4);
+}
+
+TEST_CASE("Tool configurations: a missing tool file is skipped when saving a configuration", "[unit][tool]")
+{
+	cx::DataLocations::setTestMode();
+	QString validTool = cx::DataLocations::getRootConfigPath() + "/tool/Tools/Shared/SW-RefFrame-02-077-0191_POLARIS/SW_ref.xml";
+	REQUIRE(QFileInfo::exists(validTool));
+	QTemporaryDir folder;
+	cx::ConfigurationFileParser::ToolStructure valid;
+	valid.mAbsoluteToolFilePath = validTool;
+	valid.mReference = true;
+	cx::ConfigurationFileParser::ToolStructure missing;
+	missing.mAbsoluteToolFilePath = folder.path() + "/Removed_POLARIS/removed.xml";
+
+	cx::ConfigurationFileParser::Configuration config;
+	config.mFileName = folder.path() + "/config.xml";
+	config.mClinical_app = "Laboratory";
+	config.mTrackingSystemImplementation = "ndi";
+	config.mApplyRefToTools = false;
+	config.mTrackersAndTools[cx::tsPOLARIS] = {valid, missing};
+	cx::ConfigurationFileParser::saveConfiguration(config);
+
+	QFile file(config.mFileName);
+	REQUIRE(file.open(QIODevice::ReadOnly));
+	QString content = QString::fromUtf8(file.readAll());
+	CHECK(content.contains("SW_ref.xml"));
+	CHECK_FALSE(content.contains("removed.xml"));
+}
+
+TEST_CASE("Tool configurations: a missing tool file gives an empty, invalid tool", "[unit][tool]")
+{
+	cx::TrackerConfigurationImpl config;
+	QString missing = "/nonexistent/Removed_POLARIS/removed.xml";
+	CHECK(config.getTool(missing).mTrackingSystemName.isEmpty());
+	CHECK_FALSE(config.verifyTool(missing));
 }
 
 } // namespace cxtest

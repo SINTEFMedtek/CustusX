@@ -114,11 +114,13 @@ TrackerConfigurationImpl::Tool TrackerConfigurationImpl::getTool(QString uid)
 
 	ToolFileParser parser(absoluteFilePath);
 	ToolFileParser::ToolInternalStructurePtr internal = parser.getTool();
-
-	retval.mTrackingSystemName = enum2string(internal->mTrackerType);
-	retval.mIsReference = internal->mIsReference;
-	retval.mPictureFilename = internal->mPictureFileName;
-	retval.mPortNumber = internal->mPortNumber;
+	if (internal) // empty for a missing or invalid tool file
+	{
+		retval.mTrackingSystemName = enum2string(internal->mTrackerType);
+		retval.mIsReference = internal->mIsReference;
+		retval.mPictureFilename = internal->mPictureFileName;
+		retval.mPortNumber = internal->mPortNumber;
+	}
 
 	return retval;
 }
@@ -208,7 +210,7 @@ ToolFileParser::ToolInternalStructurePtr TrackerConfigurationImpl::getToolIntern
 bool TrackerConfigurationImpl::verifyTool(QString uid)
 {
 	ToolFileParser::ToolInternalStructurePtr internal = this->getToolInternal(uid);
-	return internal->verify();
+	return internal && internal->verify();
 }
 
 QString TrackerConfigurationImpl::getConfigurationApplicationsPath()

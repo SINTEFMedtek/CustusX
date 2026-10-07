@@ -89,6 +89,10 @@ void TrackingSystemNDIService::configure()
 	{
 		ToolFileParser toolParser(toolFile, mLoggingFolder);
 		ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
+		if (!internalTool)
+		{
+			continue; // not a valid tool file, reported by the parser
+		}
 		if (toolFile == referenceToolFile)
 			referenceToolStructure = internalTool;
 		else

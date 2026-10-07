@@ -122,6 +122,8 @@ void OpenIGTLinkTrackingSystemService::configure()
 	{
 		ToolFileParser toolParser((*it).mAbsoluteToolFilePath, mLoggingFolder);
 		ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
+		if(!internalTool)
+			continue; // not a valid tool file, reported by the parser
 
 		QString devicename = internalTool->mUid;
 		OpenIGTLinkToolPtr newTool = OpenIGTLinkToolPtr(new OpenIGTLinkTool((*it), internalTool));
