@@ -83,6 +83,8 @@ the next system starts.
    application and its arguments to have it started and stopped for you, for example:
    * OpenIGTLink server: /path/to/openigtlink_tracking_server
    * Server arguments: --hostname=/dev/ttyUSB0 --tools=ref.rom,pointer.rom
+   The server is started in its own folder, so that it finds configuration files next to it. A leading
+   ~ in the server path is replaced with the home folder.
    When the server is stopped, it first gets a newline on its standard input, then a terminate signal,
    and finally it is killed.
    The OpenIGTLink tools are found by the OpenIGTLink transform id in each tool file, which must match
@@ -90,8 +92,10 @@ the next system starts.
    that send the positions in tracker space, so that the positions are relative to the
    reference as for the other systems. Turn it off if the server applies the reference itself.
 5. Select how long to record with each system, and the output folder.
-6. Press Start comparison. The progress is shown below, and the summary when it is done. Press Cancel to
-   stop.
+6. Press Start comparison. The progress is shown below. Press Cancel to stop. When it is done, a table
+   shows each tool (except the reference) for each system that worked: the tracking rate, the number of
+   positions and of positions with a warning, the jitter (length of the standard deviation of the
+   positions), the drift, and the distance between its mean position and the first system's.
 
 For each system, the comparison copies the tool configuration with that tracking system, starts the
 server (if any), starts tracking, waits for the tools to settle, records the positions, stops tracking

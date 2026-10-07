@@ -23,7 +23,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QHeaderView>
 #include <QPlainTextEdit>
+#include <QTableWidget>
 #include <QPushButton>
 #include <QSpinBox>
 #include "cxDataLocations.h"
@@ -46,10 +48,11 @@ TrackingComparisonWidget::TrackingComparisonWidget(TrackingServicePtr trackingSe
 	mDuration(new QSpinBox()),
 	mOutputFolder(new QLineEdit(settings()->value("TrackingTest/folder", QDir::homePath()).toString())),
 	mStartButton(new QPushButton("Start comparison")),
-	mLog(new QPlainTextEdit())
+	mLog(new QPlainTextEdit()),
+	mResultTable(new QTableWidget())
 {
 	this->setToolTip("Track the same tools with several tracking systems in turn, and record the positions");
-	mOpenIGTLinkCommand->setToolTip("OpenIGTLink tracking server application to start for the openigtlink run. Empty: start the server yourself.");
+	mOpenIGTLinkCommand->setToolTip("OpenIGTLink tracking server application to start for the openigtlink run, in its own folder. Empty: start the server yourself.");
 	mOpenIGTLinkArguments->setToolTip("e.g. --hostname=/dev/ttyUSB0 --tools=a.rom,b.rom");
 	mOpenIGTLinkApplyReference->setToolTip("On for servers that send positions in tracker space, off if the server applies the reference");
 	mOpenIGTLinkApplyReference->setChecked(settings()->value("TrackingTest/openIGTLinkApplyReference", true).toBool());
@@ -57,6 +60,11 @@ TrackingComparisonWidget::TrackingComparisonWidget(TrackingServicePtr trackingSe
 	mDuration->setSuffix(" s");
 	mDuration->setValue(settings()->value("TrackingTest/duration_s", 10).toInt());
 	mLog->setReadOnly(true);
+	mLog->setLineWrapMode(QPlainTextEdit::NoWrap);
+	mResultTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	mResultTable->verticalHeader()->hide();
+	mResultTable->setToolTip("Jitter: length of the standard deviation of the positions. From first: distance between the mean positions in this and the first system. All values in summary.txt");
+	mResultTable->hide();
 
 	QGridLayout* layout = new QGridLayout(this);
 	addLine(layout, "Tool configuration", this->createToolConfigurationSelector());
@@ -68,6 +76,7 @@ TrackingComparisonWidget::TrackingComparisonWidget(TrackingServicePtr trackingSe
 	addLine(layout, "Output folder", mOutputFolder);
 	layout->addWidget(mStartButton, layout->rowCount(), 0, 1, 2);
 	layout->addWidget(mLog, layout->rowCount(), 0, 1, 2);
+	layout->addWidget(mResultTable, layout->rowCount(), 0, 1, 2);
 
 	connect(mStartButton, &QPushButton::clicked, this, &TrackingComparisonWidget::startOrCancel);
 	connect(&mComparison, &TrackingSystemComparison::progress, mLog, &QPlainTextEdit::appendPlainText);
@@ -248,6 +257,7 @@ void TrackingComparisonWidget::startOrCancel()
 	comparisonSettings.openIGTLinkApplyReference = mOpenIGTLinkApplyReference->isChecked();
 	comparisonSettings.runs = createRuns(this->getSelectedImplementations(), mOpenIGTLinkCommand->text(), mOpenIGTLinkArguments->text());
 	mLog->clear();
+	mResultTable->hide();
 	mStartButton->setText("Cancel");
 	mComparison.start(comparisonSettings);
 }
@@ -256,7 +266,26 @@ void TrackingComparisonWidget::onFinished(bool success)
 {
 	Q_UNUSED(success);
 	mStartButton->setText("Start comparison");
-	mLog->appendPlainText("\n" + mComparison.getSummary());
+	this->showResults();
+}
+
+void TrackingComparisonWidget::showResults()
+{
+	std::vector<QStringList> rows = TrackingSystemComparison::createResultTable(mComparison.getResults());
+	QStringList header = TrackingSystemComparison::getResultTableHeader();
+	mResultTable->clear();
+	mResultTable->setColumnCount(header.size());
+	mResultTable->setHorizontalHeaderLabels(header);
+	mResultTable->setRowCount(static_cast<int>(rows.size()));
+	for (int row = 0; row < static_cast<int>(rows.size()); ++row)
+	{
+		for (int column = 0; column < rows[row].size(); ++column)
+		{
+			mResultTable->setItem(row, column, new QTableWidgetItem(rows[row][column]));
+		}
+	}
+	mResultTable->resizeColumnsToContents();
+	mResultTable->setVisible(!rows.empty());
 }
 
 void TrackingComparisonWidget::saveSettings()

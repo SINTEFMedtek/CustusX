@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 
+#include <QDir>
 #include <QFile>
 #include <QRegExp>
 #include <QTemporaryDir>
@@ -191,6 +192,36 @@ TEST_CASE("TrackingSystemComparison: compares the mean positions of the tools be
 	CHECK(cx::TrackingSystemComparison::compareRuns({first}).isEmpty());
 }
 
+TEST_CASE("TrackingSystemComparison: result table has one row per tool and run, without the reference", "[unit][tool]")
+{
+	cx::ToolPositionStatistics pointer;
+	pointer.addPosition(cx::Vector3D(10, 0, 0), 0, false);
+	pointer.addPosition(cx::Vector3D(10, 0, 0), 100, true);
+	cx::ToolPositionStatistics movedPointer;
+	movedPointer.addPosition(cx::Vector3D(10, 3, 4), 0, false);
+	cx::ToolPositionStatistics reference;
+	reference.reference = true;
+	reference.addPosition(cx::Vector3D(0, 0, 0), 0, false);
+
+	cx::TrackingComparisonResult first;
+	first.label = "1_igstk";
+	first.statistics = {{"pointer", pointer}, {"reference", reference}};
+	cx::TrackingComparisonResult second;
+	second.label = "2_ndi";
+	second.statistics = {{"pointer", movedPointer}, {"reference", reference}};
+
+	std::vector<QStringList> rows = cx::TrackingSystemComparison::createResultTable({first, second});
+	REQUIRE(rows.size() == 2);
+	CHECK(rows[0].size() == cx::TrackingSystemComparison::getResultTableHeader().size());
+	CHECK(rows[0][0] == "1_igstk");
+	CHECK(rows[0][1] == "pointer");
+	CHECK(rows[0][3] == "2");
+	CHECK(rows[0][4] == "1");
+	CHECK(rows[0][7] == "-");
+	CHECK(rows[1][0] == "2_ndi");
+	CHECK(rows[1][7] == "5.000");
+}
+
 TEST_CASE("TrackingSystemComparison: a run needs positions from a tool other than the reference", "[unit][tool]")
 {
 	cx::ToolPositionStatistics reference;
@@ -210,6 +241,21 @@ TEST_CASE("TrackingSystemComparison: split command arguments", "[unit][tool]")
 	CHECK(cx::TrackingSystemComparison::splitArguments("").isEmpty());
 	CHECK(cx::TrackingSystemComparison::splitArguments("  -o  --hostname=/dev/ttyUSB0 ") == QStringList({"-o", "--hostname=/dev/ttyUSB0"}));
 	CHECK(cx::TrackingSystemComparison::splitArguments("--tools=\"my tool.rom\" -v") == QStringList({"--tools=my tool.rom", "-v"}));
+}
+
+TEST_CASE("TrackingSystemComparison: expandHomeFolder replaces a leading tilde", "[unit]")
+{
+	CHECK(cx::TrackingSystemComparison::expandHomeFolder("~/build/server") == QDir::homePath() + "/build/server");
+	CHECK(cx::TrackingSystemComparison::expandHomeFolder("~") == QDir::homePath());
+	CHECK(cx::TrackingSystemComparison::expandHomeFolder("/opt/server") == "/opt/server");
+	CHECK(cx::TrackingSystemComparison::expandHomeFolder("~user/server") == "~user/server");
+	CHECK(cx::TrackingSystemComparison::expandHomeFolder("server") == "server");
+}
+
+TEST_CASE("TrackingSystemComparison: getWorkingFolder is the program's own folder", "[unit]")
+{
+	CHECK(cx::TrackingSystemComparison::getWorkingFolder("/opt/server/bin/server") == "/opt/server/bin");
+	CHECK(cx::TrackingSystemComparison::getWorkingFolder("server").isEmpty());
 }
 
 } // namespace cxtest

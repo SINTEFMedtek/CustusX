@@ -75,7 +75,10 @@ void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State val)
 {
 	TrackingSystemService::internalSetState(val);
-	mState = val;
+	if (this->isConfigured())
+	{
+		mState = val; // Not configured: the tool configuration is not for OpenIGTLink, stay in tsNONE
+	}
 	emit stateChanged();
 }
 

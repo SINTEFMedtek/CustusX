@@ -85,9 +85,15 @@ public:
 	static QString setTrackingSystemImplementation(QString configXml, QString implementation, bool applyReference = false);
 	static QString getRunLabel(int index, QString implementation);
 	static QStringList splitArguments(QString arguments); ///< Split on spaces, except inside double quotes
+	static QString expandHomeFolder(QString path); ///< Replace a leading ~ with the home folder, as a shell would
+	static QString getWorkingFolder(QString program); ///< The program's own folder, empty (current folder) for a program found in PATH
 	/** Distance between the mean positions of each tool in two runs, mm. Reference tools are left out. */
 	static std::map<QString, double> getMeanDifferences(const ToolPositionStatisticsMap& first, const ToolPositionStatisticsMap& other);
 	static QStringList compareRuns(const std::vector<TrackingComparisonResult>& results); ///< Summary lines, each run against the first
+	static QStringList getResultTableHeader();
+	/** One row per tool and run, reference tools left out. Jitter: length of the standard deviation vector. */
+	static std::vector<QStringList> createResultTable(const std::vector<TrackingComparisonResult>& results);
+	std::vector<TrackingComparisonResult> getResults() const; ///< The successful runs
 	double getMaxMeanDifference_mm() const; ///< Largest difference from the first run, for any tool
 	int getComparedToolCount() const; ///< Number of tool positions compared with the first run, over all runs
 	static bool hasTrackedTool(const ToolPositionStatisticsMap& statistics); ///< True if a tool other than the reference got positions
@@ -132,6 +138,7 @@ private:
 	bool mSuccess;
 	bool mOpenIGTLinkOpened;
 	QString mOriginalToolConfigFile;
+	QStringList mWrittenToolConfigFiles; ///< Temporary run configurations in the profile tool folder, removed when finished
 	QString mOriginalConnectionMethod;
 	std::map<QString, QString> mOriginalOpenIGTLinkOptions;
 	QStringList mSummary;

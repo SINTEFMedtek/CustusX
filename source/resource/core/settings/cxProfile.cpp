@@ -91,7 +91,7 @@ void Profile::setToolConfigFilePath(QString path)
 	QString expectedPath = this->getApplicationToolConfigPaths().front();
 
 	QFileInfo info(path);
-	if (info.absolutePath() != expectedPath)
+	if (QDir::cleanPath(info.absolutePath()) != QDir::cleanPath(expectedPath))
 		CX_LOG_WARNING() << "Set ref to file " << path << ", should be in folder " << expectedPath;
 
 	settings()->setValue("toolConfigFile", info.fileName());

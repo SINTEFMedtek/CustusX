@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDir>
 #include <QDomDocument>
 #include <QFile>
+#include <QFileInfo>
 #include <QProcess>
 #include <QTextStream>
 #include "cxLogger.h"
@@ -173,6 +174,38 @@ QStringList TrackingSystemComparison::compareRuns(const std::vector<TrackingComp
 	return retval;
 }
 
+QStringList TrackingSystemComparison::getResultTableHeader()
+{
+	return {"System", "Tool", "Rate (Hz)", "Positions", "With warning", "Jitter (mm)", "Drift (mm)", "From first (mm)"};
+}
+
+std::vector<QStringList> TrackingSystemComparison::createResultTable(const std::vector<TrackingComparisonResult>& results)
+{
+	std::vector<QStringList> retval;
+	for (unsigned i = 0; i < results.size(); ++i)
+	{
+		std::map<QString, double> differences = getMeanDifferences(results[0].statistics, results[i].statistics);
+		for (const std::pair<const QString, ToolPositionStatistics>& entry : results[i].statistics)
+		{
+			const ToolPositionStatistics& statistics = entry.second;
+			if (!statistics.reference)
+			{
+				QString difference = (i > 0 && differences.count(entry.first)) ? QString::number(differences[entry.first], 'f', 3) : "-";
+				retval.push_back({results[i].label, entry.first, QString::number(statistics.getRate_Hz(), 'f', 1),
+								  QString::number(statistics.positions), QString::number(statistics.positionsWithWarning),
+								  QString::number(statistics.getStandardDeviation().norm(), 'f', 3),
+								  QString::number(statistics.getDrift_mm(), 'f', 3), difference});
+			}
+		}
+	}
+	return retval;
+}
+
+std::vector<TrackingComparisonResult> TrackingSystemComparison::getResults() const
+{
+	return mResults;
+}
+
 int TrackingSystemComparison::getComparedToolCount() const
 {
 	int retval = 0;
@@ -237,6 +270,26 @@ QStringList TrackingSystemComparison::splitArguments(QString arguments)
 	return retval;
 }
 
+QString TrackingSystemComparison::expandHomeFolder(QString path)
+{
+	QString retval = path;
+	if (path == "~" || path.startsWith("~/"))
+	{
+		retval = QDir::homePath() + path.mid(1);
+	}
+	return retval;
+}
+
+QString TrackingSystemComparison::getWorkingFolder(QString program)
+{
+	QString retval;
+	if (program.contains("/"))
+	{
+		retval = QFileInfo(program).absolutePath();
+	}
+	return retval;
+}
+
 TrackingComparisonRun TrackingSystemComparison::currentRun() const
 {
 	return mSettings.runs[mRunIndex];
@@ -284,12 +337,14 @@ void TrackingSystemComparison::startRun()
 	QString label = getRunLabel(mRunIndex, run.implementation);
 	mRecorder.clear();
 	this->log(QString("Run %1: %2").arg(label).arg(run.command.isEmpty() ? run.implementation : run.implementation + " via " + run.command));
-	QString configFile = mSettings.outputFolder + "/" + label + "_toolconfig.xml";
+	QString configFile = profile()->getApplicationToolConfigPaths().front() + label + "_tracking_comparison.xml";
+	mWrittenToolConfigFiles << configFile;
 	if (!this->writeConfiguration(configFile, run.implementation))
 	{
 		this->stopRun("FAILED: could not write the tool configuration " + configFile);
 		return;
 	}
+	QFile::copy(configFile, mSettings.outputFolder + "/" + label + "_toolconfig.xml");
 	profile()->setToolConfigFilePath(configFile);
 	this->startCommand(run);
 	this->wait(sWAIT_FOR_COMMAND, run.command.isEmpty() ? 0 : mSettings.commandStartupDelay_ms);
@@ -386,6 +441,11 @@ void TrackingSystemComparison::finish()
 		mSummary << "" << comparison;
 	}
 	profile()->setToolConfigFilePath(mOriginalToolConfigFile);
+	for (const QString& configFile : mWrittenToolConfigFiles)
+	{
+		QFile::remove(configFile);
+	}
+	mWrittenToolConfigFiles.clear();
 	if (mVideoService && !mOriginalConnectionMethod.isEmpty())
 	{
 		mVideoService->setConnectionMethod(mOriginalConnectionMethod);
@@ -423,7 +483,14 @@ void TrackingSystemComparison::startCommand(const TrackingComparisonRun& run)
 		mProcess = new QProcess(this);
 		mProcess->setProcessChannelMode(QProcess::MergedChannels);
 		mProcess->setStandardOutputFile(mSettings.outputFolder + "/" + getRunLabel(mRunIndex, run.implementation) + "_command.log");
-		mProcess->start(run.command, run.arguments);
+		QProcess* process = mProcess;
+		connect(process, &QProcess::errorOccurred, this, [this, process](QProcess::ProcessError error)
+		{
+			this->log(QString("Error %1 from %2: %3").arg(error).arg(process->program()).arg(process->errorString()));
+		});
+		QString program = expandHomeFolder(run.command);
+		mProcess->setWorkingDirectory(getWorkingFolder(program));
+		mProcess->start(program, run.arguments);
 		this->log(QString("Started %1 %2").arg(run.command).arg(run.arguments.join(" ")));
 	}
 }

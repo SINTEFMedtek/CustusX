@@ -24,6 +24,7 @@ class QLineEdit;
 class QPlainTextEdit;
 class QPushButton;
 class QSpinBox;
+class QTableWidget;
 
 namespace cx
 {
@@ -51,6 +52,7 @@ private:
 	QWidget* createTrackingSystemSelector(TrackingServicePtr trackingService);
 	static QStringList getToolConfigurationFolders();
 	void onFinished(bool success);
+	void showResults();
 	static void addLine(class QGridLayout* layout, QString label, QWidget* widget);
 	QStringList getSelectedImplementations() const;
 	void saveSettings();
@@ -65,6 +67,7 @@ private:
 	QLineEdit* mOutputFolder;
 	QPushButton* mStartButton;
 	QPlainTextEdit* mLog;
+	QTableWidget* mResultTable;
 };
 
 } // namespace cx

@@ -184,6 +184,11 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins]
 	CHECK_FALSE(trackingSystemService->isInitialized());
 	CHECK_FALSE(trackingSystemService->isTracking());
 
+	QStringList configurations = trackingSystemService->getConfiguration()->getAllConfigurations();
+	int posToolConfigFile = 0;
+	REQUIRE(findConfigFileNumberInList(configurations, QString("PLUS"), posToolConfigFile));
+	trackingSystemService->setConfigurationFile(configurations[posToolConfigFile]);
+
 	// Set up
 
 	trackingSystemService->internalSetState(cx::Tool::tsCONFIGURED);
@@ -219,6 +224,16 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins]
 	CHECK_FALSE(trackingSystemService->isTracking());
 }
 
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: Stays in tsNONE without an OpenIGTLink tool configuration", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+	trackingSystemService->setConfigurationFile("");
+
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+	CHECK(trackingSystemService->getState() == cx::Tool::tsNONE);
+	CHECK_FALSE(trackingSystemService->isTracking());
+}
 
 TEST_CASE("NetworkHandler: Test timestamp verification", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
