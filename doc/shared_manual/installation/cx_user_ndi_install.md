@@ -21,20 +21,15 @@ For OSX 10.9 and higher you need to install the appropriate FTDI driver to get t
 Restart the machine after installing: <http://www.ftdichip.com/Drivers/VCP.htm>
 
 
-Linux
+Linux (Ubuntu)
 -----------------------------------------------------------
-Run the following shell lines after installing the Track application:
-
-### Fedora
-
-	sudo usermod -a --groups uucp,dialout,lock `whoami`
-	sudo chown :lock /var/lock
-
-### Ubuntu
+No driver installation is needed, but the current user needs access rights to the USB connection.
+The CustusX, CustusS, Fraxinus and FraxinusExcelsior install scripts set this up automatically.
+To set it up manually, run:
 
 	sudo usermod -a --groups uucp,dialout `whoami`
 
-This sets up access rights for current user. Logout to make these changes work.
+Log out and back in to make these changes take effect.
 
 
 Validation
