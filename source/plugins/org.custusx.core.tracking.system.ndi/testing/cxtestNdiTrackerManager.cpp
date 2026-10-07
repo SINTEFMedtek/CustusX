@@ -305,6 +305,34 @@ TEST_CASE("NdiTrackerManager: only new tool change bits trigger a new tool setup
 	CHECK_FALSE(cx::NdiTrackerManager::hasNewToolChange(0, 0x0002));
 }
 
+TEST_CASE("NdiTrackerManager: polls again at once after repeated frames that the device waited for", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	// Polaris: BX waits for the next camera frame, but the tools are updated every few frames
+	ManagerFixture fixture;
+	fixture.startTracking();
+	fixture.device->readDelay_ms = 10;
+	fixture.device->setNextFrame(1, {createSample(ManagerFixture::kPointerHandle, true), createSample(ManagerFixture::kReferenceHandle, true)});
+	fixture.manager->poll();
+	fixture.manager->poll();
+	fixture.manager->poll();
+	fixture.device->setNextFrame(4, {createSample(ManagerFixture::kPointerHandle, true), createSample(ManagerFixture::kReferenceHandle, true)});
+	fixture.manager->poll();
+	CHECK(fixture.manager->getCurrentPollInterval_ms() == cx::NdiTrackerManager::kNewFramePollInterval_ms);
+}
+
+TEST_CASE("NdiTrackerManager: waits for the next frame after quick repeated frames", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	// A device that replies at once with the last frame should not be polled continuously
+	ManagerFixture fixture;
+	fixture.startTracking();
+	fixture.device->setNextFrame(1, {createSample(ManagerFixture::kPointerHandle, true), createSample(ManagerFixture::kReferenceHandle, true)});
+	fixture.manager->poll();
+	fixture.manager->poll();
+	fixture.device->setNextFrame(2, {createSample(ManagerFixture::kPointerHandle, true), createSample(ManagerFixture::kReferenceHandle, true)});
+	fixture.manager->poll();
+	CHECK(fixture.manager->getCurrentPollInterval_ms() > cx::NdiTrackerManager::kRepeatPollInterval_ms);
+}
+
 TEST_CASE("NdiTrackerManager: a repeated frame number is not distributed again", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	ManagerFixture fixture;

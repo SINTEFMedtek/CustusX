@@ -33,7 +33,7 @@ NdiTrackerManager::NdiTrackerManager(ToolFileParser::TrackerInternalStructure tr
 	mConsecutiveReadFailures(0),
 	mLastSystemStatus(0),
 	mToolsChanged(false),
-	mRepeatedFrames(0),
+	mQuickRepeats(0),
 	mTrackerStructure(trackerStructure),
 	mInitialized(false),
 	mTracking(false)
@@ -147,7 +147,7 @@ void NdiTrackerManager::trackSlot(bool on)
 		{
 			mTracking = true;
 			mLastFrameNumber = 0;
-			mRepeatedFrames = 0;
+			mQuickRepeats = 0;
 			mFrameRate.reset();
 			mConsecutiveReadFailures = 0;
 			mTimer->start(kRepeatPollInterval_ms);
@@ -179,6 +179,7 @@ void NdiTrackerManager::poll()
 		return;
 	}
 	NdiFrame frame;
+	double readStart = getMilliSecondsSinceEpoch();
 	if (!mDevice->readFrame(mPortHandles, frame))
 	{
 		mConsecutiveReadFailures++;
@@ -204,16 +205,17 @@ void NdiTrackerManager::poll()
 		this->reportSystemStatus(frame.systemStatus);
 		this->distributeFrame(frame, now);
 	}
-	mTimer->setInterval(getPollInterval_ms(newFrame, mRepeatedFrames, mFrameRate.getWaitBeforeNextPoll_ms(now)));
-	mRepeatedFrames = newFrame ? 0 : mRepeatedFrames + 1;
+	bool quickRepeat = !newFrame && (now - readStart < kQuickReply_ms);
+	mTimer->setInterval(getPollInterval_ms(newFrame, mQuickRepeats, mFrameRate.getWaitBeforeNextPoll_ms(now)));
+	mQuickRepeats = newFrame ? 0 : mQuickRepeats + (quickRepeat ? 1 : 0);
 }
 
-int NdiTrackerManager::getPollInterval_ms(bool newFrame, int repeatsBeforeNewFrame, int waitBeforeNextFrame_ms)
+int NdiTrackerManager::getPollInterval_ms(bool newFrame, int quickRepeatsBeforeNewFrame, int waitBeforeNextFrame_ms)
 {
 	int retval = kRepeatPollInterval_ms;
 	if (newFrame)
 	{
-		retval = (repeatsBeforeNewFrame > 0) ? waitBeforeNextFrame_ms : kNewFramePollInterval_ms;
+		retval = (quickRepeatsBeforeNewFrame > 0) ? waitBeforeNextFrame_ms : kNewFramePollInterval_ms;
 	}
 	return retval;
 }

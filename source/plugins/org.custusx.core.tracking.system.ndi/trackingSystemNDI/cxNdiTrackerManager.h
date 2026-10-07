@@ -78,10 +78,12 @@ public slots:
 public:
 	/** How long to wait before the next poll.
 	 *  A device whose BX reply waits for its next frame (Aurora) is polled again at once after a new
-	 *  frame: any wait would lose frames. A device that replies at once with the last frame gives
-	 *  repeated frames: after its next new frame, wait until shortly before the frame after that,
-	 *  so it isn't polled continuously. After a repeated frame, poll again soon. */
-	static int getPollInterval_ms(bool newFrame, int repeatsBeforeNewFrame, int waitBeforeNextFrame_ms);
+	 *  frame: any wait would lose frames. Repeated frames from such a device (Polaris tools updated at a
+	 *  lower rate than the camera) also come after a wait for the next frame. A device that replies at
+	 *  once with the last frame gives quick repeats: after its next new frame, wait until shortly
+	 *  before the frame after that, so it isn't polled continuously. After a repeated frame, poll again soon. */
+	static int getPollInterval_ms(bool newFrame, int quickRepeatsBeforeNewFrame, int waitBeforeNextFrame_ms);
+	static constexpr double kQuickReply_ms = 5.0; ///< A repeated frame that came faster than this was not waited for
 	int getCurrentPollInterval_ms() const;
 	static const int kNewFramePollInterval_ms = 0;
 	static const int kRepeatPollInterval_ms = 2;
@@ -109,7 +111,7 @@ private:
 	int mLastSystemStatus; ///< Kept while tracking is restarted: the device keeps reporting the same bits
 	bool mToolsChanged;
 	NdiFrameRateEstimator mFrameRate;
-	int mRepeatedFrames; ///< Polls that gave the last frame again, since the last new frame
+	int mQuickRepeats; ///< Polls that quickly gave the last frame again, since the last new frame
 	ToolFileParser::TrackerInternalStructure mTrackerStructure;
 	bool mInitialized;
 	bool mTracking;

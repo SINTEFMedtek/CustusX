@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <map>
 #include <set>
+#include <QThread>
 #include "cxNdiDevice.h"
 
 namespace cxtest
@@ -139,6 +140,10 @@ public:
 	bool readFrame(const std::vector<int>& portHandles, cx::NdiFrame& frame) override
 	{
 		requestedHandles = portHandles;
+		if (readDelay_ms > 0)
+		{
+			QThread::msleep(readDelay_ms); // a device whose reply waits for its next frame
+		}
 		bool success = (failReads <= 0);
 		if (success)
 		{
@@ -185,6 +190,7 @@ public:
 	int stopCount = 0;
 	int failReads = 0;
 	cx::NdiFrame nextFrame;
+	int readDelay_ms = 0;
 	std::vector<int> requestedHandles;
 	cx::NdiConnectionSettings lastConnection;
 };
