@@ -168,7 +168,12 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 	OpenIGTLinkToolPtr tool = this->getTool(devicename);
 	if(tool)
 	{
-		if(tool->applyReference())
+		bool waitingForReference = mReference && !tool->isReference() && mReference->getTimestamp() <= 0;
+		if(tool->applyReference() && waitingForReference)
+		{
+			// No reference position yet: the tool position would be in tracker space
+		}
+		else if(tool->applyReference())
 		{
 			Transform3D tsMs = transform;
 			Transform3D prMs = tsMs;//If no reference tool: ts==pr (ts = tracking system )

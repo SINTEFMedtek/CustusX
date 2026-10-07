@@ -485,6 +485,36 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool config files, and apply r
 	CHECK_FALSE(trackingSystemService->isConfigured());
 }
 
+TEST_CASE("OpenIGTLinkTrackingSystemService: tool positions wait for the first reference position", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+	cx::TrackerConfigurationPtr config = trackingSystemService->getConfiguration();
+	QStringList configurations = config->getAllConfigurations();
+	int posToolConfigFile = 0;
+	REQUIRE(findConfigFileNumberInList(configurations, QString("BK_LabTest"), posToolConfigFile));
+	QString toolConfigFile = configurations[posToolConfigFile];
+	trackingSystemService->setConfigurationFile(toolConfigFile);
+	cx::TrackerConfiguration::Configuration trackerConfig = config->getConfiguration(toolConfigFile);
+	REQUIRE(trackerConfig.mApplyRefToTools);
+	trackingSystemService->configure();
+
+	std::vector<PositionReceiverPtr> positionReceivers = setupTestTools(trackerConfig, trackingSystemService);
+	QString refToolDeviceName;
+	QString toolDeviceName;
+	PositionReceiverPtr toolPositionReceiver;
+	getDeviceNames(positionReceivers, refToolDeviceName, toolDeviceName, toolPositionReceiver);
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+
+	trackingSystemService->receiveTransform(toolDeviceName, cx::Transform3D::Identity(), timestampMS);
+	CHECK(trackingSystemService->getTool(toolDeviceName)->getTimestamp() == 0);
+
+	trackingSystemService->receiveTransform(refToolDeviceName, cx::Transform3D::Identity(), timestampMS);
+	trackingSystemService->receiveTransform(toolDeviceName, cx::Transform3D::Identity(), timestampMS);
+	CHECK(trackingSystemService->getTool(toolDeviceName)->getTimestamp() == Approx(timestampMS));
+
+	trackingSystemService->deconfigure();
+}
+
 TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool files with OpenIGTLink id", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
