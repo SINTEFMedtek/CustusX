@@ -21,13 +21,14 @@ device.
 Tool configurations
 -----------------------------------------------------------
 
-The Laboratory profile has two tool configurations for these tests:
+The Laboratory profile has two tool configurations that can be used for these tests:
 
-* LabPolarisSWTools.xml: Polaris with the SW reference frame, the SW pointer, and the two
-  ultrasound probe tracking frames (03-215-1006 and 32-105-0289) as plain tools without a probe
-  calibration. The OpenIGTLink transform ids are SWRef, SWPointer, SWProbe1 and SWProbe2.
+* LabDefault.xml: Polaris with the NDI reference frame and pointer.
 * LabAuroraTools.xml: Aurora with the reference on port 1, a pointer on port 2, and a sensor
   without calibration on ports 3 and 4.
+
+Any other tool configuration for the tools at hand works too. For an OpenIGTLink comparison, the
+tools need the OpenIGTLink transform ids that the server sends.
 
 Build
 -----------------------------------------------------------

@@ -50,9 +50,9 @@ void checkToolConfiguration(QString configFile, cx::TRACKING_SYSTEM expectedTrac
 
 } // namespace
 
-TEST_CASE("Tool configurations: Polaris SW tools are valid", "[unit][tool]")
+TEST_CASE("Tool configurations: Polaris NDI tools are valid", "[unit][tool]")
 {
-	checkToolConfiguration("LabPolarisSWTools.xml", cx::tsPOLARIS, 4);
+	checkToolConfiguration("LabDefault.xml", cx::tsPOLARIS, 2);
 }
 
 TEST_CASE("Tool configurations: Aurora tools on ports 1-4 are valid", "[unit][tool]")
@@ -63,7 +63,7 @@ TEST_CASE("Tool configurations: Aurora tools on ports 1-4 are valid", "[unit][to
 TEST_CASE("Tool configurations: a missing tool file is skipped when saving a configuration", "[unit][tool]")
 {
 	cx::DataLocations::setTestMode();
-	QString validTool = cx::DataLocations::getRootConfigPath() + "/tool/Tools/Shared/SW-RefFrame-02-077-0191_POLARIS/SW_ref.xml";
+	QString validTool = cx::DataLocations::getRootConfigPath() + "/tool/Tools/Shared/NDI-Reference-frame_small_POLARIS/NDI_ref_small.xml";
 	REQUIRE(QFileInfo::exists(validTool));
 	QTemporaryDir folder;
 	cx::ConfigurationFileParser::ToolStructure valid;
@@ -83,7 +83,7 @@ TEST_CASE("Tool configurations: a missing tool file is skipped when saving a con
 	QFile file(config.mFileName);
 	REQUIRE(file.open(QIODevice::ReadOnly));
 	QString content = QString::fromUtf8(file.readAll());
-	CHECK(content.contains("SW_ref.xml"));
+	CHECK(content.contains("NDI_ref_small.xml"));
 	CHECK_FALSE(content.contains("removed.xml"));
 }
 

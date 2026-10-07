@@ -72,9 +72,8 @@ the next system starts.
 2. Select the tool configuration:
    * The current tool configuration (from the Preferences) is selected by default.
    * The list also has the other tool configurations of the profile, and the test configurations of
-     the Laboratory profile: LabPolarisSWTools.xml (Polaris SW reference frame, SW pointer and two
-     ultrasound probe tracking frames) and LabAuroraTools.xml (Aurora reference on port 1, pointer on
-     port 2, and sensors on ports 3 and 4).
+     the Laboratory profile: LabDefault.xml (Polaris NDI reference frame and pointer) and
+     LabAuroraTools.xml (Aurora reference on port 1, pointer on port 2, and sensors on ports 3 and 4).
    * Browse to use any other tool configuration file.
    The tracking system in the configuration doesn't matter, it is replaced for each system.
 3. Select the tracking systems to compare: igstk, ndi and/or openigtlink. Only the systems that are
