@@ -63,6 +63,7 @@ public:
 	static bool hasNewToolChange(int previousStatus, int status);
 	static double getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType);
 	static bool isPolaris(TRACKING_SYSTEM trackerType);
+	static int getIlluminatorRateToSet(TRACKING_SYSTEM trackerType, int rate_Hz); ///< 0: leave the device's default
 	static const int kMaxConsecutiveReadFailures = 3;
 
 signals:
@@ -95,6 +96,7 @@ private:
 	void distributeFrame(const NdiFrame& frame, double timestamp);
 	void setAllToolsInvisible();
 	void reportSystemStatus(int status);
+	void setIlluminatorRate(int rate_Hz);
 	void setMaxErrorRMS(double maxErrorRMS_mm);
 
 	NdiDevicePtr mDevice;
@@ -110,6 +112,7 @@ private:
 	int mConsecutiveReadFailures;
 	int mLastSystemStatus; ///< Kept while tracking is restarted: the device keeps reporting the same bits
 	bool mToolsChanged;
+	int mIlluminatorRate_Hz;
 	NdiFrameRateEstimator mFrameRate;
 	int mQuickRepeats; ///< Polls that quickly gave the last frame again, since the last new frame
 	ToolFileParser::TrackerInternalStructure mTrackerStructure;

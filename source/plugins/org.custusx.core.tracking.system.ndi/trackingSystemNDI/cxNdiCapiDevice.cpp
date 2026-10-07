@@ -412,6 +412,30 @@ NdiPortLocation NdiCapiDevice::parsePortLocation(const char location[14])
 	return retval;
 }
 
+bool NdiCapiDevice::setIlluminatorRate(int rate_Hz)
+{
+	int code = illuminatorRateToNdiCode(rate_Hz);
+	bool success = (code >= 0) && this->command("IRATE:%d", code);
+	if (code < 0)
+	{
+		mLastError = QString("%1 Hz is not an illuminator rate (20, 30 or 60 Hz)").arg(rate_Hz);
+	}
+	return success;
+}
+
+int NdiCapiDevice::illuminatorRateToNdiCode(int rate_Hz)
+{
+	int retval = -1;
+	switch (rate_Hz)
+	{
+	case 20: retval = 0; break;
+	case 30: retval = 1; break;
+	case 60: retval = 2; break;
+	default: break;
+	}
+	return retval;
+}
+
 bool NdiCapiDevice::startTracking()
 {
 	mTracking = this->command("TSTART:");

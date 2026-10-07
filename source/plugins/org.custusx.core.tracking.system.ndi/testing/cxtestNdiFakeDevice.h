@@ -135,6 +135,7 @@ public:
 		retval.channel = h.channel;
 		return retval;
 	}
+	bool setIlluminatorRate(int rate_Hz) override { illuminatorRate_Hz = rate_Hz; return illuminatorRateSucceeds; }
 	bool startTracking() override { tracking = startTrackingSucceeds; return tracking; }
 	bool stopTracking() override { tracking = false; stopCount++; return true; }
 	bool readFrame(const std::vector<int>& portHandles, cx::NdiFrame& frame) override
@@ -191,6 +192,8 @@ public:
 	int failReads = 0;
 	cx::NdiFrame nextFrame;
 	int readDelay_ms = 0;
+	int illuminatorRate_Hz = 0;
+	bool illuminatorRateSucceeds = true;
 	std::vector<int> requestedHandles;
 	cx::NdiConnectionSettings lastConnection;
 };

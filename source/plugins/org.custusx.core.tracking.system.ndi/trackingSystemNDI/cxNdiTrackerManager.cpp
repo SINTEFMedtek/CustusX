@@ -33,6 +33,7 @@ NdiTrackerManager::NdiTrackerManager(ToolFileParser::TrackerInternalStructure tr
 	mConsecutiveReadFailures(0),
 	mLastSystemStatus(0),
 	mToolsChanged(false),
+	mIlluminatorRate_Hz(0),
 	mQuickRepeats(0),
 	mTrackerStructure(trackerStructure),
 	mInitialized(false),
@@ -113,6 +114,7 @@ void NdiTrackerManager::initializeSlot(bool on)
 		bool success = this->connectToDevice() && this->setupTools();
 		if (success)
 		{
+			this->setIlluminatorRate(mIlluminatorRate_Hz);
 			mInitialized = true;
 			emit initialized(true);
 		}
@@ -326,6 +328,23 @@ double NdiTrackerManager::getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType)
 	return aurora ? NdiPositionQuality::kDefaultMaxErrorRMSAurora_mm : NdiPositionQuality::kDefaultMaxErrorRMSPolaris_mm;
 }
 
+int NdiTrackerManager::getIlluminatorRateToSet(TRACKING_SYSTEM trackerType, int rate_Hz)
+{
+	return isPolaris(trackerType) ? rate_Hz : 0;
+}
+
+void NdiTrackerManager::setIlluminatorRate(int rate_Hz)
+{
+	if (rate_Hz > 0 && mDevice->setIlluminatorRate(rate_Hz))
+	{
+		report(QString("NDI Tracker: Tracking at %1 Hz.").arg(rate_Hz));
+	}
+	else if (rate_Hz > 0)
+	{
+		reportWarning(QString("NDI Tracker: The device can't track at %1 Hz, using its default rate: %2").arg(rate_Hz).arg(mDevice->getLastError()));
+	}
+}
+
 bool NdiTrackerManager::isPolaris(TRACKING_SYSTEM trackerType)
 {
 	return (trackerType == tsPOLARIS || trackerType == tsPOLARIS_SPECTRA || trackerType == tsPOLARIS_VICRA);
@@ -363,6 +382,7 @@ bool NdiTrackerManager::connectToDevice()
 		connection = mConnection;
 	}
 	connection.requestMarkerInfo = isPolaris(mTrackerStructure.mType);
+	mIlluminatorRate_Hz = getIlluminatorRateToSet(mTrackerStructure.mType, connection.illuminatorRate_Hz);
 	this->setMaxErrorRMS(connection.maxErrorRMS_mm > 0.0 ? connection.maxErrorRMS_mm : getDefaultMaxErrorRMS(mTrackerStructure.mType));
 	QString where = connection.hostname.isEmpty() ? QString("(searching serial ports)") : connection.hostname;
 	report("NDI Tracker: Connecting to device " + where + "...");

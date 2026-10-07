@@ -50,6 +50,7 @@ public:
 	bool enablePortHandle(int portHandle, bool staticTool) override;
 	NdiPortLocation getPortLocation(int portHandle) override;
 
+	bool setIlluminatorRate(int rate_Hz) override;
 	bool startTracking() override;
 	bool stopTracking() override;
 	bool readFrame(const std::vector<int>& portHandles, NdiFrame& frame) override;
@@ -57,6 +58,7 @@ public:
 	static QStringList getSerialPortCandidates();
 	static NdiPortLocation parsePortLocation(const char location[14]);
 	static int baudRateToNdiCode(int baudRate);
+	static int illuminatorRateToNdiCode(int rate_Hz); ///< -1 if not supported
 	static std::vector<int> getBaudRatesToTry(int requested); ///< The requested rate, then slower standard rates
 	static bool isSlowerBaudRateWorthTrying(int ndiError); ///< After a failed COMM
 	static int countUsedMarkers(const char markerInfo[10]); ///< From the 10 marker bytes in a BX reply, 4 bits per marker

@@ -53,6 +53,14 @@ TEST_CASE("NdiCapiDevice: baud rates", "[unit][org.custusx.core.tracking.system.
 	CHECK(cx::NdiCapiDevice::baudRateToNdiCode(12345) == -1);
 }
 
+TEST_CASE("NdiCapiDevice: illuminator rates", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiCapiDevice::illuminatorRateToNdiCode(20) == 0);
+	CHECK(cx::NdiCapiDevice::illuminatorRateToNdiCode(30) == 1);
+	CHECK(cx::NdiCapiDevice::illuminatorRateToNdiCode(60) == 2);
+	CHECK(cx::NdiCapiDevice::illuminatorRateToNdiCode(40) == -1);
+}
+
 TEST_CASE("NdiCapiDevice: baud rates to try, fastest first", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	CHECK(cx::NdiCapiDevice::getBaudRatesToTry(921600) == std::vector<int>({921600, 115200, 57600, 38400, 19200, 9600}));

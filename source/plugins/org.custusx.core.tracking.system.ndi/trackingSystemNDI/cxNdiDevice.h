@@ -31,6 +31,7 @@ struct org_custusx_core_tracking_system_ndi_EXPORT NdiConnectionSettings
 	QString communicationLogFile; ///< If not empty, log the commands and replies to this file.
 	bool requestMarkerInfo = false; ///< Request tool and marker information in BX (Polaris only). Set by NdiTrackerManager.
 	double maxErrorRMS_mm = 0.0; ///< Warn about the position above this RMS error. 0: default for the device type.
+	int illuminatorRate_Hz = 60; ///< Polaris only: 20, 30 or 60 Hz. 0: the device's default (20 Hz).
 };
 
 /** Which port handles to list, see the NDI PHSR command. */
@@ -113,6 +114,7 @@ public:
 	virtual bool enablePortHandle(int portHandle, bool staticTool) = 0; ///< PENA, static for reference tools
 	virtual NdiPortLocation getPortLocation(int portHandle) = 0; ///< PHINF port location
 
+	virtual bool setIlluminatorRate(int rate_Hz) = 0; ///< IRATE, Polaris: 20, 30 or 60 Hz
 	virtual bool startTracking() = 0; ///< TSTART
 	virtual bool stopTracking() = 0;  ///< TSTOP
 	virtual bool readFrame(const std::vector<int>& portHandles, NdiFrame& frame) = 0; ///< BX

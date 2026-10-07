@@ -492,6 +492,18 @@ TEST_CASE("NdiTrackerManager: marker information is requested from Polaris only"
 	CHECK(cx::NdiTrackerManager::getDefaultMaxErrorRMS(cx::tsPOLARIS) == Approx(cx::NdiPositionQuality::kDefaultMaxErrorRMSPolaris_mm));
 }
 
+TEST_CASE("NdiTrackerManager: the illuminator rate is set on Polaris only", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiTrackerManager::getIlluminatorRateToSet(cx::tsPOLARIS_SPECTRA, 60) == 60);
+	CHECK(cx::NdiTrackerManager::getIlluminatorRateToSet(cx::tsPOLARIS_VICRA, 60) == 60);
+	CHECK(cx::NdiTrackerManager::getIlluminatorRateToSet(cx::tsPOLARIS, 0) == 0);
+	CHECK(cx::NdiTrackerManager::getIlluminatorRateToSet(cx::tsAURORA, 60) == 0);
+
+	ManagerFixture aurora;
+	aurora.manager->initializeSlot(true);
+	CHECK(aurora.device->illuminatorRate_Hz == 0);
+}
+
 TEST_CASE("NdiTrackerManager: the RMS error limit from the settings is used", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	QString warning;

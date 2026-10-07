@@ -37,6 +37,24 @@ Run the following shell lines after installing the Track application:
 This sets up access rights for current user. Logout to make these changes work.
 
 
+Settings
+-----------------------------------------------------------
+The NDI tracking plugin works without any settings. If needed, these can be added under [General] in
+settings.ini in the profile's settings folder (e.g. CustusX_settings/profiles/Laboratory/settings),
+while CustusX is closed:
+
+* ndiTrackingHostname: the serial port (e.g. /dev/ttyUSB0 or COM3) or the network address of the
+  device. Empty (default): search the serial ports.
+* ndiTrackingBaudRate: serial baud rate, default 921600. Slower rates are tried if the device or the
+  serial adapter can't use it.
+* ndiTrackingIlluminatorRate_Hz: Polaris only, 20, 30 or 60 Hz, default 60. 0 uses the device's
+  default (20 Hz). A Polaris that can't use the rate, e.g. a Vicra, tracks at its default rate,
+  with a warning in the log.
+* ndiTrackingMaxErrorRMS: warn about positions with a larger RMS error (mm). 0 (default): the
+  default for the device type.
+* ndiTrackingDebugLogging: true to log the commands sent to the device and its replies, in
+  NdiCommunication.txt in the logging folder.
+
 Validation
 -----------------------------------------------------------
 Load your tool ROM-files into Track and verify that they work correctly. There should be no warnings in the Track application: A badly configured tracking system might cause CustusX to fail silently by not receiving tracking data.
