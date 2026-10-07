@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLPOSITIONRECORDER_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <deque>
 #include <map>
@@ -24,7 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef std::shared_ptr<class TrackingService> TrackingServicePtr;
 
 /** \brief Position statistics for one tool: rate, mean position and spread.
  *
@@ -104,7 +105,7 @@ private:
 	int mRowCount;
 	std::map<QString, ToolPositionStatistics> mStatistics;
 };
-typedef boost::shared_ptr<ToolPositionRecorder> ToolPositionRecorderPtr;
+typedef std::shared_ptr<ToolPositionRecorder> ToolPositionRecorderPtr;
 typedef std::map<QString, ToolPositionStatistics> ToolPositionStatisticsMap;
 
 } // namespace cx

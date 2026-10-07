@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 
-#include <boost/make_shared.hpp>
+#include <memory>
 #include "cxNdiTrackerManager.h"
 #include "cxNdiFrameRateEstimator.h"
 #include "cxtestNdiFakeDevice.h"
@@ -24,7 +24,7 @@ namespace
 
 cx::ToolFileParser::ToolInternalStructurePtr createAuroraTool(QString uid, int port, bool reference = false)
 {
-	cx::ToolFileParser::ToolInternalStructurePtr retval = boost::make_shared<cx::ToolFileParser::ToolInternalStructure>();
+	cx::ToolFileParser::ToolInternalStructurePtr retval = std::make_shared<cx::ToolFileParser::ToolInternalStructure>();
 	retval->mUid = uid;
 	retval->mIsReference = reference;
 	retval->mIsPointer = !reference;
@@ -68,7 +68,7 @@ struct ManagerFixture
 	cx::NdiToolPtr pointer() { return manager->getTools()["pointer"]; }
 
 	enum { kPointerHandle = 0x0A, kReferenceHandle = 0x0B };
-	boost::shared_ptr<FakeNdiDevice> device;
+	std::shared_ptr<FakeNdiDevice> device;
 	cx::NdiTrackerManagerPtr manager;
 	int errors = 0;
 	std::vector<cx::Transform3D> pointerTransforms;

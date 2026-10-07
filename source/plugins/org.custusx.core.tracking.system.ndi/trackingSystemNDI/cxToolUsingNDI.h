@@ -17,14 +17,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxToolImpl.h"
 
 #include <QTimer>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "cxTransform3D.h"
 #include "cxDefinitions.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class NdiTool> NdiToolPtr;
-typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
+typedef std::shared_ptr<class NdiTool> NdiToolPtr;
+typedef std::shared_ptr<class ProbeImpl> ProbeImplPtr;
 
 /**
  * \file
@@ -87,7 +87,7 @@ private:
 	QTimer mTpsTimer;
 	double mTimestamp;
 };
-typedef boost::shared_ptr<ToolUsingNDI> ToolUsingNDIPtr;
+typedef std::shared_ptr<ToolUsingNDI> ToolUsingNDIPtr;
 
 /**
  * @}

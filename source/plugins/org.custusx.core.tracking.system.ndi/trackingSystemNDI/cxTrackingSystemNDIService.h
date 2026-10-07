@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGSYSTEMNDISERVICE_H_
 
 #include "org_custusx_core_tracking_system_ndi_Export.h"
+#include <memory>
 
 #include "cxTrackingSystemService.h"
 #include "cxNdiDevice.h"
@@ -30,7 +31,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class NdiTrackerThread> NdiTrackerThreadPtr;
+typedef std::shared_ptr<class NdiTrackerThread> NdiTrackerThreadPtr;
 
 /**
  * \brief Tracking system service using the NDI CAPI (Combined API).

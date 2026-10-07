@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGSYSTEMCOMPARISON_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <map>
 #include <vector>
@@ -25,7 +26,7 @@ class QProcess;
 
 namespace cx
 {
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
+typedef std::shared_ptr<class VideoService> VideoServicePtr;
 
 /** One tracking system to run in a comparison. */
 struct cxResource_EXPORT TrackingComparisonRun

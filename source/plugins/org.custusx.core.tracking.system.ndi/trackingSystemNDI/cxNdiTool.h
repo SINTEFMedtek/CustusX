@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <atomic>
 #include <QObject>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "cxTransform3D.h"
 #include "cxToolFileParser.h"
@@ -33,8 +33,8 @@ namespace cx
  */
 
 class NdiTool;
-typedef boost::shared_ptr<NdiTool> NdiToolPtr;
-typedef boost::weak_ptr<NdiTool> NdiToolWeakPtr;
+typedef std::shared_ptr<NdiTool> NdiToolPtr;
+typedef std::weak_ptr<NdiTool> NdiToolWeakPtr;
 
 /**
  * \brief Represents one tool tracked by the NDI CAPI.

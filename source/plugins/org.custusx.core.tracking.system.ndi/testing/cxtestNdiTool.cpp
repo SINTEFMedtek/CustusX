@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 
-#include <boost/make_shared.hpp>
+#include <memory>
 #include "cxNdiTool.h"
 #include "cxToolFileParser.h"
 #include "cxDefinitions.h"
@@ -26,7 +26,7 @@ static cx::ToolFileParser::ToolInternalStructurePtr makeValidStructure(
 	bool isReference = false)
 {
 	cx::ToolFileParser::ToolInternalStructurePtr s =
-		boost::make_shared<cx::ToolFileParser::ToolInternalStructure>();
+		std::make_shared<cx::ToolFileParser::ToolInternalStructure>();
 	s->mUid = uid;
 	s->mIsPointer = !isReference;
 	s->mIsReference = isReference;

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXNDITRACKERTHREAD_H_
 
 #include "org_custusx_core_tracking_system_ndi_Export.h"
+#include <memory>
 
 #include <map>
 #include <vector>
@@ -74,7 +75,7 @@ private:
 
 	NdiTrackerManagerPtr mManager;
 };
-typedef boost::shared_ptr<NdiTrackerThread> NdiTrackerThreadPtr;
+typedef std::shared_ptr<NdiTrackerThread> NdiTrackerThreadPtr;
 
 /**
  * @}

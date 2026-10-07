@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_core_tracking_system_ndi_Export.h"
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QString>
 #include "cxTransform3D.h"
 
@@ -117,7 +117,7 @@ public:
 	virtual bool stopTracking() = 0;  ///< TSTOP
 	virtual bool readFrame(const std::vector<int>& portHandles, NdiFrame& frame) = 0; ///< BX
 };
-typedef boost::shared_ptr<NdiDevice> NdiDevicePtr;
+typedef std::shared_ptr<NdiDevice> NdiDevicePtr;
 
 } // namespace cx
 
