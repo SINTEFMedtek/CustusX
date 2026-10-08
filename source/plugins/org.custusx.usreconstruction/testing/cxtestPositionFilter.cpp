@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "catch.hpp"
 #include "cxLogger.h"
 #include "cxPositionFilter.h"
+#include "cxTransform3D.h"
 #include <QDateTime>
 #include <cmath>
 
@@ -220,6 +221,28 @@ TEST_CASE("PositionFilter: Sign change of quaternion between positions","[unit][
 	PositionFilterTester positionFilter(5, posVector);
 	positionFilter.testFilterPositions();
 	requirePositionsUnchanged(posVectorInitial, posVector);
+}
+
+TEST_CASE("PositionFilter: A sequence not longer than the filter window is not filtered","[unit][usreconstruction][synthetic]")
+{
+	std::vector<cx::TimedPosition> posVector(5);
+	for (unsigned i = 0; i < posVector.size(); i++)
+	{
+		posVector[i].mTime = i;
+		posVector[i].mPos = cx::createTransformTranslate(cx::Vector3D(0, 0, 0));
+	}
+	posVector[2].mPos = cx::createTransformTranslate(cx::Vector3D(10, 0, 0));
+	std::vector<cx::TimedPosition> posVectorInitial = posVector;
+
+	PositionFilterTester positionFilter(2, posVector); // window 5: not longer than the sequence
+	positionFilter.testFilterPositions();
+	requirePositionsUnchanged(posVectorInitial, posVector);
+
+	std::vector<cx::TimedPosition> longer = posVectorInitial;
+	longer.push_back(posVectorInitial.back());
+	PositionFilterTester longerFilter(2, longer);
+	longerFilter.testFilterPositions();
+	CHECK(longer[2].mPos.translation()[0] == Approx(2)); // averaged over 5 positions
 }
 
 } // namespace

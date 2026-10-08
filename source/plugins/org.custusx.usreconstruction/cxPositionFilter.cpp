@@ -20,39 +20,29 @@ namespace cx
 PositionFilter::PositionFilter(unsigned filterStrength, std::vector<class TimedPosition> &inputImagePositions) :
 	mFilterStrength(filterStrength)
 {
-	mFilterLength = 1+2*filterStrength;
 	mInputImagePositions = &inputImagePositions;
-	mNumberInputPositions=inputImagePositions.size();
-	mNumberQuaternions = mNumberInputPositions;
+	mNumberInputPositions = inputImagePositions.size();
 
-	mQPosArray = Eigen::ArrayXXd::Zero(7,long(mNumberQuaternions));
+	mQPosArray = Eigen::ArrayXXd::Zero(7,long(mNumberInputPositions));
 	mQPosFiltered = Eigen::ArrayXXd::Zero(7,long(mNumberInputPositions));
 }
 
 void PositionFilter::convertToQuaternions()
 {
-	for (unsigned long i = 0; i < mNumberQuaternions; i++) //For each pose (Tx)
+	for (unsigned long i = 0; i < mNumberInputPositions; i++)
 	{
-		mQPosArray.col(long(i)) = matrixToQuaternion(mInputImagePositions->at(i).mPos); // Convert each Tx to quaternions
-
-		// q and -q describe the same rotation. Make the sign consistent with the previous pose, otherwise the
-		// averaging below gives wrong rotations when the sign of the quaternion changes between two poses.
+		mQPosArray.col(long(i)) = matrixToQuaternion(mInputImagePositions->at(i).mPos);
+		// Same sign as the previous pose, so that the average below doesn't mix q and -q
 		if (i > 0)
 		{
-			double dot = (mQPosArray.col(long(i)).head(4) * mQPosArray.col(long(i-1)).head(4)).sum();
-			if (dot < 0)
-				mQPosArray.col(long(i)).head(4) *= -1;
+			mQPosArray.col(long(i)) = alignQuaternionSign(mQPosArray.col(long(i)), mQPosArray.col(long(i-1)));
 		}
 	}
 }
 
 void PositionFilter::filterQuaternionArray()
 {
-	// Moving average with window length 2*filterStrength+1, centered on each position.
-	// Close to the ends of the sequence the window is made shorter, but kept symmetric around the position
-	// (half length = min(filterStrength, distance to nearest end)). The first and the last position are therefore
-	// unchanged. Padding with copies of the end positions would pull the end positions towards the interior of the
-	// sequence, as the averaged window would no longer be centered on the position.
+	// Centered moving average, shortened symmetrically near the ends: the first and last positions are not moved
 	long nPositions = long(mNumberInputPositions);
 	for (long k = 0; k < nPositions; k++)
 	{
@@ -63,28 +53,20 @@ void PositionFilter::filterQuaternionArray()
 
 void PositionFilter::convertFromQuaternion()
 {
-	for (unsigned int i = 0; i < mInputImagePositions->size(); i++) //For each pose after filtering
+	for (unsigned int i = 0; i < mInputImagePositions->size(); i++)
 	{
-		// The average of unit quaternions is not a unit quaternion. Normalize before converting to a rotation matrix
-		Eigen::ArrayXd qPose = mQPosFiltered.col(i);
-		double norm = qPose.head(4).matrix().norm();
-		if (norm > 0)
-			qPose.head(4) /= norm;
-		// Convert back to position data
-		mInputImagePositions->at(i).mPos = quaternionToMatrix(qPose);
+		mInputImagePositions->at(i).mPos = quaternionToMatrix(mQPosFiltered.col(i)); // normalizes the averaged quaternion
 	}
 }
 
 void PositionFilter::filterPositions()
 {
-	if (mFilterStrength > 0) //Position filter enabled?
+	// A sequence not longer than the filter window is not filtered
+	if (mFilterStrength > 0 && mNumberInputPositions > 2*mFilterStrength + 1)
 	{
-		if (mNumberInputPositions > mFilterLength) //Position sequence sufficient long?
-		{
-			convertToQuaternions();
-			filterQuaternionArray();
-			convertFromQuaternion();
-		}
+		convertToQuaternions();
+		filterQuaternionArray();
+		convertFromQuaternion();
 	}
 }
 
