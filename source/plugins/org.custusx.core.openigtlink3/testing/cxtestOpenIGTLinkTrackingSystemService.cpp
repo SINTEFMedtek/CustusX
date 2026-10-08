@@ -176,56 +176,6 @@ void getDeviceNames(std::vector<PositionReceiverPtr> positionReceivers, QString&
 namespace cxtest
 {
 
-TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins][org.custusx.core.openigtlink3][unit]")
-{
-	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
-
-	CHECK(trackingSystemService->getState() == cx::Tool::tsNONE);
-	CHECK_FALSE(trackingSystemService->isConfigured());
-	CHECK_FALSE(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
-
-	QStringList configurations = trackingSystemService->getConfiguration()->getAllConfigurations();
-	int posToolConfigFile = 0;
-	REQUIRE(findConfigFileNumberInList(configurations, QString("PLUS"), posToolConfigFile));
-	trackingSystemService->setConfigurationFile(configurations[posToolConfigFile]);
-
-	// Set up
-
-	trackingSystemService->internalSetState(cx::Tool::tsCONFIGURED);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK_FALSE(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
-
-	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
-
-	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK(trackingSystemService->isInitialized());
-	CHECK(trackingSystemService->isTracking());
-
-	//Take down
-
-	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
-
-	trackingSystemService->internalSetState(cx::Tool::tsCONFIGURED);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK_FALSE(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
-
-	trackingSystemService->internalSetState(cx::Tool::tsNONE);
-	CHECK_FALSE(trackingSystemService->isConfigured());
-	CHECK_FALSE(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
-}
-
-
 TEST_CASE("OpenIGTLinkTrackingSystemService: Stays in tsNONE without an OpenIGTLink tool configuration", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
@@ -365,6 +315,55 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: print openigtlinktransformid warnin
 }
 
 #ifdef CX_CUSTUS_SINTEF
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+
+	CHECK(trackingSystemService->getState() == cx::Tool::tsNONE);
+	CHECK_FALSE(trackingSystemService->isConfigured());
+	CHECK_FALSE(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+
+	QStringList configurations = trackingSystemService->getConfiguration()->getAllConfigurations();
+	int posToolConfigFile = 0;
+	REQUIRE(findConfigFileNumberInList(configurations, QString("PLUS"), posToolConfigFile));
+	trackingSystemService->setConfigurationFile(configurations[posToolConfigFile]);
+
+	// Set up
+
+	trackingSystemService->internalSetState(cx::Tool::tsCONFIGURED);
+	CHECK(trackingSystemService->isConfigured());
+	CHECK_FALSE(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+
+	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
+	CHECK(trackingSystemService->isConfigured());
+	CHECK(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+	CHECK(trackingSystemService->isConfigured());
+	CHECK(trackingSystemService->isInitialized());
+	CHECK(trackingSystemService->isTracking());
+
+	//Take down
+
+	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
+	CHECK(trackingSystemService->isConfigured());
+	CHECK(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+
+	trackingSystemService->internalSetState(cx::Tool::tsCONFIGURED);
+	CHECK(trackingSystemService->isConfigured());
+	CHECK_FALSE(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+
+	trackingSystemService->internalSetState(cx::Tool::tsNONE);
+	CHECK_FALSE(trackingSystemService->isConfigured());
+	CHECK_FALSE(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+}
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state using tool config file for Plus", "[plugins][org.custusx.core.openigtlink3][integration]")
 {
