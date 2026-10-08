@@ -251,6 +251,7 @@ void TrackingComparisonWidget::startOrCancel()
 	}
 	this->saveSettings();
 	TrackingComparisonSettings comparisonSettings;
+	TrackingSystemComparison::readOpenIGTLinkServer(comparisonSettings); // keep the server set for the OpenIGTLink streamer
 	comparisonSettings.toolConfigFile = mToolConfigFile->currentData().toString();
 	comparisonSettings.outputFolder = mOutputFolder->text() + "/tracking_comparison_" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
 	comparisonSettings.recordDuration_ms = mDuration->value() * 1000;

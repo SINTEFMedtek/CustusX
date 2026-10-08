@@ -91,6 +91,7 @@ void NetworkHandler::acquireConnection(QString user, QString serverHost, int ser
 	mConnectionUsers.insert(user);
 	if (!this->isConnected())
 	{
+		this->disconnectFromServer(); // stop an earlier attempt that is still waiting for the server
 		CX_LOG_INFO() << QString("NetworkHandler: Connecting to OpenIGTLink server %1:%2 for %3").arg(serverHost).arg(serverPort).arg(user);
 		this->requestConnectToServer(serverHost.toStdString(), serverPort);
 	}

@@ -85,6 +85,25 @@ TEST_CASE("ProfileManager::copyMissingToolConfigs adds missing configs and keeps
 	CHECK(cx::ProfileManager::copyMissingToolConfigs(installed, custom).isEmpty());
 }
 
+TEST_CASE("ProfileManager::copyMissingToolConfigs doesn't copy back a config the user deleted", "[unit]")
+{
+	QTemporaryDir root;
+	REQUIRE(root.isValid());
+	QString installed = root.path() + "/installed";
+	QString custom = root.path() + "/custom";
+	QDir().mkpath(installed + "/tool");
+	writeFile(installed + "/tool/Shipped.xml", "shipped");
+
+	CHECK(cx::ProfileManager::copyMissingToolConfigs(installed, custom) == QStringList("Shipped.xml"));
+	QFile::remove(custom + "/tool/Shipped.xml");
+	CHECK(cx::ProfileManager::copyMissingToolConfigs(installed, custom).isEmpty());
+	CHECK_FALSE(QFile::exists(custom + "/tool/Shipped.xml"));
+
+	// A newly shipped config is still added
+	writeFile(installed + "/tool/NewlyShipped.xml", "new");
+	CHECK(cx::ProfileManager::copyMissingToolConfigs(installed, custom) == QStringList("NewlyShipped.xml"));
+}
+
 TEST_CASE("ProfileManager::copyMissingToolConfigs does nothing without an installed profile", "[unit]")
 {
 	QTemporaryDir root;

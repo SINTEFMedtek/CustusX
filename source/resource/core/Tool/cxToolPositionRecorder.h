@@ -92,8 +92,8 @@ private:
 	void connectToTools();
 	void disconnectFromTools();
 	std::vector<ToolPtr> getToolsToRecord() const;
-	void onTransform(ToolPtr tool, const Transform3D& prMt, double timestamp_ms);
-	void onEvent(ToolPtr tool, QString event);
+	void onTransform(Tool* tool, const Transform3D& prMt, double timestamp_ms);
+	void onEvent(Tool* tool, QString event);
 	void writeRow(const QString& row);
 
 	TrackingServicePtr mTrackingService;

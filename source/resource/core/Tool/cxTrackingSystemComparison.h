@@ -84,6 +84,7 @@ public:
 	/** Returns the changed configuration, empty on failure. applyReference: OpenIGTLink only, see TrackingComparisonSettings. */
 	static QString setTrackingSystemImplementation(QString configXml, QString implementation, bool applyReference = false);
 	static QString getRunLabel(int index, QString implementation);
+	static void readOpenIGTLinkServer(TrackingComparisonSettings& settings); ///< The address and port set for the OpenIGTLink 3 streamer
 	static QStringList splitArguments(QString arguments); ///< Split on spaces, except inside double quotes
 	static QString expandHomeFolder(QString path); ///< Replace a leading ~ with the home folder, as a shell would
 	static QString getWorkingFolder(QString program); ///< The program's own folder, empty (current folder) for a program found in PATH

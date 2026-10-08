@@ -34,7 +34,8 @@ const int kThreadStopTimeout_ms = 15000; ///< Longer than a few unanswered comma
 }
 
 TrackingSystemNDIService::TrackingSystemNDIService() :
-	mDeviceInUse(false)
+	mDeviceInUse(false),
+	mTrackingRequested(false)
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 	this->setConfigurationFile(profile()->getToolConfigFilePath());
@@ -52,16 +53,29 @@ std::vector<ToolPtr> TrackingSystemNDIService::getTools()
 
 void TrackingSystemNDIService::setState(const Tool::State val)
 {
+	mTrackingRequested = (val >= Tool::tsTRACKING);
 	this->internalSetState(val);
 }
 
 void TrackingSystemNDIService::configure()
 {
+	if (mTrackerThread)
+	{
+		return; // already configuring: the configured signal is on its way
+	}
+	if (!this->createTrackerThread())
+	{
+		this->cancelPendingStateChanges(); // nothing will be configured
+	}
+}
+
+bool TrackingSystemNDIService::createTrackerThread()
+{
 	if (mConfigurationFilePath.isEmpty() || !QFile::exists(mConfigurationFilePath))
 	{
 		reportWarning(QString("NDI Tracking: Configuration file [%1] is not valid.")
 						  .arg(mConfigurationFilePath));
-		return;
+		return false;
 	}
 
 	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
@@ -71,17 +85,19 @@ void TrackingSystemNDIService::configure()
 	if (!handlesImplementation(implementation, isIgstkPluginBuilt()))
 	{
 		CX_LOG_DEBUG() << "TrackingSystemNDIService::configure(): Not using NDI tracking.";
-		return;
+		return false;
 	}
 	if (isLegacyIgstk)
+	{
 		CX_LOG_INFO() << "TrackingSystemNDIService::configure(): Legacy IGSTK config detected, using NDI instead.";
+	}
 	emit updateTrackingSystemImplementation(TRACKING_SYSTEM_IMPLEMENTATION_NDI);
 
 	std::vector<ToolFileParser::TrackerInternalStructure> trackers = configParser.getTrackers();
 	if (trackers.empty())
 	{
 		reportWarning("NDI Tracking: Failed to configure - no trackers found in configuration.");
-		return;
+		return false;
 	}
 
 	ToolFileParser::TrackerInternalStructure trackerStructure = trackers[0]; // one tracker at a time
@@ -101,9 +117,13 @@ void TrackingSystemNDIService::configure()
 			continue; // not a valid tool file, reported by the parser
 		}
 		if (toolFile == referenceToolFile)
+		{
 			referenceToolStructure = internalTool;
+		}
 		else
+		{
 			toolStructures.push_back(internalTool);
+		}
 	}
 
 	mTrackerThread.reset(new NdiTrackerThread(trackerStructure, toolStructures, referenceToolStructure));
@@ -115,6 +135,7 @@ void TrackingSystemNDIService::configure()
 	connect(mTrackerThread.get(), &NdiTrackerThread::error, this, &TrackingSystemNDIService::trackerErrorSlot);
 
 	mTrackerThread->start();
+	return true;
 }
 
 bool TrackingSystemNDIService::handlesImplementation(QString implementation, bool igstkPluginBuilt)
@@ -135,9 +156,21 @@ bool TrackingSystemNDIService::isIgstkPluginBuilt()
 
 void TrackingSystemNDIService::trackerConfiguredSlot(bool on)
 {
+	if (this->sender() != mTrackerThread.get())
+	{
+		return; // from a tracker thread replaced by a new configuration
+	}
 	if (!on)
 	{
-		this->deconfigure();
+		if (this->isConfigured())
+		{
+			this->deconfigure();
+		}
+		else
+		{
+			this->destroyTrackerThread(); // configuring failed: let the next configure() start again
+			this->cancelPendingStateChanges();
+		}
 		return;
 	}
 
@@ -157,7 +190,9 @@ void TrackingSystemNDIService::trackerConfiguredSlot(bool on)
 		{
 			mTools.push_back(tool);
 			if (ndiTool->isReference())
+			{
 				mReference = tool;
+			}
 		}
 		else
 		{
@@ -165,7 +200,9 @@ void TrackingSystemNDIService::trackerConfiguredSlot(bool on)
 		}
 	}
 	if (mExternalTool)
+	{
 		mTools.push_back(mExternalTool);
+	}
 
 	mState = Tool::tsCONFIGURED;
 	reportSuccess("NDI Tracking Service configured.");
@@ -176,7 +213,9 @@ void TrackingSystemNDIService::trackerConfiguredSlot(bool on)
 void TrackingSystemNDIService::deconfigure()
 {
 	if (!this->isConfigured())
+	{
 		return;
+	}
 
 	// Destroy the tracker thread synchronously regardless of tracking state.
 	// This works even when the Qt event loop is not running (e.g. at application
@@ -208,7 +247,9 @@ void TrackingSystemNDIService::initialize()
 		mTrackerThread->initialize(true);
 	}
 	else
+	{
 		reportError("NDI Tracking: Cannot initialize - tracking thread does not exist.");
+	}
 }
 
 void TrackingSystemNDIService::uninitialize()
@@ -221,10 +262,14 @@ void TrackingSystemNDIService::uninitialize()
 	}
 
 	if (!this->isInitialized())
+	{
 		return;
+	}
 
 	if (mTrackerThread)
+	{
 		mTrackerThread->initialize(false);
+	}
 }
 
 void TrackingSystemNDIService::startTracking()
@@ -237,16 +282,22 @@ void TrackingSystemNDIService::startTracking()
 	}
 
 	if (mTrackerThread)
+	{
 		mTrackerThread->track(true);
+	}
 }
 
 void TrackingSystemNDIService::stopTracking()
 {
 	if (!this->isTracking())
+	{
 		return;
+	}
 
 	if (mTrackerThread)
+	{
 		mTrackerThread->track(false);
+	}
 }
 
 void TrackingSystemNDIService::initializedSlot(bool value)
@@ -288,7 +339,9 @@ void TrackingSystemNDIService::trackerTrackingSlot(bool value)
 void TrackingSystemNDIService::setConfigurationFile(QString configurationFile)
 {
 	if (configurationFile == mConfigurationFilePath)
+	{
 		return;
+	}
 
 	mConfigurationFilePath = configurationFile; // before deconfigure(): it reconfigures at once
 	if (this->isConfigured())
@@ -301,7 +354,9 @@ void TrackingSystemNDIService::setConfigurationFile(QString configurationFile)
 void TrackingSystemNDIService::setLoggingFolder(QString loggingFolder)
 {
 	if (mLoggingFolder == loggingFolder)
+	{
 		return;
+	}
 
 	mLoggingFolder = loggingFolder; // before deconfigure(): it reconfigures at once
 	if (this->isConfigured())
@@ -337,18 +392,24 @@ NdiConnectionSettings TrackingSystemNDIService::readConnectionSettings() const
 	return retval;
 }
 
-void TrackingSystemNDIService::trackerErrorSlot()
+void TrackingSystemNDIService::cancelPendingStateChanges()
 {
 	// Cancel any pending "start tracking/initialize when ready", so that a later
 	// successful attempt doesn't start something the user didn't ask for.
 	disconnect(this, SIGNAL(initialized()), this, SLOT(startTrackingAfterInitSlot()));
 	disconnect(this, SIGNAL(configured()), this, SLOT(initializeAfterConfigSlot()));
 	disconnect(this, SIGNAL(trackingStopped()), this, SLOT(uninitializeAfterTrackingStoppedSlot()));
+}
+
+void TrackingSystemNDIService::trackerErrorSlot()
+{
+	this->cancelPendingStateChanges();
 	this->uninitialize();
 	if (mDeviceInUse)
 	{
 		mDeviceInUse = false;
-		if (settings()->value("ndiTrackingOpenIGTLinkFallback", true).toBool())
+		// Only when tracking was asked for: e.g. Stop Tracking also tries to connect, and must not start the fallback
+		if (mTrackingRequested && settings()->value("ndiTrackingOpenIGTLinkFallback", true).toBool())
 		{
 			// Not from this slot: deconfiguring destroys the tracker thread that sent the signal
 			QTimer::singleShot(0, this, &TrackingSystemNDIService::handOverToFallbackSlot);
@@ -397,7 +458,9 @@ void TrackingSystemNDIService::configureAfterDeconfigureSlot()
 void TrackingSystemNDIService::globalConfigurationFileChangedSlot(QString key)
 {
 	if (key == "toolConfigFile")
+	{
 		this->setConfigurationFile(profile()->getToolConfigFilePath());
+	}
 }
 
 void TrackingSystemNDIService::destroyTrackerThread()

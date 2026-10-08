@@ -103,6 +103,8 @@ protected:
 	NdiConnectionSettings readConnectionSettings() const;
 
 private:
+	bool createTrackerThread(); ///< false if the configuration is not for NDI, or not valid
+	void cancelPendingStateChanges();
 	void destroyTrackerThread();
 
 	std::vector<ToolPtr> mTools;
@@ -110,6 +112,7 @@ private:
 
 	NdiTrackerThreadPtr mTrackerThread;
 	bool mDeviceInUse; ///< The last connection failed because another application uses the device
+	bool mTrackingRequested; ///< The last requested state was tracking
 };
 
 /**

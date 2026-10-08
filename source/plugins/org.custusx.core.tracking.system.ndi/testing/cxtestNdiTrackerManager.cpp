@@ -129,6 +129,17 @@ TEST_CASE("NdiTrackerManager: failing to connect gives an error and no initializ
 	CHECK(fixture.errors == 1);
 }
 
+TEST_CASE("NdiTrackerManager: a configured reference that is not found gives an error and no initialization", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	ManagerFixture fixture;
+	fixture.device->handles.erase(ManagerFixture::kReferenceHandle); // no sensor on the reference port
+
+	fixture.manager->initializeSlot(true);
+
+	CHECK_FALSE(fixture.manager->isInitialized());
+	CHECK(fixture.errors == 1);
+}
+
 TEST_CASE("NdiTrackerManager: a device used by another application is reported before the error", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	ManagerFixture fixture;

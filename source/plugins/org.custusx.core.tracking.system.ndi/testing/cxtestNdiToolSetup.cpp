@@ -138,6 +138,22 @@ TEST_CASE("NdiToolSetup: Aurora wired tools are matched by physical port, not by
 	CHECK(result.messages.size() == 1); // port 1 has a sensor, but no configured tool
 }
 
+TEST_CASE("NdiToolSetup: an Aurora wired reference is enabled as a static tool", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	FakeNdiDevice device;
+	device.addWiredHandle(0x0A, 0);
+	device.addWiredHandle(0x0B, 1);
+	cx::NdiToolConfig reference = wiredTool("reference", 0);
+	reference.reference = true;
+	std::vector<cx::NdiToolConfig> tools = {reference, wiredTool("pointer", 1)};
+
+	cx::NdiToolSetupResult result = cx::setupNdiTools(device, tools);
+
+	CHECK(result.success());
+	CHECK(device.handles[0x0A].enabledAsStatic);
+	CHECK_FALSE(device.handles[0x0B].enabledAsStatic);
+}
+
 TEST_CASE("NdiToolSetup: Aurora 5DOF sensors on a splitter are matched by port and channel", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	FakeNdiDevice device;

@@ -442,15 +442,22 @@ bool NdiTrackerManager::setupTools()
 		mPortHandles.push_back(entry.first);
 	}
 
-	if (result.success())
-	{
-		reportSuccess(QString("NDI Tracker: %1 of %2 tool(s) ready.").arg(result.portHandleToUid.size()).arg(configs.size()));
-	}
-	else
+	// The tool positions are relative to the reference: without it no tool would ever be visible
+	bool referenceMissing = mReferenceTool && (mReferenceTool->getPortHandle() < 0);
+	if (!result.success())
 	{
 		reportError("NDI Tracker: None of the configured tools could be set up.");
 	}
-	return result.success();
+	else if (referenceMissing)
+	{
+		reportError("NDI Tracker: The reference tool " + mReferenceTool->getUid() + " was not found on the device. "
+					"The tool positions are relative to it, so none could be shown.");
+	}
+	else
+	{
+		reportSuccess(QString("NDI Tracker: %1 of %2 tool(s) ready.").arg(result.portHandleToUid.size()).arg(configs.size()));
+	}
+	return result.success() && !referenceMissing;
 }
 
 void NdiTrackerManager::setupToolsAgain()

@@ -42,6 +42,20 @@ bool isReferenceHandle(int portHandle, const std::map<int, QString>& handleToUid
 	return retval;
 }
 
+bool matchesWiredTool(const NdiToolConfig& tool, const NdiPortLocation& location);
+
+/** Wired tools are matched after enabling, so a wired reference is found by its port location here. */
+bool isWiredReferenceHandle(NdiDevice& device, int portHandle, const std::vector<NdiToolConfig>& tools)
+{
+	bool retval = false;
+	NdiPortLocation location = device.getPortLocation(portHandle);
+	for (const NdiToolConfig& tool : tools)
+	{
+		retval = retval || (tool.reference && matchesWiredTool(tool, location));
+	}
+	return retval;
+}
+
 void setupWirelessTools(NdiDevice& device, const std::vector<NdiToolConfig>& tools, NdiToolSetupResult& result)
 {
 	for (const NdiToolConfig& tool : tools)
@@ -100,7 +114,8 @@ void initializeAndEnablePortHandles(NdiDevice& device, const std::vector<NdiTool
 				continue;
 			}
 			newHandles = true;
-			bool staticTool = isReferenceHandle(portHandle, result.portHandleToUid, tools);
+			bool staticTool = isReferenceHandle(portHandle, result.portHandleToUid, tools)
+					|| (!result.portHandleToUid.count(portHandle) && isWiredReferenceHandle(device, portHandle, tools));
 			if (!device.enablePortHandle(portHandle, staticTool))
 			{
 				failed.insert(portHandle);

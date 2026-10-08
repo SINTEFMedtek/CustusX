@@ -87,14 +87,18 @@ QString ToolUsingNDI::getName() const
 double ToolUsingNDI::getTooltipOffset() const
 {
 	if (this->getProbe() && !this->hasType(Tool::TOOL_SCOPE))
+	{
 		return this->getProbe()->getProbeDefinition().getDepthStart();
+	}
 	return ToolImpl::getTooltipOffset();
 }
 
 void ToolUsingNDI::setTooltipOffset(double val)
 {
 	if (this->getProbe() && !this->hasType(Tool::TOOL_SCOPE))
+	{
 		return;
+	}
 	ToolImpl::setTooltipOffset(val);
 }
 
@@ -141,7 +145,9 @@ void ToolUsingNDI::addXml(QDomNode& dataNode)
 void ToolUsingNDI::parseXml(QDomNode& dataNode)
 {
 	if (dataNode.isNull())
+	{
 		return;
+	}
 	if (mProbe)
 	{
 		QDomNode probeNode = dataNode.namedItem("probe");
@@ -164,7 +170,9 @@ void ToolUsingNDI::toolTransformAndTimestampSlot(Transform3D prMs, double timest
 	mMetadata[timestamp] = metadata;
 
 	if (this->getVisible())
+	{
 		(*mPositionHistory)[timestamp] = prMt;
+	}
 
 	m_prMt = prMt_filtered;
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
@@ -178,9 +186,13 @@ void ToolUsingNDI::calculateTpsSlot()
 void ToolUsingNDI::toolVisibleSlot(bool on)
 {
 	if (on)
+	{
 		mTpsTimer.start(1000);
+	}
 	else
+	{
 		mTpsTimer.stop();
+	}
 }
 
 void ToolUsingNDI::set_prMt(const Transform3D& prMt, double timestamp)

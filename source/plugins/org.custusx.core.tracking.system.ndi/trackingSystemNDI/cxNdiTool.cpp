@@ -28,7 +28,9 @@ NdiTool::NdiTool(ToolFileParser::ToolInternalStructurePtr internalStructure) :
 	qRegisterMetaType<ToolPositionMetadata>("ToolPositionMetadata");
 
 	if (mInternalStructure)
+	{
 		mValid = mInternalStructure->verify();
+	}
 }
 
 NdiTool::~NdiTool()
@@ -43,7 +45,9 @@ ToolFileParser::ToolInternalStructurePtr NdiTool::getInternalStructure() const
 QString NdiTool::getUid() const
 {
 	if (mInternalStructure)
+	{
 		return mInternalStructure->mUid;
+	}
 	return "";
 }
 
@@ -80,9 +84,13 @@ void NdiTool::setPortHandle(int handle)
 void NdiTool::updateTransform(const Transform3D& transform, double timestamp, bool visible, const NdiToolSample& sample)
 {
 	if (!visible)
+	{
 		mMissedFrames++;
+	}
 	else
+	{
 		mMissedFrames = 0;
+	}
 
 	// Tolerate brief outages: stay visible if within tolerance, hiding the toggle from the UI
 	bool reportVisible = visible || (mVisible && mMissedFrames <= kMissTolerance);

@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QTextStream>
 #include "cxConfig.h"
 #include "cxSettings.h"
 #include "cxFileHelpers.h"
@@ -378,6 +379,39 @@ void ProfileManager::createCustomProfile(QString uid)
 	}
 }
 
+namespace
+{
+const char* kOfferedToolConfigsFile = ".offered_tool_configs"; ///< Not an .xml file: not listed as a tool configuration
+
+QStringList readLines(QString filename)
+{
+	QStringList retval;
+	QFile file(filename);
+	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+		while (!stream.atEnd())
+		{
+			QString line = stream.readLine().trimmed();
+			if (!line.isEmpty())
+			{
+				retval << line;
+			}
+		}
+	}
+	return retval;
+}
+
+void writeLines(QString filename, QStringList lines)
+{
+	QFile file(filename);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+	{
+		QTextStream(&file) << lines.join("\n") << "\n";
+	}
+}
+} // namespace
+
 void ProfileManager::addMissingToolConfigs(QString uid)
 {
 	QStringList configPaths = DataLocations::getRootConfigPaths();
@@ -401,14 +435,26 @@ QStringList ProfileManager::copyMissingToolConfigs(QString installedProfilePath,
 	{
 		QDir().mkpath(customToolPath);
 	}
+	// Each shipped configuration is offered once, so that one the user deleted is not copied back
+	QString offeredFile = customToolPath + "/" + kOfferedToolConfigsFile;
+	QStringList offered = readLines(offeredFile);
+	QStringList newlyOffered;
 	foreach(QString installedConfig, installedConfigs)
 	{
 		QString fileName = QFileInfo(installedConfig).fileName();
 		QString target = customToolPath + "/" + fileName;
-		if (!QFileInfo::exists(target) && QFile::copy(installedConfig, target))
+		if (!offered.contains(fileName))
 		{
-			retval << fileName;
+			newlyOffered << fileName;
+			if (!QFileInfo::exists(target) && QFile::copy(installedConfig, target))
+			{
+				retval << fileName;
+			}
 		}
+	}
+	if (!newlyOffered.isEmpty())
+	{
+		writeLines(offeredFile, offered + newlyOffered);
 	}
 	return retval;
 }

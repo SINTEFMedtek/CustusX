@@ -235,13 +235,15 @@ std::vector<ToolPtr> ToolPositionRecorder::getToolsToRecord() const
 void ToolPositionRecorder::connectToTools()
 {
 	this->disconnectFromTools();
-	for (ToolPtr tool : this->getToolsToRecord())
+	for (ToolPtr toolPtr : this->getToolsToRecord())
 	{
-		mConnections.push_back(connect(tool.get(), &Tool::toolTransformAndTimestamp, this,
+		// Not a ToolPtr, which would keep the tool alive: the tool sends the signals, so it exists when they arrive
+		Tool* tool = toolPtr.get();
+		mConnections.push_back(connect(tool, &Tool::toolTransformAndTimestamp, this,
 									   [this, tool](Transform3D prMt, double timestamp) { this->onTransform(tool, prMt, timestamp); }));
-		mConnections.push_back(connect(tool.get(), &Tool::toolVisible, this,
+		mConnections.push_back(connect(tool, &Tool::toolVisible, this,
 									   [this, tool](bool visible) { this->onEvent(tool, visible ? "visible" : "hidden"); }));
-		mConnections.push_back(connect(tool.get(), &Tool::toolPositionWarning, this,
+		mConnections.push_back(connect(tool, &Tool::toolPositionWarning, this,
 									   [this, tool](QString) { this->onEvent(tool, "warning"); }));
 	}
 }
@@ -255,7 +257,7 @@ void ToolPositionRecorder::disconnectFromTools()
 	mConnections.clear();
 }
 
-void ToolPositionRecorder::onTransform(ToolPtr tool, const Transform3D& prMt, double timestamp_ms)
+void ToolPositionRecorder::onTransform(Tool* tool, const Transform3D& prMt, double timestamp_ms)
 {
 	QString warning = tool->getPositionWarning();
 	ToolPositionStatistics& statistics = mStatistics[tool->getUid()];
@@ -265,7 +267,7 @@ void ToolPositionRecorder::onTransform(ToolPtr tool, const Transform3D& prMt, do
 							 tool->getVisible(), prMt, warning, tool->getMetadata().mData));
 }
 
-void ToolPositionRecorder::onEvent(ToolPtr tool, QString event)
+void ToolPositionRecorder::onEvent(Tool* tool, QString event)
 {
 	if (event != "warning")
 	{

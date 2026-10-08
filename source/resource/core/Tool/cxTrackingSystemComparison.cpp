@@ -525,6 +525,13 @@ void TrackingSystemComparison::killCommand()
 	}
 }
 
+void TrackingSystemComparison::readOpenIGTLinkServer(TrackingComparisonSettings& settings)
+{
+	QDomElement options = profile()->getXmlSettings().descend("video").getElement("video");
+	settings.openIGTLinkHost = XmlOptionItem(kOpenIGTLinkHostOption, options).readValue(settings.openIGTLinkHost);
+	settings.openIGTLinkPort = XmlOptionItem(kOpenIGTLinkPortOption, options).readValue(QString::number(settings.openIGTLinkPort)).toInt();
+}
+
 void TrackingSystemComparison::setOpenIGTLinkServer()
 {
 	this->setOpenIGTLinkOption(kOpenIGTLinkHostOption, mSettings.openIGTLinkHost);

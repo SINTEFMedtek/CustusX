@@ -155,9 +155,12 @@ class RepoHandler(object):
             result = runShell('git checkout %s' % tag, self.repo_path)
             if result is returnCode():
                 result = self._retryCheckoutAfterRemovingReplacedNestedRepos(tag, tag)
-            # returnCode() (untracked files in the way) is a failure too: it used to
-            # pass this check silently and leave the repo on the previous checkout.
-            if result is None or result is returnCode():
+            # returnCode() (untracked files in the way) and localChangesCode() are failures
+            # too: they used to pass this check silently and leave the repo on the previous
+            # checkout, which would then be built as the tag.
+            if result is localChangesCode():
+                print('Local changes in %s block the checkout of tag %s. Commit, stash or discard them, and re-run.' % (self.repo_path, tag))
+            if result is None or result is returnCode() or result is localChangesCode():
                 exit("tag checkout failed")
             return
         
@@ -250,39 +253,39 @@ class RepoHandler(object):
         A checkout refused with "untracked working tree files would be
         overwritten" can be a plugin that used to be its own repo, cloned
         inside this one, and is now part of this repo on the target branch
-        (e.g. org.custusx.core.tracking.system.ndi, CustusX#55). Such a clone
+        (e.g. a tracking plugin, CustusX#55). Such a clone
         is removed when nothing would be lost (no uncommitted changes, no
         stashes, no unpushed commits), and the checkout is retried. Anything
         else is left alone, so checkSuccess() stops the build as before.
         '''
-        removed = False
-        for nested in self._findNestedReposTrackedBy(ref):
-            full_path = os.path.join(self.repo_path, nested)
-            if self._isNestedRepoSafeToRemove(full_path):
-                print('Removing %s: it is a separate clone of what is now part of %s at %s,' % (full_path, self.getName(), ref))
-                print('with no local changes or unpushed commits.')
-                shutil.rmtree(full_path)
-                removed = True
-            else:
-                print('NOT removing %s: it has local changes or unpushed commits.' % full_path)
-                print('It is now part of %s at %s. Push or save its work, delete it, and re-run.' % (self.getName(), ref))
+        nested_paths = [os.path.join(self.repo_path, nested) for nested in self._findNestedReposTrackedBy(ref)]
+        unsafe = [path for path in nested_paths if not self._isNestedRepoSafeToRemove(path)]
+        for path in unsafe:
+            print('NOT removing %s: it has local changes or unpushed commits.' % path)
+            print('It is now part of %s at %s. Push or save its work, delete it, and re-run.' % (self.getName(), ref))
         result = returnCode()
-        if removed:
+        # Remove none unless all can go: the checkout can only succeed then
+        if nested_paths and not unsafe:
+            for path in nested_paths:
+                print('Removing %s: it is a separate clone of what is now part of %s at %s,' % (path, self.getName(), ref))
+                print('with no local changes or unpushed commits.')
+                shutil.rmtree(path)
             result = runShell('git checkout %s' % checkout_target, self.repo_path)
         return result
 
     def _findNestedReposTrackedBy(self, ref):
         '''Paths (relative) of git clones inside this repo that ref tracks as its own files.'''
+        # Only the folders of files ref adds can be such a clone. Not runShell(): it would print every file.
+        added = subprocess.run(['git', 'diff', '--name-only', '--diff-filter=A', 'HEAD', ref],
+                               cwd=self.repo_path, capture_output=True, text=True).stdout.splitlines()
         retval = []
-        for dirpath, dirnames, filenames in os.walk(self.repo_path):
-            if dirpath != self.repo_path and ('.git' in dirnames or '.git' in filenames):
-                relative = os.path.relpath(dirpath, self.repo_path).replace(os.sep, '/')
-                tracked_by_ref = runShell('git ls-tree -d --name-only %s -- %s' % (ref, relative), self.repo_path)
-                tracked_now = runShell('git ls-tree -d --name-only HEAD -- %s' % relative, self.repo_path)
-                if tracked_by_ref and not tracked_now:
-                    retval.append(relative)
-                dirnames[:] = [] # don't look inside a nested repo
-            dirnames[:] = [d for d in dirnames if d != '.git']
+        for path in added:
+            parts = path.split('/')[:-1]
+            for depth in range(1, len(parts) + 1):
+                folder = '/'.join(parts[:depth])
+                if folder not in retval and os.path.exists(os.path.join(self.repo_path, folder, '.git')):
+                    retval.append(folder)
+                    break  # files inside a clone belong to it, not to a deeper folder
         return retval
 
     def _isNestedRepoSafeToRemove(self, path):
