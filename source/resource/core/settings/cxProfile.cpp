@@ -16,6 +16,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <iostream>
 #include <QApplication>
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include "cxConfig.h"
 #include "cxSettings.h"
 #include "cxFileHelpers.h"
@@ -341,6 +343,7 @@ void ProfileManager::setActiveProfile(QString uid)
 	}
 
 	// uid now is guaranteed to exist in the custom folder
+	this->addMissingToolConfigs(uid);
 
 	mActive.reset(new Profile(this->getPathForCustom(uid), mSettings));
 	this->getGenericSettings()->setValue("profile", mActive->getUid());
@@ -373,6 +376,41 @@ void ProfileManager::createCustomProfile(QString uid)
 			this->newProfile(uid);
 		}
 	}
+}
+
+void ProfileManager::addMissingToolConfigs(QString uid)
+{
+	QStringList configPaths = DataLocations::getRootConfigPaths();
+	for (int i=0; i<configPaths.size(); ++i)
+	{
+		QString installedPath = configPaths[i]+"/profiles/"+uid;
+		QStringList copied = copyMissingToolConfigs(installedPath, this->getPathForCustom(uid));
+		if (!copied.isEmpty())
+		{
+			CX_LOG_INFO() << "Added tool configurations to profile " << uid << ": " << copied.join(", ");
+		}
+	}
+}
+
+QStringList ProfileManager::copyMissingToolConfigs(QString installedProfilePath, QString customProfilePath)
+{
+	QStringList retval;
+	QString customToolPath = customProfilePath + "/tool";
+	QStringList installedConfigs = getAbsolutePathToXmlFiles(installedProfilePath + "/tool");
+	if (!installedConfigs.isEmpty())
+	{
+		QDir().mkpath(customToolPath);
+	}
+	foreach(QString installedConfig, installedConfigs)
+	{
+		QString fileName = QFileInfo(installedConfig).fileName();
+		QString target = customToolPath + "/" + fileName;
+		if (!QFileInfo::exists(target) && QFile::copy(installedConfig, target))
+		{
+			retval << fileName;
+		}
+	}
+	return retval;
 }
 
 void ProfileManager::profilesChanged()
