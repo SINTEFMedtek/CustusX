@@ -97,8 +97,10 @@ private slots:
 	void configureAfterDeconfigureSlot();
 	void globalConfigurationFileChangedSlot(QString key);
 
-private:
+protected:
 	NdiConnectionSettings readConnectionSettings() const;
+
+private:
 	void destroyTrackerThread();
 
 	std::vector<ToolPtr> mTools;

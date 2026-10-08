@@ -128,6 +128,11 @@ commands to NdiCommunication.txt.
   should become orange (position warning) at the border and with a hidden sphere, and red when it
   is out of view. Occlude the reference: all tools should go red, or orange when the reference
   has a warning. Tune ndiTrackingMaxErrorRMS from the recorded RMS errors if needed.
+* Device in use (network): with another application (e.g. PlusServer) tracking with the device, start
+  NDI tracking in CustusX. CustusX should refuse with "already tracking" in the log, and the other
+  application should keep tracking. With ndiTrackingTakeOverDevice=true, CustusX connects.
+* Device in use (serial/USB): the same with the device on a serial or USB port. The port should fail
+  to open, and the other application should keep tracking.
 * Polaris marker count, with ndiTrackingDebugLogging=true: the "NDI Tracker debug" lines in the
   log show the 3D marker count of each tool and the markers used. Use a 4-marker tool: all
   spheres visible, one sphere hidden, a sphere removed before tracking starts, and the tool

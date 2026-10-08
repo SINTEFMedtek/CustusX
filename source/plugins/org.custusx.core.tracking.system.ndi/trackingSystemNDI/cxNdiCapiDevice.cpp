@@ -76,7 +76,7 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 	bool success = false;
 	if (!serial)
 	{
-		success = this->openNetwork(hostname, settings.networkPort);
+		success = this->openNetwork(hostname, settings.networkPort, settings.takeOverDevice);
 	}
 	else
 	{
@@ -109,6 +109,15 @@ QString NdiCapiDevice::toSerialDeviceName(QString device)
 	{
 		retval = "\\\\.\\COM" + match.captured(1);
 	}
+	return retval;
+}
+
+bool NdiCapiDevice::isTrackingForAnotherClient()
+{
+	bool responding = mResponding; // a device that doesn't answer is found by INIT
+	ndiTimeoutSocket(mDevice, kCommandTimeout_ms);
+	bool retval = this->command("BX:%04X", NDI_XFORMS_AND_STATUS);
+	mResponding = responding;
 	return retval;
 }
 
@@ -252,7 +261,7 @@ int NdiCapiDevice::baudRateToNdiCode(int baudRate)
 	return retval;
 }
 
-bool NdiCapiDevice::openNetwork(QString hostname, int port)
+bool NdiCapiDevice::openNetwork(QString hostname, int port, bool takeOverDevice)
 {
 	mDevice = ndiOpenNetwork(hostname.toLocal8Bit().constData(), port);
 	if (!mDevice)
@@ -262,6 +271,14 @@ bool NdiCapiDevice::openNetwork(QString hostname, int port)
 	}
 	mNetwork = true;
 	this->log(QString("Connected to %1:%2").arg(hostname).arg(port));
+	// INIT would stop the tracking of another application using the device
+	if (!takeOverDevice && this->isTrackingForAnotherClient())
+	{
+		mLastError = QString("The NDI device at %1 is already tracking, probably for another application "
+							 "(e.g. an OpenIGTLink server). Not connecting, so its tracking continues. If no other "
+							 "application uses it, restart the device or set ndiTrackingTakeOverDevice=true.").arg(hostname);
+		return false;
+	}
 	ndiTimeoutSocket(mDevice, kFirstInitTimeout_ms);
 	bool success = this->command("INIT:");
 	ndiTimeoutSocket(mDevice, kCommandTimeout_ms);

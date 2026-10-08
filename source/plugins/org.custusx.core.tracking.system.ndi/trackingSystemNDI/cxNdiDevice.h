@@ -27,6 +27,7 @@ struct org_custusx_core_tracking_system_ndi_EXPORT NdiConnectionSettings
 {
 	QString hostname; ///< Serial device (e.g. /dev/ttyUSB0, COM3) or network host/IP. Empty: probe the serial ports.
 	int networkPort = 8765; ///< Port for network connections (NDI default)
+	bool takeOverDevice = false; ///< Network: also connect to a device that is already tracking, stopping the other application's session
 	int baudRate = 921600; ///< Serial baud rate. Falls back to slower rates if the device or the serial adapter can't use it.
 	QString communicationLogFile; ///< If not empty, log the commands and replies to this file.
 	bool requestMarkerInfo = false; ///< Request tool and marker information in BX (Polaris only). Set by NdiTrackerManager.

@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxNdiTool.h"
 #include "cxToolUsingNDI.h"
 #include "cxTrackingSystemNDIService.h"
+#include "cxSettings.h"
 
 namespace cxtest
 {
@@ -258,6 +259,23 @@ bool waitUntilConfigured(cx::TrackingSystemNDIService& service)
 }
 
 } // namespace
+
+class TestTrackingSystemNDIService : public cx::TrackingSystemNDIService
+{
+public:
+	using cx::TrackingSystemNDIService::readConnectionSettings;
+};
+
+TEST_CASE("TrackingSystemNDIService: a network device in use is only taken over when set", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	cx::DataLocations::setTestMode();
+	TestTrackingSystemNDIService service;
+	CHECK_FALSE(service.readConnectionSettings().takeOverDevice);
+
+	cx::settings()->setValue("ndiTrackingTakeOverDevice", true);
+	CHECK(service.readConnectionSettings().takeOverDevice);
+	cx::settings()->setValue("ndiTrackingTakeOverDevice", false);
+}
 
 TEST_CASE("TrackingSystemNDIService: a new tool configuration replaces the configured one", "[unit][org.custusx.core.tracking.system.ndi]")
 {

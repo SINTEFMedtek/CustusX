@@ -324,6 +324,7 @@ NdiConnectionSettings TrackingSystemNDIService::readConnectionSettings() const
 	retval.baudRate = settings()->value("ndiTrackingBaudRate", 921600).toInt();
 	retval.maxErrorRMS_mm = settings()->value("ndiTrackingMaxErrorRMS", 0.0).toDouble();
 	retval.illuminatorRate_Hz = settings()->value("ndiTrackingIlluminatorRate_Hz", 60).toInt();
+	retval.takeOverDevice = settings()->value("ndiTrackingTakeOverDevice", false).toBool();
 	retval.debugMarkerCount = settings()->value("ndiTrackingDebugLogging", false).toBool();
 	if (retval.debugMarkerCount && !mLoggingFolder.isEmpty())
 	{

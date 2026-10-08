@@ -51,6 +51,14 @@ while CustusX is closed:
 * ndiTrackingDebugLogging: true to log the commands sent to the device and its replies, in
   NdiCommunication.txt in the logging folder. For Polaris, the number of markers of each tool is
   also written to the log ("NDI Tracker debug" lines) whenever it changes.
+* ndiTrackingTakeOverDevice: true to connect to a network device that is already tracking. By default
+  CustusX doesn't connect to it, since another application (e.g. an OpenIGTLink server) is probably
+  using it, and connecting would stop that application's tracking. A device left tracking after
+  CustusX stopped unexpectedly is also refused: restart the device, or set this to true.
+
+A serial or USB device used by another application can't be opened on Windows. On Linux and macOS
+it can't be opened if the other application locks the port, as applications using ndicapi (e.g.
+PlusServer) do.
 
 Validation
 -----------------------------------------------------------

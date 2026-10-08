@@ -69,7 +69,8 @@ public:
 
 private:
 	bool openSerial(QString device, int baudRate);
-	bool openNetwork(QString hostname, int port);
+	bool openNetwork(QString hostname, int port, bool takeOverDevice);
+	bool isTrackingForAnotherClient(); ///< BX only succeeds in tracking mode: another client is using the device
 	bool setBaudRate(int baudRate);
 	bool resetToDefaultBaudRate();
 	QString findSerialDevice();
