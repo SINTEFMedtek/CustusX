@@ -54,6 +54,10 @@ public:
 
 protected:
 	void internalSetState(Tool::State val);
+	void updateState();
+	bool isServerConnected() const;
+	void connectToServer();
+	void disconnectFromServer();
 	OpenIGTLinkToolPtr getTool(QString devicename);
 	bool printTransformIdWarning(QString devicename);
 
@@ -67,6 +71,7 @@ protected slots:
 private slots:
 	void serverIsConnected();
 	void serverIsDisconnected();
+	void globalConfigurationFileChangedSlot(QString key);
 
 	void receiveCalibration(QString devicename, Transform3D calibration);
 	void receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition);
@@ -81,6 +86,9 @@ private:
 	TrackingServicePtr mTrackingService;
 	std::map<QString, ProbeDefinitionPtr> mPendingProbeDefinitions;
 	Tool::State mLastTrackingState;
+	bool mConfigured; ///< The tool configuration is for OpenIGTLink, and the tools are created
+	Tool::State mRequestedState; ///< The state asked for. The state is at most tsCONFIGURED while not connected
+	bool mConnectionAcquired; ///< Tracking uses the shared OpenIGTLink connection
 
 signals:
 	void setInternalState(const Tool::State val);

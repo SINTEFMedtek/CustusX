@@ -151,7 +151,7 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 	testAndDeleteBaseWidgetChild(new cx::ShadingWidget(patientModelService->getActiveData(), testParent));
 //	testAndDeleteBaseWidgetChild(new cx::SimulateUSWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolPropertiesWidget(trackingService, spaceProvider, testParent));
-	testAndDeleteBaseWidgetChild(new cx::TrackingTestWidget(trackingService, services->video(), testParent));
+	testAndDeleteBaseWidgetChild(new cx::TrackingTestWidget(trackingService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::TrackPadWidget(viewService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::Transform3DWidget(testParent));
 

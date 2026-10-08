@@ -87,7 +87,7 @@ bool runComparison(cx::TrackingComparisonSettings settings, double* maxMeanDiffe
 	INFO("Set CX_TRACKING_TEST_CONFIG to the tool configuration file");
 	REQUIRE(QFile::exists(settings.toolConfigFile));
 
-	cx::TrackingSystemComparison comparison(cx::logicManager()->getTrackingService(), cx::logicManager()->getVideoService());
+	cx::TrackingSystemComparison comparison(cx::logicManager()->getTrackingService());
 	QEventLoop loop;
 	QObject::connect(&comparison, &cx::TrackingSystemComparison::finished, &loop, &QEventLoop::quit);
 	QTimer::singleShot(getMaxDuration_ms(settings), &loop, &QEventLoop::quit);

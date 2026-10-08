@@ -26,7 +26,6 @@ class QProcess;
 
 namespace cx
 {
-typedef std::shared_ptr<class VideoService> VideoServicePtr;
 
 /** One tracking system to run in a comparison. */
 struct cxResource_EXPORT TrackingComparisonRun
@@ -62,7 +61,7 @@ struct cxResource_EXPORT TrackingComparisonSettings
  * For each run: write a copy of the tool configuration with the run's tracking system
  * implementation, start the run's command (if any), start tracking, wait for the tools to
  * settle, record the positions for a while (ToolPositionRecorder), stop tracking and the
- * command. OpenIGTLink tracking is started through the video connection, as from the GUI.
+ * command. OpenIGTLink tracking connects to the server set in the run, as Start tracking does.
  * Writes one CSV file per run and a summary to the output folder.
  *
  * Only one system can use the device at a time, so the runs are never in parallel.
@@ -73,7 +72,7 @@ class cxResource_EXPORT TrackingSystemComparison : public QObject
 {
 	Q_OBJECT
 public:
-	TrackingSystemComparison(TrackingServicePtr trackingService, VideoServicePtr videoService);
+	explicit TrackingSystemComparison(TrackingServicePtr trackingService);
 	virtual ~TrackingSystemComparison();
 
 	void start(TrackingComparisonSettings settings);
@@ -119,15 +118,14 @@ private:
 	void stopCommand();
 	bool checkCommandStopped(double elapsed_ms);
 	void killCommand();
-	void openOpenIGTLinkConnection();
-	void closeOpenIGTLinkConnection();
-	void setOpenIGTLinkOption(QString uid, QString value); ///< Remembers the original value, restored when closing
+	void setOpenIGTLinkServer(); ///< The server the OpenIGTLink tracking connects to
+	void restoreOpenIGTLinkServer();
+	void setOpenIGTLinkOption(QString uid, QString value); ///< Remembers the original value, restored when finished
 	void wait(Step step, int duration_ms);
 	void log(QString message);
 	TrackingComparisonRun currentRun() const;
 
 	TrackingServicePtr mTrackingService;
-	VideoServicePtr mVideoService;
 	TrackingComparisonSettings mSettings;
 	ToolPositionRecorder mRecorder;
 	QTimer mTimer;
@@ -137,10 +135,8 @@ private:
 	double mStepStart_ms;
 	int mRunIndex;
 	bool mSuccess;
-	bool mOpenIGTLinkOpened;
 	QString mOriginalToolConfigFile;
 	QStringList mWrittenToolConfigFiles; ///< Temporary run configurations in the profile tool folder, removed when finished
-	QString mOriginalConnectionMethod;
 	std::map<QString, QString> mOriginalOpenIGTLinkOptions;
 	QStringList mSummary;
 	std::vector<TrackingComparisonResult> mResults;

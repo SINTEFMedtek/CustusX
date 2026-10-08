@@ -28,7 +28,7 @@ class cxGui_EXPORT TrackingTestWidget : public TabbedWidget
 {
 	Q_OBJECT
 public:
-	TrackingTestWidget(TrackingServicePtr trackingService, VideoServicePtr videoService, QWidget* parent = NULL);
+	TrackingTestWidget(TrackingServicePtr trackingService, QWidget* parent = NULL);
 	virtual ~TrackingTestWidget();
 };
 

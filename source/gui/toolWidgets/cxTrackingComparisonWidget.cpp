@@ -38,9 +38,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-TrackingComparisonWidget::TrackingComparisonWidget(TrackingServicePtr trackingService, VideoServicePtr videoService, QWidget* parent) :
+TrackingComparisonWidget::TrackingComparisonWidget(TrackingServicePtr trackingService, QWidget* parent) :
 	BaseWidget(parent, "tracking_comparison_widget", "Compare Tracking Systems"),
-	mComparison(trackingService, videoService),
+	mComparison(trackingService),
 	mToolConfigFile(new QComboBox()),
 	mOpenIGTLinkCommand(new QLineEdit(settings()->value("TrackingTest/openIGTLinkCommand", "").toString())),
 	mOpenIGTLinkArguments(new QLineEdit(settings()->value("TrackingTest/openIGTLinkArguments", "").toString())),

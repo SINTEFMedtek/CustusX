@@ -22,7 +22,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxTime.h"
 #include "cxTrackingService.h"
-#include "cxVideoService.h"
 #include "cxXmlOptionItem.h"
 #include "cxDefinitions.h"
 
@@ -35,23 +34,19 @@ const int kTimerInterval_ms = 100;
 const int kCommandTerminateAfter_ms = 3000;
 const int kCommandKillAfter_ms = 6000;
 const int kStopTimeout_ms = 15000;
-const char* kOpenIGTLinkStreamer = "openigtlink3_streamer";
-const char* kOpenIGTLinkStartTrackingOption = "start_tracking";
 const char* kOpenIGTLinkHostOption = "ip_scanner_openigtlink";
 const char* kOpenIGTLinkPortOption = "ip_port";
 }
 
-TrackingSystemComparison::TrackingSystemComparison(TrackingServicePtr trackingService, VideoServicePtr videoService) :
+TrackingSystemComparison::TrackingSystemComparison(TrackingServicePtr trackingService) :
 	mTrackingService(trackingService),
-	mVideoService(videoService),
 	mRecorder(trackingService),
 	mProcess(nullptr),
 	mStep(sIDLE),
 	mStepDeadline_ms(0.0),
 	mStepStart_ms(0.0),
 	mRunIndex(0),
-	mSuccess(false),
-	mOpenIGTLinkOpened(false)
+	mSuccess(false)
 {
 	mTimer.setInterval(kTimerInterval_ms);
 	connect(&mTimer, &QTimer::timeout, this, &TrackingSystemComparison::onTimer);
@@ -71,7 +66,6 @@ void TrackingSystemComparison::start(TrackingComparisonSettings settings)
 	mSummary.clear();
 	mResults.clear();
 	mOriginalToolConfigFile = profile()->getToolConfigFilePath();
-	mOriginalConnectionMethod = mVideoService ? mVideoService->getConnectionMethod() : QString();
 	QDir().mkpath(mSettings.outputFolder);
 	this->log(QString("Comparing %1 tracking system(s), recording %2 s each, output in %3")
 			  .arg(mSettings.runs.size()).arg(mSettings.recordDuration_ms / 1000.0).arg(mSettings.outputFolder));
@@ -354,12 +348,9 @@ void TrackingSystemComparison::startTracking()
 {
 	if (this->currentRun().implementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
 	{
-		this->openOpenIGTLinkConnection();
+		this->setOpenIGTLinkServer();
 	}
-	else
-	{
-		mTrackingService->setState(Tool::tsTRACKING);
-	}
+	mTrackingService->setState(Tool::tsTRACKING);
 	this->wait(sWAIT_FOR_TRACKING, mSettings.startTimeout_ms);
 }
 
@@ -408,8 +399,8 @@ void TrackingSystemComparison::stopRun(QString result)
 		mSummary << statistics;
 	}
 	this->log(QString("Run %1: %2").arg(label).arg(result));
-	this->closeOpenIGTLinkConnection();
 	mTrackingService->setState(Tool::tsNONE);
+	this->restoreOpenIGTLinkServer();
 	this->stopCommand();
 	this->wait(sWAIT_FOR_STOP, kStopTimeout_ms);
 }
@@ -446,10 +437,6 @@ void TrackingSystemComparison::finish()
 		QFile::remove(configFile);
 	}
 	mWrittenToolConfigFiles.clear();
-	if (mVideoService && !mOriginalConnectionMethod.isEmpty())
-	{
-		mVideoService->setConnectionMethod(mOriginalConnectionMethod);
-	}
 	QFile file(mSettings.outputFolder + "/summary.txt");
 	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
 	{
@@ -538,30 +525,14 @@ void TrackingSystemComparison::killCommand()
 	}
 }
 
-void TrackingSystemComparison::openOpenIGTLinkConnection()
+void TrackingSystemComparison::setOpenIGTLinkServer()
 {
-	if (mVideoService)
-	{
-		this->setOpenIGTLinkOption(kOpenIGTLinkStartTrackingOption, "1");
-		this->setOpenIGTLinkOption(kOpenIGTLinkHostOption, mSettings.openIGTLinkHost);
-		this->setOpenIGTLinkOption(kOpenIGTLinkPortOption, QString::number(mSettings.openIGTLinkPort));
-		mVideoService->setConnectionMethod(kOpenIGTLinkStreamer);
-		mVideoService->openConnection();
-		mOpenIGTLinkOpened = true;
-	}
-	else
-	{
-		this->log("No video service, cannot start OpenIGTLink tracking");
-	}
+	this->setOpenIGTLinkOption(kOpenIGTLinkHostOption, mSettings.openIGTLinkHost);
+	this->setOpenIGTLinkOption(kOpenIGTLinkPortOption, QString::number(mSettings.openIGTLinkPort));
 }
 
-void TrackingSystemComparison::closeOpenIGTLinkConnection()
+void TrackingSystemComparison::restoreOpenIGTLinkServer()
 {
-	if (mOpenIGTLinkOpened && mVideoService)
-	{
-		mVideoService->closeConnection();
-	}
-	mOpenIGTLinkOpened = false;
 	QDomElement options = profile()->getXmlSettings().descend("video").getElement("video");
 	for (const std::pair<const QString, QString>& entry : mOriginalOpenIGTLinkOptions)
 	{

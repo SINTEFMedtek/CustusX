@@ -37,7 +37,7 @@ class cxGui_EXPORT TrackingComparisonWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	TrackingComparisonWidget(TrackingServicePtr trackingService, VideoServicePtr videoService, QWidget* parent = NULL);
+	TrackingComparisonWidget(TrackingServicePtr trackingService, QWidget* parent = NULL);
 	virtual ~TrackingComparisonWidget();
 
 	static std::vector<TrackingComparisonRun> createRuns(QStringList implementations, QString openIGTLinkCommand, QString openIGTLinkArguments);

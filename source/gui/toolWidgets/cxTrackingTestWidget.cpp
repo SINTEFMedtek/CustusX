@@ -18,12 +18,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-TrackingTestWidget::TrackingTestWidget(TrackingServicePtr trackingService, VideoServicePtr videoService, QWidget* parent) :
+TrackingTestWidget::TrackingTestWidget(TrackingServicePtr trackingService, QWidget* parent) :
 	TabbedWidget(parent, "tracking_test_widget", "Tracking Test")
 {
 	this->setToolTip("Test tracking: tracking state, record tool positions, compare tracking systems");
 	this->addTab(new ToolPositionRecorderWidget(trackingService, this), "Record positions");
-	this->addTab(new TrackingComparisonWidget(trackingService, videoService, this), "Compare systems");
+	this->addTab(new TrackingComparisonWidget(trackingService, this), "Compare systems");
 	this->addTab(new ToolManagerWidget(trackingService, this), "Tracking state");
 }
 
