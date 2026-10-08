@@ -57,6 +57,8 @@ public:
 	bool readFrame(const std::vector<int>& portHandles, NdiFrame& frame) override;
 
 	static QStringList getSerialPortCandidates();
+	static bool isSerialDevice(QString hostname); ///< Empty (probe), /dev/..., COMn or \\.\COMn. Otherwise a network host
+	static QString toSerialDeviceName(QString device); ///< Windows: COM10 and up must be opened as \\.\COM10
 	static NdiPortLocation parsePortLocation(const char location[14]);
 	static int baudRateToNdiCode(int baudRate);
 	static int illuminatorRateToNdiCode(int rate_Hz); ///< -1 if not supported

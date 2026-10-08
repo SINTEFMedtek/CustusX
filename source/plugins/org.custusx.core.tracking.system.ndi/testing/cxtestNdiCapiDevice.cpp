@@ -26,6 +26,27 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cxtest
 {
 
+TEST_CASE("NdiCapiDevice: serial devices and network hosts", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiCapiDevice::isSerialDevice(""));
+	CHECK(cx::NdiCapiDevice::isSerialDevice("/dev/ttyUSB0"));
+	CHECK(cx::NdiCapiDevice::isSerialDevice("COM3"));
+	CHECK(cx::NdiCapiDevice::isSerialDevice("com12"));
+	CHECK(cx::NdiCapiDevice::isSerialDevice("\\\\.\\COM12"));
+	CHECK_FALSE(cx::NdiCapiDevice::isSerialDevice("192.168.1.10"));
+	CHECK_FALSE(cx::NdiCapiDevice::isSerialDevice("P9-01234.local"));
+}
+
+TEST_CASE("NdiCapiDevice: Windows COM ports from 10 get the device namespace prefix", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiCapiDevice::toSerialDeviceName("COM3") == "COM3");
+	CHECK(cx::NdiCapiDevice::toSerialDeviceName("COM9") == "COM9");
+	CHECK(cx::NdiCapiDevice::toSerialDeviceName("COM10") == "\\\\.\\COM10");
+	CHECK(cx::NdiCapiDevice::toSerialDeviceName("com23") == "\\\\.\\COM23");
+	CHECK(cx::NdiCapiDevice::toSerialDeviceName("\\\\.\\COM12") == "\\\\.\\COM12");
+	CHECK(cx::NdiCapiDevice::toSerialDeviceName("/dev/ttyUSB0") == "/dev/ttyUSB0");
+}
+
 TEST_CASE("NdiCapiDevice: port location of a wired Aurora sensor", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	// 8 chars device number, Aurora (1), wired (0), port 03, channel 01

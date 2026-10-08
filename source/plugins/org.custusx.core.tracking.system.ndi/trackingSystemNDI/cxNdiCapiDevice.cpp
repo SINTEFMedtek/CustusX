@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <cstdio>
 #include <QDateTime>
 #include <QDir>
+#include <QRegularExpression>
 #include <QTextStream>
 
 #include "ndicapi.h"
@@ -71,7 +72,7 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 	}
 
 	QString hostname = settings.hostname.trimmed();
-	bool serial = hostname.isEmpty() || hostname.startsWith("/dev/") || hostname.startsWith("COM", Qt::CaseInsensitive);
+	bool serial = isSerialDevice(hostname);
 	bool success = false;
 	if (!serial)
 	{
@@ -79,7 +80,7 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 	}
 	else
 	{
-		QString device = hostname.isEmpty() ? this->findSerialDevice() : hostname;
+		QString device = hostname.isEmpty() ? this->findSerialDevice() : toSerialDeviceName(hostname);
 		success = !device.isEmpty() && this->openSerial(device, settings.baudRate);
 	}
 
@@ -92,6 +93,23 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 		this->close();
 	}
 	return success;
+}
+
+bool NdiCapiDevice::isSerialDevice(QString hostname)
+{
+	return hostname.isEmpty() || hostname.startsWith("/dev/") || hostname.startsWith("COM", Qt::CaseInsensitive)
+			|| hostname.startsWith("\\\\.\\");
+}
+
+QString NdiCapiDevice::toSerialDeviceName(QString device)
+{
+	QString retval = device;
+	QRegularExpressionMatch match = QRegularExpression("^COM(\\d+)$", QRegularExpression::CaseInsensitiveOption).match(device);
+	if (match.hasMatch() && match.captured(1).toInt() >= 10)
+	{
+		retval = "\\\\.\\COM" + match.captured(1);
+	}
+	return retval;
 }
 
 QString NdiCapiDevice::findSerialDevice()

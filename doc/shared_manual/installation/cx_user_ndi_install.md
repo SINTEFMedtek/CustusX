@@ -39,7 +39,8 @@ settings.ini in the profile's settings folder (e.g. CustusX_settings/profiles/La
 while CustusX is closed:
 
 * ndiTrackingHostname: the serial port (e.g. /dev/ttyUSB0 or COM3) or the network address of the
-  device. Empty (default): search the serial ports.
+  device. Empty (default): search the serial ports (on Windows COM1 to COM20). Set it for a device
+  on a higher COM port; the COM port number is shown in the Windows Device Manager.
 * ndiTrackingBaudRate: serial baud rate, default 921600. Slower rates are tried if the device or the
   serial adapter can't use it.
 * ndiTrackingIlluminatorRate_Hz: Polaris only, 20, 30 or 60 Hz, default 60. 0 uses the device's
