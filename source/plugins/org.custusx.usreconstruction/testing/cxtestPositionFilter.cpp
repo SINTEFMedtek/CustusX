@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxPositionFilter.h"
 #include <QDateTime>
+#include <cmath>
 
 
 namespace cxtest
@@ -158,6 +159,67 @@ TEST_CASE("PositionFilter: Filter active","[unit][usreconstruction][synthetic]")
 
 	REQUIRE(activeFilterTestResult == 2); //Elements are changed in filtered array, but total energy and # elements unchanged
 
+}
+
+
+namespace
+{
+// Poses with constant speed: z position increases 1 mm per pose and a rotation about the z axis increases with
+// startAngleDeg + 0.5 deg per pose.
+std::vector<cx::TimedPosition> buildMovingArray(int nTestElements, double startAngleDeg)
+{
+	std::vector<cx::TimedPosition> posVector;
+	for (int i = 0; i < nTestElements; i++)
+	{
+		cx::TimedPosition timedPosition;
+		timedPosition.mTime = 50*i;
+		timedPosition.mPos = cx::Transform3D::Identity();
+		timedPosition.mPos.rotate(Eigen::AngleAxisd((startAngleDeg + 0.5*i)*M_PI/180, Eigen::Vector3d::UnitZ()));
+		timedPosition.mPos.pretranslate(Eigen::Vector3d(0, 0, i));
+		posVector.push_back(timedPosition);
+	}
+	return posVector;
+}
+
+void requirePositionsUnchanged(const std::vector<cx::TimedPosition> &original, const std::vector<cx::TimedPosition> &result)
+{
+	REQUIRE(original.size() == result.size());
+	for (unsigned i = 0; i < original.size(); i++)
+	{
+		double translationError = (original[i].mPos.translation() - result[i].mPos.translation()).norm();
+		Eigen::Matrix3d rotationDifference = result[i].mPos.rotation() * original[i].mPos.rotation().transpose();
+		double rotationError = Eigen::AngleAxisd(rotationDifference).angle();
+		INFO("Position " << i);
+		CHECK(translationError < 1e-9);
+		CHECK(rotationError < 1e-9);
+	}
+}
+} // namespace
+
+TEST_CASE("PositionFilter: Constant speed movement is not changed, including first and last position","[unit][usreconstruction][synthetic]")
+{
+	// A centered moving average does not change a signal that is linear in time. This must also be true for the
+	// first and last positions (no padding with copies of the end positions, which would pull them inwards).
+	for (unsigned filterStrength = 1; filterStrength <= 10; filterStrength+=3)
+	{
+		INFO("Filter strength " << filterStrength);
+		std::vector<cx::TimedPosition> posVector = buildMovingArray(50, 0);
+		std::vector<cx::TimedPosition> posVectorInitial = posVector;
+		PositionFilterTester positionFilter(filterStrength, posVector);
+		positionFilter.testFilterPositions();
+		requirePositionsUnchanged(posVectorInitial, posVector);
+	}
+}
+
+TEST_CASE("PositionFilter: Sign change of quaternion between positions","[unit][usreconstruction][synthetic]")
+{
+	// A rotation sweep where the quaternion from the matrix changes sign between two positions
+	// (q and -q are the same rotation). The filtered rotations must still follow the sweep.
+	std::vector<cx::TimedPosition> posVector = buildMovingArray(60, 230);
+	std::vector<cx::TimedPosition> posVectorInitial = posVector;
+	PositionFilterTester positionFilter(5, posVector);
+	positionFilter.testFilterPositions();
+	requirePositionsUnchanged(posVectorInitial, posVector);
 }
 
 } // namespace
