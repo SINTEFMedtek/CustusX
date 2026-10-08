@@ -129,6 +129,24 @@ TEST_CASE("NdiTrackerManager: failing to connect gives an error and no initializ
 	CHECK(fixture.errors == 1);
 }
 
+TEST_CASE("NdiTrackerManager: a device used by another application is reported before the error", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	ManagerFixture fixture;
+	fixture.device->openSucceeds = false;
+	fixture.device->inUse = true;
+	QStringList emitted;
+	QObject::connect(fixture.manager.get(), &cx::NdiTrackerManager::deviceInUse, [&emitted]() { emitted << "deviceInUse"; });
+	QObject::connect(fixture.manager.get(), &cx::NdiTrackerManager::error, [&emitted]() { emitted << "error"; });
+
+	fixture.manager->initializeSlot(true);
+	CHECK(emitted == QStringList({"deviceInUse", "error"}));
+
+	emitted.clear();
+	fixture.device->inUse = false;
+	fixture.manager->initializeSlot(true);
+	CHECK(emitted == QStringList({"error"}));
+}
+
 TEST_CASE("NdiTrackerManager: tool positions are reported relative to the reference", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	ManagerFixture fixture;

@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDir>
 #include <QFile>
 #include <QCoreApplication>
+#include <QTimer>
 
 #include "cxLogger.h"
 #include "cxToolUsingNDI.h"
@@ -32,7 +33,8 @@ namespace
 const int kThreadStopTimeout_ms = 15000; ///< Longer than a few unanswered commands while closing the device
 }
 
-TrackingSystemNDIService::TrackingSystemNDIService()
+TrackingSystemNDIService::TrackingSystemNDIService() :
+	mDeviceInUse(false)
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 	this->setConfigurationFile(profile()->getToolConfigFilePath());
@@ -109,6 +111,7 @@ void TrackingSystemNDIService::configure()
 	connect(mTrackerThread.get(), &NdiTrackerThread::configured, this, &TrackingSystemNDIService::trackerConfiguredSlot);
 	connect(mTrackerThread.get(), &NdiTrackerThread::initialized, this, &TrackingSystemNDIService::initializedSlot);
 	connect(mTrackerThread.get(), &NdiTrackerThread::tracking, this, &TrackingSystemNDIService::trackerTrackingSlot);
+	connect(mTrackerThread.get(), &NdiTrackerThread::deviceInUse, this, &TrackingSystemNDIService::deviceInUseSlot);
 	connect(mTrackerThread.get(), &NdiTrackerThread::error, this, &TrackingSystemNDIService::trackerErrorSlot);
 
 	mTrackerThread->start();
@@ -342,6 +345,29 @@ void TrackingSystemNDIService::trackerErrorSlot()
 	disconnect(this, SIGNAL(configured()), this, SLOT(initializeAfterConfigSlot()));
 	disconnect(this, SIGNAL(trackingStopped()), this, SLOT(uninitializeAfterTrackingStoppedSlot()));
 	this->uninitialize();
+	if (mDeviceInUse)
+	{
+		mDeviceInUse = false;
+		if (settings()->value("ndiTrackingOpenIGTLinkFallback", true).toBool())
+		{
+			// Not from this slot: deconfiguring destroys the tracker thread that sent the signal
+			QTimer::singleShot(0, this, &TrackingSystemNDIService::handOverToFallbackSlot);
+		}
+	}
+}
+
+void TrackingSystemNDIService::deviceInUseSlot()
+{
+	mDeviceInUse = true;
+}
+
+void TrackingSystemNDIService::handOverToFallbackSlot()
+{
+	// Remove the NDI tools, so that only the fallback system has tools from this configuration
+	QString configurationFile = mConfigurationFilePath;
+	this->deconfigure();
+	report("NDI Tracking: The device is used by another application. Using the tool positions it sends over OpenIGTLink, if any.");
+	emit deviceInUse(configurationFile);
 }
 
 void TrackingSystemNDIService::startTrackingAfterInitSlot()

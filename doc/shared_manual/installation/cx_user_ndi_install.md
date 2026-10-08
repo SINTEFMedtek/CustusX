@@ -56,9 +56,26 @@ while CustusX is closed:
   using it, and connecting would stop that application's tracking. A device left tracking after
   CustusX stopped unexpectedly is also refused: restart the device, or set this to true.
 
+* ndiTrackingOpenIGTLinkFallback: true (default) to use the tool positions from an OpenIGTLink server
+  when the NDI device is used by another application, see below. false: just report that the device
+  is in use.
+
 A serial or USB device used by another application can't be opened on Windows. On Linux and macOS
 it can't be opened if the other application locks the port, as applications using ndicapi (e.g.
 PlusServer) do.
+
+Device used by another application
+-----------------------------------------------------------
+When another application uses the NDI device, e.g. an OpenIGTLink server like PlusServer that streams
+the tool positions, CustusX can't connect to the device. It then gets the positions of the tools in
+the NDI tool configuration from that server instead, without changing the tool configuration:
+
+* The OpenIGTLink connection uses the Address and Port of the OpenIGTLink 3 streamer in the Video
+  Connection widget.
+* The server's transform names must match the tools: the openigtlinktransformid attribute of the
+  toolfile in the tool configuration, or port_N for an Aurora tool on port number N.
+* Only one of them tracks at a time. Every Start Tracking tries the NDI device first, and uses the
+  server only if the device is still in use.
 
 Validation
 -----------------------------------------------------------

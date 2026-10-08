@@ -24,6 +24,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxNdiTransformUtils.h"
 #include "cxLogger.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <cerrno>
+#include <fcntl.h>
+#include <unistd.h>
+#endif
+
 namespace cx
 {
 
@@ -47,7 +55,8 @@ NdiCapiDevice::NdiCapiDevice() :
 	mMarkerInfoFailures(0),
 	mRequest3DMarkers(false),
 	mLastBXHas3DMarkers(false),
-	mResponding(true)
+	mResponding(true),
+	mInUse(false)
 {
 }
 
@@ -60,6 +69,7 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 {
 	this->close();
 	mResponding = true;
+	mInUse = false;
 	mRequestMarkerInfo = settings.requestMarkerInfo;
 	mRequest3DMarkers = settings.requestMarkerInfo && settings.debugMarkerCount;
 	mLast3DMarkerLog.clear();
@@ -82,6 +92,11 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 	{
 		QString device = hostname.isEmpty() ? this->findSerialDevice() : toSerialDeviceName(hostname);
 		success = !device.isEmpty() && this->openSerial(device, settings.baudRate);
+		if (!success && !hostname.isEmpty() && isSerialPortInUse(device))
+		{
+			mInUse = true;
+			mLastError = QString("The serial port %1 is used by another application").arg(device);
+		}
 	}
 
 	if (success && this->command("VER:4"))
@@ -112,6 +127,38 @@ QString NdiCapiDevice::toSerialDeviceName(QString device)
 	return retval;
 }
 
+bool NdiCapiDevice::isSerialPortInUse(QString device)
+{
+	bool retval = false;
+	QByteArray name = toSerialDeviceName(device).toLocal8Bit();
+#ifdef _WIN32
+	HANDLE handle = CreateFileA(name.constData(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+	if (handle == INVALID_HANDLE_VALUE)
+	{
+		retval = (GetLastError() == ERROR_ACCESS_DENIED); // opened by another application
+	}
+	else
+	{
+		CloseHandle(handle);
+	}
+#else
+	int port = ::open(name.constData(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+	if (port < 0)
+	{
+		retval = (errno == EBUSY); // opened exclusively by another application
+	}
+	else
+	{
+		struct flock lock = {};
+		lock.l_type = F_WRLCK;
+		lock.l_whence = SEEK_SET;
+		retval = (fcntl(port, F_GETLK, &lock) == 0) && (lock.l_type != F_UNLCK); // locked, as ndicapi does
+		::close(port);
+	}
+#endif
+	return retval;
+}
+
 bool NdiCapiDevice::isTrackingForAnotherClient()
 {
 	bool responding = mResponding; // a device that doesn't answer is found by INIT
@@ -134,7 +181,20 @@ QString NdiCapiDevice::findSerialDevice()
 	}
 	if (retval.isEmpty())
 	{
+		QStringList inUse;
+		for (const QString& candidate : candidates)
+		{
+			if (isSerialPortInUse(candidate))
+			{
+				inUse << candidate;
+			}
+		}
+		mInUse = !inUse.isEmpty();
 		mLastError = QString("No NDI device found on the serial ports (tried %1)").arg(candidates.join(", "));
+		if (mInUse)
+		{
+			mLastError += QString(", used by another application: %1").arg(inUse.join(", "));
+		}
 	}
 	this->log("Serial port probe: " + (retval.isEmpty() ? mLastError : retval));
 	return retval;
@@ -274,6 +334,7 @@ bool NdiCapiDevice::openNetwork(QString hostname, int port, bool takeOverDevice)
 	// INIT would stop the tracking of another application using the device
 	if (!takeOverDevice && this->isTrackingForAnotherClient())
 	{
+		mInUse = true;
 		mLastError = QString("The NDI device at %1 is already tracking, probably for another application "
 							 "(e.g. an OpenIGTLink server). Not connecting, so its tracking continues. If no other "
 							 "application uses it, restart the device or set ndiTrackingTakeOverDevice=true.").arg(hostname);
@@ -329,6 +390,11 @@ bool NdiCapiDevice::isSerial() const
 QString NdiCapiDevice::getLastError() const
 {
 	return mLastError;
+}
+
+bool NdiCapiDevice::isInUseByAnotherApplication() const
+{
+	return mInUse;
 }
 
 QString NdiCapiDevice::getDescription() const

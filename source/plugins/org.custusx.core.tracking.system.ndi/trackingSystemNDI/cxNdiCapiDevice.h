@@ -41,6 +41,7 @@ public:
 	void close() override;
 	bool isOpen() const override;
 	QString getLastError() const override;
+	bool isInUseByAnotherApplication() const override;
 	QString getDescription() const override;
 
 	std::vector<int> searchPortHandles(NdiPortHandleSearch search) override;
@@ -59,6 +60,7 @@ public:
 	static QStringList getSerialPortCandidates();
 	static bool isSerialDevice(QString hostname); ///< Empty (probe), /dev/..., COMn or \\.\COMn. Otherwise a network host
 	static QString toSerialDeviceName(QString device); ///< Windows: COM10 and up must be opened as \\.\COM10
+	static bool isSerialPortInUse(QString device); ///< The port exists, but another application has it open (Windows) or locked (Linux, macOS)
 	static NdiPortLocation parsePortLocation(const char location[14]);
 	static int baudRateToNdiCode(int baudRate);
 	static int illuminatorRateToNdiCode(int rate_Hz); ///< -1 if not supported
@@ -94,6 +96,7 @@ private:
 	bool mLastBXHas3DMarkers;
 	std::map<int, QString> mLast3DMarkerLog;
 	bool mResponding; ///< False after the device stopped answering: don't wait for it when closing
+	bool mInUse; ///< The last open() failed because another application uses the device
 	QString mLastError;
 	QString mLastReply; ///< Reply to the last text (non-binary) command
 	QString mDescription;

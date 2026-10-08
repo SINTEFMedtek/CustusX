@@ -120,7 +120,12 @@ void NdiTrackerManager::initializeSlot(bool on)
 		}
 		else
 		{
+			bool inUse = mDevice->isInUseByAnotherApplication();
 			this->disconnectFromDevice();
+			if (inUse)
+			{
+				emit deviceInUse();
+			}
 			emit error();
 		}
 	}

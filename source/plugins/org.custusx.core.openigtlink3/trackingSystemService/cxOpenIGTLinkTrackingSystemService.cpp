@@ -43,7 +43,8 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 	mLastTrackingState(Tool::tsNONE),
 	mConfigured(false),
 	mRequestedState(Tool::tsNONE),
-	mConnectionAcquired(false)
+	mConnectionAcquired(false),
+	mFallback(false)
 {
 	if(mNetworkHandler == NULL)
 		return;
@@ -82,7 +83,8 @@ void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 
 void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State val)
 {
-	if (val == Tool::tsNONE)
+	// A new start ends the fallback: the other system tries its device again, and asks again if it is still in use
+	if (val == Tool::tsNONE || (mFallback && val >= Tool::tsTRACKING))
 	{
 		this->deconfigure();
 	}
@@ -151,6 +153,28 @@ void OpenIGTLinkTrackingSystemService::disconnectFromServer()
 	}
 }
 
+void OpenIGTLinkTrackingSystemService::startFallbackTracking(QString configurationFile)
+{
+	if (mNetworkHandler)
+	{
+		this->deconfigure();
+		mFallback = true;
+		mFallbackConfigurationFile = configurationFile;
+		this->configure();
+		if (mConfigured)
+		{
+			report("OpenIGTLink: Tracking the tools of " + configurationFile + " from the OpenIGTLink server, since their device is used by another application.");
+			mRequestedState = Tool::tsTRACKING;
+			this->connectToServer();
+		}
+		else
+		{
+			mFallback = false;
+		}
+		this->updateState();
+	}
+}
+
 void OpenIGTLinkTrackingSystemService::globalConfigurationFileChangedSlot(QString key)
 {
 	if (key == "toolConfigFile")
@@ -180,9 +204,9 @@ ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 void OpenIGTLinkTrackingSystemService::configure()
 {
 	//parse
-	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
+	ConfigurationFileParser configParser(mFallback ? mFallbackConfigurationFile : mConfigurationFilePath, mLoggingFolder);
 
-	if(!configParser.getTrackingSystemImplementation().contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
+	if(!mFallback && !configParser.getTrackingSystemImplementation().contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
 	{
 		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Not using OpenIGTLink tracking.";
 		return;
@@ -222,6 +246,7 @@ void OpenIGTLinkTrackingSystemService::deconfigure()
 	this->disconnectFromServer();
 	mRequestedState = Tool::tsNONE;
 	mConfigured = false;
+	mFallback = false;
 	mTools.clear();
 	mReference.reset();
 	this->updateState();

@@ -91,6 +91,8 @@ private slots:
 	void trackerTrackingSlot(bool on);
 
 	void trackerErrorSlot();
+	void deviceInUseSlot();
+	void handOverToFallbackSlot();
 	void startTrackingAfterInitSlot();
 	void initializeAfterConfigSlot();
 	void uninitializeAfterTrackingStoppedSlot();
@@ -107,6 +109,7 @@ private:
 	ToolPtr mReference;
 
 	NdiTrackerThreadPtr mTrackerThread;
+	bool mDeviceInUse; ///< The last connection failed because another application uses the device
 };
 
 /**

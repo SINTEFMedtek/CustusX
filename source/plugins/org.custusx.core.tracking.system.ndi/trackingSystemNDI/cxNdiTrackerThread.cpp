@@ -72,6 +72,7 @@ void NdiTrackerThread::configure()
 
 	connect(mManager.get(), &NdiTrackerManager::initialized, this, &NdiTrackerThread::initialized);
 	connect(mManager.get(), &NdiTrackerManager::tracking, this, &NdiTrackerThread::tracking);
+	connect(mManager.get(), &NdiTrackerManager::deviceInUse, this, &NdiTrackerThread::deviceInUse);
 	connect(mManager.get(), &NdiTrackerManager::error, this, &NdiTrackerThread::error);
 	connect(this, &NdiTrackerThread::requestInitialize, mManager.get(), &NdiTrackerManager::initializeSlot);
 	connect(this, &NdiTrackerThread::requestTrack, mManager.get(), &NdiTrackerManager::trackSlot);

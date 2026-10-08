@@ -59,6 +59,7 @@ signals:
 	void configured(bool on);
 	void initialized(bool on);
 	void tracking(bool on);
+	void deviceInUse(); ///< Before error(): the device is used by another application
 	void error();
 
 	void requestInitialize(bool on); ///< internal signal

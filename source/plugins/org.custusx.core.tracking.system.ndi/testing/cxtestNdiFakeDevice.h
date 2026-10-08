@@ -53,6 +53,7 @@ public:
 	bool isOpen() const override { return opened; }
 	QString getLastError() const override { return "fake error"; }
 	QString getDescription() const override { return "fake NDI device"; }
+	bool isInUseByAnotherApplication() const override { return inUse; }
 
 	std::vector<int> searchPortHandles(cx::NdiPortHandleSearch search) override
 	{
@@ -184,6 +185,7 @@ public:
 	bool failWirelessRequest = false;
 	int nextWirelessHandle = 1;
 	bool openSucceeds = true;
+	bool inUse = false; ///< open() fails because another application uses the device
 	bool startTrackingSucceeds = true;
 	bool opened = false;
 	bool tracking = false;

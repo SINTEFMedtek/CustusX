@@ -103,6 +103,8 @@ public:
 
 	virtual void installTrackingSystem(TrackingSystemServicePtr system);
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system);
+	/** Ask the systems other than deviceInUse to track the tools in configurationFile. */
+	static void startFallbackTracking(std::vector<TrackingSystemServicePtr> systems, TrackingSystemService* deviceInUse, QString configurationFile);
 	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems();
 	virtual void resetTimeSynchronization();
 
@@ -114,6 +116,7 @@ public slots:
 private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 	void onSystemStateChanged();
+	void onDeviceInUse(QString configurationFile);
 	void activeCheckSlot(); ///< checks if the visible tool is going to be set as active tool
 	void onTooltipOffset(double val);
 

@@ -51,6 +51,7 @@ public:
 	virtual ToolPtr getReference(); ///< reference tool used by entire tracking service - NOTE: system fails if several TrackingSystemServices define this tool
 
 	virtual void resetTimeSynchronization();
+	virtual void startFallbackTracking(QString configurationFile);
 
 protected:
 	void internalSetState(Tool::State val);
@@ -89,6 +90,8 @@ private:
 	bool mConfigured; ///< The tool configuration is for OpenIGTLink, and the tools are created
 	Tool::State mRequestedState; ///< The state asked for. The state is at most tsCONFIGURED while not connected
 	bool mConnectionAcquired; ///< Tracking uses the shared OpenIGTLink connection
+	bool mFallback; ///< Tracking the tools of another system's configuration, whose device is used by another application
+	QString mFallbackConfigurationFile;
 
 signals:
 	void setInternalState(const Tool::State val);

@@ -107,6 +107,7 @@ public:
 	virtual bool isOpen() const = 0;
 	virtual QString getLastError() const = 0;
 	virtual QString getDescription() const = 0; ///< Device and firmware, for the log
+	virtual bool isInUseByAnotherApplication() const { return false; } ///< The last open() failed because another application uses the device
 
 	virtual std::vector<int> searchPortHandles(NdiPortHandleSearch search) = 0; ///< PHSR
 	virtual bool freePortHandle(int portHandle) = 0; ///< PHF

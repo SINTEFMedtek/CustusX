@@ -133,6 +133,10 @@ commands to NdiCommunication.txt.
   application should keep tracking. With ndiTrackingTakeOverDevice=true, CustusX connects.
 * Device in use (serial/USB): the same with the device on a serial or USB port. The port should fail
   to open, and the other application should keep tracking.
+* OpenIGTLink fallback: with an NDI tool configuration, and an OpenIGTLink server (e.g. PlusServer)
+  using the device and sending the tool positions, Start Tracking should track the tools from the
+  server ("Using the tool positions it sends over OpenIGTLink" in the log). Stop the server and start
+  tracking again: the NDI plugin should connect to the device, and the server should not be used.
 * Polaris marker count, with ndiTrackingDebugLogging=true: the "NDI Tracker debug" lines in the
   log show the 3D marker count of each tool and the markers used. Use a 4-marker tool: all
   spheres visible, one sphere hidden, a sphere removed before tracking starts, and the tool

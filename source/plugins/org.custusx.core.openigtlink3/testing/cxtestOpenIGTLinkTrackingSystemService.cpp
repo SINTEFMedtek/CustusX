@@ -289,6 +289,35 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: a video connection starts tracking,
 	CHECK(trackingSystemService->getState() == cx::Tool::tsCONFIGURED);
 }
 
+TEST_CASE("OpenIGTLinkTrackingSystemService: tracks the tools of an NDI configuration whose device is in use", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService(new OpenIGTLinkTrackingSystemServiceMoc(server));
+	QStringList configurations = trackingSystemService->getConfiguration()->getAllConfigurations();
+	int posToolConfigFile = 0;
+	REQUIRE(findConfigFileNumberInList(configurations, QString("LabAuroraTools"), posToolConfigFile));
+	QString ndiConfiguration = configurations[posToolConfigFile];
+	trackingSystemService->setConfigurationFile(ndiConfiguration);
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+
+	// Not an OpenIGTLink configuration: only tracked as a fallback
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+	CHECK(trackingSystemService->getState() == cx::Tool::tsNONE);
+
+	trackingSystemService->startFallbackTracking(ndiConfiguration);
+	CHECK(trackingSystemService->isTracking());
+	CHECK(server->mConnectAttempts == 1);
+	// The Aurora sensor on port number 2 is found by the transform name port_2
+	trackingSystemService->receiveTransform("port_2", cx::Transform3D::Identity(), timestampMS);
+	REQUIRE(trackingSystemService->getTool("port_2"));
+	CHECK(trackingSystemService->getTool("port_2")->getTimestamp() == Approx(timestampMS));
+
+	// A new start ends the fallback, so that the NDI system tries its device again
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+	CHECK(trackingSystemService->getState() == cx::Tool::tsNONE);
+	CHECK_FALSE(server->isConnected());
+}
+
 TEST_CASE("NetworkHandler: the connection is shared, and closed when the last user releases it", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
