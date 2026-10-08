@@ -44,6 +44,8 @@ NdiCapiDevice::NdiCapiDevice() :
 	mMarkerInfoConfirmed(false),
 	mLastBXHasMarkerInfo(false),
 	mMarkerInfoFailures(0),
+	mRequest3DMarkers(false),
+	mLastBXHas3DMarkers(false),
 	mResponding(true)
 {
 }
@@ -58,6 +60,8 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 	this->close();
 	mResponding = true;
 	mRequestMarkerInfo = settings.requestMarkerInfo;
+	mRequest3DMarkers = settings.requestMarkerInfo && settings.debugMarkerCount;
+	mLast3DMarkerLog.clear();
 	mMarkerInfoConfirmed = false;
 	mMarkerInfoFailures = 0;
 	if (!settings.communicationLogFile.isEmpty())
@@ -491,6 +495,18 @@ bool NdiCapiDevice::readFrame(const std::vector<int>& portHandles, NdiFrame& fra
 
 bool NdiCapiDevice::sendBX()
 {
+	if (mRequest3DMarkers)
+	{
+		mLastBXHasMarkerInfo = true;
+		mLastBXHas3DMarkers = true;
+		if (this->command("BX:%04X", NDI_XFORMS_AND_STATUS | NDI_ADDITIONAL_INFO | NDI_3D_MARKER_POSITIONS))
+		{
+			return true;
+		}
+		CX_LOG_INFO() << "NDI Tracker debug: BX with 3D marker positions failed, no longer requested: " << mLastError;
+		mRequest3DMarkers = false;
+	}
+	mLastBXHas3DMarkers = false;
 	mLastBXHasMarkerInfo = mRequestMarkerInfo;
 	bool success = this->command("BX:%04X", NDI_XFORMS_AND_STATUS | (mRequestMarkerInfo ? NDI_ADDITIONAL_INFO : 0));
 	if (!success && mRequestMarkerInfo && !mMarkerInfoConfirmed)
@@ -528,7 +544,31 @@ NdiToolSample NdiCapiDevice::getBXSample(int portHandle)
 		sample.toolInfo = info[0] & 0xFF;
 		sample.markersUsed = countUsedMarkers(info + 1);
 	}
+	if (mLastBXHas3DMarkers)
+	{
+		this->log3DMarkerCount(portHandle, sample);
+	}
 	return sample;
+}
+
+void NdiCapiDevice::log3DMarkerCount(int portHandle, const NdiToolSample& sample)
+{
+	for (int i = 0; i < mDevice->BxHandleCount; ++i)
+	{
+		if (static_cast<unsigned char>(mDevice->BxHandles[i]) == portHandle && mDevice->BxHandlesStatus[i] != NDI_HANDLE_DISABLED)
+		{
+			QString text = QString("3D marker count %1, markers used %2, visible %3, out of volume bits %4")
+					.arg(static_cast<int>(mDevice->Bx3DMarkerCount[i]))
+					.arg(sample.markersUsed)
+					.arg(sample.visible ? "yes" : "no")
+					.arg(static_cast<unsigned char>(mDevice->Bx3DMarkerOutOfVolume[i][0]), 8, 2, QChar('0'));
+			if (mLast3DMarkerLog[portHandle] != text)
+			{
+				mLast3DMarkerLog[portHandle] = text;
+				CX_LOG_INFO() << QString("NDI Tracker debug: port %1: %2").arg(portHandle, 2, 16, QChar('0')).arg(text);
+			}
+		}
+	}
 }
 
 const char* NdiCapiDevice::findBXToolMarkerInformation(int portHandle) const

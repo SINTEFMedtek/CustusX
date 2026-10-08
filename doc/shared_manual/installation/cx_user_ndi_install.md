@@ -48,7 +48,8 @@ while CustusX is closed:
 * ndiTrackingMaxErrorRMS: warn about positions with a larger RMS error (mm). 0 (default): the
   default for the device type.
 * ndiTrackingDebugLogging: true to log the commands sent to the device and its replies, in
-  NdiCommunication.txt in the logging folder.
+  NdiCommunication.txt in the logging folder. For Polaris, the number of markers of each tool is
+  also written to the log ("NDI Tracker debug" lines) whenever it changes.
 
 Validation
 -----------------------------------------------------------

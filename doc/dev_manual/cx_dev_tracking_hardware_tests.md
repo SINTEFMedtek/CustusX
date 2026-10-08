@@ -128,5 +128,10 @@ commands to NdiCommunication.txt.
   should become orange (position warning) at the border and with a hidden sphere, and red when it
   is out of view. Occlude the reference: all tools should go red, or orange when the reference
   has a warning. Tune ndiTrackingMaxErrorRMS from the recorded RMS errors if needed.
+* Polaris marker count, with ndiTrackingDebugLogging=true: the "NDI Tracker debug" lines in the
+  log show the 3D marker count of each tool and the markers used. Use a 4-marker tool: all
+  spheres visible, one sphere hidden, a sphere removed before tracking starts, and the tool
+  hidden. If the 3D marker count stays 4 while fewer markers are used, it is the tool's marker
+  count, and can be used to warn about a missing sphere from the start.
 * Aurora: plug a tool into a different port than in its tool file, and check that it is
   tracked, with a warning in the log that names the right ports.

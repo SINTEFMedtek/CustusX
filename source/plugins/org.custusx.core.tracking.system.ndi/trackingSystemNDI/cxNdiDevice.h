@@ -30,6 +30,7 @@ struct org_custusx_core_tracking_system_ndi_EXPORT NdiConnectionSettings
 	int baudRate = 921600; ///< Serial baud rate. Falls back to slower rates if the device or the serial adapter can't use it.
 	QString communicationLogFile; ///< If not empty, log the commands and replies to this file.
 	bool requestMarkerInfo = false; ///< Request tool and marker information in BX (Polaris only). Set by NdiTrackerManager.
+	bool debugMarkerCount = false; ///< Also request the 3D marker positions in BX, and log the marker count of each tool
 	double maxErrorRMS_mm = 0.0; ///< Warn about the position above this RMS error. 0: default for the device type.
 	int illuminatorRate_Hz = 60; ///< Polaris only: 20, 30 or 60 Hz. 0: the device's default (20 Hz).
 };

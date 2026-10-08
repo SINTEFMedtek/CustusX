@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QFile>
 #include <QStringList>
+#include <map>
 #include "cxNdiDevice.h"
 
 struct ndicapi;
@@ -76,6 +77,7 @@ private:
 	void setSerialTimeout(int timeout_ms);
 	bool sendBX();
 	NdiToolSample getBXSample(int portHandle);
+	void log3DMarkerCount(int portHandle, const NdiToolSample& sample);
 	const char* findBXToolMarkerInformation(int portHandle) const; ///< Tool info byte + 10 marker bytes, or null
 
 	ndicapi* mDevice;
@@ -85,6 +87,9 @@ private:
 	bool mMarkerInfoConfirmed; ///< BX with marker information has worked at least once
 	bool mLastBXHasMarkerInfo;
 	int mMarkerInfoFailures;
+	bool mRequest3DMarkers; ///< Debug: request the 3D marker positions to log the marker count of each tool
+	bool mLastBXHas3DMarkers;
+	std::map<int, QString> mLast3DMarkerLog;
 	bool mResponding; ///< False after the device stopped answering: don't wait for it when closing
 	QString mLastError;
 	QString mLastReply; ///< Reply to the last text (non-binary) command
