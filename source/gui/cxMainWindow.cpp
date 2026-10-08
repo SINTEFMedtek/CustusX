@@ -58,6 +58,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+namespace
+{
+const QString kHelpWidgetTitle("Help"); ///< Window title of the help widget from the help plugin
+}
+
 MainWindow::MainWindow() :
 	mFullScreenAction(NULL),
 	mStandard3DViewActions(new QActionGroup(this)),
@@ -173,9 +178,14 @@ void MainWindow::onGUIExtenderServiceAdded(GUIExtenderService* service)
 	for (unsigned j = 0; j < widgets.size(); ++j)
 	{
 		if(!widgets[j].mPlaceInSeparateWindow)
-			mDockWidgets->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory, service);
+		{
+			QDockWidget* dockWidget = mDockWidgets->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory, service);
+			this->connectContextSensitiveHelpAction(dockWidget);
+		}
 		else
+		{
 			this->createActionForWidgetInSeparateWindow(widgets[j].mWidget);
+		}
 	}
 
 	std::vector<QToolBar*> toolBars = service->createToolBars();
@@ -257,6 +267,7 @@ void MainWindow::createActions()
 
 	mShowContextSensitiveHelpAction = new QAction(QIcon(":/icons/open_icon_library/help-contents-5.png"),
 												  "Context-sensitive help", this);
+	mShowContextSensitiveHelpAction->setCheckable(true);
 	connect(mShowContextSensitiveHelpAction, &QAction::triggered, this, &MainWindow::onShowContextSentitiveHelp);
 
 	mShowControlPanelAction = new QAction("Show Control Panel", this);
@@ -379,9 +390,26 @@ void MainWindow::resetDesktopSlot()
 	this->onWorkflowStateChangedSlot();
 }
 
-void MainWindow::onShowContextSentitiveHelp()
+void MainWindow::onShowContextSentitiveHelp(bool show)
 {
-	mDockWidgets->showWidget("Help");
+	if (show)
+	{
+		mDockWidgets->showWidget(kHelpWidgetTitle);
+	}
+	else
+	{
+		mDockWidgets->hideWidget(kHelpWidgetTitle);
+	}
+}
+
+void MainWindow::connectContextSensitiveHelpAction(QDockWidget* dockWidget)
+{
+	if (dockWidget && dockWidget == mDockWidgets->getDockWidget(kHelpWidgetTitle))
+	{
+		// visibilityChanged is also false when the dock is a hidden tab: the action then raises it
+		connect(dockWidget, &QDockWidget::visibilityChanged, mShowContextSensitiveHelpAction, &QAction::setChecked);
+		mShowContextSensitiveHelpAction->setChecked(dockWidget->isVisible() && !dockWidget->visibleRegion().isEmpty());
+	}
 }
 
 void MainWindow::toggleFullScreenSlot()

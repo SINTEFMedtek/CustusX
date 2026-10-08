@@ -90,3 +90,11 @@ Utility for sampling points in 3D.
 Lets you sample points in 3D and get the distance between sampled points.
 
 Prefer the \ref utility_widgets_metrics instead.
+
+
+Help Widget {#utility_widgets_help}
+===========================================================
+Shows the user documentation for the widget you are working in.
+
+The help follows the widget you last clicked in, typed in, or selected the tab of. Use the
+Context-sensitive help button in the toolbar, or the Help menu, to show or hide the help widget.

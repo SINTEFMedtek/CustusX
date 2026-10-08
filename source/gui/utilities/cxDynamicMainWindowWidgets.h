@@ -40,6 +40,8 @@ public:
 	void restoreFrom(const Desktop& desktop);
 	QMenu* createPopupMenu();
 	void showWidget(QString name);
+	void hideWidget(QString name);
+	QDockWidget* getDockWidget(QString name);
 
 private slots:
 	void onConsoleWindowTitleChanged(const QString & title);
