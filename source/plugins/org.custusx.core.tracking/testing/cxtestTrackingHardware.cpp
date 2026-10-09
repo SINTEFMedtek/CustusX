@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDateTime>
 #include <QDir>
 #include <QEventLoop>
+#include <QFileInfo>
 #include <QTimer>
 #include "cxDataLocations.h"
 #include "cxDefinitions.h"
@@ -187,6 +188,22 @@ TEST_CASE("Tracking hardware: long run", "[manual][hide][tracking_hardware]")
 	cx::LogicManager::shutdown();
 }
 
+namespace
+{
+
+/** The profile only stores the file name of the tool configuration, and looks for it in its own tool folder. */
+QString copyToProfileToolFolder(QString configFile)
+{
+	QString folder = cx::profile()->getApplicationToolConfigPaths().front();
+	QString retval = folder + "/" + QFileInfo(configFile).fileName();
+	QDir().mkpath(folder);
+	QFile::remove(retval);
+	QFile::copy(configFile, retval);
+	return retval;
+}
+
+} // namespace
+
 TEST_CASE("Tracking hardware: shut down while tracking, then track again", "[manual][hide][tracking_hardware]")
 {
 	QString config = getEnvironment("CX_TRACKING_TEST_CONFIG");
@@ -197,7 +214,7 @@ TEST_CASE("Tracking hardware: shut down while tracking, then track again", "[man
 	{
 		cx::DataLocations::setTestMode();
 		cx::LogicManager::initialize();
-		cx::profile()->setToolConfigFilePath(config);
+		cx::profile()->setToolConfigFilePath(copyToProfileToolFolder(config));
 		cx::logicManager()->getTrackingService()->setState(cx::Tool::tsTRACKING);
 		CHECK(waitForTrackingState(cx::Tool::tsTRACKING, 30000));
 		wait_ms(3000);
