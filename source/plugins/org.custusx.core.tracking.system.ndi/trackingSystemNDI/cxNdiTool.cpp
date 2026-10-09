@@ -120,6 +120,11 @@ void NdiTool::setInitialized(bool on)
 	mInitialized = on;
 }
 
+void NdiTool::setMarkerCount(int markers)
+{
+	mQuality.setMarkerCount(markers);
+}
+
 QString NdiTool::updateQuality(const NdiToolSample& sample)
 {
 	return mQuality.update(sample);

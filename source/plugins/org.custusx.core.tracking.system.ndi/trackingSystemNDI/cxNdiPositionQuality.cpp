@@ -11,6 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxNdiPositionQuality.h"
 
+#include <QFile>
+
 #include <QStringList>
 
 namespace cx
@@ -97,6 +99,28 @@ void NdiPositionQuality::reset()
 void NdiPositionQuality::setMaxErrorRMS(double maxErrorRMS_mm)
 {
 	mMaxErrorRMS_mm = maxErrorRMS_mm;
+}
+
+void NdiPositionQuality::setMarkerCount(int markers)
+{
+	mExpectedMarkers = std::max(mExpectedMarkers, markers);
+}
+
+int NdiPositionQuality::readMarkerCount(QString romFile)
+{
+	// An NDI tool definition starts with "NDI", and has the number of markers as a 32 bit integer at byte 28
+	int retval = -1;
+	QFile file(romFile);
+	if (file.open(QIODevice::ReadOnly))
+	{
+		QByteArray data = file.read(32);
+		if (data.size() == 32 && data.startsWith("NDI"))
+		{
+			const unsigned char* bytes = reinterpret_cast<const unsigned char*>(data.constData()) + 28;
+			retval = bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
+		}
+	}
+	return retval;
 }
 
 int NdiPositionQuality::getExpectedMarkers() const

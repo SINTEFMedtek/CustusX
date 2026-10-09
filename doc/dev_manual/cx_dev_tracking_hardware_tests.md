@@ -145,10 +145,10 @@ commands to NdiCommunication.txt.
   server ("Using the tool positions it sends over OpenIGTLink" in the log). Stop the server and start
   tracking again: the NDI plugin should connect to the device, and the server should not be used.
 * Polaris marker count, with ndiTrackingDebugLogging=true: the "NDI Tracker debug" lines in the
-  log show the 3D marker count of each tool and the markers used. Use a 4-marker tool: all
-  spheres visible, one sphere hidden, a sphere removed before tracking starts, and the tool
-  hidden. If the 3D marker count stays 4 while fewer markers are used, it is the tool's marker
-  count, and can be used to warn about a missing sphere from the start.
+  log show the 3D markers seen and the markers used for each tool. Use a 4-marker tool: all
+  spheres visible, one sphere hidden, a sphere hidden or removed before tracking starts, and the
+  tool hidden. The tool should be orange whenever fewer markers than in its .rom file are used,
+  also when a sphere is hidden from the start.
 * Aurora: plug a tool into a different port than in its tool file, and check that it is
   tracked, with a warning in the log that names the right ports.
 * Aurora: unplug a sensor while tracking and plug it in again, then stop and start tracking: the

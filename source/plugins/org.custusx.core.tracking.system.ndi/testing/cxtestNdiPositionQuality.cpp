@@ -10,6 +10,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <QFile>
+#include <QTemporaryDir>
 
 #include "cxNdiPositionQuality.h"
 
@@ -129,6 +131,39 @@ TEST_CASE("NdiPositionQuality: invisible samples are ignored, reset clears the w
 
 	quality.reset();
 	CHECK(quality.getWarning().isEmpty());
+}
+
+TEST_CASE("NdiPositionQuality: the number of markers is read from the tool definition", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	QTemporaryDir folder;
+	QByteArray rom(752, 0);
+	rom.replace(0, 3, "NDI");
+	rom[28] = 4;
+	QFile file(folder.path() + "/tool.rom");
+	REQUIRE(file.open(QIODevice::WriteOnly));
+	file.write(rom);
+	file.close();
+
+	CHECK(cx::NdiPositionQuality::readMarkerCount(file.fileName()) == 4);
+	CHECK(cx::NdiPositionQuality::readMarkerCount(folder.path() + "/missing.rom") == -1);
+}
+
+TEST_CASE("NdiPositionQuality: a tool with a hidden sphere from the start gets a warning when its marker count is known", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	cx::NdiToolSample threeMarkers;
+	threeMarkers.visible = true;
+	threeMarkers.markersUsed = 3;
+
+	cx::NdiPositionQuality unknown;
+	cx::NdiPositionQuality known;
+	known.setMarkerCount(4);
+	for (int i = 0; i < cx::NdiPositionQuality::kFramesBeforeWarning; ++i)
+	{
+		unknown.update(threeMarkers);
+		known.update(threeMarkers);
+	}
+	CHECK(unknown.getWarning().isEmpty()); // only the most markers seen so far are expected
+	CHECK(known.getWarning().contains("3 of 4 markers used"));
 }
 
 } // namespace cxtest

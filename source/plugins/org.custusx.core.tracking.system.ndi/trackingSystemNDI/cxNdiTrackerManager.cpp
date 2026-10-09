@@ -438,6 +438,11 @@ bool NdiTrackerManager::setupTools()
 		NdiToolPtr tool = mTools[entry.second];
 		tool->setPortHandle(entry.first);
 		tool->setInitialized(true);
+		if (isPolaris(mTrackerStructure.mType))
+		{
+			// Warn about a hidden or missing sphere from the start, not only after all were seen once
+			tool->setMarkerCount(NdiPositionQuality::readMarkerCount(tool->getInternalStructure()->mSROMFilename));
+		}
 		mPortHandleToTool[entry.first] = tool;
 		mPortHandles.push_back(entry.first);
 	}

@@ -23,7 +23,7 @@ namespace cx
 /** \brief Decides whether a tool position may be inaccurate, from the BX status of each sample.
  *
  * Warns when the tool is (partially) out of the measurement volume, when the RMS error is
- * above a limit, or, for Polaris, when the fit is bad or fewer markers than usual were used
+ * above a limit, or, for Polaris, when the fit is bad or fewer markers than the tool has were used
  * (a hidden or partly hidden sphere). A warning is set after a few bad frames in a row and
  * cleared after a few good frames, so that it doesn't flicker.
  *
@@ -46,7 +46,9 @@ public:
 	QString getWarning() const;
 	void reset(); ///< Clear the warning, e.g. when tracking stops
 	void setMaxErrorRMS(double maxErrorRMS_mm);
-	int getExpectedMarkers() const; ///< The most markers used in any sample so far
+	int getExpectedMarkers() const; ///< The tool's number of markers, or the most markers used in any sample so far
+	void setMarkerCount(int markers); ///< The tool's own number of markers: fewer is a warning from the first sample
+	static int readMarkerCount(QString romFile); ///< The number of markers in an NDI tool definition (.rom) file, -1 if it can't be read
 
 private:
 	double mMaxErrorRMS_mm;

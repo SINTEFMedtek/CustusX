@@ -69,6 +69,7 @@ public:
     void updateTransform(const Transform3D& transform, double timestamp, bool visible, const NdiToolSample& sample = NdiToolSample());
 
 	QString updateQuality(const NdiToolSample& sample); ///< Add a sample to the position quality, return the tool's own warning
+	void setMarkerCount(int markers); ///< The tool's own number of markers, see NdiPositionQuality
 	void setPositionWarning(QString warning); ///< Emits positionWarning if it changed
 	void setMaxErrorRMS(double maxErrorRMS_mm);
 
