@@ -23,6 +23,11 @@ namespace
 {
 const int kMaxInitializeRounds = 5;
 
+int portLabel(int port)
+{
+	return port + 1; // ports are numbered from 1 on the device
+}
+
 QString handleText(int portHandle)
 {
 	return QString("%1").arg(portHandle, 2, 16, QChar('0')).toUpper();
@@ -180,7 +185,7 @@ void assignLeftoverSensors(std::vector<WiredSensor>& sensors, const std::vector<
 			assigned.insert(tool.uid);
 			result.warnings << QString("Tool %1: no sensor on its configured port %2, using the sensor on port %3%4 instead. "
 									   "Update the port number in the tool file if this is not the right tool.")
-							   .arg(tool.uid).arg(tool.port).arg(sensor->location.port)
+							   .arg(tool.uid).arg(portLabel(tool.port)).arg(portLabel(sensor->location.port))
 							   .arg(sensor->location.channel ? QString(", channel %1").arg(sensor->location.channel) : QString());
 		}
 	}
@@ -221,7 +226,7 @@ void matchWiredTools(NdiDevice& device, const std::vector<NdiToolConfig>& tools,
 		if (!result.portHandleToUid.count(sensor.portHandle))
 		{
 			result.messages << QString("Port handle %1 (port %2, channel %3) has no configured tool.")
-							   .arg(handleText(sensor.portHandle)).arg(sensor.location.port).arg(sensor.location.channel);
+							   .arg(handleText(sensor.portHandle)).arg(portLabel(sensor.location.port)).arg(sensor.location.channel);
 		}
 	}
 	for (const NdiToolConfig& tool : tools)
@@ -229,7 +234,7 @@ void matchWiredTools(NdiDevice& device, const std::vector<NdiToolConfig>& tools,
 		if (!tool.wireless && !assigned.count(tool.uid))
 		{
 			result.warnings << QString("Tool %1: no sensor found on port %2%3. Is the tool plugged in?")
-							   .arg(tool.uid).arg(tool.port).arg(tool.fiveDOF ? QString(", channel %1").arg(tool.channel) : QString());
+							   .arg(tool.uid).arg(portLabel(tool.port)).arg(tool.fiveDOF ? QString(", channel %1").arg(tool.channel) : QString());
 		}
 	}
 }
