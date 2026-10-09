@@ -16,6 +16,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <cstdio>
 #include <QDateTime>
 #include <QDir>
+#include <QFileInfo>
+#include <QCoreApplication>
 #include <QRegularExpression>
 #include <QTextStream>
 
@@ -92,11 +94,6 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 	{
 		QString device = hostname.isEmpty() ? this->findSerialDevice() : toSerialDeviceName(hostname);
 		success = !device.isEmpty() && this->openSerial(device, settings.baudRate);
-		if (!success && !hostname.isEmpty() && isSerialPortInUse(device))
-		{
-			mInUse = true;
-			mLastError = QString("The serial port %1 is used by another application").arg(device);
-		}
 	}
 
 	if (success && this->command("VER:4"))
@@ -127,10 +124,36 @@ QString NdiCapiDevice::toSerialDeviceName(QString device)
 	return retval;
 }
 
-bool NdiCapiDevice::isSerialPortInUse(QString device)
+bool NdiCapiDevice::isOpenByAnotherProcess(QString path)
 {
 	bool retval = false;
+#ifdef __linux__
+	QString target = QFileInfo(path).canonicalFilePath();
+	QString self = QString::number(QCoreApplication::applicationPid());
+	QStringList processes = QDir("/proc").entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+	for (const QString& process : processes)
+	{
+		bool isProcess = false;
+		process.toLongLong(&isProcess);
+		if (!retval && isProcess && process != self && !target.isEmpty())
+		{
+			QDir fds("/proc/" + process + "/fd");
+			for (const QFileInfo& fd : fds.entryInfoList(QDir::AllEntries | QDir::System | QDir::NoDotAndDotDot))
+			{
+				retval = retval || (fd.symLinkTarget() == target);
+			}
+		}
+	}
+#else
+	Q_UNUSED(path);
+#endif
+	return retval;
+}
+
+bool NdiCapiDevice::isSerialPortInUse(QString device)
+{
 	QByteArray name = toSerialDeviceName(device).toLocal8Bit();
+	bool retval = isOpenByAnotherProcess(QString::fromLocal8Bit(name)); // e.g. a server that neither locks nor opens it exclusively
 #ifdef _WIN32
 	HANDLE handle = CreateFileA(name.constData(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (handle == INVALID_HANDLE_VALUE)
@@ -142,12 +165,12 @@ bool NdiCapiDevice::isSerialPortInUse(QString device)
 		CloseHandle(handle);
 	}
 #else
-	int port = ::open(name.constData(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-	if (port < 0)
+	int port = retval ? -1 : ::open(name.constData(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+	if (!retval && port < 0)
 	{
 		retval = (errno == EBUSY); // opened exclusively by another application
 	}
-	else
+	else if (!retval)
 	{
 		struct flock lock = {};
 		lock.l_type = F_WRLCK;
@@ -172,23 +195,24 @@ QString NdiCapiDevice::findSerialDevice()
 {
 	QString retval;
 	QStringList candidates = getSerialPortCandidates();
+	QStringList inUse;
 	for (const QString& candidate : candidates)
 	{
-		if (retval.isEmpty() && ndiSerialProbe(candidate.toLocal8Bit().constData(), false) == NDI_OKAY)
+		if (!retval.isEmpty())
+		{
+			continue;
+		}
+		if (isSerialPortInUse(candidate)) // not probed: the probe sends INIT, which would disturb the other application
+		{
+			inUse << candidate;
+		}
+		else if (ndiSerialProbe(candidate.toLocal8Bit().constData(), false) == NDI_OKAY)
 		{
 			retval = candidate;
 		}
 	}
 	if (retval.isEmpty())
 	{
-		QStringList inUse;
-		for (const QString& candidate : candidates)
-		{
-			if (isSerialPortInUse(candidate))
-			{
-				inUse << candidate;
-			}
-		}
 		mInUse = !inUse.isEmpty();
 		mLastError = QString("No NDI device found on the serial ports (tried %1)").arg(candidates.join(", "));
 		if (mInUse)
@@ -224,6 +248,12 @@ QStringList NdiCapiDevice::getSerialPortCandidates()
 
 bool NdiCapiDevice::openSerial(QString device, int baudRate)
 {
+	if (isSerialPortInUse(device)) // checked first: probing sends INIT, which would disturb the other application
+	{
+		mInUse = true;
+		mLastError = QString("The serial port %1 is used by another application").arg(device);
+		return false;
+	}
 	int probeResult = ndiSerialProbe(device.toLocal8Bit().constData(), false);
 	if (probeResult != NDI_OKAY)
 	{

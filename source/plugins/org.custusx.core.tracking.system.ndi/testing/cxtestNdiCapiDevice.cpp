@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QCoreApplication>
 #include <QElapsedTimer>
 #include <QFile>
+#include <QProcess>
 #include <QTemporaryDir>
 #include "cxDataLocations.h"
 
@@ -284,6 +285,29 @@ TEST_CASE("TrackingSystemNDIService: the communication log is in the application
 	CHECK(cx::TrackingSystemNDIService::getCommunicationLogFile(false, "/session", "/logs").isEmpty());
 	CHECK(cx::TrackingSystemNDIService::getCommunicationLogFile(true, "", "").isEmpty());
 }
+
+#ifdef __linux__
+TEST_CASE("NdiCapiDevice: a file another process has open is found", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	// A tracking server may keep the serial port open without locking it
+	QTemporaryDir folder;
+	QString filename = folder.path() + "/port";
+	QFile file(filename);
+	REQUIRE(file.open(QIODevice::WriteOnly));
+	file.close();
+	CHECK_FALSE(cx::NdiCapiDevice::isOpenByAnotherProcess(filename));
+
+	QProcess holder;
+	holder.start("sh", {"-c", "exec 3<\"$0\"; echo ready; exec sleep 30", filename});
+	REQUIRE(holder.waitForReadyRead(5000));
+	CHECK(cx::NdiCapiDevice::isOpenByAnotherProcess(filename));
+	CHECK(cx::NdiCapiDevice::isSerialPortInUse(filename));
+
+	holder.kill();
+	holder.waitForFinished(5000);
+	CHECK_FALSE(cx::NdiCapiDevice::isOpenByAnotherProcess(filename));
+}
+#endif
 
 TEST_CASE("TrackingSystemNDIService: a new tool configuration replaces the configured one", "[unit][org.custusx.core.tracking.system.ndi]")
 {
