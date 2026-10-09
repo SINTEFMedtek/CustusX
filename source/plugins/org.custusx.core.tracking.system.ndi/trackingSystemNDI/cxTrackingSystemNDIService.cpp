@@ -13,10 +13,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QCoreApplication>
 #include <QTimer>
 
 #include "cxLogger.h"
+#include "cxReporter.h"
 #include "cxToolUsingNDI.h"
 #include "cxNdiTrackerThread.h"
 #include "cxToolConfigurationParser.h"
@@ -136,6 +138,12 @@ bool TrackingSystemNDIService::createTrackerThread()
 
 	mTrackerThread->start();
 	return true;
+}
+
+QString TrackingSystemNDIService::getCommunicationLogFile(bool debugLogging, QString loggingFolder, QString applicationLoggingFolder)
+{
+	QString folder = loggingFolder.isEmpty() ? applicationLoggingFolder : loggingFolder;
+	return (debugLogging && !folder.isEmpty()) ? folder + "/NdiCommunication.txt" : QString();
 }
 
 bool TrackingSystemNDIService::handlesImplementation(QString implementation, bool igstkPluginBuilt)
@@ -384,10 +392,10 @@ NdiConnectionSettings TrackingSystemNDIService::readConnectionSettings() const
 	retval.illuminatorRate_Hz = settings()->value("ndiTrackingIlluminatorRate_Hz", 60).toInt();
 	retval.takeOverDevice = settings()->value("ndiTrackingTakeOverDevice", false).toBool();
 	retval.debugMarkerCount = settings()->value("ndiTrackingDebugLogging", false).toBool();
-	if (retval.debugMarkerCount && !mLoggingFolder.isEmpty())
+	retval.communicationLogFile = getCommunicationLogFile(retval.debugMarkerCount, mLoggingFolder, reporter()->getLoggingFolder());
+	if (!retval.communicationLogFile.isEmpty())
 	{
-		QDir().mkpath(mLoggingFolder);
-		retval.communicationLogFile = mLoggingFolder + "/NdiCommunication.txt";
+		QDir().mkpath(QFileInfo(retval.communicationLogFile).absolutePath());
 	}
 	return retval;
 }

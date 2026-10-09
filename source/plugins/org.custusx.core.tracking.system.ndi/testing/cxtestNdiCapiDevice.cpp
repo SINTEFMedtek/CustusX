@@ -277,6 +277,14 @@ TEST_CASE("TrackingSystemNDIService: a network device in use is only taken over 
 	cx::settings()->setValue("ndiTrackingTakeOverDevice", false);
 }
 
+TEST_CASE("TrackingSystemNDIService: the communication log is in the application's logging folder if the service has none", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::TrackingSystemNDIService::getCommunicationLogFile(true, "", "/logs") == "/logs/NdiCommunication.txt");
+	CHECK(cx::TrackingSystemNDIService::getCommunicationLogFile(true, "/session", "/logs") == "/session/NdiCommunication.txt");
+	CHECK(cx::TrackingSystemNDIService::getCommunicationLogFile(false, "/session", "/logs").isEmpty());
+	CHECK(cx::TrackingSystemNDIService::getCommunicationLogFile(true, "", "").isEmpty());
+}
+
 TEST_CASE("TrackingSystemNDIService: a new tool configuration replaces the configured one", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	cx::DataLocations::setTestMode();

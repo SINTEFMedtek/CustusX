@@ -55,6 +55,8 @@ class org_custusx_core_tracking_system_ndi_EXPORT TrackingSystemNDIService : pub
 public:
 	/** NDI handles ndi configurations, and igstk configurations unless the IGSTK plugin is built too. */
 	static bool handlesImplementation(QString implementation, bool igstkPluginBuilt);
+	/** The debug log of the device communication: in the tracking system's logging folder, or else the application's. */
+	static QString getCommunicationLogFile(bool debugLogging, QString loggingFolder, QString applicationLoggingFolder);
 	static bool isIgstkPluginBuilt();
 
 	TrackingSystemNDIService();
