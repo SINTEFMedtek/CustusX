@@ -197,6 +197,7 @@ TEST_CASE("NdiToolSetup: a wired tool whose port is empty uses a leftover sensor
 	REQUIRE(result.warnings.size() == 1);
 	CHECK(result.warnings[0].contains("configured port 1,")); // numbered from 1, as on the device
 	CHECK(result.warnings[0].contains("sensor on port 2"));
+	CHECK(result.warnings[0].contains("<portnumber> to 1 in the tool file")); // counted from 0 in the tool file
 }
 
 TEST_CASE("NdiToolSetup: tools with the wrong ports get the leftover sensors in port order", "[unit][org.custusx.core.tracking.system.ndi]")

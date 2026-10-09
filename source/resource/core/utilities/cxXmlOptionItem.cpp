@@ -198,6 +198,15 @@ bool XmlOptionItem::hasValue() const
 	return !item.isNull() && item.hasAttribute("value");
 }
 
+void XmlOptionItem::removeValue()
+{
+	QDomElement item = this->findElemFromUid(mUid, mRoot);
+	if (!item.isNull())
+	{
+		item.parentNode().removeChild(item);
+	}
+}
+
 void XmlOptionItem::writeValue(const QString& val)
 {
 	if (mRoot.isNull())

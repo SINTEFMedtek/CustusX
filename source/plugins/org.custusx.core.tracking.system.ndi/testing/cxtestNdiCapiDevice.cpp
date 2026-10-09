@@ -286,6 +286,14 @@ TEST_CASE("TrackingSystemNDIService: the communication log is in the application
 	CHECK(cx::TrackingSystemNDIService::getCommunicationLogFile(true, "", "").isEmpty());
 }
 
+TEST_CASE("NdiCapiDevice: only USB serial ports are checked for other processes using them", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	CHECK(cx::NdiCapiDevice::isUsbSerialPort("/dev/ttyUSB0"));
+	CHECK(cx::NdiCapiDevice::isUsbSerialPort("/dev/ttyACM1"));
+	CHECK_FALSE(cx::NdiCapiDevice::isUsbSerialPort("/dev/ttyS0")); // e.g. a console keeps it open
+	CHECK_FALSE(cx::NdiCapiDevice::isUsbSerialPort("COM3"));
+}
+
 #ifdef __linux__
 TEST_CASE("NdiCapiDevice: a file another process has open is found", "[unit][org.custusx.core.tracking.system.ndi]")
 {
@@ -301,7 +309,6 @@ TEST_CASE("NdiCapiDevice: a file another process has open is found", "[unit][org
 	holder.start("sh", {"-c", "exec 3<\"$0\"; echo ready; exec sleep 30", filename});
 	REQUIRE(holder.waitForReadyRead(5000));
 	CHECK(cx::NdiCapiDevice::isOpenByAnotherProcess(filename));
-	CHECK(cx::NdiCapiDevice::isSerialPortInUse(filename));
 
 	holder.kill();
 	holder.waitForFinished(5000);

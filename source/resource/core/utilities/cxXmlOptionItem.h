@@ -45,6 +45,7 @@ public:
 	QString readValue(const QString& defval) const;
 	QString readNonEmptyValue(const QString& defval) const; ///< As readValue(), but also defval for an empty value
 	bool hasValue() const;
+	void removeValue(); ///< Remove the option, so that readValue() gives the default
 	void writeValue(const QString& val);
 
 	QVariant readVariant(const QVariant& defval=QVariant()) const;

@@ -184,9 +184,10 @@ void assignLeftoverSensors(std::vector<WiredSensor>& sensors, const std::vector<
 			result.portHandleToUid[sensor->portHandle] = tool.uid;
 			assigned.insert(tool.uid);
 			result.warnings << QString("Tool %1: no sensor on its configured port %2, using the sensor on port %3%4 instead. "
-									   "Update the port number in the tool file if this is not the right tool.")
+									   "If this is the right sensor, set <portnumber> to %5 in the tool file (counted from 0 there).")
 							   .arg(tool.uid).arg(portLabel(tool.port)).arg(portLabel(sensor->location.port))
-							   .arg(sensor->location.channel ? QString(", channel %1").arg(sensor->location.channel) : QString());
+							   .arg(sensor->location.channel ? QString(", channel %1").arg(sensor->location.channel) : QString())
+							   .arg(sensor->location.port);
 		}
 	}
 }

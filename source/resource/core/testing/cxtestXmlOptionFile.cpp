@@ -162,4 +162,8 @@ TEST_CASE("XmlOptionItem: an empty or missing value gives the default with readN
 
 	item.writeValue("10.0.0.2");
 	CHECK(item.readNonEmptyValue("127.0.0.1") == "10.0.0.2");
+
+	item.removeValue();
+	CHECK_FALSE(item.hasValue());
+	CHECK(item.readValue("127.0.0.1") == "127.0.0.1");
 }

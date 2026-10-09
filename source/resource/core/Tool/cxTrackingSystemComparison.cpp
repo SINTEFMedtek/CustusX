@@ -543,7 +543,15 @@ void TrackingSystemComparison::restoreOpenIGTLinkServer()
 	QDomElement options = profile()->getXmlSettings().descend("video").getElement("video");
 	for (const std::pair<const QString, QString>& entry : mOriginalOpenIGTLinkOptions)
 	{
-		XmlOptionItem(entry.first, options).writeValue(entry.second);
+		XmlOptionItem item(entry.first, options);
+		if (entry.second.isNull())
+		{
+			item.removeValue(); // it was not set before
+		}
+		else
+		{
+			item.writeValue(entry.second);
+		}
 	}
 	mOriginalOpenIGTLinkOptions.clear();
 }
@@ -551,9 +559,9 @@ void TrackingSystemComparison::restoreOpenIGTLinkServer()
 void TrackingSystemComparison::setOpenIGTLinkOption(QString uid, QString value)
 {
 	XmlOptionItem item(uid, profile()->getXmlSettings().descend("video").getElement("video"));
-	if (!mOriginalOpenIGTLinkOptions.count(uid) && item.hasValue()) // a missing option is not restored as empty
+	if (!mOriginalOpenIGTLinkOptions.count(uid))
 	{
-		mOriginalOpenIGTLinkOptions[uid] = item.readValue("");
+		mOriginalOpenIGTLinkOptions[uid] = item.hasValue() ? item.readValue("") : QString(); // null: not set, removed again
 	}
 	item.writeValue(value);
 }

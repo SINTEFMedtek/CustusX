@@ -124,6 +124,12 @@ QString NdiCapiDevice::toSerialDeviceName(QString device)
 	return retval;
 }
 
+bool NdiCapiDevice::isUsbSerialPort(QString device)
+{
+	QString name = QFileInfo(device).fileName();
+	return name.startsWith("ttyUSB") || name.startsWith("ttyACM");
+}
+
 bool NdiCapiDevice::isOpenByAnotherProcess(QString path)
 {
 	bool retval = false;
@@ -153,7 +159,9 @@ bool NdiCapiDevice::isOpenByAnotherProcess(QString path)
 bool NdiCapiDevice::isSerialPortInUse(QString device)
 {
 	QByteArray name = toSerialDeviceName(device).toLocal8Bit();
-	bool retval = isOpenByAnotherProcess(QString::fromLocal8Bit(name)); // e.g. a server that neither locks nor opens it exclusively
+	// A server may neither lock the port nor open it exclusively. Only USB serial ports, where NDI
+	// devices are: a console or other service may keep a built-in port like /dev/ttyS0 open
+	bool retval = isUsbSerialPort(QString::fromLocal8Bit(name)) && isOpenByAnotherProcess(QString::fromLocal8Bit(name));
 #ifdef _WIN32
 	HANDLE handle = CreateFileA(name.constData(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (handle == INVALID_HANDLE_VALUE)

@@ -62,6 +62,7 @@ public:
 	static QString toSerialDeviceName(QString device); ///< Windows: COM10 and up must be opened as \\.\COM10
 	static bool isSerialPortInUse(QString device); ///< The port exists, but another application has it open (Windows, Linux) or locked (Linux, macOS)
 	static bool isOpenByAnotherProcess(QString path); ///< Linux: another process has the file open. Always false elsewhere.
+	static bool isUsbSerialPort(QString device); ///< ttyUSB* or ttyACM*
 	static NdiPortLocation parsePortLocation(const char location[14]);
 	static int baudRateToNdiCode(int baudRate);
 	static int illuminatorRateToNdiCode(int rate_Hz); ///< -1 if not supported
