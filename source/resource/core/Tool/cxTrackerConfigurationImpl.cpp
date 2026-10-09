@@ -48,7 +48,7 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 
 		for (unsigned i = 0; i < config.mToolList.size(); ++i)
 		{
-			if(tool.mAbsoluteToolFilePath == config.mToolList[i].mAbsoluteToolFilePath)
+			if(QFileInfo(tool.mAbsoluteToolFilePath).canonicalFilePath() == QFileInfo(config.mToolList[i].mAbsoluteToolFilePath).canonicalFilePath())
 			{
 				tool.mOpenIGTLinkImageId = config.mToolList[i].mOpenIGTLinkImageId;
 				tool.mOpenIGTLinkTransformId = config.mToolList[i].mOpenIGTLinkTransformId;

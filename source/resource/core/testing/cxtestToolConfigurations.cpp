@@ -95,4 +95,34 @@ TEST_CASE("Tool configurations: a missing tool file gives an empty, invalid tool
 	CHECK_FALSE(config.verifyTool(missing));
 }
 
+TEST_CASE("Tool configurations: the OpenIGTLink ids in a configuration are kept when it is saved", "[unit][tool]")
+{
+	// The NDI reference tool file has no OpenIGTLink id: it is only in the configuration
+	cx::DataLocations::setTestMode();
+	QString toolFolder = cx::DataLocations::getRootConfigPath() + "/tool/Tools/Shared/NDI-Reference-frame_small_POLARIS";
+	QTemporaryDir folder;
+	cx::ConfigurationFileParser::ToolStructure reference;
+	reference.mAbsoluteToolFilePath = toolFolder + "/NDI_ref_small.xml";
+	reference.mReference = true;
+	reference.mOpenIGTLinkTransformId = "MyRef";
+	cx::ConfigurationFileParser::Configuration original;
+	original.mFileName = folder.path() + "/original.xml";
+	original.mClinical_app = "Laboratory";
+	original.mTrackingSystemImplementation = "ndi";
+	original.mApplyRefToTools = false;
+	original.mTrackersAndTools[cx::tsPOLARIS] = {reference};
+	cx::ConfigurationFileParser::saveConfiguration(original);
+
+	cx::TrackerConfigurationImpl trackerConfiguration;
+	cx::TrackerConfiguration::Configuration config = trackerConfiguration.getConfiguration(original.mFileName);
+	config.mUid = folder.path() + "/saved.xml";
+	config.mTools = QStringList() << toolFolder + "/../NDI-Reference-frame_small_POLARIS/NDI_ref_small.xml"; // another spelling of the same file
+	config.mReferenceTool = config.mTools[0];
+	trackerConfiguration.saveConfiguration(config);
+
+	std::vector<cx::ConfigurationFileParser::ToolStructure> saved = cx::ConfigurationFileParser(config.mUid).getToolListWithMetaInformation();
+	REQUIRE(saved.size() == 1);
+	CHECK(saved[0].mOpenIGTLinkTransformId == "MyRef");
+}
+
 } // namespace cxtest
