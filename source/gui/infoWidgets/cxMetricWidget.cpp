@@ -37,6 +37,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMetricUtilities.h"
 #include "cxPatientModelService.h"
 #include "cxVisServices.h"
+#include "cxFileDialogOptions.h"
 
 
 namespace cx
@@ -458,7 +459,8 @@ void MetricWidget::exportMetricsButtonClickedSlot()
 
 	QString filename = QFileDialog::getSaveFileName(this,
 													"Select the file to export the metrics to",
-													suggestion);
+													suggestion,
+													QString(), nullptr, fileDialogOptions());
 	if(!filename.isEmpty())
 		mMetricManager->exportMetricsToXMLFile(filename);
 }
@@ -471,7 +473,7 @@ void MetricWidget::importMetricsButtonClickedSlot()
 	QString fileName = QFileDialog::getOpenFileName(this,
 													"Select the file to import metrics from (can be a patient file)",
 													suggestion,
-                                                    "XML file (*.xml)");
+                                                    "XML file (*.xml)", nullptr, fileDialogOptions());
 
 	if(!fileName.isEmpty() && fileName.endsWith(".xml"))
 		mMetricManager->importMetricsFromXMLFile(fileName);

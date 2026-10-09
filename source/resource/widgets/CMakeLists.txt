@@ -57,6 +57,8 @@ cx_add_class(CX_RESOURCE_WIDGETS_FILES
     cxStyles
     )
 
+list(APPEND CX_RESOURCE_WIDGETS_FILES cxFileDialogOptions.h)
+
 cx_create_export_header("cxResourceWidgets")
 
 add_library( cxResourceWidgets ${CX_RESOURCE_WIDGETS_FILES})

@@ -24,6 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <iostream>
 #include <QHBoxLayout>
 #include <QtWidgets>
+#include "cxFileDialogOptions.h"
 
 namespace cx
 {
@@ -102,7 +103,7 @@ void FileSelectWidget::selectData()
 	QString folder;
 	if (!mRootPaths.isEmpty())
 		folder = mRootPaths.front();
-	QString filename = QFileDialog::getOpenFileName(this, QString(tr("Select file")), folder, filter);
+	QString filename = QFileDialog::getOpenFileName(this, QString(tr("Select file")), folder, filter, nullptr, fileDialogOptions());
 
 	if (filename.isEmpty())
 		return;

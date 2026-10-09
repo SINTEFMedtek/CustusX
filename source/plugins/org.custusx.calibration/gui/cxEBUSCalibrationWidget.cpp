@@ -30,6 +30,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSettings.h"
 #include "cxTransformFile.h"
 #include "cxFrame3D.h"
+#include "cxFileDialogOptions.h"
 
 namespace cx
 {
@@ -160,7 +161,7 @@ void EBUSCalibrationWidget::toolSelectedSlot()
 void EBUSCalibrationWidget::browseAdapterCalibrationPathSlot()
 {
 	QFileInfo fileInfo(mAdapterCalibrationPath);
-	mAdapterCalibrationPath = QFileDialog::getOpenFileName(this, tr("Find adapter calibration matrix file"), fileInfo.absolutePath());
+	mAdapterCalibrationPath = QFileDialog::getOpenFileName(this, tr("Find adapter calibration matrix file"), fileInfo.absolutePath(), QString(), nullptr, fileDialogOptions());
 
 	settings()->setValue("EBUScalibration/path", mAdapterCalibrationPath);
 
