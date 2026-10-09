@@ -642,13 +642,17 @@ bool NdiCapiDevice::sendBX()
 		{
 			return true;
 		}
+		if (!mResponding)
+		{
+			return false; // the device is lost, it doesn't lack the feature: no simpler BX to try
+		}
 		CX_LOG_INFO() << "NDI Tracker debug: BX with 3D marker positions failed, no longer requested: " << mLastError;
 		mRequest3DMarkers = false;
 	}
 	mLastBXHas3DMarkers = false;
 	mLastBXHasMarkerInfo = mRequestMarkerInfo;
 	bool success = this->command("BX:%04X", NDI_XFORMS_AND_STATUS | (mRequestMarkerInfo ? NDI_ADDITIONAL_INFO : 0));
-	if (!success && mRequestMarkerInfo && !mMarkerInfoConfirmed)
+	if (!success && mResponding && mRequestMarkerInfo && !mMarkerInfoConfirmed)
 	{
 		QString markerInfoError = mLastError;
 		mLastBXHasMarkerInfo = false;
