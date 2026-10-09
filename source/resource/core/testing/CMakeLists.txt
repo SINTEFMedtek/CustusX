@@ -14,6 +14,7 @@ if(BUILD_TESTING)
         cxtestCatchSharedMemory.cpp
         cxtestCatchTransform3D.cpp
         cxtestCatchVector3D.cpp
+        cxtestMathUtils.cpp
         cxtestImageParameters.cpp
         cxtestCatchImageAlgorithms.cpp
         cxtestBinaryThinning3D.cpp

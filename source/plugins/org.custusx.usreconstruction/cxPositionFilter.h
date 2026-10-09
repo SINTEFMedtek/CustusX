@@ -32,8 +32,6 @@ protected:
 	unsigned mFilterStrength;
 	std::vector<TimedPosition> *mInputImagePositions;
 	unsigned long mNumberInputPositions;
-	unsigned mFilterLength;
-	unsigned long mNumberQuaternions;
 	Eigen::ArrayXXd mQPosArray;
 	Eigen::ArrayXXd mQPosFiltered;
 

@@ -41,6 +41,7 @@
 #include "cxFileReaderWriterService.h"
 #include "cxApplication.h"
 #include "cxStyles.h"
+#include "cxFileDialogOptions.h"
 
 namespace cx
 {
@@ -421,7 +422,7 @@ void MainWindowActions::loadPatientFileSlot(bool useSimpleFileDialog)
 	if(useSimpleFileDialog)
 		folder = getUserToSelectExistingPatient();
 	else
-		folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly | QFileDialog::DontUseNativeDialog);
+		folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient", patientDatafolder, fileDialogOptions(QFileDialog::ShowDirsOnly));
 
 	if (!folder.isEmpty())
 		mServices->session()->load(folder);
@@ -435,7 +436,7 @@ void MainWindowActions::loadPatientFileCopySlot()
 	QString patientDatafolder = profile()->getPatientTemplatePath();
 
 	// Open file dialog
-	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select template patient to copy", patientDatafolder, QFileDialog::ShowDirsOnly | QFileDialog::DontUseNativeDialog);
+	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select template patient to copy", patientDatafolder, fileDialogOptions(QFileDialog::ShowDirsOnly));
 	if (!folder.isEmpty())
 	{
 		QString newFolder = this->selectNewPatientFolder();
