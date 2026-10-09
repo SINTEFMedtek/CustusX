@@ -60,9 +60,9 @@ while CustusX is closed:
   when the NDI device is used by another application, see below. false: just report that the device
   is in use.
 
-A serial or USB device used by another application can't be opened on Windows. On Linux and macOS
-it can't be opened if the other application locks the port, as applications using ndicapi (e.g.
-PlusServer) do.
+A serial or USB device used by another application is found on Windows and Linux. On macOS it is
+found only if the other application locks the port, as applications using ndicapi (e.g. PlusServer)
+do. CustusX doesn't send anything to a port in use, so the other application's tracking continues.
 
 Device used by another application
 -----------------------------------------------------------
@@ -74,6 +74,8 @@ the NDI tool configuration from that server instead, without changing the tool c
   Connection widget.
 * The server's transform names must match the tools: the openigtlinktransformid attribute of the
   toolfile in the tool configuration, or port_N for an Aurora tool on port number N.
+* The positions are made relative to the reference tool, as when tracking with the device itself.
+  For a server that already does this, set openIGTLinkFallbackApplyReference=false.
 * Only one of them tracks at a time. Every Start Tracking tries the NDI device first, and uses the
   server only if the device is still in use.
 

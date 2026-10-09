@@ -216,6 +216,15 @@ void OpenIGTLinkTrackingSystemService::configure()
 	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Using OpenIGTLink3 tracking";
 
 	std::vector<ConfigurationFileParser::ToolStructure> toolList = configParser.getToolListWithMetaInformation();
+	if (mFallback)
+	{
+		// The server replaces the device: positions in tracker space, as from the device itself
+		bool applyReference = settings()->value("openIGTLinkFallbackApplyReference", true).toBool();
+		for (ConfigurationFileParser::ToolStructure& tool : toolList)
+		{
+			tool.mApplyRefToTool = applyReference;
+		}
+	}
 
 	//Create tools
 	for(std::vector<ConfigurationFileParser::ToolStructure>::iterator it = toolList.begin(); it != toolList.end(); ++it)

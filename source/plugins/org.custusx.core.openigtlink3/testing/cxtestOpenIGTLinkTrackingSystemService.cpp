@@ -307,9 +307,11 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: tracks the tools of an NDI configur
 	trackingSystemService->startFallbackTracking(ndiConfiguration);
 	CHECK(trackingSystemService->isTracking());
 	CHECK(server->mConnectAttempts == 1);
-	// The Aurora sensor on port number 2 is found by the transform name port_2
-	trackingSystemService->receiveTransform("port_2", cx::Transform3D::Identity(), timestampMS);
+	// The Aurora sensor on port number 2 is found by the transform name port_2, the reference by port_0
 	REQUIRE(trackingSystemService->getTool("port_2"));
+	CHECK(trackingSystemService->getTool("port_2")->applyReference()); // the server replaces the device
+	trackingSystemService->receiveTransform("port_0", cx::Transform3D::Identity(), timestampMS);
+	trackingSystemService->receiveTransform("port_2", cx::Transform3D::Identity(), timestampMS);
 	CHECK(trackingSystemService->getTool("port_2")->getTimestamp() == Approx(timestampMS));
 
 	// A new start ends the fallback, so that the NDI system tries its device again
