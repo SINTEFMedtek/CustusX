@@ -137,8 +137,8 @@ void OpenIGTLinkTrackingSystemService::connectToServer()
 	{
 		// Also when already acquired: connects again if the last attempt failed
 		QDomElement options = profile()->getXmlSettings().descend("video").getElement("video");
-		QString host = XmlOptionItem(OPENIGTLINK3_STREAMER_IP, options).readValue("127.0.0.1");
-		int port = XmlOptionItem(OPENIGTLINK3_STREAMER_PORT, options).readValue("18944").toInt();
+		QString host = XmlOptionItem(OPENIGTLINK3_STREAMER_IP, options).readNonEmptyValue("127.0.0.1");
+		int port = XmlOptionItem(OPENIGTLINK3_STREAMER_PORT, options).readNonEmptyValue("18944").toInt();
 		mConnectionAcquired = true;
 		mNetworkHandler->acquireConnection("tracking", host, port);
 	}

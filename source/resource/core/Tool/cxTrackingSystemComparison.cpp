@@ -528,8 +528,8 @@ void TrackingSystemComparison::killCommand()
 void TrackingSystemComparison::readOpenIGTLinkServer(TrackingComparisonSettings& settings)
 {
 	QDomElement options = profile()->getXmlSettings().descend("video").getElement("video");
-	settings.openIGTLinkHost = XmlOptionItem(kOpenIGTLinkHostOption, options).readValue(settings.openIGTLinkHost);
-	settings.openIGTLinkPort = XmlOptionItem(kOpenIGTLinkPortOption, options).readValue(QString::number(settings.openIGTLinkPort)).toInt();
+	settings.openIGTLinkHost = XmlOptionItem(kOpenIGTLinkHostOption, options).readNonEmptyValue(settings.openIGTLinkHost);
+	settings.openIGTLinkPort = XmlOptionItem(kOpenIGTLinkPortOption, options).readNonEmptyValue(QString::number(settings.openIGTLinkPort)).toInt();
 }
 
 void TrackingSystemComparison::setOpenIGTLinkServer()
@@ -551,7 +551,7 @@ void TrackingSystemComparison::restoreOpenIGTLinkServer()
 void TrackingSystemComparison::setOpenIGTLinkOption(QString uid, QString value)
 {
 	XmlOptionItem item(uid, profile()->getXmlSettings().descend("video").getElement("video"));
-	if (!mOriginalOpenIGTLinkOptions.count(uid))
+	if (!mOriginalOpenIGTLinkOptions.count(uid) && item.hasValue()) // a missing option is not restored as empty
 	{
 		mOriginalOpenIGTLinkOptions[uid] = item.readValue("");
 	}

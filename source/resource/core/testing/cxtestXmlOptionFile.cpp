@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxXmlOptionItem.h"
 #include "cxDataLocations.h"
 
+#include <QDomDocument>
 #include <QFile>
 #include <QFileInfo>
 #include "catch.hpp"
@@ -142,4 +143,23 @@ TEST_CASE("XmlOptionFile: Write and read QVariant-QColor", "[unit][resource][cor
 
 	cx::XmlOptionItem item2 = file1.item();
 	CHECK(item2.readVariant("none").value<QColor>() == value); //  second item contains same value as first
+}
+
+TEST_CASE("XmlOptionItem: an empty or missing value gives the default with readNonEmptyValue", "[unit][resource][core]")
+{
+	QDomDocument doc;
+	QDomElement root = doc.createElement("root");
+	doc.appendChild(root);
+
+	cx::XmlOptionItem item("address", root);
+	CHECK_FALSE(item.hasValue());
+	CHECK(item.readNonEmptyValue("127.0.0.1") == "127.0.0.1");
+
+	item.writeValue("");
+	CHECK(item.hasValue());
+	CHECK(item.readValue("127.0.0.1").isEmpty());
+	CHECK(item.readNonEmptyValue("127.0.0.1") == "127.0.0.1");
+
+	item.writeValue("10.0.0.2");
+	CHECK(item.readNonEmptyValue("127.0.0.1") == "10.0.0.2");
 }
