@@ -47,7 +47,9 @@ public:
 	void reset(); ///< Clear the warning, e.g. when tracking stops
 	void setMaxErrorRMS(double maxErrorRMS_mm);
 	int getExpectedMarkers() const; ///< The tool's number of markers, or the most markers used in any sample so far
-	void setMarkerCount(int markers); ///< The tool's own number of markers: fewer is a warning from the first sample
+	/** The tool's own number of markers: fewer is a warning from the first sample. For a tool with markers
+	 *  on several faces this is the total, so it always gets a warning ("4 of 8 markers used"). */
+	void setMarkerCount(int markers);
 	static int readMarkerCount(QString romFile); ///< The number of markers in an NDI tool definition (.rom) file, -1 if it can't be read
 
 private:

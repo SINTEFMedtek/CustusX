@@ -148,7 +148,8 @@ commands to NdiCommunication.txt.
   log show the 3D markers seen and the markers used for each tool. Use a 4-marker tool: all
   spheres visible, one sphere hidden, a sphere hidden or removed before tracking starts, and the
   tool hidden. The tool should be orange whenever fewer markers than in its .rom file are used,
-  also when a sphere is hidden from the start.
+  also when a sphere is hidden from the start. A tool with markers on several faces is always
+  orange, as the .rom file gives the markers of all faces (e.g. "4 of 8 markers used").
 * Aurora: plug a tool into a different port than in its tool file, and check that it is
   tracked, with a warning in the log that names the right ports.
 * Aurora: unplug a sensor while tracking and plug it in again, then stop and start tracking: the

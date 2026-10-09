@@ -125,4 +125,28 @@ TEST_CASE("Tool configurations: the OpenIGTLink ids in a configuration are kept 
 	CHECK(saved[0].mOpenIGTLinkTransformId == "MyRef");
 }
 
+TEST_CASE("Tool configurations: two missing tool files keep their own OpenIGTLink ids when saved", "[unit][tool]")
+{
+	QTemporaryDir folder;
+	cx::TrackerConfiguration::Configuration config;
+	config.mUid = folder.path() + "/saved.xml";
+	config.mClinicalApplication = "Laboratory";
+	config.mTrackingSystemImplementation = "ndi";
+	config.mTrackingSystemName = "polaris";
+	config.mApplyRefToTools = false;
+	config.mTools << folder.path() + "/A_POLARIS/a.xml" << folder.path() + "/B_POLARIS/b.xml";
+	cx::ConfigurationFileParser::ToolStructure a;
+	a.mAbsoluteToolFilePath = config.mTools[0];
+	a.mOpenIGTLinkTransformId = "a";
+	cx::ConfigurationFileParser::ToolStructure b;
+	b.mAbsoluteToolFilePath = config.mTools[1];
+	b.mOpenIGTLinkTransformId = "b";
+	config.mToolList = {a, b};
+
+	std::vector<cx::ConfigurationFileParser::ToolStructure> structures = cx::TrackerConfigurationImpl::createToolStructures(config);
+	REQUIRE(structures.size() == 2);
+	CHECK(structures[0].mOpenIGTLinkTransformId == "a");
+	CHECK(structures[1].mOpenIGTLinkTransformId == "b");
+}
+
 } // namespace cxtest
