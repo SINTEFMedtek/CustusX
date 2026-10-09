@@ -122,7 +122,14 @@ commands to NdiCommunication.txt.
 * Shut down while tracking (the light and the full shutdown), and quit the application while
   tracking. No errors, and no tracking thread left running.
 * Unplug the cable or power off the device while tracking: the log says that the contact with
-  the device was lost, the tools become invisible, and tracking can be started again.
+  the device was lost, the tools become invisible, and tracking can be started again. After a
+  power off, changing the tool configuration or quitting should not hang, and the log should not
+  say that the tracker thread was terminated.
+* Rate: NDI tracks an Aurora at 40 Hz and a Polaris Spectra at 60 Hz ("Tracking at 60 Hz" in
+  the log), with even intervals between the positions in the CSV file. A Polaris that can't track
+  at 60 Hz (e.g. a Vicra) tracks at 20 Hz, with a warning.
+* Baud rate: NdiCommunication.txt shows that COMM succeeded at 921600 baud. With
+  ndiTrackingBaudRate set to a rate that isn't supported (e.g. 1228739), a slower rate is used.
 * With Record positions in the Tracking Test widget: move a tool in and out of the measurement
   volume, to and from its border, and (Polaris) hide one sphere, partly or completely. The tool
   should become orange (position warning) at the border and with a hidden sphere, and red when it
@@ -144,3 +151,13 @@ commands to NdiCommunication.txt.
   count, and can be used to warn about a missing sphere from the start.
 * Aurora: plug a tool into a different port than in its tool file, and check that it is
   tracked, with a warning in the log that names the right ports.
+* Aurora: unplug a sensor while tracking and plug it in again, then stop and start tracking: the
+  tool is tracked again. Unplug a sensor, then stop and start tracking: the tool is shown as not
+  initialized.
+* OpenIGTLink: Start Tracking connects to the server and Stop Tracking disconnects, several times.
+* Change the tool configuration in the Preferences while NDI is configured but not tracking: the
+  new configuration's tools are used when tracking starts.
+* A tool configuration with a tool file that is missing (e.g. renamed while CustusX runs): a
+  warning when the configuration is saved or tracking starts, and no crash.
+* An existing profile gets the shipped tool configurations it is missing.
+* Windows: a device on COM10 or higher is found.
