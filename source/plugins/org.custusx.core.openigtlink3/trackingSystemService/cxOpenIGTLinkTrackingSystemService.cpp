@@ -44,7 +44,8 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 	mConfigured(false),
 	mRequestedState(Tool::tsNONE),
 	mConnectionAcquired(false),
-	mFallback(false)
+	mFallback(false),
+	m_tsMref(Transform3D::Identity())
 {
 	if(mNetworkHandler == NULL)
 		return;
@@ -258,6 +259,7 @@ void OpenIGTLinkTrackingSystemService::deconfigure()
 	mFallback = false;
 	mTools.clear();
 	mReference.reset();
+	m_tsMref = Transform3D::Identity();
 	this->updateState();
 }
 
@@ -297,14 +299,18 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 		}
 		else if(tool->applyReference())
 		{
+			// Positions relative to the reference (pr), as from the NDI and IGSTK tracking systems
 			Transform3D tsMs = transform;
 			Transform3D prMs = tsMs;//If no reference tool: ts==pr (ts = tracking system )
-			if(mReference && !tool->isReference())
+			if(tool->isReference())
 			{
-				Transform3D tsMpr = mReference->get_prMt();
-				prMs = tsMpr.inv() * tsMs;
+				m_tsMref = tsMs;
+				prMs = Transform3D::Identity(); // the reference is the origin of its own space
 			}
-			//Apply ref sensor pos to all tool positions
+			else if(mReference)
+			{
+				prMs = m_tsMref.inv() * tsMs; // the raw reference position, without its calibration or filtering
+			}
 			tool->toolTransformAndTimestampSlot(prMs, timestampMS);
 		}
 		else

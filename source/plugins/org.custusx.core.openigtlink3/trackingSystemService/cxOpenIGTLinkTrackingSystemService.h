@@ -92,6 +92,7 @@ private:
 	bool mConnectionAcquired; ///< Tracking uses the shared OpenIGTLink connection
 	bool mFallback; ///< Tracking the tools of another system's configuration, whose device is used by another application
 	QString mFallbackConfigurationFile;
+	Transform3D m_tsMref; ///< The last reference position from the server, in tracker space
 
 signals:
 	void setInternalState(const Tool::State val);
