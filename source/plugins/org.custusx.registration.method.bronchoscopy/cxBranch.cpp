@@ -243,9 +243,11 @@ void Branch::removeEqualPositions()
 {
 	Eigen::MatrixXd positions = this->getPositions();
 	Eigen::MatrixXd orientations = this->getOrientations();
+	Eigen::VectorXd radius = this->getRadius();
 	bool resizeOrientations = false;
 	if (positions.cols() == orientations.cols())
 		resizeOrientations = true;
+	bool resizeRadius = (radius.size() > 0 && radius.size() == positions.cols()); // keep radius aligned with positions
 
 	for (int i = positions.cols() - 1; i > 0; i--)
 	{
@@ -255,12 +257,19 @@ void Branch::removeEqualPositions()
 			positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
 			if (resizeOrientations)
 				orientations.conservativeResize(Eigen::NoChange, orientations.cols() - 1);
+			if (resizeRadius)
+			{
+				radius.segment(i, radius.size() - i - 1) = radius.tail(radius.size() - i - 1).eval();
+				radius.conservativeResize(radius.size() - 1);
+			}
 		}
 	}
 
 	mPositions = positions;
 	if (resizeOrientations)
 		mOrientations = orientations;
+	if (resizeRadius)
+		mRadius = radius;
 }
 
 void Branch::setLap(QString lap)

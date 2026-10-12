@@ -612,15 +612,24 @@ void BranchList::excludeClosePositionsInCTCenterline(double minPointDistance){
 	{
 		Eigen::MatrixXd positions = branchVector[i]->getPositions();
 		Eigen::MatrixXd orientations = branchVector[i]->getOrientations();
+		Eigen::VectorXd radius = branchVector[i]->getRadius();
+		bool updateRadius = (radius.size() > 0 && radius.size() == positions.cols()); // keep radius aligned with positions
 
-		for (int i = positions.cols()-2; i > 0; i--){
-			double distance = (positions.col(i) - positions.col(i+1)).norm();
+		for (int j = positions.cols()-2; j > 0; j--){
+			double distance = (positions.col(j) - positions.col(j+1)).norm();
 			if ( distance < minPointDistance )
 			{
-				positions = eraseCol(i,positions);
-				orientations = eraseCol(i,orientations);
+				positions = eraseCol(j,positions);
+				orientations = eraseCol(j,orientations);
+				if (updateRadius)
+				{
+					radius.segment(j, radius.size() - j - 1) = radius.tail(radius.size() - j - 1).eval();
+					radius.conservativeResize(radius.size() - 1);
+				}
 			}
 		}
+		if (updateRadius)
+			branchVector[i]->setRadius(radius); // set before positions, so that removeEqualPositions() keeps them aligned
 		branchVector[i]->setPositions(positions);
 	}
 

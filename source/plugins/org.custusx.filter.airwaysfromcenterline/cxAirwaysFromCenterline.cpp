@@ -19,6 +19,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxContourFilter.h"
 #include <vtkImageData.h>
 #include <vtkPointData.h>
+#include <vtkDoubleArray.h>
+#include <vtkIdList.h>
 #include "cxVolumeHelpers.h"
 #include "vtkCardinalSpline.h"
 #include "cxLogger.h"
@@ -341,21 +343,40 @@ vtkPolyDataPtr AirwaysFromCenterline::getVTKPoints()
 	std::vector<BranchPtr> branches  = mBranchListPtr->getBranches();
 	int pointIndex = 0;
 
+	// Airway radius for each centerline point, if calculated (BranchList::setRadius) and still aligned with the positions
+	bool addRadius = mBranchListPtr->isRadiusAvailable();
+	for (int i = 0; i < branches.size() && addRadius; i++)
+		if (branches[i]->getRadius().size() != branches[i]->getPositions().cols())
+		{
+			CX_LOG_WARNING() << "AirwaysFromCenterline::getVTKPoints: Airway radius not aligned with centerline positions. Radius is not added to centerline.";
+			addRadius = false;
+		}
+	vtkDoubleArrayPtr radiusArray = vtkDoubleArrayPtr::New();
+	radiusArray->SetName(getRadiusArrayName().toStdString().c_str());
+
 	for (int i = 0; i < branches.size(); i++)
 	{
 		Eigen::MatrixXd positions = branches[i]->getPositions();
+		Eigen::VectorXd radius = branches[i]->getRadius();
 		int numberOfPositions = positions.cols();
 
 		if (branches[i]->getParentBranch()) // Add parents last position to get connected centerlines
 		{
 			Eigen::MatrixXd parentPositions = branches[i]->getParentBranch()->getPositions();
 			points->InsertNextPoint(parentPositions(0,parentPositions.cols()-1),parentPositions(1,parentPositions.cols()-1),parentPositions(2,parentPositions.cols()-1));
+			if (addRadius)
+			{
+				Eigen::VectorXd parentRadius = branches[i]->getParentBranch()->getRadius();
+				radiusArray->InsertNextValue(parentRadius(parentRadius.size()-1));
+			}
 			pointIndex += 1;
 		}
 
 		for (int j = 0; j < numberOfPositions; j++)
 		{
 			points->InsertNextPoint(positions(0,j),positions(1,j),positions(2,j));
+			if (addRadius)
+				radiusArray->InsertNextValue(radius(j));
 
 			if (j>1 || branches[i]->getParentBranch())
 			{
@@ -368,7 +389,86 @@ vtkPolyDataPtr AirwaysFromCenterline::getVTKPoints()
 
 	retval->SetPoints(points);
 	retval->SetLines(lines);
+	if (addRadius)
+		retval->GetPointData()->AddArray(radiusArray); // Not set as active scalars, to avoid coloring the centerline by radius
 	return retval;
+}
+
+QString AirwaysFromCenterline::getRadiusArrayName()
+{
+	return "Radius";
+}
+
+/*
+	AirwaysFromCenterline::addRadiusToCenterline calculates the airway radius (mm) for each point in an existing centerline
+	mesh, and adds it as a point data array to the mesh. Used for centerlines created before the radius was stored.
+	The orientation in each point is found from the line segments connected to the point.
+*/
+bool AirwaysFromCenterline::addRadiusToCenterline(MeshPtr centerline, ImagePtr segmentationVolume)
+{
+	if (!centerline || !segmentationVolume)
+		return false;
+
+	vtkPolyDataPtr centerline_r = centerline->getTransformedPolyDataCopy(centerline->get_rMd());
+	vtkIdType numberOfPoints = centerline_r->GetNumberOfPoints();
+	if (numberOfPoints < 2)
+		return false;
+
+	std::vector<Eigen::Vector3d> orientations(numberOfPoints, Eigen::Vector3d::Zero());
+	vtkSmartPointer<vtkIdList> cellPoints = vtkSmartPointer<vtkIdList>::New();
+	for (vtkIdType i = 0; i < centerline_r->GetNumberOfCells(); i++)
+	{
+		centerline_r->GetCellPoints(i, cellPoints);
+		for (vtkIdType j = 0; j < cellPoints->GetNumberOfIds()-1; j++)
+		{
+			vtkIdType from = cellPoints->GetId(j);
+			vtkIdType to = cellPoints->GetId(j+1);
+			Eigen::Vector3d direction = Vector3D(centerline_r->GetPoint(to)) - Vector3D(centerline_r->GetPoint(from));
+			if (direction.norm() < 1e-10)
+				continue;
+			direction.normalize();
+			orientations[from] += direction;
+			orientations[to] += direction;
+		}
+	}
+
+	// Points not connected to any line (e.g. first point of trachea): use orientation of the closest connected point
+	for (vtkIdType i = 0; i < numberOfPoints; i++)
+	{
+		if (orientations[i].norm() > 1e-10)
+			continue;
+		Vector3D position(centerline_r->GetPoint(i));
+		double minDistance = std::numeric_limits<double>::max();
+		for (vtkIdType j = 0; j < numberOfPoints; j++)
+		{
+			double distance = (Vector3D(centerline_r->GetPoint(j)) - position).norm();
+			if (orientations[j].norm() > 1e-10 && distance < minDistance)
+			{
+				minDistance = distance;
+				orientations[i] = orientations[j];
+			}
+		}
+	}
+
+	BranchList branchList;
+	vtkDoubleArrayPtr radiusArray = vtkDoubleArrayPtr::New();
+	radiusArray->SetName(getRadiusArrayName().toStdString().c_str());
+	radiusArray->SetNumberOfValues(numberOfPoints);
+	for (vtkIdType i = 0; i < numberOfPoints; i++)
+	{
+		Eigen::Vector3d orientation = orientations[i];
+		if (orientation.norm() > 1e-10)
+			orientation.normalize();
+		radiusArray->SetValue(i, branchList.calculateRadius(Vector3D(centerline_r->GetPoint(i)), orientation, segmentationVolume));
+	}
+
+	vtkPolyDataPtr polyData = centerline->getVtkPolyData();
+	polyData->GetPointData()->RemoveArray(getRadiusArrayName().toStdString().c_str());
+	polyData->GetPointData()->AddArray(radiusArray);
+	polyData->Modified();
+	centerline->setVtkPolyData(polyData);
+
+	return true;
 }
 
 std::pair<int, double> findDistanceToLine(Eigen::Vector3d point, Eigen::MatrixXd line)

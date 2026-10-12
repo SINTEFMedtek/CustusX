@@ -109,4 +109,31 @@ TEST_CASE("Test the findParentIndex method", "[unit][bronchoscopy]")
 
 }
 
+TEST_CASE("BranchList: excluding close positions keeps radius aligned with positions", "[unit][bronchoscopy]")
+{
+	int numberOfPositions = 101;
+	Eigen::MatrixXd positions(3, numberOfPositions);
+	Eigen::VectorXd radius(numberOfPositions);
+	for (int i = 0; i < numberOfPositions; ++i)
+	{
+		positions.col(i) = Eigen::Vector3d(0, 0, 0.2 * i);
+		radius(i) = positions(2, i); // radius identifies the position
+	}
+	cx::BranchPtr branch(new cx::Branch());
+	branch->setPositions(positions);
+	branch->setRadius(radius);
+	cx::BranchListPtr branchList(new cx::BranchList());
+	branchList->addBranch(branch);
+
+	branchList->excludeClosePositionsInCTCenterline(0.5);
+
+	Eigen::MatrixXd reducedPositions = branch->getPositions();
+	Eigen::VectorXd reducedRadius = branch->getRadius();
+	CHECK(reducedPositions.cols() < numberOfPositions);
+	REQUIRE(reducedRadius.size() == reducedPositions.cols());
+	for (int i = 0; i < reducedPositions.cols(); ++i)
+		CHECK(reducedRadius(i) == Approx(reducedPositions(2, i)));
+}
+
 } //namespace cxtest
+

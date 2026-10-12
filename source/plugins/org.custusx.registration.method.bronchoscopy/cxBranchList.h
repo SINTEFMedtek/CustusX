@@ -60,6 +60,7 @@ public:
 	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
 	void setRadius(ImagePtr segmentationVolume);
 	bool isRadiusAvailable();
+	double calculateRadius(Eigen::Vector3d position, Eigen::Vector3d orientation, ImagePtr segmentationVolume);
 	void setBranchCode();
 	void findBranchCodeForChildren(BranchPtr branch);
 
@@ -73,7 +74,6 @@ private:
 	double findDistance(Vector3D p1, Vector3D p2);
 	BranchPtr findClosestBranch(Vector3D targetCoordinate_r);
 	Eigen::MatrixXd findMainConnectedAirwayTree(Eigen::MatrixXd positions_r);
-	double calculateRadius(Eigen::Vector3d position, Eigen::Vector3d orientation, ImagePtr segmentationVolume);
 	double findDistanceToSegmentationEdge(vtkImageDataPtr segmentationVolume, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction);
 
 	bool mIsRadiusAvailable = false;
