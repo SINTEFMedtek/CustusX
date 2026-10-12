@@ -254,7 +254,9 @@ TEST_CASE("TrackingSystemComparison: expandHomeFolder replaces a leading tilde",
 
 TEST_CASE("TrackingSystemComparison: getWorkingFolder is the program's own folder", "[unit]")
 {
-	CHECK(cx::TrackingSystemComparison::getWorkingFolder("/opt/server/bin/server") == "/opt/server/bin");
+	QString folder = QDir::tempPath() + "/server/bin";
+	CHECK(cx::TrackingSystemComparison::getWorkingFolder(folder + "/server") == folder);
+	CHECK(cx::TrackingSystemComparison::getWorkingFolder(QDir::toNativeSeparators(folder + "/server")) == folder);
 	CHECK(cx::TrackingSystemComparison::getWorkingFolder("server").isEmpty());
 }
 

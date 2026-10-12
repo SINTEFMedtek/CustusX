@@ -277,7 +277,7 @@ QString TrackingSystemComparison::expandHomeFolder(QString path)
 QString TrackingSystemComparison::getWorkingFolder(QString program)
 {
 	QString retval;
-	if (program.contains("/"))
+	if (QDir::fromNativeSeparators(program).contains("/"))
 	{
 		retval = QFileInfo(program).absolutePath();
 	}
