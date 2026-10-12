@@ -33,6 +33,7 @@ if(BUILD_TESTING)
     target_link_libraries(cxtest_org_custusx_filter_routetotarget
         PRIVATE
         org_custusx_filter_routetotarget
+        org_custusx_registration_method_bronchoscopy
         cxtestUtilities
         cxCatch
         cxResource
