@@ -22,7 +22,7 @@ The tool buttons in the status bar show the state of each tool while you test:
   sphere on a Polaris tool is hidden. Light orange is the active tool.
 
 Record positions {#tracking_test_widget_record}
------------------------------------------------------------
+===========================================================
 
 \addindex tool_position_recorder_widget
 
@@ -58,7 +58,7 @@ The file has one row for each position, visibility change and position warning, 
   the number of markers used.
 
 Compare systems {#tracking_test_widget_compare}
------------------------------------------------------------
+===========================================================
 
 \addindex tracking_comparison_widget
 
@@ -110,7 +110,7 @@ The results are in a new folder in the output folder, named tracking_comparison 
   be well below a millimeter.
 
 Tracking state {#tracking_test_widget_state}
------------------------------------------------------------
+===========================================================
 
 \addindex tool_manager_widget
 

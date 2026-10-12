@@ -88,7 +88,7 @@ void MehdiGPURayCastMultiVolumeRepImageMapperMonitor::applyCropping()
 
 	DoubleBoundingBox3D bb_d = mImage->getCroppingBox();
 
-	mapper->SetCroppingRegionPlanes(mVolumeIndex, bb_d.begin());
+	mapper->SetCroppingRegionPlanes(mVolumeIndex, bb_d.data());
 	mapper->Update();
 }
 

@@ -99,7 +99,7 @@ void ImageMapperMonitor::applyCropping()
 
 	DoubleBoundingBox3D bb_d = mImage->getCroppingBox();
 
-	mapper->SetCroppingRegionPlanes(bb_d.begin());
+	mapper->SetCroppingRegionPlanes(bb_d.data());
 	mapper->Update();
 }
 
