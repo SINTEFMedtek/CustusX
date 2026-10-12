@@ -523,6 +523,26 @@ class CloneRepoWithPromptTest(unittest.TestCase):
         self.assertTrue(events[0][1], 'the directory must still exist when the user is prompted')
         self.assertFalse(events[1][1], 'the directory must be deleted before cloning starts')
 
+    def test_unreadable_git_clone_is_never_deleted(self):
+        '''A clone where "git status" fails may hold local work: stop instead of deleting it, even when silent.'''
+        _init_repo(self.repo_path)
+        _commit(self.repo_path)
+        work = os.path.join(self.repo_path, 'uncommitted.txt')
+        with open(work, 'w') as f:
+            f.write('local work')
+        with open(os.path.join(self.repo_path, '.git', 'HEAD'), 'w') as f:
+            f.write('garbage')  # makes "git status" fail
+
+        handler = _make_handler(self.repo_path)
+        handler._promptToContinue = lambda doprompt: None
+        handler._cloneWithRetry = lambda: self.fail('must not clone over an existing clone')
+
+        # Keep git from finding an enclosing repo when TMPDIR is inside a checkout
+        with mock.patch.dict(os.environ, {'GIT_CEILING_DIRECTORIES': self.tmp}):
+            with self.assertRaises(SystemExit):
+                handler.cloneRepoWithPrompt()
+        self.assertTrue(os.path.exists(work))
+
 
 if __name__ == '__main__':
     unittest.main()

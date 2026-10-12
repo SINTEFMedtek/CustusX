@@ -13,6 +13,19 @@ import subprocess
 import pprint
 import argparse
 import shutil
+import stat
+
+def removeTree(path):
+    '''
+    shutil.rmtree that also works on a git clone on Windows: git leaves the
+    files in .git/objects read-only, and Windows can't delete a read-only file.
+    '''
+    def clearReadonlyAndRetry(func, failed_path, exc_info):
+        if not issubclass(exc_info[0], PermissionError) or os.path.islink(failed_path):
+            raise exc_info[1]
+        os.chmod(failed_path, os.stat(failed_path).st_mode | stat.S_IWRITE)
+        func(failed_path)
+    shutil.rmtree(path, onerror=clearReadonlyAndRetry)
 
 def returnCode():
     return 0
@@ -92,6 +105,11 @@ class RepoHandler(object):
         '''
         if self.is_git_directory(self.repo_path):
             return
+        if os.path.exists(os.path.join(self.repo_path, '.git')):
+            # A clone git can't read (e.g. "dubious ownership") may still hold local work
+            print('ERROR: %s is a git clone, but "git status" fails in it.' % self.repo_path)
+            print('Not removing it. Run "git status" there to see why, fix it or delete the folder yourself, and re-run.')
+            sys.exit(1)
         pathfound = os.path.exists(self.repo_path)
         if pathfound:
             print("Not a git repo, removing folder and contents of %s." % self.repo_path)
@@ -101,7 +119,7 @@ class RepoHandler(object):
         self._promptToContinue(doprompt)
 
         if pathfound:
-            shutil.rmtree(self.repo_path)
+            removeTree(self.repo_path)
 
         self._cloneWithRetry()
 
@@ -120,7 +138,7 @@ class RepoHandler(object):
                 return
             print('Clone attempt %d/%d failed for %s.' % (attempt, attempts, self.getName()))
             if os.path.exists(self.repo_path):
-                shutil.rmtree(self.repo_path)
+                removeTree(self.repo_path)
         sys.exit('ERROR: failed to clone %s after %d attempts.' % (self.getName(), attempts))
 
     def getUrl(self):
@@ -269,7 +287,7 @@ class RepoHandler(object):
             for path in nested_paths:
                 print('Removing %s: it is a separate clone of what is now part of %s at %s,' % (path, self.getName(), ref))
                 print('with no local changes or unpushed commits.')
-                shutil.rmtree(path)
+                removeTree(path)
             result = runShell('git checkout %s' % checkout_target, self.repo_path)
         return result
 
