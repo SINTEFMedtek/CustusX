@@ -26,17 +26,13 @@ class TestNetworkHandler : public cx::NetworkHandler
 public:
 	TestNetworkHandler() : cx::NetworkHandler(nullptr) {}
 
-	double synchronizedTimestamp(double receivedTimestampSec)
+	double synchronizedTimestamp(double sentTimestampSec, double received_ms, QString deviceName = "device")
 	{
-		return NetworkHandler::synchronizedTimestamp(receivedTimestampSec);
+		return NetworkHandler::synchronizedTimestamp(deviceName, sentTimestampSec, received_ms);
 	}
-	bool verifyTimestamp(double &timestampMS)
+	double getTimestampOffset(QString deviceName = "device")
 	{
-		return NetworkHandler::verifyTimestamp(timestampMS);
-	}
-	double getTimestampOffset()
-	{
-		return mTimestampOffsetMS;
+		return mClockSynchronizers.count(deviceName) ? mClockSynchronizers[deviceName].getOffset_ms() : 0.0;
 	}
 };
 
@@ -337,90 +333,53 @@ TEST_CASE("NetworkHandler: the connection is shared, and closed when the last us
 	CHECK_FALSE(server->isConnected());
 }
 
-TEST_CASE("NetworkHandler: Test timestamp verification", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("NetworkHandler: Timestamps follow the sender, with the offset of the fastest message", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double timestamp = latestSystemTime;
-
-	REQUIRE(networkHandler->verifyTimestamp(timestamp));
-	timestamp += 500;
-	REQUIRE(networkHandler->verifyTimestamp(timestamp));
-	timestamp += 1000;
-	REQUIRE_FALSE(networkHandler->verifyTimestamp(timestamp));
-	timestamp -= 3000;
-	REQUIRE_FALSE(networkHandler->verifyTimestamp(timestamp));
+	double start_ms = 5000000;
+	double latency_ms = 2;
+	for (int i = 0; i < 40; ++i)
+	{
+		double sentSec = 1000 + i * 0.005;
+		double received_ms = start_ms + i * 5 + latency_ms + (i % 3);
+		double synchedTimeMs = networkHandler->synchronizedTimestamp(sentSec, received_ms);
+		INFO("iteration: " + qstring_cast(i));
+		CHECK(cx::similar(synchedTimeMs, received_ms - (i % 3), 0.001));
+	}
+	CHECK(cx::similar(networkHandler->getTimestampOffset(), start_ms + latency_ms - 1000000, 0.001));
 }
 
-TEST_CASE("NetworkHandler: Test timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("NetworkHandler: Uses the receive time when the sender time jumps back", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
+	double received_ms = 5000000;
+	networkHandler->synchronizedTimestamp(1000, received_ms);
+	received_ms += 5;
+	CHECK(cx::similar(networkHandler->synchronizedTimestamp(1000 - 3, received_ms), received_ms, 0.001));
+}
 
-	double tolerance = 10;
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double synchValue = 1000;
-	double timestampSec = synchValue;
-
-	double synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-	double timeIncrementSec = 0.005;
-
-	for(int i = 1; i < 40; ++i)
-	{
-		timestampSec += timeIncrementSec;
-		synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-		{
-			double targetTime = latestSystemTime + timeIncrementSec*1000*i;
-			INFO("iteration: "+qstring_cast(i)+" "+qstring_cast(synchedTimeMs)+" == "+qstring_cast(targetTime));
-			REQUIRE(cx::similar(synchedTimeMs, targetTime, tolerance));
-		}
-	}
-
-	//Adding a difference from system time above 1 sec will cause NetworkHandler::verifyTimestamp to change timestamp to system time
-	timestampSec += 1;
-	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	INFO(qstring_cast(synchedTimeMs)+" == "+qstring_cast(latestSystemTime));
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-	timestampSec -= 3;
-	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
+TEST_CASE("NetworkHandler: Each device has its own timestamp offset", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
+	double received_ms = 5000000;
+	networkHandler->synchronizedTimestamp(1000, received_ms, "tracking");
+	networkHandler->synchronizedTimestamp(3000, received_ms, "image");
+	CHECK(cx::similar(networkHandler->getTimestampOffset("tracking"), received_ms - 1000000, 0.001));
+	CHECK(cx::similar(networkHandler->getTimestampOffset("image"), received_ms - 3000000, 0.001));
 }
 
 TEST_CASE("NetworkHandler: Test timestamp synchronization reset", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-
-	double tolerance = 10;
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double timestampSec = 1000;
-
-	double synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-
-	double offset = latestSystemTime - timestampSec*1000;
-	{
-		INFO(qstring_cast(offset)+"=="+qstring_cast(networkHandler->getTimestampOffset()));
-		REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
-	}
+	double received_ms = 5000000;
+	networkHandler->synchronizedTimestamp(1000, received_ms);
+	CHECK(cx::similar(networkHandler->getTimestampOffset(), received_ms - 1000000, 0.001));
 
 	networkHandler->clearTimestampSynchronization();
-	REQUIRE_FALSE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
-	REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
+	CHECK(cx::similar(networkHandler->getTimestampOffset(), 0, 0.001));
 
-
-	timestampSec = 3000;
-	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-	offset = latestSystemTime - timestampSec*1000;
-	REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
+	networkHandler->synchronizedTimestamp(3000, received_ms);
+	CHECK(cx::similar(networkHandler->getTimestampOffset(), received_ms - 3000000, 0.001));
 }
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Test timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
@@ -432,7 +391,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test timestamp synchronization", "[
 	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
 	double timestampSec = 1000;
 
-	double synchedTimeMs = trackingSystemService->mTestNetworkHandler->synchronizedTimestamp(timestampSec);
+	double synchedTimeMs = trackingSystemService->mTestNetworkHandler->synchronizedTimestamp(timestampSec, latestSystemTime);
 	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
 
 	REQUIRE_FALSE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));

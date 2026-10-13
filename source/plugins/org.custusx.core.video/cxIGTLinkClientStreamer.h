@@ -17,7 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QAbstractSocket>
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
-#include "cxStreamedTimestampSynchronizer.h"
+#include "cxSenderClockSynchronizer.h"
+#include "cxForwardDeclarations.h"
 
 class QTcpSocket;
 
@@ -64,6 +65,7 @@ private:
 	bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool readOneMessage();
+	void synchronizeTimestamp(ImagePtr image);
 	void addToQueue(IGTLinkUSStatusMessage::Pointer msg);
 	void addToQueue(igtl::ImageMessage::Pointer msg);
 	bool multipleTryConnectToHost();
@@ -72,7 +74,7 @@ private:
 	bool mHeadingReceived;
 	QString mAddress;
 	int mPort;
-    StreamedTimestampSynchronizer mStreamSynchronizer;
+	SenderClockSynchronizer mClockSynchronizer;
     std::shared_ptr<QTcpSocket> mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;
 	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives

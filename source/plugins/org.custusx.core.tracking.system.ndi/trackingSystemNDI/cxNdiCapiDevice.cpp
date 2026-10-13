@@ -625,8 +625,10 @@ bool NdiCapiDevice::readFrame(const std::vector<int>& portHandles, NdiFrame& fra
 		frame.samples.clear();
 		for (int portHandle : portHandles)
 		{
-			frame.frameNumber = std::max(frame.frameNumber, ndiGetBXFrame(mDevice, portHandle));
-			frame.samples.push_back(this->getBXSample(portHandle));
+			NdiToolSample sample = this->getBXSample(portHandle);
+			sample.frameNumber = ndiGetBXFrame(mDevice, portHandle);
+			frame.frameNumber = std::max(frame.frameNumber, sample.frameNumber);
+			frame.samples.push_back(sample);
 		}
 	}
 	return success;

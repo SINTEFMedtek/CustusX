@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlStatusMessage.h"
 
 #include "cxTypeConversions.h"
+#include "cxTime.h"
 #include "cxLogger.h"
 #include "cxIGTLinkConversion.h"
 #include "cxIGTLinkConversionImage.h"
@@ -351,13 +352,22 @@ void IGTLinkClientStreamer::addToQueue(igtl::ImageMessage::Pointer msg)
 //				mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
 	}
 
-    //Should only be needed if time stamp is set on another computer that is
-    //not synched with the one running this code: e.g. The Ultrasonix scanner
-    mStreamSynchronizer.syncToCurrentTime(package->mImage);
+	this->synchronizeTimestamp(package->mImage);
 
 	mSender->send(package);
 }
 
+
+void IGTLinkClientStreamer::synchronizeTimestamp(ImagePtr image)
+{
+	// The sender's clock may not be synchronized with this computer, e.g. an ultrasound scanner
+	double received_ms = getMilliSecondsSinceEpoch();
+	QDateTime sent = image->getAcquisitionTime();
+	image->setOriginalAcquisitionTime(sent);
+	image->setSoftwareAcquisitionTime(QDateTime::fromMSecsSinceEpoch(qint64(received_ms)));
+	double timestamp_ms = mClockSynchronizer.getTimestamp(double(sent.toMSecsSinceEpoch()), received_ms);
+	image->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(qint64(timestamp_ms)));
+}
 
 } // namespace cx
 

@@ -54,8 +54,8 @@ The file has one row for each position, visibility change and position warning, 
 * visible: 1 or 0.
 * x, y, z: the tool tip in the patient reference space (mm), r00 to r22: the rotation.
 * warning: why the position may be inaccurate, empty if it is OK.
-* metadata: extra information from the tracking system. For NDI: the RMS error, the port status and
-  the number of markers used.
+* metadata: extra information from the tracking system. For NDI: the RMS error, the port status,
+  the number of markers used, the frame number and the time the frame was read.
 
 Compare systems {#tracking_test_widget_compare}
 ===========================================================

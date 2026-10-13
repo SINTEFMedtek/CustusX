@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 #include "cxMesh.h"
 #include "cxProbeDefinitionFromStringMessages.h"
+#include "cxSenderClockSynchronizer.h"
 
 #include "ctkVTKObject.h"
 
@@ -100,8 +101,7 @@ protected:
 	ThreadResult processImage(ThreadResult result);
 	bool convertZeroesInsideSectorToOnes(ThreadResult &result, int threshold = 0, int newValue = 1);
 	bool createMask(ThreadResult &result);
-	double synchronizedTimestamp(double receivedTimestampSec);///Synchronize with system clock: Calculate a fixed offset, and apply this to all timestamps
-	bool verifyTimestamp(double &timestampMS);
+	double synchronizedTimestamp(QString clockId, double sentTimestampSec, double received_ms); ///< The sender's timestamp converted to the system clock, with an offset estimated per clockId
 	void saveThreadResult(ThreadResult &threadResult);
 	ThreadResult createThreadResultObject(QString deviceName, ImagePtr image = ImagePtr());
 
@@ -110,8 +110,8 @@ protected:
 	QSet<QString> mConnectionUsers;
 	QTimer *mTimer;
 
-	bool mGotTimeOffset;
-	double mTimestampOffsetMS;
+	std::map<QString, SenderClockSynchronizer> mClockSynchronizers; ///< Per message type and device, as they may use different clocks
+	QSet<QString> mClockProblemsReported;
 
 	std::list<QFutureWatcher<ThreadResult>*> mSaveImageThreads;
 	std::map<QString, ThreadResult> mDevices;

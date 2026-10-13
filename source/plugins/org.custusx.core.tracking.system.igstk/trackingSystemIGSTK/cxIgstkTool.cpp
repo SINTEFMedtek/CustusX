@@ -207,6 +207,12 @@ void IgstkTool::processReceivedTransformResult(igstk::CoordinateSystemTransformT
 	igstk::Transform transform = result.GetTransform();
 	Transform3D prMt = igstk2Transform3D(transform);
 	double timestamp = transform.GetStartTime();
+	// The sample info is read later than the transform: if it is newer than the transform, it belongs to the next frame
+	if (sampleInfo.m_FrameNumber != 0 && sampleInfo.m_TimeStamp <= timestamp)
+	{
+		// the time the frame was read, instead of when IGSTK distributed it
+		timestamp = mFrameTimestamper.getTimestamp(sampleInfo.m_FrameNumber, sampleInfo.m_TimeStamp);
+	}
 
 	emit toolTransformAndTimestamp(prMt, timestamp, metadata);
 }

@@ -79,6 +79,8 @@ struct org_custusx_core_tracking_system_ndi_EXPORT NdiToolSample
 	int portStatus = 0;  ///< BX port status bits, see NdiPortStatus
 	int toolInfo = 0;    ///< BX tool information bits, see NdiToolInfo. Polaris only.
 	int markersUsed = -1; ///< Markers used to compute the transform, -1 if unknown. Polaris only.
+	unsigned long frameNumber = 0; ///< The frame of this port handle, which may be older than the frame
+	double received_ms = 0.0; ///< When the frame was read, before it was timestamped from the frame number
 };
 
 /** Tracking data for all port handles in one frame. */

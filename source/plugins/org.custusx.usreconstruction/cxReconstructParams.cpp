@@ -142,7 +142,7 @@ void ReconstructParams::createParameters()
     this->add(mPositionThinning);
 
 	mTimeCalibration = DoubleProperty::initialize("Extra Temporal Calib", "",
-		"Set an offset in the frame timestamps, in addition to the one used in acquisition", 0.0,
+		"Set an offset in ms to subtract from the frame timestamps, in addition to the one used in acquisition", 0.0,
 		DoubleRange(-1000, 1000, 10), 0,
 		mSettings.getElement());
 	connect(mTimeCalibration.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
