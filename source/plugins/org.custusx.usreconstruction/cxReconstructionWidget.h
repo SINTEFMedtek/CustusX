@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLabeledComboBoxWidget.h"
 #include "cxFileSelectWidget.h"
 #include "cxBaseWidget.h"
+#include "cxForwardDeclarations.h"
 
 
 namespace cx
@@ -46,7 +47,7 @@ class org_custusx_usreconstruction_EXPORT ReconstructionWidget: public BaseWidge
 {
 Q_OBJECT
 public:
-	ReconstructionWidget(QWidget* parent, UsReconstructionServicePtr reconstructer);
+	ReconstructionWidget(QWidget* parent, UsReconstructionServicePtr reconstructer, PatientModelServicePtr patientModelService);
 	UsReconstructionServicePtr reconstructer()
 	{
 		return mReconstructer;

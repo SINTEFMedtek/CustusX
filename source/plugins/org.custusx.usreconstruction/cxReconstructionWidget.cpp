@@ -21,11 +21,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDoubleProperty.h"
 #include "cxBoolProperty.h"
 #include "cxUsReconstructionService.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServicePtr reconstructer) :
+ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServicePtr reconstructer, PatientModelServicePtr patientModelService) :
 	BaseWidget(parent, "us_reconstruction", "US Reconstruction"),
 	mReconstructer(reconstructer),
 	mFileSelectWidget( new FileSelectWidget(this))
@@ -44,6 +45,16 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 
 	connect(mFileSelectWidget, &FileSelectWidget::fileSelected, this, &ReconstructionWidget::selectData);
 	mFileSelectWidget->setNameFilter(QStringList() << "*.fts");
+	// The Select data dialog starts in the US_Acq folder of the active patient
+	mFileSelectWidget->setDialogFolderProvider([patientModelService]() -> QString
+	{
+		QString folder;
+		if (patientModelService && patientModelService->isPatientValid())
+		{
+			folder = patientModelService->getActivePatientFolder() + "/US_Acq";
+		}
+		return folder;
+	});
 	connect(mReconstructer.get(), &UsReconstructionService::newInputDataAvailable, mFileSelectWidget, &FileSelectWidget::refresh);
 	connect(mReconstructer.get(), &UsReconstructionService::newInputDataPath, this, &ReconstructionWidget::updateFileSelectorPath);
 

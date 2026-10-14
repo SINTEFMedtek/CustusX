@@ -39,6 +39,7 @@ public:
 
 private:
   UsReconstructionServicePtr mReconstructer;
+  PatientModelServicePtr mPatientModelService;
 
 };
 

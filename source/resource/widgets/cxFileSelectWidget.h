@@ -24,6 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QWidget>
 #include <QStringList>
+#include <functional>
 
 class QComboBox;
 class QToolButton;
@@ -54,6 +55,11 @@ public:
 	void setPaths(QStringList paths);
 	void setPath(QString path);
 	void setFolderDepth(int depth);
+	/** Set a function that gives the folder where the file dialog (Select data button) starts.
+	 *  It is called every time the dialog is opened, so the folder can follow e.g. the active patient.
+	 *  If the function is not set, or gives an empty or non-existing folder, the dialog starts in the first path.
+	 */
+	void setDialogFolderProvider(std::function<QString()> provider);
 
 	QStringList getAllFiles();
 
@@ -79,6 +85,7 @@ private:
 	QStringList mRootPaths;
 	QStringList mNameFilters;
 	int mFolderDepth;
+	std::function<QString()> mDialogFolderProvider;
 };
 
 }
