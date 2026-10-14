@@ -49,6 +49,8 @@ private slots:
   void patientChangedSlot();
   void selectData(QString filename);
   void calibrateSlot();
+  void recordingStartedSlot();
+  void recordingCancelledSlot();
 
 protected:
   void showEvent(QShowEvent* event);
@@ -58,6 +60,7 @@ private:
   VisServicesPtr mServices;
   FileSelectWidget* mFileSelectWidget;
   QLineEdit* mResult;
+  QPushButton* mCalibrateButton;
   QCheckBox* mVerbose;
   RecordSessionWidget* mRecordSessionWidget;
   QLabel* mInfoLabel;
