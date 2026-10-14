@@ -40,6 +40,7 @@ ReconstructPreprocessor::ReconstructPreprocessor(PatientModelServicePtr patientM
 	mInput(ReconstructCore::InputParams()),
 	mPatientModelService(patientModelService)
 {
+    mPrMd = Transform3D::Identity();
     mMaxTimeDiff = 250; // TODO: Change default value for max allowed time difference between tracking and image time tags
     // TODO Legg inn andre rekonstruksjonsparametre?
     //
@@ -70,6 +71,8 @@ std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInp
 			CX_LOG_ERROR() << "ReconstructPreprocessor::createProcessedInput: No US mask";
 			return retval;
 		}
+		// Lets the frame positions be converted back to tracking positions (prMt)
+		input->setTrackingTransforms(mPrMd, mFileData.mProbeDefinition.get_tMu() * mFileData.mProbeDefinition.get_uMv());
 		CX_ASSERT(Eigen::Array3i(frames[i][0]->GetDimensions()).isApprox(Eigen::Array3i(mFileData.getMask()->GetDimensions())));
 		retval.push_back(input);
 	}
@@ -421,6 +424,7 @@ void ReconstructPreprocessor::findExtentAndOutputTransform()
 	mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, mInput.mMaxOutputVolumeSize);
 
 	mOutputVolumeParams.set_rMd((mPatientModelService->get_rMpr()) * prMd);
+	mPrMd = prMd;
 }
 
 /**Use the mOriginalFileData structure to rebuild all internal data.

@@ -77,6 +77,7 @@ private:
 
 	// generated data
 	OutputVolumeParams mOutputVolumeParams;
+	Transform3D mPrMd; ///< from output volume space to patient reference space, from findExtentAndOutputTransform()
 
 	PatientModelServicePtr mPatientModelService;
 	void convertToQuaternions(Eigen::ArrayXXd qPosArray, int nQuaternions, int nPositions, int filterStrength);

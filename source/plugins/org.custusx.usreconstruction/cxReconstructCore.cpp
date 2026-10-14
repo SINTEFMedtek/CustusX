@@ -24,6 +24,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkPointData.h"
 #include "vtkDataArray.h"
 #include "cxPatientModelService.h"
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QTextStream>
 
 namespace cx
 {
@@ -98,6 +102,7 @@ void ReconstructCore::threadedPostReconstruct()
 
 	if (mSuccess)
 	{
+		this->writeProcessedPositions();
 		mOutput = this->generateOutputVolume(mRawOutput);
 
 		Eigen::Array3i outputDims(mRawOutput->GetDimensions());
@@ -115,6 +120,56 @@ void ReconstructCore::threadedPostReconstruct()
 	{
 		reportError("Reconstruction failed");
 	}
+}
+
+/**
+ * Write the positions that the reconstruction algorithm used, next to the input data:
+ *  <name>.tp.corr  : one position (prMt, same format as .tp) for each frame used, at the frame time
+ *  <name>.tts.corr : the time stamps (ms) of the positions, same format as .tts
+ *
+ * The positions are those after the position filter, the time calibration (also the estimated lag),
+ * and any correction done by the algorithm (e.g. VIC image correlation correction). They are given at the frame times,
+ * so used as .tp/.tts, they reproduce the reconstruction with position filter strength 0 and no time calibration.
+ * Frames that are removed by the preprocessing are not included.
+ */
+void ReconstructCore::writeProcessedPositions()
+{
+	if (!mInput.mWriteProcessedPositions || !mFileData || !mFileData->hasTrackingTransforms())
+		return;
+	QString inputFile = mFileData->getFilePath();
+	if (inputFile.isEmpty())
+		return;
+	QFileInfo info(inputFile);
+	if (!info.absoluteDir().exists())
+		return;
+
+	std::vector<TimedPosition> frames = mFileData->getFramePositionsUsed();
+	Transform3D prMd = mFileData->get_prMd();
+	Transform3D uMt = mFileData->get_tMu().inverse();
+
+	QString base = info.absoluteDir().absoluteFilePath(info.completeBaseName());
+	QFile positionFile(base + ".tp.corr");
+	QFile timeFile(base + ".tts.corr");
+	if (!positionFile.open(QIODevice::WriteOnly | QIODevice::Truncate) || !timeFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	{
+		reportWarning("Cannot write processed positions to " + base + ".tp.corr/.tts.corr");
+		return;
+	}
+
+	QTextStream positionStream(&positionFile);
+	positionStream.setRealNumberPrecision(12);
+	QTextStream timeStream(&timeFile);
+	for (unsigned i = 0; i < frames.size(); ++i)
+	{
+		Transform3D prMt = prMd * frames[i].mPos * uMt;
+		for (int row = 0; row < 3; ++row)
+		{
+			positionStream << prMt(row, 0) << " " << prMt(row, 1) << " " << prMt(row, 2) << " " << prMt(row, 3) << "\n";
+		}
+		timeStream << QString::number(frames[i].mTime, 'f', 3) << "\n";
+	}
+
+	report(QString("Wrote %1 processed positions to %2.tp.corr and %2.tts.corr").arg(frames.size()).arg(info.completeBaseName()));
 }
 
 /**

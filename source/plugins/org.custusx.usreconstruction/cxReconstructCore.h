@@ -48,7 +48,8 @@ public:
 			mPosFilterStrength(0),
 			mMaskReduce(0),
 			mAngio(false),
-			mMaxOutputVolumeSize(1024*1024)
+			mMaxOutputVolumeSize(1024*1024),
+			mWriteProcessedPositions(false)
 		{}
 		double mExtraTimeCalibration;
 		bool mAlignTimestamps;
@@ -65,6 +66,9 @@ public:
 		bool mAngio; ///< true for angio data, false is B-mode.
 		QString mTransferFunctionPreset;
 		double mMaxOutputVolumeSize;
+		/** Write the positions as used by the reconstruction (after filtering, time lag and any correction by the
+		 *  algorithm) next to the input data, as <name>.tp.corr and <name>.tts.corr. */
+		bool mWriteProcessedPositions;
 	};
 
 	ReconstructCore(PatientModelServicePtr patientModelService);
@@ -85,6 +89,7 @@ public:
 
 private:
 	bool validInputData() const;
+	void writeProcessedPositions();
 	QString generateOutputUid();
 	QString generateImageName(QString uid) const;
 

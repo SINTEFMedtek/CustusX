@@ -35,13 +35,50 @@ namespace cx
 {
 
 ProcessedUSInputData::ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<TimedPosition> pos, vtkImageDataPtr mask, QString path, QString uid) :
+	mHasTrackingTransforms(false),
 	mProcessedImage(frames),
 	mFrames(pos),
 	mMask(mask),
 	mPath(path),
 	mUid(uid)
 {
+	mPrMd.setIdentity();
+	mTMu.setIdentity();
 	this->validate();
+}
+
+void ProcessedUSInputData::setFramePositionsUsed(std::vector<TimedPosition> frames)
+{
+	mFramePositionsUsed = frames;
+}
+
+std::vector<TimedPosition> ProcessedUSInputData::getFramePositionsUsed() const
+{
+	if (mFramePositionsUsed.empty())
+		return mFrames;
+	return mFramePositionsUsed;
+}
+
+void ProcessedUSInputData::setTrackingTransforms(Transform3D prMd, Transform3D tMu)
+{
+	mPrMd = prMd;
+	mTMu = tMu;
+	mHasTrackingTransforms = true;
+}
+
+bool ProcessedUSInputData::hasTrackingTransforms() const
+{
+	return mHasTrackingTransforms;
+}
+
+Transform3D ProcessedUSInputData::get_prMd() const
+{
+	return mPrMd;
+}
+
+Transform3D ProcessedUSInputData::get_tMu() const
+{
+	return mTMu;
 }
 
 bool ProcessedUSInputData::validate() const

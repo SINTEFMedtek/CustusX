@@ -57,7 +57,26 @@ public:
 	QString getUid();
 	bool validate() const;
 
+	/** Set by a reconstruction algorithm that changes the frame positions (e.g. correction based on image correlation).
+	 *  Same coordinate system as getFrames(). Must be set before the reconstruction is finished, and is read after that.
+	 */
+	void setFramePositionsUsed(std::vector<TimedPosition> frames);
+	/** The frame positions used by the reconstruction algorithm. Equal to getFrames() if the algorithm did not change them. */
+	std::vector<TimedPosition> getFramePositionsUsed() const;
+
+	/** Transforms that convert the frame positions (dMu) back to tracking positions (prMt):
+	 *  prMt = prMd * dMu * inv(tMu). Set by the preprocessor.
+	 */
+	void setTrackingTransforms(Transform3D prMd, Transform3D tMu);
+	bool hasTrackingTransforms() const;
+	Transform3D get_prMd() const;
+	Transform3D get_tMu() const;
+
 private:
+	std::vector<TimedPosition> mFramePositionsUsed;
+	bool mHasTrackingTransforms;
+	Transform3D mPrMd;
+	Transform3D mTMu;
 	std::vector<vtkImageDataPtr> mProcessedImage;
 	std::vector<TimedPosition> mFrames;
 	vtkImageDataPtr mMask;///< Clipping mask for the input data

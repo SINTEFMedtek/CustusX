@@ -146,9 +146,14 @@ std::vector<ReconstructCorePtr> ReconstructionExecuter::createCores(Reconstructi
 {
 	std::vector<ReconstructCorePtr> retval;
 
+	// Write the processed positions from the first core only. With angio data, that is the B-mode core.
+	ReconstructCore::InputParams firstPar = par;
+	firstPar.mWriteProcessedPositions = true;
+	par.mWriteProcessedPositions = false;
+
 	if (createBModeWhenAngio && par.mAngio)
 	{
-		ReconstructCorePtr core = this->createBModeCore(par, algo);
+		ReconstructCorePtr core = this->createBModeCore(firstPar, algo);
 		if (core)
 			retval.push_back(core);
 		core = this->createCore(par, algo);
@@ -158,7 +163,7 @@ std::vector<ReconstructCorePtr> ReconstructionExecuter::createCores(Reconstructi
 	// only one thread
 	else
 	{
-		ReconstructCorePtr core = this->createCore(par, algo);
+		ReconstructCorePtr core = this->createCore(firstPar, algo);
 		if (core)
 			retval.push_back(core);
 	}
