@@ -31,6 +31,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPositionFilter.h"
 
 #include <QThread>
+#include "cxReconstructionMethodService.h"
 
 namespace cx
 {
@@ -429,6 +430,19 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
 {
 	// uncomment to test cropping of data before reconstructing
 	this->cropInputData();
+	// Keep the cropped data, so that the position processing can be repeated with other time calibration
+	mCroppedFileData = mFileData;
+
+	this->processPositions();
+}
+
+/**
+ * Time calibration, filtering and interpolation of the tracking positions, and calculation of the output volume.
+ * Starts from the cropped input data, so it can be repeated with a changed time calibration.
+ */
+void ReconstructPreprocessor::processPositions()
+{
+	mFileData = mCroppedFileData;
 
 	// Only use this if the time stamps have different formats
 	// The function assumes that both lists of time stamps start at the same time,
@@ -454,6 +468,52 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
 
 	this->findExtentAndOutputTransform();
 	//mPos in mFrames is now dMu
+}
+
+/**
+ * Estimate the time lag between images and tracking data using the reconstruction algorithm (if it requests this),
+ * and apply it if the algorithm asks for it.
+ *
+ * The estimate is made on data processed without any time calibration, so that it is not dependent on the
+ * user selections Extra Temporal Calib and Align timestamps. If the lag is applied, it replaces those selections,
+ * and all position processing is redone (also the volume extent, as the lag changes the pose of each frame).
+ * This is done before the algorithm starts, so any later image-based correction (VIC image correlation correction)
+ * is done on top of the lagged tracking data.
+ */
+bool ReconstructPreprocessor::estimateAndApplyTimeLag(ReconstructionMethodService* algorithm)
+{
+	if (!algorithm || !algorithm->isTimeLagEstimateRequested(mInput.mAlgoSettings))
+		return false;
+
+	ReconstructCore::InputParams userInput = mInput;
+
+	// Estimate on the tracking data as recorded
+	mInput.mExtraTimeCalibration = 0;
+	mInput.mAlignTimestamps = false;
+	this->processPositions();
+
+	TimeLagEstimate estimate;
+	if (!mFileData.mFrames.empty())
+	{
+		std::vector<bool> bmode(1, false);
+		std::vector<ProcessedUSInputDataPtr> baseline = this->createProcessedInput(bmode);
+		if (!baseline.empty())
+			estimate = algorithm->estimateTimeLag(baseline[0], userInput.mAlgoSettings);
+	}
+
+	mInput = userInput;
+	bool applied = estimate.valid && estimate.apply;
+	if (applied)
+	{
+		mInput.mExtraTimeCalibration = estimate.lagMs;
+		mInput.mAlignTimestamps = false;
+		report(QString("Applying estimated time lag %1 ms to the tracking data. "
+					   "The user selections 'Extra Temporal Calib' and 'Align timestamps' are not used.").arg(estimate.lagMs, 0, 'f', 1));
+	}
+
+	// Redo with the user settings, or with the estimated lag
+	this->processPositions();
+	return applied;
 }
 
 void ReconstructPreprocessor::initialize(ReconstructCore::InputParams input, USReconstructInputData fileData)

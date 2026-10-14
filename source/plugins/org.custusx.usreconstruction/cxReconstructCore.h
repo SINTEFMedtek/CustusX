@@ -81,6 +81,7 @@ public:
 
 	// published helper methods, also needed for parameter display outside of reconstruction execution:
 	InputParams getInputParams() { return mInput; }
+	ReconstructionMethodService* getAlgorithm() { return mAlgorithm; }
 
 private:
 	bool validInputData() const;

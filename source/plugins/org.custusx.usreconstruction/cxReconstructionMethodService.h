@@ -17,12 +17,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <vector>
 #include <QObject>
+#include <QDomElement>
 #include <vtkSmartPointer.h>
 #include "cxProperty.h"
 #include <memory>
 
 
-class QDomElement;
 
 #define ReconstructionMethodService_iid "cx::ReconstructionMethodService"
 
@@ -41,6 +41,20 @@ typedef std::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
  */
 
 typedef std::shared_ptr<class ReconstructionMethodService> ReconstructionMethodServicePtr;
+
+/**
+ * Result of an estimate of the time lag between the images and the tracking data.
+ * The lag has the same sign convention as the reconstruction parameter 'Extra Temporal Calib':
+ * it is added to the tracking time stamps.
+ */
+struct TimeLagEstimate
+{
+	TimeLagEstimate() : valid(false), apply(false), lagMs(0), correlation(0) {}
+	bool valid; ///< true if a lag was estimated
+	bool apply; ///< true if the lag should replace the time calibration settings (Extra Temporal Calib, Align timestamps)
+	double lagMs; ///< estimated lag in ms
+	double correlation; ///< quality of the estimate
+};
 
 /**
  * \brief Abstract interface for reconstruction algorithm.
@@ -69,6 +83,19 @@ public:
 	 * \param settings Reference to settings file containing algorithm-specific settings
 	 */
 	virtual bool reconstruct(ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, QDomElement settings) = 0;
+
+	/**
+	 * Optional: Return true if the algorithm should be asked to estimate the time lag between images and tracking
+	 * data (estimateTimeLag()) before the reconstruction.
+	 */
+	virtual bool isTimeLagEstimateRequested(QDomElement settings) { Q_UNUSED(settings); return false; }
+	/**
+	 * Optional: Estimate the time lag between images and tracking data.
+	 * Called with data that is created without any time calibration, i.e. with the tracking timestamps as recorded.
+	 * If the returned estimate is valid and has apply=true, the preprocessor applies the lag to the tracking data
+	 * (replacing the user time calibration), and the reconstruction is done with the lagged tracking data.
+	 */
+	virtual TimeLagEstimate estimateTimeLag(ProcessedUSInputDataPtr input, QDomElement settings) { Q_UNUSED(input); Q_UNUSED(settings); return TimeLagEstimate(); }
 };
 
 /**

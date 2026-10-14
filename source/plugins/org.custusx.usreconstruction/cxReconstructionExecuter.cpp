@@ -37,6 +37,8 @@ bool ReconstructionExecuter::startNonThreadedReconstruction(ReconstructionMethod
 	for (unsigned i=0; i<mCores.size(); ++i)
 		angio.push_back(mCores[i]->getInputParams().mAngio);
 
+	preprocessor->estimateAndApplyTimeLag(algo);
+
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(angio);
 
 	for (unsigned i=0; i<mCores.size(); ++i)

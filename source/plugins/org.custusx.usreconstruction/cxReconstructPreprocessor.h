@@ -44,10 +44,20 @@ public:
 
 	std::vector<ProcessedUSInputDataPtr> createProcessedInput(std::vector<bool> angio);
 
+	/**
+	 * If the algorithm requests it, estimate the time lag between images and tracking data,
+	 * and if the algorithm asks for it, apply the lag to the tracking data (overriding Extra Temporal Calib and
+	 * Align timestamps), and recalculate positions, frames and output volume.
+	 * Must be called before createProcessedInput() / getOutputVolumeParams() are used for the reconstruction.
+	 * \return true if a lag was applied.
+	 */
+	bool estimateAndApplyTimeLag(ReconstructionMethodService* algorithm);
+
 private:
 	void cropInputData();
 	IntBoundingBox3D reduceCropboxToImageSize(IntBoundingBox3D cropbox, QSize size);
 	void updateFromOriginalFileData();
+	void processPositions();
 	void findExtentAndOutputTransform();
 	Transform3D applyOutputOrientation();
 	std::vector<Vector3D> generateInputRectangle();
@@ -62,6 +72,7 @@ private:
 	// input data
 	ReconstructCore::InputParams mInput;
 	USReconstructInputData mFileData;
+	USReconstructInputData mCroppedFileData; ///< input after cropping, before any time calibration and position processing
 	double mMaxTimeDiff;
 
 	// generated data
