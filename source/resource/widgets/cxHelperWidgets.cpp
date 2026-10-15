@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxHelperWidgets.h"
 
 #include <iostream>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "cxDoubleWidgets.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxCheckBoxWidget.h"
@@ -43,7 +43,7 @@ QWidget* createDataWidget(ViewServicePtr viewService, PatientModelServicePtr pat
 	QWidget* retval = NULL;
 
 	//make cx widgets
-	SelectDataStringPropertyBasePtr dsda = boost::dynamic_pointer_cast<SelectDataStringPropertyBase>(data);
+	SelectDataStringPropertyBasePtr dsda = std::dynamic_pointer_cast<SelectDataStringPropertyBase>(data);
 	if (dsda)
 	{
 		retval = new DataSelectWidget(viewService, patientModelService, parent, dsda, gridLayout, row);
@@ -58,13 +58,13 @@ QWidget* createDataWidget(ViewServicePtr viewService, PatientModelServicePtr pat
 
 QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gridLayout, int row)
 {
-	FilePathPropertyPtr fp = boost::dynamic_pointer_cast<FilePathProperty>(data);
+	FilePathPropertyPtr fp = std::dynamic_pointer_cast<FilePathProperty>(data);
 	if (fp)
 	{
 		return new FilenameWidget(parent, fp, gridLayout, row);
 	}
 
-	StringPropertyBasePtr str = boost::dynamic_pointer_cast<StringPropertyBase>(data);
+	StringPropertyBasePtr str = std::dynamic_pointer_cast<StringPropertyBase>(data);
 	if (str)
 	{
 		//		if (str->getGuiRepresentation()==StringPropertyBase::grFILENAME)
@@ -75,7 +75,7 @@ QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gri
 			return new LabeledLineEditWidget(parent, str, gridLayout, row);
 	}
 
-	DoublePropertyBasePtr dbl = boost::dynamic_pointer_cast<DoublePropertyBase>(data);
+	DoublePropertyBasePtr dbl = std::dynamic_pointer_cast<DoublePropertyBase>(data);
 	if (dbl)
 	{
 		DoublePropertyBase::GuiRepresentation gui = dbl->getGuiRepresentation();
@@ -92,24 +92,24 @@ QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gri
 		}
 	}
 
-	BoolPropertyBasePtr bl = boost::dynamic_pointer_cast<BoolPropertyBase>(data);
+	BoolPropertyBasePtr bl = std::dynamic_pointer_cast<BoolPropertyBase>(data);
 	if (bl)
 	{
 		return new CheckBoxWidget(parent, bl, gridLayout, row);
 	}
 
-	ColorPropertyBasePtr cl = boost::dynamic_pointer_cast<ColorPropertyBase>(data);
+	ColorPropertyBasePtr cl = std::dynamic_pointer_cast<ColorPropertyBase>(data);
 	if (cl)
 	{
 		return new ColorSelectWidget(parent, cl, gridLayout, row);
 	}
-	DoublePairPropertyBasePtr doublepair = boost::dynamic_pointer_cast<DoublePairPropertyBase>(data);
+	DoublePairPropertyBasePtr doublepair = std::dynamic_pointer_cast<DoublePairPropertyBase>(data);
 	if (doublepair)
 	{
 		return new SliderRangeGroupWidget(parent, doublepair, gridLayout, row);
 	}
 
-	FilePreviewPropertyPtr filePreview = boost::dynamic_pointer_cast<FilePreviewProperty>(data);
+	FilePreviewPropertyPtr filePreview = std::dynamic_pointer_cast<FilePreviewProperty>(data);
 	if (filePreview)
 	{
 		return new FilePreviewWidget(parent, filePreview, gridLayout, row);

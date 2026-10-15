@@ -25,8 +25,10 @@ ManualToolAdapter::ManualToolAdapter(QString uid) :
 }
 
 ManualToolAdapter::ManualToolAdapter(ToolPtr base) :
-	ManualTool(mBase->getUid() + "_manual"), mBase(base)
+	ManualTool(base->getUid() + "_manual")
 {
+	mInitialBase = base;
+	this->setBase(mInitialBase);
 }
 
 ManualToolAdapter::~ManualToolAdapter()

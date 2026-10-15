@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSINGLEVOLUMEPAINTERHELPER_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 #include "cxForwardDeclarations.h"
 #include <vtkCommand.h>
 
@@ -58,7 +59,7 @@ public:
 		float mLLR; //low level reject
 		float mAlpha;
 	};
-	typedef boost::shared_ptr<ShaderItem> ShaderItemPtr;
+	typedef std::shared_ptr<ShaderItem> ShaderItemPtr;
 
 	static ShaderCallback *New();
 	ShaderCallback();

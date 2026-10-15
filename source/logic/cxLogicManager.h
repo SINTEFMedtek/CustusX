@@ -13,22 +13,22 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxLogicManagerExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 
 class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class StateService> StateServicePtr;
-typedef boost::shared_ptr<class ViewService> ViewServicePtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class FileManagerService> FileManagerServicePtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class VideoService> VideoServicePtr;
+typedef std::shared_ptr<class StateService> StateServicePtr;
+typedef std::shared_ptr<class ViewService> ViewServicePtr;
+typedef std::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class FileManagerService> FileManagerServicePtr;
 
 /**
 * \file
@@ -36,9 +36,9 @@ typedef boost::shared_ptr<class FileManagerService> FileManagerServicePtr;
 * @{
 */
 
-typedef boost::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPtr;
+typedef std::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPtr;
 
-typedef boost::shared_ptr<class ApplicationComponent> ApplicationComponentPtr;
+typedef std::shared_ptr<class ApplicationComponent> ApplicationComponentPtr;
 /**
  * Class holding anything that can be created/destroyed and exist meanwhile.
  */
@@ -145,7 +145,7 @@ private:
   void shutdownLegacyStoredServices();
 
   template<class T>
-  void shutdownService(boost::shared_ptr<T>& service, QString name);
+  void shutdownService(std::shared_ptr<T>& service, QString name);
 
   static LogicManager* mInstance;
   static void setInstance(LogicManager* instance);

@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include <QAbstractSocket>
 #include <QString>

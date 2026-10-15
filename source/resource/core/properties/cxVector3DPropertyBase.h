@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QString>
 #include <QObject>
 #include "cxDoubleRange.h"
@@ -81,7 +81,7 @@ public:
 		return 0;
 	} ///< number of relevant decimals in value
 };
-typedef boost::shared_ptr<Vector3DPropertyBase> Vector3DPropertyBasePtr;
+typedef std::shared_ptr<Vector3DPropertyBase> Vector3DPropertyBasePtr;
 
 /** Dummy implementation */
 class cxResource_EXPORT Vector3DPropertyNull: public Vector3DPropertyBase

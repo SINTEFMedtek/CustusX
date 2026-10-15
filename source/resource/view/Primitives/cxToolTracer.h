@@ -22,7 +22,7 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 #include "cxTransform3D.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxTool.h"
@@ -32,9 +32,9 @@ class QColor;
 namespace cx
 {
 
-typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
+typedef std::shared_ptr<class ToolTracer> ToolTracerPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class SpaceListener> SpaceListenerPtr;
 
 /** \brief 3D Graphics class for displaying the trace path traversed by a tool.
  *

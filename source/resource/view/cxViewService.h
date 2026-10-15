@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceVisualizationExport.h"
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 #include "cxData.h"
 #include "cxLayoutData.h"

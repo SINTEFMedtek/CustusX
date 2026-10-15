@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSRECONSTRUCTIONSERVICEPROXY_H
 
 #include "org_custusx_usreconstruction_Export.h"
+#include <memory>
 
 #include "cxUsReconstructionService.h"
 #include "cxServiceTrackerListener.h"
@@ -63,7 +64,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	UsReconstructionServicePtr mUsReconstructionService;
-	boost::shared_ptr<ServiceTrackerListener<UsReconstructionService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<UsReconstructionService> > mServiceListener;
 };
 
 } //cx

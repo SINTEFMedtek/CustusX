@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QtGlobal>
 #include <QThread>
 #include <iostream>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QString>
 #include <QMutex>
 #include <QSound>
@@ -138,7 +138,7 @@ void Log::uninstallObserver(MessageObserverPtr observer)
 
 void Log::stopQtMessages()
 {
-	ReporterThreadPtr reporterThread = boost::dynamic_pointer_cast<ReporterThread>(mWorker);
+	ReporterThreadPtr reporterThread = std::dynamic_pointer_cast<ReporterThread>(mWorker);
 	if (reporterThread)
 		reporterThread->stopQtMessages();
 	else
@@ -146,7 +146,7 @@ void Log::stopQtMessages()
 }
 void Log::startQtMessages()
 {
-	ReporterThreadPtr reporterThread = boost::dynamic_pointer_cast<ReporterThread>(mWorker);
+	ReporterThreadPtr reporterThread = std::dynamic_pointer_cast<ReporterThread>(mWorker);
 	if (reporterThread)
 		reporterThread->startQtMessages();
 }

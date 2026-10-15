@@ -12,13 +12,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLPROXY_H
 
 #include "cxTool.h"
+#include <memory>
 #include "cxServiceTrackerListener.h"
 
 class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef std::shared_ptr<class TrackingService> TrackingServicePtr;
 
 /** Proxy for a real Tool. Turns to Null when Tool becomes unavailable
  *
@@ -81,7 +82,7 @@ private:
 	ctkPluginContext *mPluginContext;
 	ToolPtr mTool;
 	TrackingServicePtr mTrackingService;
-	boost::shared_ptr<ServiceTrackerListener<TrackingService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<TrackingService> > mServiceListener;
 
 };
 

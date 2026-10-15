@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <memory>
 #include "cxImageAlgorithms.h"
 
 #include <vtkImageData.h>
@@ -36,8 +37,8 @@ TEST_CASE("ImageAlgorithms: resample() works", "[integration][resource][core]")
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/mra.mhd";
 	QString fname1 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/US_01_20110222T110117_1.mhd";
 
-	boost::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(pasm)->importDataMock(fname0, fname0, filemanager);
-	boost::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(pasm)->importDataMock(fname1, fname1, filemanager);
+	std::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(pasm)->importDataMock(fname0, fname0, filemanager);
+	std::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(pasm)->importDataMock(fname1, fname1, filemanager);
 	cx::ImagePtr image = pasm->getData<cx::Image>(fname0);
 	cx::ImagePtr referenceImage = pasm->getData<cx::Image>(fname1);
 	//	std::cout << "referenceImage base: " << referenceImage->getBaseVtkImageData() << std::endl;

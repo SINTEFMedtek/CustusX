@@ -14,8 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QObject>
 #include "sscConfig.h"
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
+#include <memory>
 #include <vtkSmartPointer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
@@ -29,7 +28,7 @@ class QColor;
 namespace cx
 {
 class DoubleBoundingBox3D;
-typedef boost::shared_ptr<class Rep> RepPtr;
+typedef std::shared_ptr<class Rep> RepPtr;
 
 /**
  * Base widget for displaying representations (Rep).
@@ -91,7 +90,7 @@ signals:
 	void focusChange(bool gotFocus, Qt::FocusReason reason);
 	void customContextMenuRequested(const QPoint&);
 };
-typedef boost::shared_ptr<View> ViewPtr;
+typedef std::shared_ptr<View> ViewPtr;
 
 } // namespace cx
 

@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXHELPENGINE_H
 
 #include <map>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "org_custusx_help_Export.h"
 
 #include <QString>
@@ -58,7 +58,7 @@ private:
 
 	void setupDocFile();
 };
-typedef boost::shared_ptr<HelpEngine> HelpEnginePtr;
+typedef std::shared_ptr<HelpEngine> HelpEnginePtr;
 
 }
 

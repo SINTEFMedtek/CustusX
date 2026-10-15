@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGEOMETRICREP2D_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "vtkForwardDeclarations.h"
 #include "cxRepImpl.h"
@@ -21,10 +22,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class Mesh> MeshPtr;
-typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef std::shared_ptr<class Mesh> MeshPtr;
+typedef std::shared_ptr<class SliceProxy> SliceProxyPtr;
 
-typedef boost::shared_ptr<class GeometricRep2D> GeometricRep2DPtr;
+typedef std::shared_ptr<class GeometricRep2D> GeometricRep2DPtr;
 
 /**\brief Display one Mesh in 2D.
  *

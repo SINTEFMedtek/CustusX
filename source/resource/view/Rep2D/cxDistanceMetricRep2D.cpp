@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxDistanceMetricRep2D.h"
+#include <memory>
 #include "boost/bind/bind.hpp"
 
 #include <vtkActor.h>
@@ -91,7 +92,7 @@ void DistanceMetricRep2D::onModifiedStartRender()
 	mLine->setWidth(2);
 
 	mLine->setColor(mMetric->getColor());
-	DistanceMetricPtr distanceMetric = boost::dynamic_pointer_cast<DistanceMetric>(mMetric);
+	DistanceMetricPtr distanceMetric = std::dynamic_pointer_cast<DistanceMetric>(mMetric);
 	if(!distanceMetric)
 	{
 		CX_LOG_WARNING() << "DistanceMetricRep2D: Got no DistanceMetric";

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLFILTERWIDGET_H_
 
 #include "cxGuiExport.h"
+#include <memory>
 
 #include <QGroupBox>
 #include "cxDefinitions.h"
@@ -25,7 +26,7 @@ namespace cx
 {
 class SelectionGroupBox;
 class FilteringToolListWidget;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef std::shared_ptr<class TrackingService> TrackingServicePtr;
 
 /**
  * ToolFilterWidget

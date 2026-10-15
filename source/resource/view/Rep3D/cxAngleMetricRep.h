@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXANGLEMETRICREP_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
@@ -23,15 +24,15 @@ typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class CaptionText3D> CaptionText3DPtr;
-typedef boost::shared_ptr<class GraphicalArc3D> GraphicalArc3DPtr;
+typedef std::shared_ptr<class CaptionText3D> CaptionText3DPtr;
+typedef std::shared_ptr<class GraphicalArc3D> GraphicalArc3DPtr;
 }
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class AngleMetricRep> AngleMetricRepPtr;
-typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
+typedef std::shared_ptr<class AngleMetricRep> AngleMetricRepPtr;
+typedef std::shared_ptr<class AngleMetric> AngleMetricPtr;
 
 /** Rep for visualizing a AngleMetric.
  *

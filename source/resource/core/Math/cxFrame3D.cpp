@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxFrame3D.h"
+#include <array>
 #include <math.h>
 #include "cxUtilHelpers.h"
 
@@ -165,9 +166,9 @@ void Frame3D::put(std::ostream& s) const
 		* 180 << ", Phi=" << mAngleAxis.angle() / M_PI * 180 << ", Pos=[" << mPos << "]";
 }
 
-boost::array<double, 6> Frame3D::getCompactAxisAngleRep() const
+std::array<double, 6> Frame3D::getCompactAxisAngleRep() const
 {
-	boost::array<double, 6> retval;
+	std::array<double, 6> retval;
 	retval[0] = getThetaXY(mAngleAxis.axis());
 	retval[1] = getThetaZ(mAngleAxis.axis());
 	retval[2] = mAngleAxis.angle();
@@ -177,7 +178,7 @@ boost::array<double, 6> Frame3D::getCompactAxisAngleRep() const
 	return retval;
 }
 
-Frame3D Frame3D::fromCompactAxisAngleRep(const boost::array<double, 6>& rep)
+Frame3D Frame3D::fromCompactAxisAngleRep(const std::array<double, 6>& rep)
 {
 	Frame3D retval;
 

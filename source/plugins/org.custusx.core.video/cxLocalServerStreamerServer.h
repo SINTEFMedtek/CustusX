@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLOCALSERVERSTREAMERSERVER_H
 
 #include "org_custusx_core_video_Export.h"
+#include <memory>
 #include "cxStreamerService.h"
 #include "cxStreamer.h"
 #include "cxProcessWrapper.h"
@@ -20,11 +21,11 @@ class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
-typedef boost::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
-typedef boost::shared_ptr<class Property> PropertyPtr;
-typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
-typedef boost::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
+typedef std::shared_ptr<class StringPropertyBase> StringPropertyBasePtr;
+typedef std::shared_ptr<class DoublePropertyBase> DoublePropertyBasePtr;
+typedef std::shared_ptr<class Property> PropertyPtr;
+typedef std::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef std::shared_ptr<class BoolPropertyBase> BoolPropertyBasePtr;
 
 
 /** Options for LocalServerStreamer
@@ -75,7 +76,7 @@ private:
 	QString mServerName;
 	QString mServerArguments;
 };
-typedef boost::shared_ptr<class LocalServerStreamer> LocalServerStreamerPtr;
+typedef std::shared_ptr<class LocalServerStreamer> LocalServerStreamerPtr;
 
 } //end namespace cx
 

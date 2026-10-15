@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <map>
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include "cxPatientModelService.h"
 
@@ -33,10 +33,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 // forward declarations
-typedef boost::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
-typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
+typedef std::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
+typedef std::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
+typedef std::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef std::shared_ptr<class DataFactory> DataFactoryPtr;
 
 /** Interface for a manager of data objects.
  *

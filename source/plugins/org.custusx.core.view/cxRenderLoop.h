@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRENDERLOOP_H
 
 #include "org_custusx_core_view_Export.h"
+#include <memory>
 
 #include <QObject>
 #include "cxForwardDeclarations.h"
@@ -84,7 +85,7 @@ private:
 	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
 };
 
-typedef boost::shared_ptr<RenderLoop> RenderLoopPtr;
+typedef std::shared_ptr<RenderLoop> RenderLoopPtr;
 
 } // namespace cx
 

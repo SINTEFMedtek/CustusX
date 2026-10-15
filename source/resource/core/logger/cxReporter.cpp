@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include <QtGlobal>
 #include <iostream>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QString>
 #include <QMutex>
 #include <QSound>
@@ -29,8 +29,8 @@ namespace cx
 {
 
 // --------------------------------------------------------
-boost::weak_ptr<Reporter> Reporter::mWeakInstance;
-boost::shared_ptr<Reporter> Reporter::mPersistentInstance;
+std::weak_ptr<Reporter> Reporter::mWeakInstance;
+std::shared_ptr<Reporter> Reporter::mPersistentInstance;
 // --------------------------------------------------------
 
 ReporterPtr reporter()

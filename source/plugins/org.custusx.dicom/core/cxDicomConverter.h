@@ -13,12 +13,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDICOMCONVERTER_H_
 
 #include "cxImage.h"
+#include <memory>
 #include "org_custusx_dicom_Export.h"
 class ctkDICOMDatabase;
 
 namespace cx
 {
-typedef boost::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
+typedef std::shared_ptr<class DicomImageReader> DicomImageReaderPtr;
 
 /**
  * Import dicom series into cx Image.

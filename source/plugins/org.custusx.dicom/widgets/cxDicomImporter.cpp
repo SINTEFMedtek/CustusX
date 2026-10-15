@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "ctkDICOMIndexer.h"
 
 #include "cxReporter.h"
+#include "cxFileDialogOptions.h"
 
 namespace cx
 {
@@ -159,7 +160,7 @@ void DicomImporter::onFileIndexed(const QString& filePath)
 //----------------------------------------------------------------------------
 void DicomImporter::openImportDialog()
 {
-	QString folder = QFileDialog::getExistingDirectory(NULL, "Import DICOM files from directory ...", "", QFileDialog::ShowDirsOnly);
+	QString folder = QFileDialog::getExistingDirectory(NULL, "Import DICOM files from directory ...", "", fileDialogOptions(QFileDialog::ShowDirsOnly));
 	if (!folder.isEmpty())
 		onImportDirectory(folder);
 	else

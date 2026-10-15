@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QObject>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 class QDomNode;
 
 #define AcquisitionService_iid "cx::AcquisitionService"
@@ -24,8 +24,8 @@ class QDomNode;
 namespace cx
 {
 
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+typedef std::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef std::shared_ptr<class RecordSession> RecordSessionPtr;
 
 /** \brief Acqusition services abstract interface
  *

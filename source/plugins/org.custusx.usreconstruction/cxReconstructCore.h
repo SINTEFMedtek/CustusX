@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECONSTRUCTCORE_H_
 
 #include "org_custusx_usreconstruction_Export.h"
+#include <memory>
 
 #include "cxBoundingBox3D.h"
 #include "cxForwardDeclarations.h"
@@ -23,7 +24,7 @@ namespace cx
 class ReconstructionMethodService;
 //typedef class ReconstructionMethodService* ReconstructionMethodServicePtr;
 
-typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
+typedef std::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 
 /** \brief Algorithm part of reconstruction -
  * no dependencies on parameter classes.

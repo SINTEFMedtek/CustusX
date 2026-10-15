@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPICKERREP_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxRepImpl.h"
 #include "cxTransform3D.h"
@@ -28,9 +29,9 @@ typedef vtkSmartPointer<class vtkCallbackCommand> vtkCallbackCommandPtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
-typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef std::shared_ptr<class PickerRep> PickerRepPtr;
+typedef std::shared_ptr<class Image> ImagePtr;
+typedef std::shared_ptr<class Tool> ToolPtr;
 
 /** \brief Picking of points in an image.
  *
@@ -111,7 +112,7 @@ protected:
 	PatientModelServicePtr mDataManager;
 };
 
-typedef boost::shared_ptr<PickerRep> PickerRepPtr;
+typedef std::shared_ptr<PickerRep> PickerRepPtr;
 
 }//namespace
 #endif /* CXPICKERREP_H_ */

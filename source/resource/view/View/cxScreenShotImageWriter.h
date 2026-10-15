@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSCREENSHOTIMAGEWRITER_H
 
 #include <QObject>
+#include <memory>
 #include <QPointer>
 #include <QMainWindow>
 #include "vtkSmartPointer.h"
@@ -20,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ScreenShotImageWriter> ScreenShotImageWriterPtr;
+typedef std::shared_ptr<class ScreenShotImageWriter> ScreenShotImageWriterPtr;
 
 /**
  *

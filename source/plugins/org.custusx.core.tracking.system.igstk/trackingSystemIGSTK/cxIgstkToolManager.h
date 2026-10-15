@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXIGSTKTOOLMANAGER_H_
 
 #include "org_custusx_core_tracking_system_igstk_Export.h"
+#include <memory>
 
 #include <map>
 #include <vector>
@@ -94,7 +95,7 @@ private:
 	bool mInternalInitialized;
 
 };
-typedef boost::shared_ptr<IgstkToolManager> IgstkToolManagerPtr;
+typedef std::shared_ptr<IgstkToolManager> IgstkToolManagerPtr;
 
 /**
  * @}

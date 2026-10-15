@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPLAYBACKUSACQUISITIONVIDEO_H_
 
 #include "org_custusx_core_video_Export.h"
+#include <memory>
 
 #include <QObject>
 #include <QFuture>
@@ -24,8 +25,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
-typedef boost::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
+typedef std::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
+typedef std::shared_ptr<class VideoServiceBackend> VideoServiceBackendPtr;
 
 /**
  * \file
@@ -79,7 +80,7 @@ private:
 
 	VideoServiceBackendPtr mBackend;
 };
-typedef boost::shared_ptr<USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
+typedef std::shared_ptr<USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 
 
 /**

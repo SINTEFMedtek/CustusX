@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxNIfTIReader.h"
+#include <memory>
 
 #include <QFileInfo>
 #include "vtkNIFTIImageReader.h"
@@ -54,7 +55,7 @@ bool NIfTIReader::readInto(ImagePtr image, QString path)
 
 bool NIfTIReader::readInto(DataPtr data, QString filename)
 {
-	return this->readInto(boost::dynamic_pointer_cast<Image>(data), filename);
+	return this->readInto(std::dynamic_pointer_cast<Image>(data), filename);
 }
 
 vtkImageDataPtr NIfTIReader::loadVtkImageData(QString filename)
@@ -110,7 +111,7 @@ DataPtr NIfTIReader::read(const QString &uid, const QString &filename)
 std::vector<DataPtr> NIfTIReader::read(const QString &filename)
 {
 	std::vector<DataPtr> retval;
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(this->createData(Image::getTypeName(), filename));
+	ImagePtr image = std::dynamic_pointer_cast<Image>(this->createData(Image::getTypeName(), filename));
 
 	vtkImageDataPtr raw = this->loadVtkImageData(filename);
 	if(!raw)

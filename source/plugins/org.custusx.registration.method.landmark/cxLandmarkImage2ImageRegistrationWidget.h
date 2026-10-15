@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXLANDMARKIMAGE2IMAGEREGISTRATIONWIDGET_H_
 
 #include "cxLandmarkRegistrationWidget.h"
+#include <memory>
 
 class QVBoxLayout;
 class QComboBox;
@@ -22,9 +23,9 @@ class QSlider;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
-typedef boost::shared_ptr<class StringPropertyRegistrationFixedImage> StringPropertyRegistrationFixedImagePtr;
-typedef boost::shared_ptr<class StringPropertyRegistrationMovingImage> StringPropertyRegistrationMovingImagePtr;
+typedef std::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
+typedef std::shared_ptr<class StringPropertyRegistrationFixedImage> StringPropertyRegistrationFixedImagePtr;
+typedef std::shared_ptr<class StringPropertyRegistrationMovingImage> StringPropertyRegistrationMovingImagePtr;
 
 /**
  * \file

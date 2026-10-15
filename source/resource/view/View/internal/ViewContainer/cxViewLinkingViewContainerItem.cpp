@@ -10,13 +10,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxViewLinkingViewContainerItem.h"
+#include <memory>
 
 namespace cx
 {
 
 ViewRepCollectionPtr ViewLinkingViewContainerItem::create(ViewItem* base, vtkRenderWindowPtr renderWindow)
 {
-	boost::shared_ptr<ViewLinkingViewContainerItem> retval(new ViewLinkingViewContainerItem(base, renderWindow));
+	std::shared_ptr<ViewLinkingViewContainerItem> retval(new ViewLinkingViewContainerItem(base, renderWindow));
 	retval->mSelf = retval;
 	return retval;
 }

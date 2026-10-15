@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <set>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vtkSmartPointer.h>
 #include <QObject>
 #include "cxForwardDeclarations.h"
@@ -26,7 +26,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
+typedef std::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
 
 /*
  * \date Aug 20, 2010

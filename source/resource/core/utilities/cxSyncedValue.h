@@ -16,12 +16,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QVariant>
 #include <QObject>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
+typedef std::shared_ptr<class SyncedValue> SyncedValuePtr;
 
 /** A value intended for sharing between several objects
  *

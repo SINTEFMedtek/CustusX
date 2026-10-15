@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxViewGroupData.h"
+#include <memory>
 
 #include <QMenu>
 #include <vtkCamera.h>
@@ -263,11 +264,11 @@ int getPriority(DataPtr data)
 {
 	if (data->getType()==Mesh::getTypeName())
 		return 6;
-	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
+	DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(data);
 	if (metric)
 		return 7;
 
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
 		if (image->getModality() == imUS)
@@ -424,7 +425,7 @@ bool ViewGroupData::removeData(QString uid)
 	if (!this->contains(uid))
 		return false;
 	mData.erase(std::find_if(mData.begin(), mData.end(), data_equals(uid)));
-	TrackedStreamPtr trackedStream = boost::dynamic_pointer_cast<TrackedStream>(this->getData(uid));
+	TrackedStreamPtr trackedStream = std::dynamic_pointer_cast<TrackedStream>(this->getData(uid));
 	if (trackedStream)
 		trackedStream->deleteImageToStopEmittingFrames();
 	emit dataViewPropertiesChanged(uid);
@@ -472,16 +473,16 @@ std::vector<DataPtr> ViewGroupData::getData(DataViewProperties properties) const
 
 
 template<class DATA_TYPE>
-std::vector<boost::shared_ptr<DATA_TYPE> > ViewGroupData::getDataOfType(DataViewProperties requiredProperties) const
+std::vector<std::shared_ptr<DATA_TYPE> > ViewGroupData::getDataOfType(DataViewProperties requiredProperties) const
 {
 	// speed optimization: call getdatas() instead of getdata() in for loop
 	std::map<QString, DataPtr> alldata = mServices->patient()->getDatas();
 
-	typedef boost::shared_ptr<DATA_TYPE> DATA_PTR;
+	typedef std::shared_ptr<DATA_TYPE> DATA_PTR;
 	std::vector<DATA_PTR> retval;
 	for (unsigned i = 0; i < mData.size(); ++i)
 	{
-		DATA_PTR data = boost::dynamic_pointer_cast<DATA_TYPE>(alldata[mData[i].first]);
+		DATA_PTR data = std::dynamic_pointer_cast<DATA_TYPE>(alldata[mData[i].first]);
 		if (!data)
 			continue;
 		DataViewProperties properties = mData[i].second;

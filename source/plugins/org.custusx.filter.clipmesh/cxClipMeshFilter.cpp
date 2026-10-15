@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxClipMeshFilter.h"
+#include <memory>
 
 #include <vtkPolyData.h>
 #include <vtkImageData.h>
@@ -97,8 +98,8 @@ void ClipMeshFilter::createOutputTypes()
 
 bool ClipMeshFilter::execute()
 {
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mCopiedInput[0]);
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mCopiedInput[1]);
+	MeshPtr mesh = std::dynamic_pointer_cast<Mesh>(mCopiedInput[0]);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(mCopiedInput[1]);
 
 	if (!mesh || !image)
 	{
@@ -189,7 +190,7 @@ bool ClipMeshFilter::postProcess()
 	if (!mClippedPolyData)
 		return false;
 
-	MeshPtr inputMesh = boost::dynamic_pointer_cast<Mesh>(mInputTypes[0]->getData());
+	MeshPtr inputMesh = std::dynamic_pointer_cast<Mesh>(mInputTypes[0]->getData());
 	if (!inputMesh)
 		return false;
 

@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWWRAPPER2D_H_
 
 #include "org_custusx_core_view_Export.h"
+#include <memory>
 
 #include <vector>
 #include <QPointer>
@@ -36,10 +37,10 @@ class QSlider;
 
 namespace cx
 {
-typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
-typedef boost::shared_ptr<class ViewFollower> ViewFollowerPtr;
-typedef boost::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
-typedef boost::shared_ptr<class DataRepContainer> DataRepContainerPtr;
+typedef std::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
+typedef std::shared_ptr<class ViewFollower> ViewFollowerPtr;
+typedef std::shared_ptr<class Zoom2DHandler> Zoom2DHandlerPtr;
+typedef std::shared_ptr<class DataRepContainer> DataRepContainerPtr;
 }
 
 
@@ -151,7 +152,7 @@ private:
 	void applyViewFollower();
 	DoubleBoundingBox3D getViewport_s() const;
 };
-typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
+typedef std::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 
 /**
  * @}

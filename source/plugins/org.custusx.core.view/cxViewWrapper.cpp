@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxViewWrapper.h"
+#include <memory>
 
 #include <QMenu>
 #include "vtkCamera.h"
@@ -187,12 +188,12 @@ QStringList ViewWrapper::getAllDataNames(DataViewProperties properties) const
 	QStringList text;
 	for (unsigned i = 0; i < data.size(); ++i)
 	{
-		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data[i]);
+		DataMetricPtr metric = std::dynamic_pointer_cast<DataMetric>(data[i]);
 		if (metric) // dont show metrics here: too much spam - use separate list is necessary
 			continue;
 		QString line = data[i]->getName();
 
-		ImagePtr image = boost::dynamic_pointer_cast<Image>(data[i]);
+		ImagePtr image = std::dynamic_pointer_cast<Image>(data[i]);
 		if (image)
 		{
 			if (image->getCropping())

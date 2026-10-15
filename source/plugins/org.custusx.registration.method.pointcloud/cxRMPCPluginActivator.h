@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRMPCPLUGINACTIVATOR_H
 
 #include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 namespace cx
 {
@@ -23,8 +23,8 @@ namespace cx
  *
  */
 
-typedef boost::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderServicePtr;
-typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef std::shared_ptr<class DicomGUIExtenderService> DicomGUIExtenderServicePtr;
+typedef std::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  * Activator for the pointcloud registration plugin

@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTRINGPROPERTYSELECTTOOL_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
@@ -25,7 +26,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef std::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 /**
  * \brief Adapter that selects and stores a tool.

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxOpenIGTLinkStreamerService.h"
+#include <memory>
 
 #include <QFileInfo>
 
@@ -121,7 +122,7 @@ OpenIGTLinkTrackingSystemServicePtr OpenIGTLinkStreamerService::getOpenIGTLinkTr
 	std::vector<TrackingSystemServicePtr> trackingSystems = mTrackingService->getTrackingSystems();
 	for (unsigned i = 0; i < trackingSystems.size(); ++i)
 	{
-		OpenIGTLinkTrackingSystemServicePtr trackingSystemService = boost::dynamic_pointer_cast<OpenIGTLinkTrackingSystemService>(trackingSystems[i]);
+		OpenIGTLinkTrackingSystemServicePtr trackingSystemService = std::dynamic_pointer_cast<OpenIGTLinkTrackingSystemService>(trackingSystems[i]);
 		if(trackingSystemService)
 			return trackingSystemService;
 	}

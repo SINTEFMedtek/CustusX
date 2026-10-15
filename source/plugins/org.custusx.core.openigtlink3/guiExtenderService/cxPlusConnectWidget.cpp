@@ -31,6 +31,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxFileSelectWidget.h"
 #include "cxCheckBoxWidget.h"
 #include "cxFilePreviewWidget.h"
+#include "cxFileDialogOptions.h"
 
 #define START_TEXT "Start PlusServer and connect tracking and streaming"
 #define STOP_TEXT "Stop PlusServer and disconnect tracking and streaming"
@@ -167,7 +168,7 @@ void PlusConnectWidget::searchForPlusConfigFile()
 void PlusConnectWidget::browsePlusPathSlot()
 {
 	QFileInfo fileInfo(mPlusPath);
-	mPlusPath = QFileDialog::getOpenFileName(this, tr("Find PlusServer executable"), fileInfo.absolutePath());
+	mPlusPath = QFileDialog::getOpenFileName(this, tr("Find PlusServer executable"), fileInfo.absolutePath(), QString(), nullptr, fileDialogOptions());
 
 	if(!mPlusPath.isEmpty())
 	{

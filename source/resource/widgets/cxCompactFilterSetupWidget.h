@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCOMPACTFILTERSETUPWIDGET_H_
 
 #include "cxResourceWidgetsExport.h"
+#include <memory>
 
 #include "cxBaseWidget.h"
 //#include "cxFilterWidget.h"
@@ -49,7 +50,7 @@ private:
 	FilterPtr mCurrentFilter;
 	OptionsWidget* mOptionsWidget;
 	QGroupBox* mFrame;
-	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+	std::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 } /* namespace cx */
 #endif /* CXCOMPACTFILTERSETUPWIDGET_H_ */

@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSAVINGVIDEORECORDER_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include <vector>
 #include <QFile>
@@ -24,7 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
+typedef std::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
 
 /** Class that saves vtkImageData continously to file.
   *
@@ -135,11 +136,11 @@ private:
 	QString mSaveFolder;
 	QString mPrefix;
 	VideoSourcePtr mSource;
-	boost::shared_ptr<VideoRecorderSaveThread> mSaveThread;
+	std::shared_ptr<VideoRecorderSaveThread> mSaveThread;
 
 };
 
-typedef boost::shared_ptr<SavingVideoRecorder> SavingVideoRecorderPtr;
+typedef std::shared_ptr<SavingVideoRecorder> SavingVideoRecorderPtr;
 
 
 } // namespace cx

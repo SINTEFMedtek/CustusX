@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWCONTAINERITEM_H_
 
 #include "cxConfig.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "vtkForwardDeclarations.h"
 #include "cxIndent.h"
 #include <QLayoutItem>
@@ -26,7 +26,7 @@ class QGridLayout;
 namespace cx
 {
 class DoubleBoundingBox3D;
-typedef boost::shared_ptr<class Rep> RepPtr;
+typedef std::shared_ptr<class Rep> RepPtr;
 
 /**
  * Adapted from SSC class provided by Sonowand
@@ -90,7 +90,7 @@ private:
 	QRect mGeometry;
 	QWidget* mParent;
 	double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
-	boost::shared_ptr<class ViewRepCollection> mView;
+	std::shared_ptr<class ViewRepCollection> mView;
 };
 
 } /* namespace cx */

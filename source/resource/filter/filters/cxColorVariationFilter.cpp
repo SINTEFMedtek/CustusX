@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include <random>
+#include <memory>
 #include <cmath>
 
 #include <vtkCellData.h>
@@ -110,7 +111,7 @@ void ColorVariationFilter::createOutputTypes()
 
 bool ColorVariationFilter::execute()
 {
-	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+	MeshPtr inputMesh = std::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	if (!inputMesh)
 		return false;
 	

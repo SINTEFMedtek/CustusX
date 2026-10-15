@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include "vtkSmartPointer.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include <QDateTime>
 #include "cxData.h"
@@ -74,7 +74,7 @@ signals:
 	void connected(bool on); ///< emitted when source is connected/disconnected
 	void newFrame();          ///< emitted when a new frame has arrived (getVtkImageData() returns something new). info/status/name/valid might also have changed
 };
-typedef boost::shared_ptr<VideoSource> VideoSourcePtr;
+typedef std::shared_ptr<VideoSource> VideoSourcePtr;
 
 } // namespace cx
 

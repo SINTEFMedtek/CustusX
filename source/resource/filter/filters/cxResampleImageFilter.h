@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRESAMPLEIMAGEFILTER_H
 
 #include "cxFilterImpl.h"
+#include <memory>
 
 namespace cx
 {
@@ -50,7 +51,7 @@ private slots:
 private:
 	ImagePtr mRawResult;
 };
-typedef boost::shared_ptr<class ResampleImageFilter> ResampleImageFilterPtr;
+typedef std::shared_ptr<class ResampleImageFilter> ResampleImageFilterPtr;
 
 
 } // namespace cx

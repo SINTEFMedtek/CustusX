@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestresourcevisualization_export.h"
 
 #include <vtkForwardDeclarations.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QString>
 #include "cxRep.h"
 #include "cxView.h"
@@ -26,7 +26,7 @@ typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 namespace cxtest
 {
 
-typedef boost::shared_ptr<class RenderTester> RenderTesterPtr;
+typedef std::shared_ptr<class RenderTester> RenderTesterPtr;
 
 /** Test actor by rendering and comparing the result to a reference image
 	*

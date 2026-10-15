@@ -23,7 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxRequestEnterStateTransition.h"
 #include "cxWorkflowState.h"
 #include "cxStyles.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 
 namespace cx

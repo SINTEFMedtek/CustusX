@@ -49,11 +49,24 @@ Transform3D quaternionToMatrix(Eigen::ArrayXd qArray)
     Eigen::Quaterniond qA;
 
     qA.coeffs() = qArray.segment<4>(0);
+	if (qA.norm() > 0)
+	{
+		qA.normalize(); // toRotationMatrix() needs a unit quaternion
+	}
     Tx.matrix().block<3, 3>(0,0) = qA.toRotationMatrix();
     Tx.matrix().block<3, 1>(0,3) = qArray.segment<3>(4);
     Tx.matrix()(3,3) = 1;
 
     return Tx;
+}
+
+Eigen::ArrayXd alignQuaternionSign(Eigen::ArrayXd qArray, const Eigen::ArrayXd& reference)
+{
+	if ((qArray.segment<4>(0) * reference.segment<4>(0)).sum() < 0)
+	{
+		qArray.segment<4>(0) *= -1;
+	}
+	return qArray;
 }
 
 }

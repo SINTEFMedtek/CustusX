@@ -2,6 +2,7 @@
 #define CXROUTETOTARGET_H
 
 #include "org_custusx_filter_routetotarget_Export.h"
+#include <memory>
 
 #include "cxMesh.h"
 #include <QDomElement>
@@ -12,7 +13,7 @@ namespace cx
 {
 
 typedef std::vector< Eigen::Matrix4d > M4Vector;
-typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
+typedef std::shared_ptr<class RouteToTarget> RouteToTargetPtr;
 
 class org_custusx_filter_routetotarget_EXPORT RouteToTarget
 {

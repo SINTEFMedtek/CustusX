@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXSERVICETRACKERCUSTOMIZER_H_
 #define CXSERVICETRACKERCUSTOMIZER_H_
 
-#include <boost/function.hpp>
+#include <functional>
 
 #include "ctkServiceTracker.h"
 #include "ctkServiceTrackerCustomizer.h"
@@ -56,23 +56,23 @@ public:
        reference.getPlugin()->getPluginContext()->ungetService(reference);
 	 }
 
-   void setServiceAddedCallback(boost::function<void (T*)> func)
+   void setServiceAddedCallback(std::function<void (T*)> func)
    {
        mServiceAddedFunction = func;
    }
-   void setServiceModifiedCallback(boost::function<void (T*)> func)
+   void setServiceModifiedCallback(std::function<void (T*)> func)
    {
        mServiceModifiedFunction = func;
    }
-   void setServiceRemovedCallback(boost::function<void (T*)> func)
+   void setServiceRemovedCallback(std::function<void (T*)> func)
    {
        mServiceRemovedFunction = func;
    }
 
 private:
-   boost::function<void (T*)> mServiceAddedFunction;
-   boost::function<void (T*)> mServiceModifiedFunction;
-   boost::function<void (T*)> mServiceRemovedFunction;
+   std::function<void (T*)> mServiceAddedFunction;
+   std::function<void (T*)> mServiceModifiedFunction;
+   std::function<void (T*)> mServiceRemovedFunction;
 };
 } /* namespace cx */
 

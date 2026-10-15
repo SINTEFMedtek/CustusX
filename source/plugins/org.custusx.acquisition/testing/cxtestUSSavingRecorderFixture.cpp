@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxtestUSSavingRecorderFixture.h"
+#include <functional>
 #include <QTimer>
 #include "cxReporter.h"
 
@@ -63,7 +64,7 @@ USSavingRecorderFixture::~USSavingRecorderFixture()
 	this->tearDown();
 }
 
-void USSavingRecorderFixture::addOperation(boost::function0<void> operation)
+void USSavingRecorderFixture::addOperation(std::function<void()> operation)
 {
 	mOperations.push_back(operation);
 }

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMETRICREFERENCEARGUMENTLIST_H
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxPrecompiledHeader.h"
 
 #include "cxForwardDeclarations.h"
@@ -25,7 +26,7 @@ class QDomNode;
 namespace cx
 {
 
-typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
+typedef std::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
 /** \brief Collection of Metric arguments that refer to another metric
  *
  *

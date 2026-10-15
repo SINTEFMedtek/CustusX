@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVECTOR3DWIDGET_H_
 
 #include "cxResourceWidgetsExport.h"
+#include <array>
 
 #include "cxVector3D.h"
 #include <QWidget>
@@ -45,8 +46,8 @@ private:
 	void addSmallControlsForIndex(QString name, QString help, int index, QBoxLayout* layout);
 
 	Vector3DPropertyBasePtr mData;
-	boost::array<DoublePropertyBasePtr, 3> mDoubleAdapter;
-	boost::array<QWidget*, 3> mWidgets;
+	std::array<DoublePropertyBasePtr, 3> mDoubleAdapter;
+	std::array<QWidget*, 3> mWidgets;
 };
 
 }

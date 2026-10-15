@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxGrabberExport.h"
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <qtcpsocket.h>
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
@@ -37,7 +37,7 @@ struct Package
 	ProbeDefinitionPtr mProbe;
 };
 
-typedef boost::shared_ptr<Package> PackagePtr;
+typedef std::shared_ptr<Package> PackagePtr;
 
 /** Interface for sending grabbed data from the ImageSender classes further to either
  *  a TCP/IP socket or directly via a Qt signal.
@@ -61,7 +61,7 @@ public:
 	virtual void send(PackagePtr package) = 0;
 
 };
-typedef boost::shared_ptr<Sender> SenderPtr;
+typedef std::shared_ptr<Sender> SenderPtr;
 
 /**
 * @}

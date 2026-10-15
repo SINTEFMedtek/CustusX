@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMETRICNAMESREP_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <vector>
 #include "cxRepImpl.h"
@@ -27,9 +28,9 @@ class QColor;
 namespace cx
 {
 
-typedef boost::shared_ptr<class MetricNamesRep> MetricNamesRepPtr;
-typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
-typedef boost::shared_ptr<class DataMetric> DataMetricPtr;
+typedef std::shared_ptr<class MetricNamesRep> MetricNamesRepPtr;
+typedef std::shared_ptr<class TextDisplay> TextDisplayPtr;
+typedef std::shared_ptr<class DataMetric> DataMetricPtr;
 
 /** 
  *

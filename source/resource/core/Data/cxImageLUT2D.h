@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 class QDomElement;
 class QDomNode;
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QColor>
 #include <QObject>
 #include "vtkForwardDeclarations.h"
@@ -27,7 +27,7 @@ class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
+typedef std::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
 
 
 /** \brief Handling of color and opacity for 2D slices.

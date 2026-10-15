@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXPIPELINE_H
 
 #include "cxResourceFilterExport.h"
+#include <memory>
 
 #include "cxFilter.h"
 #include "cxFilterGroup.h"
@@ -20,10 +21,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
-typedef boost::shared_ptr<class CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
+typedef std::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
+typedef std::shared_ptr<class CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
 
-typedef boost::shared_ptr<class StringPropertyFusedInputOutputSelectData> StringPropertyFusedInputOutputSelectDataPtr;
+typedef std::shared_ptr<class StringPropertyFusedInputOutputSelectData> StringPropertyFusedInputOutputSelectDataPtr;
 
 /** Data-Property that fuses two Data-Properties.
   *
@@ -143,7 +144,7 @@ private:
 	CompositeTimedAlgorithmPtr mCompositeTimedAlgorithm;
 	PatientModelServicePtr mPatientModelService;
 };
-typedef boost::shared_ptr<Pipeline> PipelinePtr;
+typedef std::shared_ptr<Pipeline> PipelinePtr;
 
 } // namespace cx
 

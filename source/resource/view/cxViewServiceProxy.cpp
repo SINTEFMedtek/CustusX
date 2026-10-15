@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxViewServiceProxy.h"
+#include <functional>
 
 #include <boost/bind/bind.hpp>
 #include <ctkPluginContext.h>
@@ -57,7 +58,7 @@ void ViewServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<ViewService>(
 								 mPluginContext,
 								 boost::bind(&ViewServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (ViewService*)>(),
+								 std::function<void (ViewService*)>(),
 								 boost::bind(&ViewServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

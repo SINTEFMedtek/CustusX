@@ -12,13 +12,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTOOLIMPL_H
 
 #include "cxResourceExport.h"
+#include <memory>
 
 #include "cxTool.h"
 #include "cxToolFileParser.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
+typedef std::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
 
 /** \brief Common functionality for Tool subclasses
  *
@@ -71,7 +72,7 @@ protected:
 private:
 	double mTooltipOffset;
 };
-typedef boost::shared_ptr<ToolImpl> cxToolPtr;
+typedef std::shared_ptr<ToolImpl> cxToolPtr;
 
 } // namespace cx
 

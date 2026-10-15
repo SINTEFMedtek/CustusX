@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxPatientStorage.h"
+#include <functional>
 #include "cxSessionStorageService.h"
 #include "cxXMLNodeWrapper.h"
 
@@ -25,7 +26,7 @@ PatientStorage::PatientStorage(SessionStorageServicePtr sessionStorageService, Q
 	connect(sessionStorageService.get(), &SessionStorageService::isSaving, this, &PatientStorage::duringSavePatientSlot);
 }
 
-void PatientStorage::storeVariable(QString nodeName, boost::function<QString ()> getValueFunction, boost::function<void (QString)> setValueFunction)
+void PatientStorage::storeVariable(QString nodeName, std::function<QString ()> getValueFunction, std::function<void (QString)> setValueFunction)
 {
 	mGetFunctions[nodeName] = getValueFunction;
 	mSetFunctions[nodeName] = setValueFunction;
@@ -51,7 +52,7 @@ void PatientStorage::addXml(QDomNode& parentNode)
 {
 	QDomDocument doc = parentNode.ownerDocument();
 
-	std::map<QString, boost::function<QString()> >::iterator iter;
+	std::map<QString, std::function<QString()> >::iterator iter;
 	for(iter = mGetFunctions.begin(); iter != mGetFunctions.end(); ++iter)
 	{
 		QDomElement newDataNode = doc.createElement(iter->first);
@@ -62,7 +63,7 @@ void PatientStorage::addXml(QDomNode& parentNode)
 
 void PatientStorage::parseXml(QDomNode& dataNode)
 {
-	std::map<QString, boost::function<void(QString value)> >::iterator iter;
+	std::map<QString, std::function<void(QString value)> >::iterator iter;
 	for(iter = mSetFunctions.begin(); iter != mSetFunctions.end(); ++iter)
 	{
 		QString nodeValue = dataNode.namedItem(iter->first).toElement().text();

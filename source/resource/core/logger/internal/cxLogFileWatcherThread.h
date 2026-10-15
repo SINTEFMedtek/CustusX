@@ -21,8 +21,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QMutex>
 #include <QDateTime>
 #include <QFile>
-#include "boost/shared_ptr.hpp"
-#include "boost/function.hpp"
+#include <memory>
+#include <functional>
 #include "cxDefinitions.h"
 #include "cxAudio.h"
 #include <sstream>

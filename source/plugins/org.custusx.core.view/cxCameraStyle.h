@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXCAMERASTYLE_H_
 
 #include "org_custusx_core_view_Export.h"
+#include <memory>
 
 #include <QPointer>
 #include "cxTransform3D.h"
@@ -32,9 +33,9 @@ class QActionGroup;
 namespace cx
 {
 
-typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef std::shared_ptr<class CameraStyle> CameraStylePtr;
 using cx::Transform3D;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * \file

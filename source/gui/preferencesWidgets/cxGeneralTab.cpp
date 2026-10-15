@@ -24,6 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QGroupBox>
 #include "cxProfile.h"
 #include "cxLogicManager.h"
+#include "cxFileDialogOptions.h"
 
 namespace cx
 {
@@ -158,7 +159,7 @@ void GeneralTab::browsePatientDataFolderSlot()
   mGlobalPatientDataFolder = QFileDialog::getExistingDirectory(this,
                                                      tr("Find Patient Data Folder"),
                                                      mGlobalPatientDataFolder,
-                                                     QFileDialog::ShowDirsOnly);
+                                                     fileDialogOptions(QFileDialog::ShowDirsOnly));
   if( !mGlobalPatientDataFolder.isEmpty() ) {
     mPatientDataFolderComboBox->addItem( mGlobalPatientDataFolder );
     mPatientDataFolderComboBox->setCurrentIndex( mPatientDataFolderComboBox->currentIndex() + 1 );
@@ -167,7 +168,7 @@ void GeneralTab::browsePatientDataFolderSlot()
 
 void GeneralTab::browseVLCPathSlot()
 {
-	mVLCPath = QFileDialog::getOpenFileName(this, tr("Find VLC executable"));
+	mVLCPath = QFileDialog::getOpenFileName(this, tr("Find VLC executable"), QString(), QString(), nullptr, fileDialogOptions());
 
 	if(!mVLCPath.isEmpty())
 	{

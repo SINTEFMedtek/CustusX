@@ -31,7 +31,7 @@
         IGSTK_LIBS="eigen VTK ITK IGSTK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
         IGSTK_FLAG="--igstk"
       else
-        IGSTK_LIBS="eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
+        IGSTK_LIBS="eigen VTK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
         IGSTK_FLAG=""
         rm -rf $BASE_DIR/IGSTK
       fi

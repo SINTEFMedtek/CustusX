@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWGROUP_H_
 
 #include "org_custusx_core_view_Export.h"
+#include <memory>
 
 #include <vector>
 #include <QObject>
@@ -26,10 +27,10 @@ class QPoint;
 
 namespace cx
 {
-typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
-typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
-typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef std::shared_ptr<class SyncedValue> SyncedValuePtr;
+typedef std::shared_ptr<class CameraStyle> CameraStylePtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * \file

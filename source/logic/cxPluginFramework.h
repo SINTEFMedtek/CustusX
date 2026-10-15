@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QString>
 #include <QObject>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "ctkPlugin.h"
 #include "ctkPluginFramework_global.h"
@@ -30,7 +30,7 @@ class ctkException;
 
 namespace cx
 {
-typedef boost::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPtr;
+typedef std::shared_ptr<class PluginFrameworkManager> PluginFrameworkManagerPtr;
 
 /** Manages a ctkPluginFramework instance.
  *

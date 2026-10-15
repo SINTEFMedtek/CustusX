@@ -12,14 +12,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTREAMPROPERTIESWIDGET_H
 
 #include "cxGuiExport.h"
+#include <memory>
 #include "cxTabbedWidget.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectTrackedStream> StringPropertySelectTrackedStreamPtr;
-typedef boost::shared_ptr<class TransferFunction3DWidget> TransferFunction3DWidgetPtr;
-typedef boost::shared_ptr<class ShadingWidget> ShadingWidgetPtr;
-typedef boost::shared_ptr<class TrackedStream> TrackedStreamPtr;
+typedef std::shared_ptr<class StringPropertySelectTrackedStream> StringPropertySelectTrackedStreamPtr;
+typedef std::shared_ptr<class TransferFunction3DWidget> TransferFunction3DWidgetPtr;
+typedef std::shared_ptr<class ShadingWidget> ShadingWidgetPtr;
+typedef std::shared_ptr<class TrackedStream> TrackedStreamPtr;
 
 /**
  * \brief Widget for displaying and manipulating TrackedStream properties.

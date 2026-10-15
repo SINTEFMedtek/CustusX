@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <QPointer>
 #include "cxTransform3D.h"
@@ -25,7 +26,7 @@ class QActionGroup;
 namespace cx
 {
 
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
  * \file
@@ -62,7 +63,7 @@ private:
 	ViewGroupDataPtr mGroup;
 	CoreServicesPtr mBackend;
 };
-typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
+typedef std::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 
 /**
  * @}

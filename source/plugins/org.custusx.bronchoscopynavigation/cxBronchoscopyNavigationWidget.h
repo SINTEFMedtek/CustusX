@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXBRONCHOSCOPYNAVIGATIONWIDGET_H_
 
 #include <QtWidgets>
+#include <memory>
 #include <QWidget>
 #include <QPushButton>
 #include "qdom.h"
@@ -51,8 +52,8 @@ class QVBoxLayout;
 namespace cx
 {
 
-typedef boost::shared_ptr<class TrackingSystemBronchoscopyService> TrackingSystemBronchoscopyServicePtr;
-typedef boost::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
+typedef std::shared_ptr<class TrackingSystemBronchoscopyService> TrackingSystemBronchoscopyServicePtr;
+typedef std::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
 
 /**
  * Widget for use in the BronchoscopyNavigation

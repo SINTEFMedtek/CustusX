@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWWRAPPER3D_H_
 
 #include "org_custusx_core_view_Export.h"
+#include <memory>
 
 #include <vector>
 #include <QPointer>
@@ -36,18 +37,18 @@ typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWi
 
 namespace cx
 {
-typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
-typedef boost::shared_ptr<class MetricNamesRep> MetricNamesRepPtr;
+typedef std::shared_ptr<class DataMetricRep> DataMetricRepPtr;
+typedef std::shared_ptr<class MetricNamesRep> MetricNamesRepPtr;
 
 }
 
 namespace cx
 {
-typedef boost::shared_ptr<class ImageLandmarkRep> ImageLandmarkRepPtr;
-typedef boost::shared_ptr<class PatientLandmarkRep> PatientLandmarkRepPtr;
-typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DRepProducerPtr;
-typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
-typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
+typedef std::shared_ptr<class ImageLandmarkRep> ImageLandmarkRepPtr;
+typedef std::shared_ptr<class PatientLandmarkRep> PatientLandmarkRepPtr;
+typedef std::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DRepProducerPtr;
+typedef std::shared_ptr<class AxisConnector> AxisConnectorPtr;
+typedef std::shared_ptr<class Slices3DRep> Slices3DRepPtr;
 
 /**
  * \file
@@ -55,7 +56,7 @@ typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
  * @{
  */
 
-typedef boost::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
+typedef std::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
 
 
 /** Wrapper for a View3D.
@@ -149,7 +150,7 @@ private:
 	vtkCallbackCommandPtr mCallbackCommand = nullptr;
 	InteractiveCropperPtr mInteractiveCropper;
 };
-typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
+typedef std::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
 
 /**
  * @}

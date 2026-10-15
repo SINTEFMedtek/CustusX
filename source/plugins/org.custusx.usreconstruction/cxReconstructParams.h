@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXRECONSTRUCTPARAMS_H_
 
 #include "org_custusx_usreconstruction_Export.h"
+#include <memory>
 
 #include "cxXmlOptionItem.h"
 #include "cxForwardDeclarations.h"
@@ -82,7 +83,7 @@ private:
 	XmlOptionFile mSettings;
 	void add(PropertyPtr param);
 };
-typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
+typedef std::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 
 /**
  * \}

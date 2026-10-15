@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxLandmarkRegistrationWidget.h"
+#include <memory>
 
 #include <sstream>
 #include <QVBoxLayout>
@@ -147,7 +148,7 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	mLandmarkTableWidget->clear();
 
 	QString fixedName;
-	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mServices->registration()->getFixedData());
+	DataPtr fixedData = std::dynamic_pointer_cast<Data>(mServices->registration()->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 
@@ -312,7 +313,7 @@ void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 void LandmarkRegistrationWidget::updateAverageAccuracyLabel()
 {
 	QString fixedName;
-	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mServices->registration()->getFixedData());
+	DataPtr fixedData = std::dynamic_pointer_cast<Data>(mServices->registration()->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 

@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXUSSAVINGRECORDER_H
 
 #include "org_custusx_acquisition_Export.h"
+#include <memory>
 
 #include <vector>
 #include <QFutureWatcher>
@@ -24,9 +25,9 @@ struct USReconstructInputData;
 }
 namespace cx
 {
-typedef boost::shared_ptr<class UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
-typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
-typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
+typedef std::shared_ptr<class UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
+typedef std::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
+typedef std::shared_ptr<class RecordSession> RecordSessionPtr;
 
 /**
  * \file
@@ -100,7 +101,7 @@ private:
 	bool mDoWriteColor;
 	Transform3D m_rMpr;
 };
-typedef boost::shared_ptr<USSavingRecorder> USSavingRecorderPtr;
+typedef std::shared_ptr<USSavingRecorder> USSavingRecorderPtr;
 
 /**
 * @}

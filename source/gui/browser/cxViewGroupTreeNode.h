@@ -12,13 +12,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWGROUPTREENODE_H
 
 #include "cxTreeNodeImpl.h"
+#include <memory>
 
 namespace cx
 {
 
 class TreeNode;
-typedef boost::weak_ptr<TreeNode> TreeNodeWeakPtr;
-typedef boost::shared_ptr<TreeNode> TreeNodePtr;
+typedef std::weak_ptr<TreeNode> TreeNodeWeakPtr;
+typedef std::shared_ptr<TreeNode> TreeNodePtr;
 
 
 class ViewGroupTreeNode : public TreeNodeImpl
@@ -33,7 +34,7 @@ public:
 	virtual TreeNodePtr getParent() const;
 	virtual void activate();
 	virtual QIcon getIcon() const;
-	virtual boost::shared_ptr<QWidget> createPropertiesWidget() const;
+	virtual std::shared_ptr<QWidget> createPropertiesWidget() const;
 	virtual QVariant getColor() const;
 	virtual bool useColoredName() const { return false; }
 	virtual QVariant getFont() const;

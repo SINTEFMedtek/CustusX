@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxCgeoReaderWriter.h"
+#include <memory>
 
 #include <QDir>
 #include <iostream>
@@ -76,7 +77,7 @@ QByteArray CgeoReaderWriter::convertToQByteArray(DataPtr data)
 
 void CgeoReaderWriter::writeToStream(DataPtr data, QDataStream &out)
 {
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
+	MeshPtr mesh = std::dynamic_pointer_cast<Mesh>(data);
 	if(!mesh)
 	{
 		CX_LOG_ERROR() << "Couldn't find mesh.";

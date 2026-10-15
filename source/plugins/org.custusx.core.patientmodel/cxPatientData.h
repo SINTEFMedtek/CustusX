@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_core_patientmodel_Export.h"
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include <QString>
 #include <QObject>
 #include "cxForwardDeclarations.h"
@@ -26,8 +26,8 @@ class QDomDocument;
 namespace cx
 {
 
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class DataManager> DataServicePtr;
+typedef std::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef std::shared_ptr<class DataManager> DataServicePtr;
 
 
 /**
@@ -77,7 +77,7 @@ private:
 	FileManagerServicePtr mFileManagerService;
 };
 
-typedef boost::shared_ptr<PatientData> PatientDataPtr;
+typedef std::shared_ptr<PatientData> PatientDataPtr;
 
 } // namespace cx
 

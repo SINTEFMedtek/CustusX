@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxRegistrationServiceProxy.h"
+#include <functional>
 
 #include <boost/bind/bind.hpp>
 #include <ctkPluginContext.h>
@@ -32,7 +33,7 @@ void RegistrationServiceProxy::initServiceListener()
 	mServiceListener.reset(new ServiceTrackerListener<RegistrationService>(
 								 mPluginContext,
 								 boost::bind(&RegistrationServiceProxy::onServiceAdded, this, boost::placeholders::_1),
-								 boost::function<void (RegistrationService*)>(),
+								 std::function<void (RegistrationService*)>(),
 								 boost::bind(&RegistrationServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();

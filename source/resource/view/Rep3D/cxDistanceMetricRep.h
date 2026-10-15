@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDISTANCEMETRICREP_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxDataMetricRep.h"
 #include "cxGraphicalPrimitives.h"
@@ -27,7 +28,7 @@ typedef vtkSmartPointer<vtkTextActor> vtkTextActorPtr;
 namespace cx
 {
 
-typedef boost::shared_ptr<class DistanceMetricRep> DistanceMetricRepPtr;
+typedef std::shared_ptr<class DistanceMetricRep> DistanceMetricRepPtr;
 
 /** \brief Rep for visualizing a DistanceMetric.
  *

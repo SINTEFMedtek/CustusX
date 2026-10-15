@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVIEWCOLLECTIONWIDGETMIXED_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxViewCollectionWidgetUsingViewWidgets.h"
 #include "cxView.h"
@@ -25,7 +26,7 @@ class QGridLayout;
 namespace cx
 {
 
-typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+typedef std::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 class ViewCollectionWidgetUsingViewContainer;
 class LayoutWidgetUsingViewWidgets;
 

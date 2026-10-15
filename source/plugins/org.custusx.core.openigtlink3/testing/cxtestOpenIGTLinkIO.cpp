@@ -12,7 +12,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QCoreApplication>
 #include <QEventLoop>
-#include <boost/make_shared.hpp>
 #include "vtkTimerLog.h"
 #include "igtlioConnector.h"
 #include "igtlioDevice.h"
@@ -338,7 +337,7 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector ze
 	vtkImageDataPtr expected = this->readImageData("US_small_sector_masked.png", "input expected");
 
 	cx::ProbeDefinition probeDefinition = this->readProbeDefinition(imageFilename);
-	cx::ProbeDefinitionPtr probeDefinitionPtr = boost::make_shared<cx::ProbeDefinition>(probeDefinition);
+	cx::ProbeDefinitionPtr probeDefinitionPtr = std::make_shared<cx::ProbeDefinition>(probeDefinition);
 	REQUIRE(probeDefinitionPtr);
 
 	igtlioLogicPointer logic = igtlioLogicPointer::New();
@@ -378,7 +377,7 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector ze
 	vtkImageDataPtr expected = this->readImageData("US_small_sector_masked.png", "input expected");
 
 	cx::ProbeDefinition probeDefinition = this->readProbeDefinition(imageFilename);
-	cx::ProbeDefinitionPtr probeDefinitionPtr = boost::make_shared<cx::ProbeDefinition>(probeDefinition);
+	cx::ProbeDefinitionPtr probeDefinitionPtr = std::make_shared<cx::ProbeDefinition>(probeDefinition);
 	REQUIRE(probeDefinitionPtr);
 
 	igtlioLogicPointer logic = igtlioLogicPointer::New();

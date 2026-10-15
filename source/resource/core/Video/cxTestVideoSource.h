@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "vtkSmartPointer.h"
 #include <stdint.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <QObject>
 #include <QDateTime>
 
@@ -84,7 +84,7 @@ private:
 	uint8_t *mBuffer;
 	bool mInitialized;
 };
-typedef boost::shared_ptr<TestVideoSource> TestVideoSourcePtr;
+typedef std::shared_ptr<TestVideoSource> TestVideoSourcePtr;
 
 } // namespace cx
 

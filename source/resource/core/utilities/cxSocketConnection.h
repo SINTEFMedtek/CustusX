@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTcpServer>
 #include <QMutex>
 #include "cxEnumConverter.h"
-#include "boost/shared_ptr.hpp"
+#include <memory>
 
 namespace cx {
 enum CX_SOCKETCONNECTION_STATE
@@ -49,8 +49,8 @@ SNW_DECLARE_ENUM_STRING_CONVERTERS(cxResource_EXPORT, cx, CX_SOCKETCONNECTION_ST
 
 namespace cx {
 
-typedef boost::shared_ptr<class SocketConnector> SocketConnectorPtr;
-typedef boost::shared_ptr<class SocketConnection> SocketConnectionPtr;
+typedef std::shared_ptr<class SocketConnector> SocketConnectorPtr;
+typedef std::shared_ptr<class SocketConnection> SocketConnectionPtr;
 
 class cxResource_EXPORT SocketConnection : public QObject
 {

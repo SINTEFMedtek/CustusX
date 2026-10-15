@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDateTime>
 #include <QColor>
 #include <QTimer>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace cx
 {
@@ -83,7 +83,7 @@ private:
 
 };
 
-typedef boost::shared_ptr<PlaybackTime> PlaybackTimePtr;
+typedef std::shared_ptr<PlaybackTime> PlaybackTimePtr;
 
 /**\brief Description of one event in time.
  *

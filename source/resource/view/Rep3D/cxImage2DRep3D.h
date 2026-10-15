@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXIMAGE2DREP3D_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include "cxRepImpl.h"
 #include "cxForwardDeclarations.h"
@@ -20,13 +21,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-typedef boost::shared_ptr<class ApplyLUTToImage2DProxy> ApplyLUTToImage2DProxyPtr;
+typedef std::shared_ptr<class ApplyLUTToImage2DProxy> ApplyLUTToImage2DProxyPtr;
 }
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class Image2DProxy> Image2DProxyPtr;
+typedef std::shared_ptr<class Image2DProxy> Image2DProxyPtr;
 
 /**
  * \brief Display a 2D image in 3D space using a vtkImageSlice.
@@ -65,7 +66,7 @@ private:
 
 
 
-typedef boost::shared_ptr<class Image2DRep3D> Image2DRep3DPtr;
+typedef std::shared_ptr<class Image2DRep3D> Image2DRep3DPtr;
 
 /** \brief Display a 2D Volume in 3D
  *

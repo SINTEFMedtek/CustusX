@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXINTERACTIVECLIPPER_H_
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 
 #include <vector>
 #include <QObject>
@@ -22,7 +23,7 @@ class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
 
 /**
 * \file
@@ -83,7 +84,7 @@ protected:
 	void addAllInteractiveClipPlanes();
 	void updateClipPlanesInData();
 };
-typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
+typedef std::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
 
 /**
 * @}

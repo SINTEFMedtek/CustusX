@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxLayoutInteractor.h"
+#include <memory>
 #include "cxLayoutEditorWidget.h"
 #include <QMenu>
 #include <QMessageBox>
@@ -137,7 +138,7 @@ void LayoutInteractor::deepDeleteActionGroup(QActionGroup* actionGroup)
  */
 LayoutData LayoutInteractor::executeLayoutEditorDialog(QString title, bool createNew)
 {
-	boost::shared_ptr<QDialog> dialog(new QDialog(NULL, Qt::Dialog));
+	std::shared_ptr<QDialog> dialog(new QDialog(NULL, Qt::Dialog));
 	dialog->setWindowTitle(title);
 	QVBoxLayout* layout = new QVBoxLayout(dialog.get());
 	layout->setMargin(0);

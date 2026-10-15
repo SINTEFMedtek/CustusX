@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKEDSTREAM_H
 
 #include "cxImage.h"
+#include <memory>
 
 namespace cx
 {
@@ -76,7 +77,7 @@ private:
 	Transform3D get_tMu();
 };
 
-typedef boost::shared_ptr<TrackedStream> TrackedStreamPtr;
+typedef std::shared_ptr<TrackedStream> TrackedStreamPtr;
 
 } //cx
 

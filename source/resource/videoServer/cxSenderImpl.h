@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSender.h"
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <qtcpsocket.h>
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"

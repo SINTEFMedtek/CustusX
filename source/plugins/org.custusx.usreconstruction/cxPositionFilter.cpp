@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPositionFilter.h"
 #include "cxMathUtils.h"
 #include "cxLogger.h"
+#include <algorithm>
 
 namespace cx
 {
@@ -19,53 +20,53 @@ namespace cx
 PositionFilter::PositionFilter(unsigned filterStrength, std::vector<class TimedPosition> &inputImagePositions) :
 	mFilterStrength(filterStrength)
 {
-	mFilterLength = 1+2*filterStrength;
 	mInputImagePositions = &inputImagePositions;
-	mNumberInputPositions=inputImagePositions.size();
-	mNumberQuaternions = mNumberInputPositions+mFilterLength;
+	mNumberInputPositions = inputImagePositions.size();
 
-	mQPosArray = Eigen::ArrayXXd::Zero(7,long(mNumberQuaternions));
+	mQPosArray = Eigen::ArrayXXd::Zero(7,long(mNumberInputPositions));
 	mQPosFiltered = Eigen::ArrayXXd::Zero(7,long(mNumberInputPositions));
 }
 
 void PositionFilter::convertToQuaternions()
 {
-	for (unsigned int i = 0; i < mNumberQuaternions; i++) //For each pose (Tx), with edge padding
+	for (unsigned long i = 0; i < mNumberInputPositions; i++)
 	{
-		unsigned long sourceIdx =  (i > mFilterStrength) ? (i-mFilterStrength) : 0; // Calculate index in Tx array, pad with edge elements //Skriv om
-		sourceIdx =  (sourceIdx < mNumberInputPositions) ? sourceIdx : (mNumberInputPositions-1);
-		mQPosArray.col(i) = matrixToQuaternion(mInputImagePositions->at(sourceIdx).mPos); // Convert each Tx to quaternions
+		mQPosArray.col(long(i)) = matrixToQuaternion(mInputImagePositions->at(i).mPos);
+		// Same sign as the previous pose, so that the average below doesn't mix q and -q
+		if (i > 0)
+		{
+			mQPosArray.col(long(i)) = alignQuaternionSign(mQPosArray.col(long(i)), mQPosArray.col(long(i-1)));
+		}
 	}
 }
 
 void PositionFilter::filterQuaternionArray()
 {
-	for (unsigned int i = 0; i < mFilterLength; i++)
+	// Centered moving average, shortened symmetrically near the ends: the first and last positions are not moved
+	long nPositions = long(mNumberInputPositions);
+	for (long k = 0; k < nPositions; k++)
 	{
-		mQPosFiltered = mQPosFiltered + mQPosArray.block(0,i,7,long(mNumberInputPositions));
+		long halfLength = std::min(long(mFilterStrength), std::min(k, nPositions-1-k));
+		mQPosFiltered.col(k) = mQPosArray.block(0, k-halfLength, 7, 2*halfLength+1).rowwise().sum() / double(2*halfLength+1);
 	}
-	mQPosFiltered = mQPosFiltered / mFilterLength; // Scale and write back to qPosArray
 }
 
 void PositionFilter::convertFromQuaternion()
 {
-	for (unsigned int i = 0; i < mInputImagePositions->size(); i++) //For each pose after filtering
+	for (unsigned int i = 0; i < mInputImagePositions->size(); i++)
 	{
-		// Convert back to position data
-		mInputImagePositions->at(i).mPos = quaternionToMatrix(mQPosFiltered.col(i));
+		mInputImagePositions->at(i).mPos = quaternionToMatrix(mQPosFiltered.col(i)); // normalizes the averaged quaternion
 	}
 }
 
 void PositionFilter::filterPositions()
 {
-	if (mFilterStrength > 0) //Position filter enabled?
+	// A sequence not longer than the filter window is not filtered
+	if (mFilterStrength > 0 && mNumberInputPositions > 2*mFilterStrength + 1)
 	{
-		if (mNumberInputPositions > mFilterLength) //Position sequence sufficient long?
-		{
-			convertToQuaternions();
-			filterQuaternionArray();
-			convertFromQuaternion();
-		}
+		convertToQuaternions();
+		filterQuaternionArray();
+		convertFromQuaternion();
 	}
 }
 

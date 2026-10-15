@@ -55,7 +55,7 @@ RGBColor::RGBColor() {}
 RGBColor::RGBColor(const RGBColor& t)
 {
 	for (unsigned i=0; i<size(); ++i)
-		elems[i] = t.elems[i];
+		(*this)[i] = t[i];
 }
 
 RGBColor& RGBColor::operator=(const RGBColor& t)
@@ -63,38 +63,38 @@ RGBColor& RGBColor::operator=(const RGBColor& t)
 	if (this!=&t)
 	{
 		for (unsigned i=0; i<size(); ++i)
-			elems[i] = t.elems[i];
+			(*this)[i] = t[i];
 	}
 	return *this;
 }
 
 RGBColor& RGBColor::operator=(const QColor& t)
 {
-	elems[0] = t.redF();
-	elems[1] = t.greenF();
-	elems[2] = t.blueF();
+	(*this)[0] = t.redF();
+	(*this)[1] = t.greenF();
+	(*this)[2] = t.blueF();
 	return *this;
 }
 
 RGBColor::RGBColor(QColor c)
 {
-	elems[0] = c.redF();
-	elems[1] = c.greenF();
-	elems[2] = c.blueF();
+	(*this)[0] = c.redF();
+	(*this)[1] = c.greenF();
+	(*this)[2] = c.blueF();
 }
 
 RGBColor::RGBColor(double r, double g, double b)
 {
-	elems[0] = r;
-	elems[1] = g;
-	elems[2] = b;
+	(*this)[0] = r;
+	(*this)[1] = g;
+	(*this)[2] = b;
 }
 
 RGBColor::RGBColor(const double* rgb)
 {
-	elems[0] = rgb[0];
-	elems[1] = rgb[1];
-	elems[2] = rgb[2];
+	(*this)[0] = rgb[0];
+	(*this)[1] = rgb[1];
+	(*this)[2] = rgb[2];
 }
 
 

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxToolMetricRep.h"
+#include <memory>
 
 #include "cxView.h"
 #include "boost/bind/bind.hpp"
@@ -52,7 +53,7 @@ void ToolMetricRep::removeRepActorsFromViewRenderer(ViewPtr view)
 
 ToolMetricPtr ToolMetricRep::getToolMetric()
 {
-	return boost::dynamic_pointer_cast<ToolMetric>(mMetric);
+	return std::dynamic_pointer_cast<ToolMetric>(mMetric);
 }
 
 void ToolMetricRep::onModifiedStartRender()

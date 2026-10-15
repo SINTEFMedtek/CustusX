@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include <cxLogicManager.h>
+#include <memory>
 
 #ifndef CX_WINDOWS
 #include <sys/utsname.h>
@@ -256,7 +257,7 @@ void LogicManager::shutdownLegacyStoredServices()
 }
 
 template<class T>
-void LogicManager::shutdownService(boost::shared_ptr<T>& service, QString name)
+void LogicManager::shutdownService(std::shared_ptr<T>& service, QString name)
 {
 	requireUnique(service, name);
 	service.reset();

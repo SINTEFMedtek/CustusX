@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXSTATESERVICEPROXY_H
 
 #include "cxStateService.h"
+#include <memory>
 #include "cxServiceTrackerListener.h"
 
 namespace cx
@@ -52,7 +53,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	StateServicePtr mService;
-	boost::shared_ptr<ServiceTrackerListener<StateService> > mServiceListener;
+	std::shared_ptr<ServiceTrackerListener<StateService> > mServiceListener;
 };
 
 }

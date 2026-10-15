@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define GRAPHICALOBJECTWITHDIRECTION_H
 
 #include "cxResourceVisualizationExport.h"
+#include <memory>
 #include <vtkActor2D.h>
 #include <vtkArcSource.h>
 #include <vtkArrowSource.h>
@@ -70,7 +71,7 @@ protected:
     Vector3D mVectorUp;
 	Vector3D mScale;
 };
-typedef boost::shared_ptr<GraphicalObjectWithDirection> GraphicalObjectWithDirectionPtr;
+typedef std::shared_ptr<GraphicalObjectWithDirection> GraphicalObjectWithDirectionPtr;
 
 } // namespace cx
 

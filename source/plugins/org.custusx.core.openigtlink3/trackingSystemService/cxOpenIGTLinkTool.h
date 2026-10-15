@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxToolImpl.h"
 
 #include <QTimer>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "igtlioBaseConverter.h"
 
@@ -29,11 +29,11 @@ class QStringList;
 namespace cx
 {
 typedef std::vector<double> DoubleVector;
-typedef boost::shared_ptr<DoubleVector> DoubleVectorPtr;
+typedef std::shared_ptr<DoubleVector> DoubleVectorPtr;
 typedef std::vector<Transform3DPtr> Transform3DVector;
-typedef boost::shared_ptr<Transform3DVector> Transform3DVectorPtr;
-typedef boost::shared_ptr<class IgstkTool> IgstkToolPtr;
-typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
+typedef std::shared_ptr<Transform3DVector> Transform3DVectorPtr;
+typedef std::shared_ptr<class IgstkTool> IgstkToolPtr;
+typedef std::shared_ptr<class ProbeImpl> ProbeImplPtr;
 
 /**
  * \file
@@ -101,7 +101,7 @@ private:
 	void checkTimestampMismatch();
 	void printWarningAboutTimestampMismatch(double diff);
 };
-typedef boost::shared_ptr<OpenIGTLinkTool> OpenIGTLinkToolPtr;
+typedef std::shared_ptr<OpenIGTLinkTool> OpenIGTLinkToolPtr;
 
 /**
  * @}

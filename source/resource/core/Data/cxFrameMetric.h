@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTFRAMEMETRIC_H_
 
 #include "cxResourceExport.h"
+#include <memory>
 #include "cxPrecompiledHeader.h"
 
 #include "cxFrameMetricBase.h"
@@ -20,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-typedef boost::shared_ptr<class FrameMetric> FrameMetricPtr;
+typedef std::shared_ptr<class FrameMetric> FrameMetricPtr;
 
 /** \brief Data class that represents a single frame (transform).
  *

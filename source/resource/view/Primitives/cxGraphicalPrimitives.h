@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceVisualizationExport.h"
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "vtkForwardDeclarations.h"
 #include "cxTransform3D.h"
 #include "cxViewportListener.h"
@@ -94,7 +94,7 @@ public:
 private:
 	vtkPolyDataMapperPtr mMapper;
 };
-typedef boost::shared_ptr<GraphicalPolyData3D> GraphicalPolyData3DPtr;
+typedef std::shared_ptr<GraphicalPolyData3D> GraphicalPolyData3DPtr;
 
 
 /** \brief Helper for rendering a a glyph in 3D
@@ -114,7 +114,7 @@ public:
 private:
 	vtkGlyph3DMapperPtr mMapper;
 };
-typedef boost::shared_ptr<GraphicalGlyph3DData> GraphicalGlyph3DDataPtr;
+typedef std::shared_ptr<GraphicalGlyph3DData> GraphicalGlyph3DDataPtr;
 
 
 /** \brief Helper for rendering a point in 3D
@@ -139,7 +139,7 @@ private:
 	vtkActorPtr actor;
 	vtkRendererPtr mRenderer;
 };
-typedef boost::shared_ptr<GraphicalPoint3D> GraphicalPoint3DPtr;
+typedef std::shared_ptr<GraphicalPoint3D> GraphicalPoint3DPtr;
 
 /** \brief Helper for rendering a line in 3D
  */
@@ -160,7 +160,7 @@ private:
 	vtkRendererPtr mRenderer;
 	vtkLineSourcePtr source;
 };
-typedef boost::shared_ptr<GraphicalLine3D> GraphicalLine3DPtr;
+typedef std::shared_ptr<GraphicalLine3D> GraphicalLine3DPtr;
 
 /** \brief Helper for rendering a line in 3D
  */
@@ -180,7 +180,7 @@ private:
 	vtkRendererPtr mRenderer;
 	vtkArcSourcePtr source;
 };
-typedef boost::shared_ptr<GraphicalArc3D> GraphicalArc3DPtr;
+typedef std::shared_ptr<GraphicalArc3D> GraphicalArc3DPtr;
 
 /** \brief Helper for rendering an arrow in 3D
  */
@@ -198,7 +198,7 @@ private:
 	vtkRendererPtr mRenderer;
 	vtkArrowSourcePtr source;
 };
-typedef boost::shared_ptr<GraphicalArrow3D> GraphicalArrow3DPtr;
+typedef std::shared_ptr<GraphicalArrow3D> GraphicalArrow3DPtr;
 
 /**\brief Helper for drawing a rectangle in 3D.
  */
@@ -220,7 +220,7 @@ private:
 	vtkPointsPtr mPoints;
 	vtkCellArrayPtr mSide;
 };
-typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
+typedef std::shared_ptr<class Rect3D> Rect3DPtr;
 
 /** \brief Helper for rendering 3D text that faces the camera and
  *  has a constant viewed size.
@@ -250,7 +250,7 @@ private:
 
 	ViewportListenerPtr mViewportListener;
 };
-typedef boost::shared_ptr<FollowerText3D> FollowerText3DPtr;
+typedef std::shared_ptr<FollowerText3D> FollowerText3DPtr;
 
 /** \brief Helper for rendering 3D text that faces the camera and
  *  has a constant viewed size, always on top.
@@ -284,7 +284,7 @@ private:
 
 	//    ViewportListenerPtr mViewportListener;
 };
-typedef boost::shared_ptr<CaptionText3D> CaptionText3DPtr;
+typedef std::shared_ptr<CaptionText3D> CaptionText3DPtr;
 
 /**
  * @}

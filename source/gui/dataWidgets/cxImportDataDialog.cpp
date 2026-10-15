@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxImportDataDialog.h"
+#include <memory>
 
 #include <cmath>
 #include <QFileDialog>
@@ -138,7 +139,7 @@ void ImportDataDialog::importDataSlot()
   mUidLabel->setText("Data uid:  " + qstring_cast(mData->getUid()));
   mNameLabel->setText("Data name: " + qstring_cast(mData->getName()));
 
-  ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
+  ImagePtr image = std::dynamic_pointer_cast<Image>(mData);
   mModalityAdapter->setData(image);
   mModalityCombo->setEnabled(image!=0);
   mImageTypeAdapter->setData(image);
@@ -250,7 +251,7 @@ void ImportDataDialog::convertToUnsigned()
 	if (!mConvertToUnsignedCheckBox->isChecked())
 		return;
 
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
+	ImagePtr image = std::dynamic_pointer_cast<Image>(mData);
 	if (!image)
 		return;
 

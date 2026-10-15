@@ -12,15 +12,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXREGISTRATIONMETHODSERVICES_H
 
 #include "org_custusx_registration_Export.h"
+#include <memory>
 
 #include "cxVisServices.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class RegServices> RegServicesPtr;
-typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
-typedef boost::shared_ptr<class ViewService> ViewServicePtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef std::shared_ptr<class RegServices> RegServicesPtr;
+typedef std::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef std::shared_ptr<class ViewService> ViewServicePtr;
+typedef std::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 
 /**
  * Convenience class combining all services used by registration methods.

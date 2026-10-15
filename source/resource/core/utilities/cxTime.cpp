@@ -10,7 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include "cxTime.h"
 #include <QDateTime>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 
 namespace cx
 {
@@ -47,7 +47,7 @@ double getMilliSecondsSinceEpoch()
 	return QDateTime::currentDateTime().toMSecsSinceEpoch(); //milliseconds
 #else
 	QDateTime now = QDateTime::currentDateTime();
-	boost::uint64_t now_t64 = now.toTime_t();
+	std::uint64_t now_t64 = now.toTime_t();
 	now_t64 *= 1000;
 	now_t64 += now.time().msec();
 	return now_t64;

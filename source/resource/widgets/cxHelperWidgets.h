@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXHELPERWIDGETS_H_
 
 #include "cxResourceWidgetsExport.h"
+#include <memory>
 
 #include <QWidget>
 #include "cxProperty.h"
@@ -82,8 +83,8 @@ cxResourceWidgets_EXPORT QWidget* addDummyMargin(QWidget* widget);
  */
 cxResourceWidgets_EXPORT QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gridLayout = 0, int row = 0);
 
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class ViewService> ViewServicePtr;
+typedef std::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef std::shared_ptr<class ViewService> ViewServicePtr;
 
 /**\brief Create a widget capable of displaying the input data.
  *

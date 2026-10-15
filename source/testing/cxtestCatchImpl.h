@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXTESTCATCHIMPL_H_
 #define CXTESTCATCHIMPL_H_
 
-#include "boost/shared_ptr.hpp"
+#include <memory>
 #include "catch.hpp"
 
 #include "cxcatch_export.h"
@@ -49,7 +49,7 @@ private:
 	int countTests();
 	std::vector<Catch::TestCase> getMatchingTests();
 
-	boost::shared_ptr<Catch::Session> mSession;
+	std::shared_ptr<Catch::Session> mSession;
 };
 
 } /* namespace cxtest */
