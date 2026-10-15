@@ -128,6 +128,8 @@ SlicedImageProxy::SlicedImageProxy()
 	mReslicer->SetInterpolationModeToLinear();
 	mReslicer->SetOutputDimensionality(2);
 	mReslicer->SetResliceAxes(mMatrixAxes);
+	// A slice is small: with one thread per core, starting the threads costs more than the slicing. Matters for video at 40 Hz.
+	mReslicer->SetNumberOfThreads(2);
 	//mReslicer->SetAutoCropOutput(false); //faster update rate
 	mReslicer->AutoCropOutputOn(); // fix used in 2.0.9, but slower update rate
 
