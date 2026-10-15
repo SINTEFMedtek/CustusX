@@ -26,10 +26,36 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+namespace
+{
+void setLayoutItemVisible(QLayoutItem* item, bool visible)
+{
+	if (!item)
+		return;
+	if (QWidget* widget = item->widget())
+	{
+		widget->setVisible(visible);
+	}
+	else if (QLayout* layout = item->layout())
+	{
+		for (int i = 0; i < layout->count(); ++i)
+			setLayoutItemVisible(layout->itemAt(i), visible);
+	}
+}
+
+/** Show or hide all widgets (label and input) in a row of a grid layout */
+void setGridRowVisible(QGridLayout* layout, int row, bool visible)
+{
+	for (int column = 0; column < layout->columnCount(); ++column)
+		setLayoutItemVisible(layout->itemAtPosition(row, column), visible);
+}
+}
+
 ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServicePtr reconstructer, PatientModelServicePtr patientModelService) :
 	BaseWidget(parent, "us_reconstruction", "US Reconstruction"),
 	mReconstructer(reconstructer),
-	mFileSelectWidget( new FileSelectWidget(this))
+	mFileSelectWidget( new FileSelectWidget(this)),
+	mOptionsLayout(NULL)
 {
 	this->setToolTip("Reconstruct 3D US data from an acquired 2D sequence");
 	connect(mReconstructer.get(), &UsReconstructionService::reconstructAboutToStart, this, &ReconstructionWidget::reconstructAboutToStartSlot);
@@ -95,6 +121,16 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 
 	QWidget* presetTFWidget = sscCreateDataWidget(this, mReconstructer->getParam("Preset"));
 	topLayout->addWidget(presetTFWidget);
+	topLayout->addWidget(sscCreateDataWidget(this, mReconstructer->getParam("Reduce mask (% in 1D)")));
+
+	mDimXWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyXDim(mReconstructer)));
+	mDimYWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyYDim(mReconstructer)));
+	mDimZWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyZDim(mReconstructer)));
+	QHBoxLayout* outputVolDimLayout = new QHBoxLayout;
+	outputVolDimLayout->addWidget(mDimXWidget);
+	outputVolDimLayout->addWidget(mDimYWidget);
+	outputVolDimLayout->addWidget(mDimZWidget);
+	topLayout->addLayout(outputVolDimLayout);
 
 	mOptionsWidget = this->createOptionsWidget();
 	mOptionsWidget->setVisible(settings()->value("reconstruction/guiShowDetails").toBool());
@@ -121,6 +157,7 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	QWidget* retval = new QWidget(this);
 	QGridLayout* layout = new QGridLayout(retval);
 	layout->setMargin(0);
+	mOptionsLayout = layout;
 
 	int line = 0;
 
@@ -149,28 +186,49 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	sscCreateDataWidget(this, mReconstructer->getParam("Orientation"), layout, line++);
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 2);
 
-	mDimXWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyXDim(mReconstructer)));
-	mDimYWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyYDim(mReconstructer)));
-	mDimZWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyZDim(mReconstructer)));
-	QHBoxLayout* outputVolDimLayout = new QHBoxLayout;
-	outputVolDimLayout->addWidget(mDimXWidget);
-	outputVolDimLayout->addWidget(mDimYWidget);
-	outputVolDimLayout->addWidget(mDimZWidget);
-	layout->addLayout(outputVolDimLayout, line++, 0, 1, 2);
-
 	sscCreateDataWidget(this, mReconstructer->getParam("Align timestamps"), layout, line++);
 	sscCreateDataWidget(this, mReconstructer->getParam("Extra Temporal Calib"), layout, line++);
 //    sscCreateDataWidget(this, mReconstructer->getParam("Position Thinning"), layout, line++);
 	sscCreateDataWidget(this, mReconstructer->getParam("Position Filter"), layout, line++);
-    sscCreateDataWidget(this, mReconstructer->getParam("Position Filter Strength"), layout, line++);
-	sscCreateDataWidget(this, mReconstructer->getParam("Holt alpha"), layout, line++);
-	sscCreateDataWidget(this, mReconstructer->getParam("Holt beta"), layout, line++);
-	sscCreateDataWidget(this, mReconstructer->getParam("Holt both directions"), layout, line++);
-	sscCreateDataWidget(this, mReconstructer->getParam("Holt add trend"), layout, line++);
-	sscCreateDataWidget(this, mReconstructer->getParam("Reduce mask (% in 1D)"), layout, line++);
+	mMovingAverageRows.clear();
+	mHoltRows.clear();
+	mMovingAverageRows.push_back(line);
+	sscCreateDataWidget(this, mReconstructer->getParam("Position Filter Strength"), layout, line++);
+	QStringList holtParameters = QStringList() << "Holt alpha" << "Holt beta" << "Holt both directions" << "Holt add trend";
+	for (int i = 0; i < holtParameters.size(); ++i)
+	{
+		mHoltRows.push_back(line);
+		sscCreateDataWidget(this, mReconstructer->getParam(holtParameters[i]), layout, line++);
+	}
 	sscCreateDataWidget(this, mReconstructer->getParam("Save processed positions"), layout, line++);
 
+	// The parameters that are shown or enabled depend on other parameters
+	QStringList controllingParameters = QStringList() << "Position Filter" << "Align timestamps";
+	for (int i = 0; i < controllingParameters.size(); ++i)
+		connect(mReconstructer->getParam(controllingParameters[i]).get(), &Property::changed, this, &ReconstructionWidget::updateParameterStates);
+	this->updateParameterStates();
+
 	return retval;
+}
+
+void ReconstructionWidget::updateParameterStates()
+{
+	if (mOptionsLayout)
+	{
+		// Show only the parameters of the selected position filter
+		QString filter = mReconstructer->getParam("Position Filter")->getValueAsVariant().toString();
+		for (unsigned i = 0; i < mMovingAverageRows.size(); ++i)
+			setGridRowVisible(mOptionsLayout, mMovingAverageRows[i], filter == "Moving average");
+		for (unsigned i = 0; i < mHoltRows.size(); ++i)
+			setGridRowVisible(mOptionsLayout, mHoltRows[i], filter == "Holt");
+	}
+
+	// An estimated time lag that is applied replaces the user's time calibration, and aligned time stamps make an extra calibration meaningless
+	bool applyLag = mApplyLagProperty && mApplyLagProperty->getValueAsVariant().toBool();
+	PropertyPtr align = mReconstructer->getParam("Align timestamps");
+	PropertyPtr extra = mReconstructer->getParam("Extra Temporal Calib");
+	align->setEnabled(!applyLag);
+	extra->setEnabled(!applyLag && !align->getValueAsVariant().toBool());
 }
 
 void ReconstructionWidget::repopulateAlgorithmGroup()
@@ -218,6 +276,20 @@ void ReconstructionWidget::createNewStackedWidget(QString algoName)
 	{
 		sscCreateDataWidget(oneAlgoWidget, algoOption[row], oneAlgoLayout, row);
 	}
+
+	// Algorithms that apply an estimated time lag (option uid 'applyLag') replace the time calibration parameters
+	if (mApplyLagProperty)
+		disconnect(mApplyLagProperty.get(), NULL, this, NULL);
+	mApplyLagProperty.reset();
+	for (unsigned i = 0; i < algoOption.size(); ++i)
+	{
+		if (algoOption[i]->getUid() == "applyLag" && std::dynamic_pointer_cast<BoolProperty>(algoOption[i]))
+		{
+			mApplyLagProperty = algoOption[i];
+			connect(mApplyLagProperty.get(), &Property::changed, this, &ReconstructionWidget::updateParameterStates);
+		}
+	}
+	this->updateParameterStates();
 	oneAlgoLayout->setRowStretch(row, 1); // Set stretch on last row
 
 	mAlgoLayout->setCurrentWidget(oneAlgoWidget);

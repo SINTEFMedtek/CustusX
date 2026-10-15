@@ -69,6 +69,9 @@ private slots:
 	void reconstructAboutToStartSlot();
 
 	void updateFileSelectorPath(QString path);
+	/** Show only the parameters of the selected position filter, and enable/disable the time calibration parameters
+	 *  that are not used with the current selections. */
+	void updateParameterStates();
 private:
 	UsReconstructionServicePtr mReconstructer;
 
@@ -88,6 +91,10 @@ private:
 	std::vector<QWidget*> mAlgoWidgets;
 
 	QWidget* mOptionsWidget;
+	QGridLayout* mOptionsLayout;
+	std::vector<int> mMovingAverageRows; ///< Rows in mOptionsLayout with the parameters of the moving average filter
+	std::vector<int> mHoltRows; ///< Rows in mOptionsLayout with the parameters of the Holt filter
+	PropertyPtr mApplyLagProperty; ///< Option 'Apply estimated time lag' of the selected algorithm, if it has one
 	QWidget* createOptionsWidget();
 	QString getCurrentPath();
 	void updateComboBox();

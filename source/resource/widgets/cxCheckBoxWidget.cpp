@@ -69,6 +69,7 @@ void CheckBoxWidget::prePaintEvent()
 
 	this->setEnabled(mData->getEnabled());
 	mCheckBox->setEnabled(mData->getEnabled());
+	mLabel->setEnabled(mData->getEnabled());
 
 	mCheckBox->setChecked(mData->getValue());
 	mCheckBox->setToolTip(mData->getHelp());
