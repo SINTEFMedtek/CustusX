@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "cxPlaybackTime.h"
 #include "cxBronchoscopyTool.h"
+#include <algorithm>
 #include <QApplication>
 #include "cxUtilHelpers.h"
 #include "cxManualTool.h"
@@ -51,12 +52,12 @@ TrackingSystemBronchoscopyService::TrackingSystemBronchoscopyService(TrackingSer
 	mProjectionCenterline(projectionCenterline),
 	mTool(tool)
 {
-	mBase = this->getIGSTKTrackingSystemService();
-
-	connect(mBase.get(), &TrackingSystemService::stateChanged, this, &TrackingSystemBronchoscopyService::onStateChanged);
 	if (!mTool)
 		mTool = mTrackingService->getActiveTool(); // Use active tool if tool is not set
-	this->onStateChanged();
+
+	this->setBase(findTrackingSystemWithTool(mTrackingService->getTrackingSystems(), mTool));
+	if (!mBase)
+		reportWarning("Bronchoscopy navigation: Found no tracking system with the tool to lock to the centerline.");
 }
 
 TrackingSystemBronchoscopyService::~TrackingSystemBronchoscopyService()
@@ -69,22 +70,34 @@ bool TrackingSystemBronchoscopyService::setTrackingSystem(QString trackingSystem
 	for (int i=0; i<trackingSystems.size(); i++)
 		if (trackingSystems[i]->getUid() == trackingSystemName)
 		{
-			mBase = trackingSystems[i];
-			this->onStateChanged();
+			this->setBase(trackingSystems[i]);
 			return true;
 		}
 	return false;
 }
 
-TrackingSystemServicePtr TrackingSystemBronchoscopyService::getIGSTKTrackingSystemService()
+TrackingSystemServicePtr TrackingSystemBronchoscopyService::findTrackingSystemWithTool(std::vector<TrackingSystemServicePtr> trackingSystems, ToolPtr tool)
 {
-	std::vector<TrackingSystemServicePtr> trackingSystems = mTrackingService->getTrackingSystems();
+	if (!tool)
+		return TrackingSystemServicePtr();
+
 	for (unsigned i = 0; i < trackingSystems.size(); ++i)
 	{
-		if(trackingSystems[i]->getUid() == "org.custusx.core.tracking.system.igstk")
+		std::vector<ToolPtr> tools = trackingSystems[i]->getTools();
+		if (std::find(tools.begin(), tools.end(), tool) != tools.end())
 			return trackingSystems[i];
 	}
 	return TrackingSystemServicePtr();
+}
+
+void TrackingSystemBronchoscopyService::setBase(TrackingSystemServicePtr base)
+{
+	if (mBase)
+		disconnect(mBase.get(), &TrackingSystemService::stateChanged, this, &TrackingSystemBronchoscopyService::onStateChanged);
+	mBase = base;
+	if (mBase)
+		connect(mBase.get(), &TrackingSystemService::stateChanged, this, &TrackingSystemBronchoscopyService::onStateChanged);
+	this->onStateChanged();
 }
 
 void TrackingSystemBronchoscopyService::setTool(ToolPtr tool)
@@ -94,8 +107,13 @@ void TrackingSystemBronchoscopyService::setTool(ToolPtr tool)
 
 void TrackingSystemBronchoscopyService::onStateChanged()
 {
-	std::vector<ToolPtr> tools	 = mBase->getTools();
 	mTools.clear();
+	if (!mBase)
+	{
+		emit stateChanged();
+		return;
+	}
+	std::vector<ToolPtr> tools	 = mBase->getTools();
 	for (unsigned i=0; i<tools.size(); ++i)
 	{
 		if (tools[i] == mTool)

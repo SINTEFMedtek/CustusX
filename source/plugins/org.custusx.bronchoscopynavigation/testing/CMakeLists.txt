@@ -1,18 +1,31 @@
 
-if (BUILD_TESTING)
-    include_directories(
+if(BUILD_TESTING)
+
+    set(CX_TEST_CATCH_org_custusx_bronchoscopynavigation_MOC_SOURCE_FILES
     )
+    set(CX_TEST_CATCH_org_custusx_bronchoscopynavigation_SOURCE_FILES
+        cxtestTrackingSystemBronchoscopyService.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
+        )
 
-
-    set(CX_TEST_CATCH_ORG_CUSTUSX_EXAMPLE_MOC_SOURCE_FILES
+    qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_bronchoscopynavigation_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_bronchoscopynavigation_MOC_SOURCE_FILES})
+    add_library(cxtest_org_custusx_bronchoscopynavigation ${CX_TEST_CATCH_org_custusx_bronchoscopynavigation_SOURCE_FILES} ${CX_TEST_CATCH_org_custusx_bronchoscopynavigation_MOC_SOURCE_FILES})
+    include(GenerateExportHeader)
+    generate_export_header(cxtest_org_custusx_bronchoscopynavigation)
+    target_include_directories(cxtest_org_custusx_bronchoscopynavigation
+        PUBLIC
+        .
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${org_custusx_bronchoscopynavigation_BINARY_DIR}
     )
-	set(CX_TEST_CATCH_ORG_CUSTUSX_EXAMPLE_SOURCE_FILES
-		${CX_TEST_CATCH_ORG_CUSTUSX_EXAMPLE_MOC_SOURCE_FILES}
-		cxtestExamplePlugin.cpp
-		)
+    target_link_libraries(
+        cxtest_org_custusx_bronchoscopynavigation
+        PRIVATE
+        cxtestUtilities
+        cxResource
+        org_custusx_bronchoscopynavigation
+        cxCatch
+    )
+    cx_add_tests_to_catch(cxtest_org_custusx_bronchoscopynavigation)
 
-    cx_catch_add_lib_and_exe(org_custusx_example 
-        "${CX_TEST_CATCH_ORG_CUSTUSX_EXAMPLE_SOURCE_FILES}" 
-        "${CX_TEST_CATCH_ORG_CUSTUSX_EXAMPLE_MOC_SOURCE_FILES}")
-
-endif (BUILD_TESTING)
+endif(BUILD_TESTING)
