@@ -262,6 +262,7 @@ ReconstructCore::InputParams UsReconstructionImplService::createCoreParameters()
 	par.mHoltBeta = mParams->getHoltBeta()->getValue();
 	par.mHoltBothDirections = mParams->getHoltBothDirections()->getValue();
 	par.mHoltAddTrend = mParams->getHoltAddTrend()->getValue();
+	par.mWriteProcessedPositions = mParams->getWriteProcessedPositions()->getValue();
 	par.mMaskReduce = mParams->getMaskReduce()->getValue().toDouble();
 	par.mOrientation = mParams->getOrientationAdapter()->getValue();
 	return par;

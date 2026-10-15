@@ -100,6 +100,8 @@ public:
 private:
 	bool validInputData() const;
 	void writeProcessedPositions();
+	QString getProcessedPositionsFileBase() const;
+	void writeProcessedPositions(QString base);
 	QString generateOutputUid();
 	QString generateImageName(QString uid) const;
 

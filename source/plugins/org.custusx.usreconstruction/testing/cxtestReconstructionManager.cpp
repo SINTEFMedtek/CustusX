@@ -187,6 +187,54 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 
 }
 
+namespace
+{
+/** Asks for a time lag estimate, and returns one that is not to be applied */
+class NotAppliedTimeLagAlgorithm : public cx::ReconstructionMethodService
+{
+public:
+	virtual QString getName() const { return "NotAppliedTimeLag"; }
+	virtual std::vector<cx::PropertyPtr> getSettings(QDomElement root) { Q_UNUSED(root); return std::vector<cx::PropertyPtr>(); }
+	virtual bool reconstruct(cx::ProcessedUSInputDataPtr input, vtkImageDataPtr outputData, QDomElement settings)
+	{
+		Q_UNUSED(input); Q_UNUSED(outputData); Q_UNUSED(settings);
+		return false;
+	}
+	virtual bool isTimeLagEstimateRequested(QDomElement settings) { Q_UNUSED(settings); return true; }
+	virtual cx::TimeLagEstimate estimateTimeLag(cx::ProcessedUSInputDataPtr input, QDomElement settings)
+	{
+		Q_UNUSED(input); Q_UNUSED(settings);
+		cx::TimeLagEstimate retval;
+		retval.valid = true;
+		retval.apply = false;
+		return retval;
+	}
+};
+}
+
+TEST_CASE("ReconstructPreprocessor: images and positions match after a time lag estimate that is not applied", "[unit][usreconstruction][synthetic]")
+{
+	SyntheticReconstructInputPtr generator(new SyntheticReconstructInput);
+	generator->defineProbe(cx::DummyToolTestUtilities::createProbeDefinitionLinear(100, 100, Eigen::Array2i(150,150)));
+	generator->setSpherePhantom();
+	cx::USReconstructInputData inputData = generator->generateSynthetic_USReconstructInputData();
+	unsigned recordedFrames = inputData.mFrames.size();
+
+	// Removes the frames without tracking data with the user settings, but not when estimating the lag
+	cx::ReconstructCore::InputParams par;
+	par.mExtraTimeCalibration = 300;
+	cx::ReconstructPreprocessorPtr preprocessor(new cx::ReconstructPreprocessor(cx::PatientModelService::getNullObject()));
+	preprocessor->initialize(par, inputData);
+	NotAppliedTimeLagAlgorithm algorithm;
+	CHECK_FALSE(preprocessor->estimateAndApplyTimeLag(&algorithm));
+
+	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(std::vector<bool>(1, false));
+	REQUIRE(processedInput.size() == 1);
+	unsigned frames = processedInput[0]->getFrames().size();
+	CHECK(frames < recordedFrames);
+	CHECK(processedInput[0]->getDimensions()[2] == int(frames));
+}
+
 TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic][not_win32]")
 {
 	ReconstructionManagerTestFixture fixture;

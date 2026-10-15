@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXRECONSTRUCTPREPROCESSOR_H_
 #define CXRECONSTRUCTPREPROCESSOR_H_
 
+#include <map>
 #include "org_custusx_usreconstruction_Export.h"
 #include <memory>
 
@@ -22,6 +23,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
+struct TimeLagEstimate;
+struct RemoveDataType;
 typedef std::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
 
 /** \brief Algorithm part of reconstruction -
@@ -57,11 +60,13 @@ private:
 	void cropInputData();
 	IntBoundingBox3D reduceCropboxToImageSize(IntBoundingBox3D cropbox, QSize size);
 	void updateFromOriginalFileData();
-	void processPositions();
+	void processPositions(bool reportRemovedFrames); ///< reportRemovedFrames: false when repeated with other settings
+	TimeLagEstimate estimateTimeLag(ReconstructionMethodService* algorithm);
+	void reportRemovedFrames(const std::map<unsigned, RemoveDataType>& removedData, unsigned startFrames);
 	void findExtentAndOutputTransform();
 	Transform3D applyOutputOrientation();
 	std::vector<Vector3D> generateInputRectangle();
-	void interpolatePositions();
+	void interpolatePositions(bool reportRemovedFrames);
 	double timeToPosition(unsigned i_frame, unsigned i_pos);
 	void filterPositions(); // Noise-supressing position filter, averaging filter, configurable length
 	void positionThinning(); // If enabled, try to remove "suspect" data (large jumps etc.)

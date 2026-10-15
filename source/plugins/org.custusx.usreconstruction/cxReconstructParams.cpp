@@ -123,6 +123,12 @@ void ReconstructParams::createParameters()
 	connect(mHoltAddTrend.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 	this->add(mHoltAddTrend);
 
+	mWriteProcessedPositions = BoolProperty::initialize("Save processed positions", "",
+		"Save the positions used by the reconstruction, after filtering, time calibration and any correction by the algorithm, "
+		"next to the input data as .tp.corr and .tts.corr.", false,
+		mSettings.getElement());
+	this->add(mWriteProcessedPositions);
+
     mAlignTimestamps = BoolProperty::initialize("Align timestamps", "",
 		"Align the first of tracker and frame timestamps, ignoring lags.", false,
 		mSettings.getElement());

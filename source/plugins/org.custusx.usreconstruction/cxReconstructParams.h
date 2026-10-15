@@ -53,6 +53,7 @@ public:
 	DoublePropertyPtr getHoltBeta() { this->createParameters(); return mHoltBeta; }
 	BoolPropertyPtr getHoltBothDirections() { this->createParameters(); return mHoltBothDirections; }
 	BoolPropertyPtr getHoltAddTrend() { this->createParameters(); return mHoltAddTrend; }
+	BoolPropertyPtr getWriteProcessedPositions() { this->createParameters(); return mWriteProcessedPositions; }
 	BoolPropertyPtr getAlignTimestamps() { this->createParameters(); return mAlignTimestamps; }
     BoolPropertyPtr getPositionThinning() { this->createParameters(); return mPositionThinning; }
 	DoublePropertyPtr getTimeCalibration() { this->createParameters(); return mTimeCalibration; }
@@ -82,6 +83,7 @@ private:
 	DoublePropertyPtr mHoltBeta; ///< Holt filter trend smoothing
 	BoolPropertyPtr mHoltBothDirections; ///< Holt filter forward and backward
 	BoolPropertyPtr mHoltAddTrend; ///< Holt filter output level + trend
+	BoolPropertyPtr mWriteProcessedPositions;
 	BoolPropertyPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
     BoolPropertyPtr mPositionThinning; ///remove outlier positions from position sequence
 	DoublePropertyPtr mTimeCalibration; ///set a offset in the frame timestamps
