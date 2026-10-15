@@ -161,7 +161,12 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	sscCreateDataWidget(this, mReconstructer->getParam("Align timestamps"), layout, line++);
 	sscCreateDataWidget(this, mReconstructer->getParam("Extra Temporal Calib"), layout, line++);
 //    sscCreateDataWidget(this, mReconstructer->getParam("Position Thinning"), layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Position Filter"), layout, line++);
     sscCreateDataWidget(this, mReconstructer->getParam("Position Filter Strength"), layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Holt alpha"), layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Holt beta"), layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Holt both directions"), layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Holt add trend"), layout, line++);
 	sscCreateDataWidget(this, mReconstructer->getParam("Reduce mask (% in 1D)"), layout, line++);
 
 	return retval;

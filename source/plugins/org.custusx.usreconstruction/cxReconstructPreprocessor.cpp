@@ -194,6 +194,20 @@ struct RemoveDataType
 
 void ReconstructPreprocessor::filterPositions()
 {
+	if (mInput.mPosFilterType == "Off")
+		return;
+	if (mInput.mPosFilterType == "Holt")
+	{
+		CX_LOG_DEBUG() << QString("Position filter: Holt, alpha=%1, beta=%2%3%4")
+						  .arg(mInput.mHoltAlpha).arg(mInput.mHoltBeta)
+						  .arg(mInput.mHoltBothDirections ? ", forward and backward" : ", forward only")
+						  .arg(mInput.mHoltAddTrend ? ", level + trend" : "");
+		HoltPositionFilter holtFilter(mFileData.mPositions, mInput.mHoltAlpha, mInput.mHoltBeta, mInput.mHoltBothDirections, mInput.mHoltAddTrend);
+		holtFilter.filterPositions();
+		return;
+	}
+
+	// Moving average (default)
 	unsigned filterStrength = mInput.mPosFilterStrength;
 	CX_LOG_DEBUG() << "Filter length specified " << filterStrength;
 	//PositionsPtr positions = new PositionsPtr(mFileData.mPositions);

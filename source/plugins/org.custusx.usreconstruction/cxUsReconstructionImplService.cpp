@@ -257,6 +257,11 @@ ReconstructCore::InputParams UsReconstructionImplService::createCoreParameters()
 	par.mAlignTimestamps = mParams->getAlignTimestamps()->getValue();
     par.mPositionThinning = mParams->getPositionThinning()->getValue();
     par.mPosFilterStrength = mParams->getPosFilterStrength()->getValue().toDouble();;
+	par.mPosFilterType = mParams->getPosFilterType()->getValue();
+	par.mHoltAlpha = mParams->getHoltAlpha()->getValue();
+	par.mHoltBeta = mParams->getHoltBeta()->getValue();
+	par.mHoltBothDirections = mParams->getHoltBothDirections()->getValue();
+	par.mHoltAddTrend = mParams->getHoltAddTrend()->getValue();
 	par.mMaskReduce = mParams->getMaskReduce()->getValue().toDouble();
 	par.mOrientation = mParams->getOrientationAdapter()->getValue();
 	return par;
