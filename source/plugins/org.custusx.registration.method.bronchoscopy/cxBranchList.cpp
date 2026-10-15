@@ -448,6 +448,27 @@ double branchLength(BranchPtr branch)
 	return retval;
 }
 
+/** Length from the start of branch to its farthest end branch, along the branches. */
+double lengthToFarthestEnd(BranchPtr branch)
+{
+	double longestChild = 0;
+	for (BranchPtr child : branch->getChildBranches())
+	{
+		longestChild = std::max(longestChild, lengthToFarthestEnd(child));
+	}
+	return branchLength(branch) + longestChild;
+}
+
+/** Appends branch and all branches below it (children, grandchildren, ...) to branches. */
+void appendWithDescendants(BranchPtr branch, branchVector& branches)
+{
+	branches.push_back(branch);
+	for (BranchPtr child : branch->getChildBranches())
+	{
+		appendWithDescendants(child, branches);
+	}
+}
+
 int countDescendants(BranchPtr branch)
 {
 	int retval = 0;
@@ -501,7 +522,7 @@ void BranchList::mergeAllSingleChildren()
 	}
 }
 
-/** Removes end branches shorter than maxLength from the trachea, then from the main bronchi. */
+/** Removes spurs ending within maxLength from the trachea, then from the main bronchi. */
 void BranchList::removeShortEndBranchesFromMainAirways(double maxLength)
 {
 	if (!mBranches.empty())
@@ -515,8 +536,8 @@ void BranchList::removeShortEndBranchesFromMainAirways(double maxLength)
 	}
 }
 
-/** Removes end branches shorter than maxLength from branch, as long as another child remains,
- *  then merges a remaining single child into branch. Repeats until no more are removed. */
+/** Removes children of branch that end within maxLength, counting their own children too, as long as
+ *  another child remains, then merges a remaining single child into branch. Repeats until no more are removed. */
 void BranchList::removeShortEndBranches(BranchPtr branch, double maxLength)
 {
 	bool removed = true;
@@ -527,7 +548,7 @@ void BranchList::removeShortEndBranches(BranchPtr branch, double maxLength)
 		branchVector spurs;
 		for (BranchPtr child : branch->getChildBranches())
 		{
-			if (child->getChildBranches().empty() && branchLength(child) < maxLength)
+			if (lengthToFarthestEnd(child) < maxLength)
 			{
 				spurs.push_back(child);
 			}
@@ -538,9 +559,14 @@ void BranchList::removeShortEndBranches(BranchPtr branch, double maxLength)
 		}
 		if (!spurs.empty() && !kept.empty())
 		{
+			branchVector removedBranches;
 			for (BranchPtr spur : spurs)
 			{
-				mBranches.erase(std::remove(mBranches.begin(), mBranches.end(), spur), mBranches.end());
+				appendWithDescendants(spur, removedBranches);
+			}
+			for (BranchPtr removedBranch : removedBranches)
+			{
+				mBranches.erase(std::remove(mBranches.begin(), mBranches.end(), removedBranch), mBranches.end());
 			}
 			branch->setChildBranches(kept);
 			mergeSingleChildInto(branch);

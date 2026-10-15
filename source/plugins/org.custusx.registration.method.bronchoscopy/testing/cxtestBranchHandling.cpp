@@ -163,7 +163,7 @@ TEST_CASE("BranchList: a short end branch on the trachea is removed and the trac
 	CHECK(right->getParentBranch() == trachea);
 }
 
-TEST_CASE("BranchList: long or branching children of the trachea are kept", "[unit][bronchoscopy]")
+TEST_CASE("BranchList: a short child of the trachea is kept when its own child makes it long", "[unit][bronchoscopy]")
 {
 	cx::BranchPtr trachea = createBranch(Eigen::Vector3d(0, 0, 100), Eigen::Vector3d(0, 0, -1), 40);
 	cx::BranchPtr left = createBranch(Eigen::Vector3d(-1, 0, 59), Eigen::Vector3d(-1, 0, -1), 15);
@@ -182,6 +182,60 @@ TEST_CASE("BranchList: long or branching children of the trachea are kept", "[un
 
 	CHECK(branchList->getBranches().size() == 4);
 	CHECK(trachea->getChildBranches().size() == 2);
+}
+
+TEST_CASE("BranchList: a short spur with short children on the trachea is removed with its children", "[unit][bronchoscopy]")
+{
+	cx::BranchPtr trachea = createBranch(Eigen::Vector3d(0, 0, 100), Eigen::Vector3d(0, 0, -1), 40);
+	cx::BranchPtr spur = createBranch(Eigen::Vector3d(1, 0, 60), Eigen::Vector3d(1, 0, 0), 4);
+	cx::BranchPtr spurA = createBranch(Eigen::Vector3d(5, 0, 60), Eigen::Vector3d(1, 1, 0), 3);
+	cx::BranchPtr spurB = createBranch(Eigen::Vector3d(5, 0, 60), Eigen::Vector3d(1, -1, 0), 3);
+	cx::BranchPtr lowerTrachea = createBranch(Eigen::Vector3d(0, 0, 59), Eigen::Vector3d(0, 0, -1), 30);
+	cx::BranchPtr left = createBranch(Eigen::Vector3d(-1, 0, 28), Eigen::Vector3d(-1, 0, -1), 20);
+	cx::BranchPtr right = createBranch(Eigen::Vector3d(1, 0, 28), Eigen::Vector3d(1, 0, -1), 20);
+	connect(trachea, spur);
+	connect(spur, spurA);
+	connect(spur, spurB);
+	connect(trachea, lowerTrachea);
+	connect(lowerTrachea, left);
+	connect(lowerTrachea, right);
+	cx::BranchListPtr branchList(new cx::BranchList());
+	for (cx::BranchPtr branch : {trachea, spur, spurA, spurB, lowerTrachea, left, right})
+	{
+		branchList->addBranch(branch);
+	}
+
+	branchList->removeShortEndBranchesFromMainAirways(10);
+
+	REQUIRE(branchList->getBranches().size() == 3);
+	CHECK(branchList->getBranches()[0] == trachea);
+	CHECK(trachea->getPositions().cols() == 41 + 31);
+	REQUIRE(trachea->getChildBranches().size() == 2);
+	CHECK(left->getParentBranch() == trachea);
+	CHECK(right->getParentBranch() == trachea);
+}
+
+TEST_CASE("BranchList: a short child of the trachea is kept when its children reach the limit", "[unit][bronchoscopy]")
+{
+	cx::BranchPtr trachea = createBranch(Eigen::Vector3d(0, 0, 100), Eigen::Vector3d(0, 0, -1), 40);
+	cx::BranchPtr left = createBranch(Eigen::Vector3d(-1, 0, 59), Eigen::Vector3d(-1, 0, -1), 20);
+	cx::BranchPtr right = createBranch(Eigen::Vector3d(1, 0, 59), Eigen::Vector3d(1, 0, -1), 4);
+	cx::BranchPtr rightA = createBranch(Eigen::Vector3d(5, 0, 55), Eigen::Vector3d(1, 0, -1), 6);
+	cx::BranchPtr rightB = createBranch(Eigen::Vector3d(5, 0, 55), Eigen::Vector3d(0, 0, -1), 3);
+	connect(trachea, left);
+	connect(trachea, right);
+	connect(right, rightA);
+	connect(right, rightB);
+	cx::BranchListPtr branchList(new cx::BranchList());
+	for (cx::BranchPtr branch : {trachea, left, right, rightA, rightB})
+	{
+		branchList->addBranch(branch);
+	}
+
+	branchList->removeShortEndBranchesFromMainAirways(10);
+
+	CHECK(trachea->getChildBranches().size() == 2);
+	CHECK(right->getParentBranch() == trachea);
 }
 
 TEST_CASE("BranchList: the trachea keeps its children if all of them are short end branches", "[unit][bronchoscopy]")

@@ -31,7 +31,7 @@ typedef std::vector< Eigen::Matrix4d > M4Vector;
 #define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_EXISTING_BRANCH 60 //deg
 #define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_NEW_BRANCH 40 //deg
 #define MAX_ORIENTATION_VARIANCE_IN_NEW_BRANCH 0.6 // To exclude "noisy" branches which are difficult to connect correctly
-#define MAX_MAIN_AIRWAY_SPUR_LENGTH 10 //mm. Shorter end branches on the trachea or main bronchi are spurs, not airways.
+#define MAX_MAIN_AIRWAY_SPUR_LENGTH 10 //mm. Branches on the trachea or main bronchi that end within this length, also through their children, are spurs, not airways.
 
 
 class org_custusx_registration_method_bronchoscopy_EXPORT BranchList
