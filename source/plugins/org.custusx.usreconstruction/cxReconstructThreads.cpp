@@ -54,7 +54,9 @@ void ThreadedTimedReconstructPreprocessor::calculate()
 		angio.push_back(mCores[i]->getInputParams().mAngio);
 
 	if (!mCores.empty())
+	{
 		mInput->estimateAndApplyTimeLag(mCores[0]->getAlgorithm());
+	}
 
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = mInput->createProcessedInput(angio);
 	if(processedInput.size() < mCores.size())

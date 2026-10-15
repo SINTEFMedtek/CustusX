@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUSFrameData.h"
 
 #include <QFileInfo>
+#include <algorithm>
 #include <vtkImageData.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageClip.h>
@@ -54,9 +55,7 @@ void ProcessedUSInputData::setFramePositionsUsed(std::vector<TimedPosition> fram
 
 std::vector<TimedPosition> ProcessedUSInputData::getFramePositionsUsed() const
 {
-	if (mFramePositionsUsed.empty())
-		return mFrames;
-	return mFramePositionsUsed;
+	return mFramePositionsUsed.empty() ? mFrames : mFramePositionsUsed;
 }
 
 void ProcessedUSInputData::setTrackingTransforms(Transform3D prMd, Transform3D tMu)
@@ -216,7 +215,7 @@ USFrameDataPtr USFrameData::create(QString name, std::vector<vtkImageDataPtr> fr
 
 
 USFrameData::USFrameData() :
-		mCropbox(0,0,0,0,0,0), mPurgeInput(true)
+		mCropbox(0,0,0,0,0,0), mPurgeInput(true), mKeepGrayscaleFrames(false)
 {
 }
 
@@ -283,6 +282,7 @@ void USFrameData::setCropBox(IntBoundingBox3D cropbox)
 	cropbox[4] = -100000;
 	cropbox[5] =  100000;
 	mCropbox = cropbox;
+	mGrayscaleFrames.clear();
 }
 
 /** Crop the image by setting the wholeExtent.
@@ -459,6 +459,11 @@ void USFrameData::setPurgeInputDataAfterInitialize(bool value)
 	mPurgeInput = value;
 }
 
+void USFrameData::setKeepGrayscaleFrames(bool keep)
+{
+	mKeepGrayscaleFrames = keep;
+}
+
 std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::vector<bool> angio)
 {
 
@@ -469,17 +474,31 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 		raw[i].resize(mReducedToFull.size());
 	}
 
+	bool anyAngio = std::find(angio.begin(), angio.end(), true) != angio.end();
+
 	// apply cropping and angio
 	for (unsigned i=0; i<mReducedToFull.size(); ++i)
 	{
-		CX_ASSERT(mImageContainer->size() > mReducedToFull[i]);
-		vtkImageDataPtr current = mImageContainer->get(mReducedToFull[i]);
+		// optimization: grayFrame is used in both calculations: compute once, or reuse a kept frame
+		std::map<int, vtkImageDataPtr>::iterator kept = mGrayscaleFrames.find(mReducedToFull[i]);
+		vtkImageDataPtr grayFrame = (kept != mGrayscaleFrames.end()) ? kept->second : vtkImageDataPtr();
+		vtkImageDataPtr current;
+		if (!grayFrame || anyAngio)
+		{
+			CX_ASSERT(mImageContainer->size() > mReducedToFull[i]);
+			current = mImageContainer->get(mReducedToFull[i]);
 
-		if (mCropbox.range()[0]!=0)
-			current = this->cropImageExtent(current, mCropbox);
-
-		// optimization: grayFrame is used in both calculations: compute once
-		vtkImageDataPtr grayFrame = this->to8bitGrayscaleAndEffectuateCropping(current);
+			if (mCropbox.range()[0]!=0)
+				current = this->cropImageExtent(current, mCropbox);
+		}
+		if (!grayFrame)
+		{
+			grayFrame = this->to8bitGrayscaleAndEffectuateCropping(current);
+		}
+		if (mKeepGrayscaleFrames)
+		{
+			mGrayscaleFrames[mReducedToFull[i]] = grayFrame;
+		}
 
 		for (unsigned j=0; j<angio.size(); ++j)
 		{
@@ -501,6 +520,10 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 
 	if (mPurgeInput)
 		mImageContainer->purgeAll();
+	if (!mKeepGrayscaleFrames)
+	{
+		mGrayscaleFrames.clear();
+	}
 
 	return raw;
 }

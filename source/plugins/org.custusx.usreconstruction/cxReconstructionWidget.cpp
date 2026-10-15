@@ -30,16 +30,18 @@ namespace
 {
 void setLayoutItemVisible(QLayoutItem* item, bool visible)
 {
-	if (!item)
-		return;
-	if (QWidget* widget = item->widget())
+	QWidget* widget = item ? item->widget() : nullptr;
+	QLayout* layout = item ? item->layout() : nullptr;
+	if (widget)
 	{
 		widget->setVisible(visible);
 	}
-	else if (QLayout* layout = item->layout())
+	else if (layout)
 	{
 		for (int i = 0; i < layout->count(); ++i)
+		{
 			setLayoutItemVisible(layout->itemAt(i), visible);
+		}
 	}
 }
 
@@ -47,7 +49,9 @@ void setLayoutItemVisible(QLayoutItem* item, bool visible)
 void setGridRowVisible(QGridLayout* layout, int row, bool visible)
 {
 	for (int column = 0; column < layout->columnCount(); ++column)
+	{
 		setLayoutItemVisible(layout->itemAtPosition(row, column), visible);
+	}
 }
 }
 
@@ -219,7 +223,9 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	// The parameters that are shown or enabled depend on other parameters
 	QStringList controllingParameters = QStringList() << "Position Filter" << "Align timestamps";
 	for (int i = 0; i < controllingParameters.size(); ++i)
+	{
 		connect(mReconstructer->getParam(controllingParameters[i]).get(), &Property::changed, this, &ReconstructionWidget::updateParameterStates);
+	}
 	this->updateParameterStates();
 
 	return retval;
@@ -232,9 +238,13 @@ void ReconstructionWidget::updateParameterStates()
 		// Show only the parameters of the selected position filter
 		QString filter = mReconstructer->getParam("Position Filter")->getValueAsVariant().toString();
 		for (unsigned i = 0; i < mMovingAverageRows.size(); ++i)
+		{
 			setGridRowVisible(mOptionsLayout, mMovingAverageRows[i], filter == "Moving average");
+		}
 		for (unsigned i = 0; i < mHoltRows.size(); ++i)
+		{
 			setGridRowVisible(mOptionsLayout, mHoltRows[i], filter == "Holt");
+		}
 	}
 
 	// An estimated time lag that is applied replaces the user's time calibration, and aligned time stamps make an extra calibration meaningless
@@ -293,7 +303,9 @@ void ReconstructionWidget::createNewStackedWidget(QString algoName)
 
 	// Algorithms that apply an estimated time lag (option uid 'applyLag') replace the time calibration parameters
 	if (mApplyLagProperty)
+	{
 		disconnect(mApplyLagProperty.get(), NULL, this, NULL);
+	}
 	mApplyLagProperty.reset();
 	for (unsigned i = 0; i < algoOption.size(); ++i)
 	{

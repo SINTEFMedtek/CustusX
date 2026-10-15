@@ -27,7 +27,8 @@ class org_custusx_usreconstruction_EXPORT PositionFilter
 {
 public:
 	PositionFilter(unsigned filterStrength, std::vector<TimedPosition> &inputImagePositions);
-	void filterPositions();
+	virtual ~PositionFilter() {}
+	virtual void filterPositions();
 protected:
 	unsigned mFilterStrength;
 	std::vector<TimedPosition> *mInputImagePositions;
@@ -73,7 +74,7 @@ class org_custusx_usreconstruction_EXPORT HoltPositionFilter : public PositionFi
 {
 public:
 	HoltPositionFilter(std::vector<TimedPosition> &inputImagePositions, double alpha, double beta, bool bothDirections, bool addTrend);
-	void filterPositions();
+	void filterPositions() override;
 protected:
 	double mAlpha;
 	double mBeta;

@@ -274,6 +274,7 @@ TEST_CASE("HoltFilter: A signal that is linear in time is not changed, and the f
 {
 	Eigen::ArrayXXd input = buildLinearRows(60);
 	for (double alpha : {0.1, 0.5, 0.9})
+	{
 		for (double beta : {0.0, 0.3, 1.0})
 		{
 			INFO("alpha " << alpha << " beta " << beta);
@@ -285,6 +286,7 @@ TEST_CASE("HoltFilter: A signal that is linear in time is not changed, and the f
 			// With trend, the output is the level plus one step: ahead of the input
 			CHECK((withTrend.block(0, 1, 2, 58) - input.block(0, 2, 2, 58)).abs().maxCoeff() < 1e-9);
 		}
+	}
 }
 
 TEST_CASE("HoltFilter: Alpha 1 gives the input, a lower alpha gives less change between values","[unit][usreconstruction][synthetic]")

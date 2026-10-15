@@ -31,6 +31,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPositionFilter.h"
 
 #include <QThread>
+#include <memory>
 #include "cxReconstructionMethodService.h"
 
 namespace cx
@@ -194,25 +195,26 @@ struct RemoveDataType
 
 void ReconstructPreprocessor::filterPositions()
 {
-	if (mInput.mPosFilterType == "Off")
-		return;
+	std::unique_ptr<PositionFilter> filter;
 	if (mInput.mPosFilterType == "Holt")
 	{
 		CX_LOG_DEBUG() << QString("Position filter: Holt, alpha=%1, beta=%2%3%4")
 						  .arg(mInput.mHoltAlpha).arg(mInput.mHoltBeta)
 						  .arg(mInput.mHoltBothDirections ? ", forward and backward" : ", forward only")
 						  .arg(mInput.mHoltAddTrend ? ", level + trend" : "");
-		HoltPositionFilter holtFilter(mFileData.mPositions, mInput.mHoltAlpha, mInput.mHoltBeta, mInput.mHoltBothDirections, mInput.mHoltAddTrend);
-		holtFilter.filterPositions();
-		return;
+		filter.reset(new HoltPositionFilter(mFileData.mPositions, mInput.mHoltAlpha, mInput.mHoltBeta, mInput.mHoltBothDirections, mInput.mHoltAddTrend));
 	}
-
-	// Moving average (default)
-	unsigned filterStrength = mInput.mPosFilterStrength;
-	CX_LOG_DEBUG() << "Filter length specified " << filterStrength;
-	//PositionsPtr positions = new PositionsPtr(mFileData.mPositions);
-	PositionFilter positionFilter(filterStrength, mFileData.mPositions);
-	positionFilter.filterPositions();
+	else if (mInput.mPosFilterType != "Off")
+	{
+		// Moving average (default)
+		unsigned filterStrength = mInput.mPosFilterStrength;
+		CX_LOG_DEBUG() << "Filter length specified " << filterStrength;
+		filter.reset(new PositionFilter(filterStrength, mFileData.mPositions));
+	}
+	if (filter)
+	{
+		filter->filterPositions();
+	}
 }
 
 void ReconstructPreprocessor::positionThinning()
@@ -515,6 +517,7 @@ bool ReconstructPreprocessor::estimateAndApplyTimeLag(ReconstructionMethodServic
 	if (algorithm && algorithm->isTimeLagEstimateRequested(mInput.mAlgoSettings))
 	{
 		TimeLagEstimate estimate = this->estimateTimeLag(algorithm);
+		ReconstructCore::InputParams userInput = mInput;
 		applied = estimate.valid && estimate.apply;
 		if (applied)
 		{
@@ -525,6 +528,14 @@ bool ReconstructPreprocessor::estimateAndApplyTimeLag(ReconstructionMethodServic
 		}
 		// Process the positions again with the lag or the user settings, as this also selects the frames used
 		this->processPositions(applied);
+		if (applied && mFileData.mFrames.empty())
+		{
+			reportWarning(QString("The estimated time lag %1 ms leaves no frames with tracking data. "
+								  "Using the user selections 'Extra Temporal Calib' and 'Align timestamps' instead.").arg(estimate.lagMs, 0, 'f', 1));
+			mInput = userInput;
+			applied = false;
+			this->processPositions(true);
+		}
 	}
 	return applied;
 }
@@ -533,6 +544,7 @@ bool ReconstructPreprocessor::estimateAndApplyTimeLag(ReconstructionMethodServic
  * The estimate is made on data processed without any time calibration, so that it does not depend on the
  * user selections Extra Temporal Calib and Align timestamps. The user settings are restored afterwards, but the
  * positions must be processed again before they are used.
+ * The grayscale frames are kept, so that the reconstruction does not load and convert them again.
  */
 TimeLagEstimate ReconstructPreprocessor::estimateTimeLag(ReconstructionMethodService* algorithm)
 {
@@ -549,7 +561,9 @@ TimeLagEstimate ReconstructPreprocessor::estimateTimeLag(ReconstructionMethodSer
 	else
 	{
 		std::vector<bool> bmode(1, false);
+		mFileData.mUsRaw->setKeepGrayscaleFrames(true);
 		std::vector<ProcessedUSInputDataPtr> baseline = this->createProcessedInput(bmode);
+		mFileData.mUsRaw->setKeepGrayscaleFrames(false);
 		if (!baseline.empty())
 		{
 			retval = algorithm->estimateTimeLag(baseline[0], userInput.mAlgoSettings);

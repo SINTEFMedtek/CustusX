@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 #include <memory>
+#include <map>
 
 #include "cxProbeSector.h"
 #include "cxUSReconstructInputData.h"
@@ -124,6 +125,7 @@ public:
 	void setCropBox(IntBoundingBox3D mCropbox);
 	void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
 	void setPurgeInputDataAfterInitialize(bool value);
+	void setKeepGrayscaleFrames(bool keep); ///< Keep the grayscale frames made by initializeFrames(), so that the next call reuses them instead of loading and converting again
 
 	/** Use the input raw data and control parameters to generate filtered frames.
 	  * The input angio controls how many output objects that will be created, and if each
@@ -150,6 +152,8 @@ protected:
 	QString mName;
 	cx::ImageDataContainerPtr mImageContainer;
 	bool mPurgeInput;
+	bool mKeepGrayscaleFrames;
+	std::map<int, vtkImageDataPtr> mGrayscaleFrames; ///< grayscale frames kept from initializeFrames(), indexed by the full volume
 private:
 	vtkImageDataPtr convertTo8bit(vtkImageDataPtr input) const;
 };

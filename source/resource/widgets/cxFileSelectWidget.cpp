@@ -107,12 +107,16 @@ void FileSelectWidget::selectData()
 	QString filter = mNameFilters.join(";;");
 	QString folder;
 	if (mDialogFolderProvider)
+	{
 		folder = mDialogFolderProvider();
+	}
 	if (folder.isEmpty() || !QFileInfo(folder).isDir())
 	{
 		folder.clear();
 		if (!mRootPaths.isEmpty())
+		{
 			folder = mRootPaths.front();
+		}
 	}
 	QString filename = QFileDialog::getOpenFileName(this, QString(tr("Select file")), folder, filter, nullptr, fileDialogOptions());
 
