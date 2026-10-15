@@ -80,10 +80,10 @@ private:
 	QPushButton* mReloadButton;
 	QLineEdit* mExtentLineEdit;
 	QLineEdit* mInputSpacingLineEdit;
-	SpinBoxGroupWidget* mSpacingWidget;
-	SpinBoxGroupWidget* mDimXWidget;
-	SpinBoxGroupWidget* mDimYWidget;
-	SpinBoxGroupWidget* mDimZWidget;
+	QLineEdit* mOutputSpacingLineEdit; ///< Indicator for the output volume spacing
+	QLineEdit* mDimXLineEdit; ///< Indicators for the output volume dimensions
+	QLineEdit* mDimYLineEdit;
+	QLineEdit* mDimZLineEdit;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
 	QFrame* mAlgorithmGroup;
@@ -96,6 +96,7 @@ private:
 	std::vector<int> mHoltRows; ///< Rows in mOptionsLayout with the parameters of the Holt filter
 	PropertyPtr mApplyLagProperty; ///< Option 'Apply estimated time lag' of the selected algorithm, if it has one
 	QWidget* createOptionsWidget();
+	QLineEdit* createIndicator(); ///< Read-only line edit, for showing a value
 	QString getCurrentPath();
 	void updateComboBox();
 	void createNewStackedWidget(QString algoName);

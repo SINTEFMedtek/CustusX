@@ -104,7 +104,9 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 	sizesLayout->addWidget(inputSpacingLabel, 0, 0);
 	sizesLayout->addWidget(mInputSpacingLineEdit, 0, 1);
 	sizesLayout->addLayout(extentLayout, 0, 2);
-	mSpacingWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertySpacing(mReconstructer)), sizesLayout, 1);
+	mOutputSpacingLineEdit = this->createIndicator();
+	sizesLayout->addWidget(new QLabel("Spacing Out", this), 1, 0);
+	sizesLayout->addWidget(mOutputSpacingLineEdit, 1, 1);
 	sizesLayout->addWidget(maxVolSizeWidget, 1, 2);
 
 	QHBoxLayout* runLayout = new QHBoxLayout;
@@ -123,13 +125,16 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 	topLayout->addWidget(presetTFWidget);
 	topLayout->addWidget(sscCreateDataWidget(this, mReconstructer->getParam("Reduce mask (% in 1D)")));
 
-	mDimXWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyXDim(mReconstructer)));
-	mDimYWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyYDim(mReconstructer)));
-	mDimZWidget = new SpinBoxGroupWidget(this, DoublePropertyBasePtr(new DoublePropertyZDim(mReconstructer)));
+	mDimXLineEdit = this->createIndicator();
+	mDimYLineEdit = this->createIndicator();
+	mDimZLineEdit = this->createIndicator();
 	QHBoxLayout* outputVolDimLayout = new QHBoxLayout;
-	outputVolDimLayout->addWidget(mDimXWidget);
-	outputVolDimLayout->addWidget(mDimYWidget);
-	outputVolDimLayout->addWidget(mDimZWidget);
+	outputVolDimLayout->addWidget(new QLabel("X", this));
+	outputVolDimLayout->addWidget(mDimXLineEdit);
+	outputVolDimLayout->addWidget(new QLabel("Y", this));
+	outputVolDimLayout->addWidget(mDimYLineEdit);
+	outputVolDimLayout->addWidget(new QLabel("Z", this));
+	outputVolDimLayout->addWidget(mDimZLineEdit);
 	topLayout->addLayout(outputVolDimLayout);
 
 	mOptionsWidget = this->createOptionsWidget();
@@ -138,6 +143,15 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 
 	topLayout->addStretch();
 	topLayout->addWidget(mTimedAlgorithmProgressBar);
+
+	this->paramsChangedSlot();
+}
+
+QLineEdit* ReconstructionWidget::createIndicator()
+{
+	QLineEdit* retval = new QLineEdit(this);
+	retval->setReadOnly(true);
+	return retval;
 }
 
 void ReconstructionWidget::updateFileSelectorPath(QString path)
@@ -347,6 +361,13 @@ void ReconstructionWidget::paramsChangedSlot()
 	mExtentLineEdit->setText(extText);
 
 	mInputSpacingLineEdit->setText(QString("%1").arg(mReconstructer->getOutputVolumeParams().getInputSpacing(), 0, 'f', 4));
+
+	OutputVolumeParams outputParams = mReconstructer->getOutputVolumeParams();
+	mOutputSpacingLineEdit->setText(QString("%1").arg(outputParams.getSpacing(), 0, 'f', 4));
+	Eigen::Array3i dim = outputParams.getDim();
+	mDimXLineEdit->setText(QString::number(dim[0]));
+	mDimYLineEdit->setText(QString::number(dim[1]));
+	mDimZLineEdit->setText(QString::number(dim[2]));
 }
 
 void ReconstructionWidget::reconstructAboutToStartSlot()
