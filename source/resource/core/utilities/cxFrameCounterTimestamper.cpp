@@ -33,6 +33,7 @@ void FrameCounterTimestamper::reset()
 	mLastTimestamp_ms = std::numeric_limits<double>::lowest();
 	mPeriod_ms = 0.0;
 	mStablePeriod_ms = 0.0;
+	mPeriodMismatchSince_ms = -1.0;
 }
 
 void FrameCounterTimestamper::restart(unsigned long frameNumber, double received_ms)
@@ -44,6 +45,14 @@ void FrameCounterTimestamper::restart(unsigned long frameNumber, double received
 	mPeriod_ms = 0.0;
 }
 
+/** The frame arrived much later than its frame number says: the device clock paused, e.g. while the device was reconfigured */
+bool FrameCounterTimestamper::isClockPause(unsigned long frameNumber, double gap_ms) const
+{
+	double period_ms = (mStablePeriod_ms > 0.0) ? mStablePeriod_ms : mPeriod_ms;
+	double expectedGap_ms = (frameNumber > mLastFrame) ? period_ms * double(frameNumber - mLastFrame) : 0.0;
+	return period_ms > 0.0 && (gap_ms - expectedGap_ms > kMaxClockPause_ms);
+}
+
 double FrameCounterTimestamper::getTimestampOfEarlierFrame(unsigned long frameNumber) const
 {
 	double framesBefore = (frameNumber < mLastFrame) ? double(mLastFrame - frameNumber) : 0.0;
@@ -53,7 +62,8 @@ double FrameCounterTimestamper::getTimestampOfEarlierFrame(unsigned long frameNu
 double FrameCounterTimestamper::getTimestamp(unsigned long frameNumber, double received_ms)
 {
 	double gap_ms = received_ms - mLastReceived_ms;
-	bool continues = !mSamples.empty() && (frameNumber >= mLastFrame) && (gap_ms >= 0.0) && (gap_ms < kMaxGap_ms);
+	bool continues = !mSamples.empty() && (frameNumber >= mLastFrame) && (gap_ms >= 0.0) && (gap_ms < kMaxGap_ms)
+			&& !this->isClockPause(frameNumber, gap_ms);
 	double retval = received_ms;
 	if (frameNumber == 0)
 	{
@@ -173,11 +183,23 @@ bool FrameCounterTimestamper::fit(double& period_ms, double& offset_ms)
  */
 void FrameCounterTimestamper::updateStablePeriod(double hullSlope, double span_ms)
 {
+	double now_ms = mFirstReceived_ms + mSamples.back().received_ms;
 	if (mStablePeriod_ms > 0.0)
 	{
 		if (std::abs(hullSlope - mStablePeriod_ms) < kMaxPeriodChange * mStablePeriod_ms)
 		{
 			mStablePeriod_ms += kPeriodUpdateWeight * (hullSlope - mStablePeriod_ms);
+			mPeriodMismatchSince_ms = -1.0;
+		}
+		else if (mPeriodMismatchSince_ms < 0.0)
+		{
+			mPeriodMismatchSince_ms = now_ms;
+		}
+		else if (now_ms - mPeriodMismatchSince_ms > kPeriodMismatchBeforeRemeasure_ms)
+		{
+			// Longer than any queue: the period has changed, measure it again
+			mStablePeriod_ms = 0.0;
+			mPeriodMismatchSince_ms = -1.0;
 		}
 	}
 	else if (span_ms >= kStablePeriodSpan_ms && hullSlope > 0.0)

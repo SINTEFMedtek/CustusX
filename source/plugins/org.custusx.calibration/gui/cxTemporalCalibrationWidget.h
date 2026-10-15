@@ -51,6 +51,8 @@ private slots:
   void calibrateSlot();
   void recordingStartedSlot();
   void recordingCancelledSlot();
+  void recordingStoppedSlot();
+  void usDataRecordedSlot();
 
 protected:
   void showEvent(QShowEvent* event);
@@ -64,6 +66,7 @@ private:
   QCheckBox* mVerbose;
   RecordSessionWidget* mRecordSessionWidget;
   QLabel* mInfoLabel;
+  bool mRecordingHasUsData;
 };
 
 

@@ -44,7 +44,8 @@ typedef unsigned char uchar;
 
 TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService, QWidget* parent) :
 	BaseWidget(parent, "temporal_calibration_widget", "Temporal Calibration"),
-	mInfoLabel(new QLabel(""))
+	mInfoLabel(new QLabel("")),
+	mRecordingHasUsData(false)
 {
 	mServices = services;
 
@@ -56,6 +57,9 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
   // Calibrate the new recording, not the previous one, while the new one is being saved
   connect(acquisitionService.get(), &AcquisitionService::started, this, &TemporalCalibrationWidget::recordingStartedSlot);
   connect(acquisitionService.get(), &AcquisitionService::cancelled, this, &TemporalCalibrationWidget::recordingCancelledSlot);
+  connect(acquisitionService.get(), &AcquisitionService::acquisitionDataReady, this, &TemporalCalibrationWidget::usDataRecordedSlot);
+  // Queued: after the US acquisition has handled the stop, and emitted acquisitionDataReady if there is US data
+  connect(acquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &TemporalCalibrationWidget::recordingStoppedSlot, Qt::QueuedConnection);
 
   cx::AcquisitionService::TYPES context(cx::AcquisitionService::tTRACKING | cx::AcquisitionService::tUS);
   mRecordSessionWidget = new RecordSessionWidget(acquisitionService, this, context, "temp_cal");
@@ -128,8 +132,23 @@ void TemporalCalibrationWidget::selectData(QString filename)
 
 void TemporalCalibrationWidget::recordingStartedSlot()
 {
+	mRecordingHasUsData = false;
 	mCalibrateButton->setEnabled(false);
 	mResult->setText("Waiting for the recording to be saved");
+}
+
+void TemporalCalibrationWidget::usDataRecordedSlot()
+{
+	mRecordingHasUsData = true;
+}
+
+void TemporalCalibrationWidget::recordingStoppedSlot()
+{
+	// A recording without US data is not saved, so selectData() isn't called
+	if (!mRecordingHasUsData)
+	{
+		this->recordingCancelledSlot();
+	}
 }
 
 void TemporalCalibrationWidget::recordingCancelledSlot()

@@ -100,6 +100,29 @@ TEST_CASE("FrameCounterTimestamper: frames that queue up for seconds don't chang
 	CHECK(meanError_ms < 5.0);
 }
 
+TEST_CASE("FrameCounterTimestamper: a pause of the device clock doesn't make the timestamps early", "[unit]")
+{
+	cx::FrameCounterTimestamper timestamper;
+	double period_ms = 25.0;
+	double latency_ms = 10.0;
+	double pause_ms = 600.0;
+	int frame = 0;
+	for (; frame < 400; ++frame)
+	{
+		timestamper.getTimestamp(1000 + frame, kStart_ms + frame * period_ms + latency_ms + jitter_ms(frame));
+	}
+	// The device clock stops for 600 ms, and the frame numbers continue from where they stopped
+	double timestamp_ms = 0.0;
+	double received_ms = 0.0;
+	for (; frame < 500; ++frame)
+	{
+		received_ms = kStart_ms + frame * period_ms + pause_ms + latency_ms + jitter_ms(frame);
+		timestamp_ms = timestamper.getTimestamp(1000 + frame, received_ms);
+	}
+	double delay_ms = received_ms - timestamp_ms;
+	CHECK(delay_ms < 20.0);
+}
+
 TEST_CASE("FrameCounterTimestamper: restarts the fit when the frame number is not increasing", "[unit]")
 {
 	cx::FrameCounterTimestamper timestamper;

@@ -207,14 +207,20 @@ void IgstkTool::processReceivedTransformResult(igstk::CoordinateSystemTransformT
 	igstk::Transform transform = result.GetTransform();
 	Transform3D prMt = igstk2Transform3D(transform);
 	double timestamp = transform.GetStartTime();
-	// The sample info is read later than the transform: if it is newer than the transform, it belongs to the next frame
-	if (sampleInfo.m_FrameNumber != 0 && sampleInfo.m_TimeStamp <= timestamp)
+	bool haveFrameNumber = sampleInfo.m_FrameNumber != 0;
+	// The sample info is read later than the transform: if it is newer than the transform, it belongs to the next frame.
+	// That rare sample is skipped, as its time is not known.
+	bool sampleInfoMatches = sampleInfo.m_TimeStamp <= timestamp;
+	if (haveFrameNumber && sampleInfoMatches)
 	{
 		// the time the frame was read, instead of when IGSTK distributed it
 		timestamp = mFrameTimestamper.getTimestamp(sampleInfo.m_FrameNumber, sampleInfo.m_TimeStamp);
 	}
 
-	emit toolTransformAndTimestamp(prMt, timestamp, metadata);
+	if (!haveFrameNumber || sampleInfoMatches)
+	{
+		emit toolTransformAndTimestamp(prMt, timestamp, metadata);
+	}
 }
 
 void IgstkTool::toolTransformCallback(const itk::EventObject &event)

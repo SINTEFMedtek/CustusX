@@ -34,13 +34,15 @@ public:
 	static constexpr double kWindow_ms = 10000.0; ///< Frames used in the fit
 	static constexpr double kMinFitSpan_ms = 500.0;
 	static const int kMinFitFrames = 10;
-	static constexpr double kMaxGap_ms = 1000.0; ///< A longer pause, a step back of the clock or a decreasing frame number restarts the fit
+	static constexpr double kMaxGap_ms = 1000.0; ///< A longer pause, a step back of the clock, a clock pause or a decreasing frame number restarts the fit
 	static constexpr double kMinStep_ms = 0.01; ///< Timestamps are kept increasing
 	static constexpr double kEarliestArrivalPercentile = 0.05; ///< The arrivals that give the offset
 	static constexpr double kStablePeriodSpan_ms = 5000.0; ///< Window needed to measure the stable frame period
 	static constexpr double kMaxSpreadForStablePeriod_ms = 30.0; ///< Median minus earliest arrival delay, larger means queued frames
 	static constexpr double kMaxPeriodChange = 0.005; ///< Relative change of the period that the stable period follows
 	static constexpr double kPeriodUpdateWeight = 0.05;
+	static constexpr double kPeriodMismatchBeforeRemeasure_ms = 20000.0; ///< A different period for this long is measured again
+	static constexpr double kMaxClockPause_ms = 200.0; ///< A frame this much later than its frame number says restarts the fit
 
 	FrameCounterTimestamper();
 	void reset();
@@ -55,6 +57,7 @@ private:
 	};
 	void restart(unsigned long frameNumber, double received_ms);
 	double getFittedTimestamp(unsigned long frameNumber, double received_ms);
+	bool isClockPause(unsigned long frameNumber, double gap_ms) const;
 	bool fit(double& period_ms, double& offset_ms); ///< received = offset + period * frame, along the earliest arrivals
 	void updateStablePeriod(double hullSlope, double span_ms);
 	double getOffsetPercentile(double period_ms, double percentile) const;
@@ -70,6 +73,7 @@ private:
 	double mLastTimestamp_ms;
 	double mPeriod_ms; ///< From the last fit, 0 if none
 	double mStablePeriod_ms; ///< Measured once, kept after a restart of the fit. 0 if not measured yet
+	double mPeriodMismatchSince_ms; ///< When the measured period started to differ from mStablePeriod_ms, -1 if it doesn't
 };
 
 } // namespace cx
