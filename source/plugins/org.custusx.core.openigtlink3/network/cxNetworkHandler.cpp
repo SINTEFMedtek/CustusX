@@ -487,8 +487,9 @@ bool NetworkHandler::convertZeroesInsideSectorToOnes(ThreadResult &result, int t
 	unsigned components = result.image->getBaseVtkImageData()->GetNumberOfScalarComponents();
 	unsigned dimX = maskDims[0];
 	unsigned dimY = maskDims[1];
-	for (unsigned x = 0; x < dimX; x++)
-		for (unsigned y = 0; y < dimY; y++)
+	// Row by row, the order of the pixels in memory
+	for (unsigned y = 0; y < dimY; y++)
+		for (unsigned x = 0; x < dimX; x++)
 		{
 			unsigned pos = x + y * dimX;
 			unsigned imagePos = pos*components;
