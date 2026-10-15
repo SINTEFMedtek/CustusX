@@ -72,6 +72,34 @@ TEST_CASE("FrameCounterTimestamper: a few frames arriving too early don't shift 
 	CHECK(std::abs(timestamp_ms - (device_ms + latency_ms)) < 0.5);
 }
 
+TEST_CASE("FrameCounterTimestamper: frames that queue up for seconds don't change the timestamps afterwards", "[unit]")
+{
+	cx::FrameCounterTimestamper timestamper;
+	double period_ms = 37.4;
+	double latency_ms = 15.0;
+	int frame = 0;
+	for (; frame < 200; ++frame)
+	{
+		timestamper.getTimestamp(1000 + frame, kStart_ms + frame * period_ms + latency_ms + jitter_ms(frame));
+	}
+	// 10 s where the delay grows to 700 ms and drains again
+	for (int i = 0; i < 270; ++frame, ++i)
+	{
+		double queue_ms = 700.0 * std::sin(M_PI * i / 270.0);
+		timestamper.getTimestamp(1000 + frame, kStart_ms + frame * period_ms + latency_ms + queue_ms);
+	}
+	double sumError_ms = 0.0;
+	int n = 0;
+	for (; frame < 600; ++frame, ++n)
+	{
+		double device_ms = kStart_ms + frame * period_ms;
+		double timestamp_ms = timestamper.getTimestamp(1000 + frame, device_ms + latency_ms + jitter_ms(frame));
+		sumError_ms += std::abs(timestamp_ms - (device_ms + latency_ms));
+	}
+	double meanError_ms = sumError_ms / n;
+	CHECK(meanError_ms < 5.0);
+}
+
 TEST_CASE("FrameCounterTimestamper: restarts the fit when the frame number is not increasing", "[unit]")
 {
 	cx::FrameCounterTimestamper timestamper;
