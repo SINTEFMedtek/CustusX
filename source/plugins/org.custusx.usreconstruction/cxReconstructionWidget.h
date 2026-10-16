@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLabeledComboBoxWidget.h"
 #include "cxFileSelectWidget.h"
 #include "cxBaseWidget.h"
+#include "cxForwardDeclarations.h"
 
 
 namespace cx
@@ -46,7 +47,7 @@ class org_custusx_usreconstruction_EXPORT ReconstructionWidget: public BaseWidge
 {
 Q_OBJECT
 public:
-	ReconstructionWidget(QWidget* parent, UsReconstructionServicePtr reconstructer);
+	ReconstructionWidget(QWidget* parent, UsReconstructionServicePtr reconstructer, PatientModelServicePtr patientModelService);
 	UsReconstructionServicePtr reconstructer()
 	{
 		return mReconstructer;
@@ -68,6 +69,9 @@ private slots:
 	void reconstructAboutToStartSlot();
 
 	void updateFileSelectorPath(QString path);
+	/** Show only the parameters of the selected position filter, and enable/disable the time calibration parameters
+	 *  that are not used with the current selections. */
+	void updateParameterStates();
 private:
 	UsReconstructionServicePtr mReconstructer;
 
@@ -76,10 +80,10 @@ private:
 	QPushButton* mReloadButton;
 	QLineEdit* mExtentLineEdit;
 	QLineEdit* mInputSpacingLineEdit;
-	SpinBoxGroupWidget* mSpacingWidget;
-	SpinBoxGroupWidget* mDimXWidget;
-	SpinBoxGroupWidget* mDimYWidget;
-	SpinBoxGroupWidget* mDimZWidget;
+	QLineEdit* mOutputSpacingLineEdit; ///< Indicator for the output volume spacing
+	QLineEdit* mDimXLineEdit; ///< Indicators for the output volume dimensions
+	QLineEdit* mDimYLineEdit;
+	QLineEdit* mDimZLineEdit;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
 	QFrame* mAlgorithmGroup;
@@ -87,7 +91,12 @@ private:
 	std::vector<QWidget*> mAlgoWidgets;
 
 	QWidget* mOptionsWidget;
+	QGridLayout* mOptionsLayout;
+	std::vector<int> mMovingAverageRows; ///< Rows in mOptionsLayout with the parameters of the moving average filter
+	std::vector<int> mHoltRows; ///< Rows in mOptionsLayout with the parameters of the Holt filter
+	PropertyPtr mApplyLagProperty; ///< Option 'Apply estimated time lag' of the selected algorithm, if it has one
 	QWidget* createOptionsWidget();
+	QLineEdit* createIndicator(); ///< Read-only line edit, for showing a value
 	QString getCurrentPath();
 	void updateComboBox();
 	void createNewStackedWidget(QString algoName);

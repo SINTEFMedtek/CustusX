@@ -245,4 +245,131 @@ TEST_CASE("PositionFilter: A sequence not longer than the filter window is not f
 	CHECK(longer[2].mPos.translation()[0] == Approx(2)); // averaged over 5 positions
 }
 
+namespace
+{
+Eigen::ArrayXXd buildLinearRows(int nColumns)
+{
+	Eigen::ArrayXXd retval(2, nColumns);
+	for (int i = 0; i < nColumns; i++)
+	{
+		retval(0, i) = 2.0 + 0.3*i;
+		retval(1, i) = -5.0 + 1.5*i;
+	}
+	return retval;
+}
+
+Eigen::ArrayXXd buildNoisyRows(int nColumns)
+{
+	Eigen::ArrayXXd retval = Eigen::ArrayXXd::Zero(2, nColumns);
+	for (int i = 0; i < nColumns; i++)
+	{
+		retval(0, i) = std::sin(0.2*i) + ((i*7919) % 13 - 6)/20.0; // deterministic "noise"
+		retval(1, i) = std::cos(0.15*i) + ((i*104729) % 11 - 5)/20.0;
+	}
+	return retval;
+}
+} // namespace
+
+TEST_CASE("HoltFilter: A signal that is linear in time is not changed, and the first value is never changed","[unit][usreconstruction][synthetic]")
+{
+	Eigen::ArrayXXd input = buildLinearRows(60);
+	for (double alpha : {0.1, 0.5, 0.9})
+	{
+		for (double beta : {0.0, 0.3, 1.0})
+		{
+			INFO("alpha " << alpha << " beta " << beta);
+			Eigen::ArrayXXd output = cx::holtFilter(input, alpha, beta, false);
+			CHECK((output - input).abs().maxCoeff() < 1e-9);
+
+			Eigen::ArrayXXd withTrend = cx::holtFilter(input, alpha, beta, true);
+			CHECK((withTrend.col(0) - input.col(0)).abs().maxCoeff() == 0); //First value is not changed
+			// With trend, the output is the level plus one step: ahead of the input
+			CHECK((withTrend.block(0, 1, 2, 58) - input.block(0, 2, 2, 58)).abs().maxCoeff() < 1e-9);
+		}
+	}
+}
+
+TEST_CASE("HoltFilter: Alpha 1 gives the input, a lower alpha gives less change between values","[unit][usreconstruction][synthetic]")
+{
+	Eigen::ArrayXXd input = buildNoisyRows(80);
+	CHECK((cx::holtFilter(input, 1.0, 0.4, false) - input).abs().maxCoeff() < 1e-12);
+
+	// Variation of the filtered signal: smaller with stronger smoothing
+	Eigen::ArrayXXd smooth = cx::holtFilter(input, 0.2, 0.2, false);
+	Eigen::ArrayXXd lessSmooth = cx::holtFilter(input, 0.8, 0.2, false);
+	double variationInput = (input.block(0, 1, 2, 79) - input.block(0, 0, 2, 79)).abs().sum();
+	double variationSmooth = (smooth.block(0, 1, 2, 79) - smooth.block(0, 0, 2, 79)).abs().sum();
+	double variationLessSmooth = (lessSmooth.block(0, 1, 2, 79) - lessSmooth.block(0, 0, 2, 79)).abs().sum();
+	CHECK(variationSmooth < variationLessSmooth);
+	CHECK(variationLessSmooth < variationInput);
+}
+
+TEST_CASE("HoltFilter: Both directions gives the time reversed result for a time reversed input, and no shift for linear motion","[unit][usreconstruction][synthetic]")
+{
+	Eigen::ArrayXXd input = buildNoisyRows(80);
+	for (bool addTrend : {false, true})
+	{
+		INFO("add trend " << addTrend);
+		Eigen::ArrayXXd forwardBackward = cx::holtFilterBothDirections(input, 0.4, 0.3, addTrend);
+		Eigen::ArrayXXd reversedInput = input.rowwise().reverse();
+		Eigen::ArrayXXd reversedResult = cx::holtFilterBothDirections(reversedInput, 0.4, 0.3, addTrend);
+		CHECK((forwardBackward - reversedResult.rowwise().reverse()).abs().maxCoeff() < 1e-12);
+
+		// Linear motion: forward and backward are one step ahead and one step behind for the output with trend: no shift
+		Eigen::ArrayXXd linear = buildLinearRows(60);
+		Eigen::ArrayXXd output = cx::holtFilterBothDirections(linear, 0.4, 0.3, addTrend);
+		CHECK((output.block(0, 2, 2, 56) - linear.block(0, 2, 2, 56)).abs().maxCoeff() < 1e-9);
+	}
+}
+
+TEST_CASE("HoltPositionFilter: Constant speed movement is not changed","[unit][usreconstruction][synthetic]")
+{
+	for (bool bothDirections : {false, true})
+	{
+		INFO("both directions " << bothDirections);
+		std::vector<cx::TimedPosition> posVector = buildMovingArray(50, 0);
+		std::vector<cx::TimedPosition> posVectorInitial = posVector;
+		cx::HoltPositionFilter filter(posVector, 0.5, 0.3, bothDirections, false);
+		filter.filterPositions();
+		REQUIRE(posVector.size() == posVectorInitial.size());
+		for (unsigned i = 1; i + 1 < posVector.size(); i++) //the ends of the both directions result are partly filtered
+		{
+			double translationError = (posVectorInitial[i].mPos.translation() - posVector[i].mPos.translation()).norm();
+			Eigen::Matrix3d rotationDifference = posVector[i].mPos.rotation() * posVectorInitial[i].mPos.rotation().transpose();
+			double rotationError = Eigen::AngleAxisd(rotationDifference).angle();
+			INFO("Position " << i);
+			CHECK(translationError < 1e-3);
+			CHECK(rotationError < 1e-3);
+		}
+	}
+}
+
+TEST_CASE("HoltPositionFilter: Smooths a position jump, and handles sign change of the quaternion","[unit][usreconstruction][synthetic]")
+{
+	std::vector<cx::TimedPosition> jump(40);
+	for (unsigned i = 0; i < jump.size(); i++)
+	{
+		jump[i].mTime = 50*i;
+		jump[i].mPos = cx::createTransformTranslate(cx::Vector3D(0, 0, i == 20 ? 10 : 0));
+	}
+	cx::HoltPositionFilter filter(jump, 0.5, 0.3, true, false);
+	filter.filterPositions();
+	CHECK(jump[20].mPos.translation()[2] < 10); // the peak is reduced
+	CHECK(jump[20].mPos.translation()[2] > 0);
+	CHECK(jump[19].mPos.translation()[2] > 0); // and spread to the neighbours, in both directions
+	CHECK(jump[21].mPos.translation()[2] > 0);
+
+	// Rotation sweep where the sign of the quaternion changes: the filtered rotation follows the sweep, with no jumps
+	std::vector<cx::TimedPosition> sweep = buildMovingArray(60, 230);
+	std::vector<cx::TimedPosition> sweepInitial = sweep;
+	cx::HoltPositionFilter sweepFilter(sweep, 0.5, 0.3, true, false);
+	sweepFilter.filterPositions();
+	for (unsigned i = 1; i + 1 < sweep.size(); i++)
+	{
+		Eigen::Matrix3d rotationDifference = sweep[i].mPos.rotation() * sweepInitial[i].mPos.rotation().transpose();
+		INFO("Position " << i);
+		CHECK(Eigen::AngleAxisd(rotationDifference).angle() < 1e-3);
+	}
+}
+
 } // namespace

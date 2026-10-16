@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceExport.h"
 #include <memory>
+#include <map>
 
 #include "cxProbeSector.h"
 #include "cxUSReconstructInputData.h"
@@ -57,7 +58,26 @@ public:
 	QString getUid();
 	bool validate() const;
 
+	/** Set by a reconstruction algorithm that changes the frame positions (e.g. correction based on image correlation).
+	 *  Same coordinate system as getFrames(). Must be set before the reconstruction is finished, and is read after that.
+	 */
+	void setFramePositionsUsed(std::vector<TimedPosition> frames);
+	/** The frame positions used by the reconstruction algorithm. Equal to getFrames() if the algorithm did not change them. */
+	std::vector<TimedPosition> getFramePositionsUsed() const;
+
+	/** Transforms that convert the frame positions (dMu) back to tracking positions (prMt):
+	 *  prMt = prMd * dMu * inv(tMu). Set by the preprocessor.
+	 */
+	void setTrackingTransforms(Transform3D prMd, Transform3D tMu);
+	bool hasTrackingTransforms() const;
+	Transform3D get_prMd() const;
+	Transform3D get_tMu() const;
+
 private:
+	std::vector<TimedPosition> mFramePositionsUsed;
+	bool mHasTrackingTransforms;
+	Transform3D mPrMd;
+	Transform3D mTMu;
 	std::vector<vtkImageDataPtr> mProcessedImage;
 	std::vector<TimedPosition> mFrames;
 	vtkImageDataPtr mMask;///< Clipping mask for the input data
@@ -105,6 +125,7 @@ public:
 	void setCropBox(IntBoundingBox3D mCropbox);
 	void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
 	void setPurgeInputDataAfterInitialize(bool value);
+	void setKeepGrayscaleFrames(bool keep); ///< Keep the grayscale frames made by initializeFrames(), so that the next call reuses them instead of loading and converting again
 
 	/** Use the input raw data and control parameters to generate filtered frames.
 	  * The input angio controls how many output objects that will be created, and if each
@@ -131,6 +152,8 @@ protected:
 	QString mName;
 	cx::ImageDataContainerPtr mImageContainer;
 	bool mPurgeInput;
+	bool mKeepGrayscaleFrames;
+	std::map<int, vtkImageDataPtr> mGrayscaleFrames; ///< grayscale frames kept from initializeFrames(), indexed by the full volume
 private:
 	vtkImageDataPtr convertTo8bit(vtkImageDataPtr input) const;
 };

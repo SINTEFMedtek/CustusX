@@ -46,14 +46,25 @@ public:
 			mAlignTimestamps(false),
 			mPositionThinning(false),
 			mPosFilterStrength(0),
+			mPosFilterType("Moving average"),
+			mHoltAlpha(0.5),
+			mHoltBeta(0.3),
+			mHoltBothDirections(true),
+			mHoltAddTrend(false),
 			mMaskReduce(0),
 			mAngio(false),
-			mMaxOutputVolumeSize(1024*1024)
+			mMaxOutputVolumeSize(1024*1024),
+			mWriteProcessedPositions(false)
 		{}
 		double mExtraTimeCalibration;
 		bool mAlignTimestamps;
 		bool mPositionThinning;
-		unsigned mPosFilterStrength;
+		unsigned mPosFilterStrength; ///< Strength (half window length, in samples) of the moving average position filter. 0 = off.
+		QString mPosFilterType; ///< "Off", "Moving average" (uses mPosFilterStrength) or "Holt" (uses the Holt parameters below)
+		double mHoltAlpha; ///< Holt filter: smoothing of the level, [0,1]
+		double mHoltBeta; ///< Holt filter: smoothing of the trend, [0,1]
+		bool mHoltBothDirections; ///< Holt filter: filter forward and backward in time and use the mean, which gives no delay
+		bool mHoltAddTrend; ///< Holt filter: output level + trend instead of the level
 		double mMaskReduce;
 		QString mOrientation;
 
@@ -65,6 +76,9 @@ public:
 		bool mAngio; ///< true for angio data, false is B-mode.
 		QString mTransferFunctionPreset;
 		double mMaxOutputVolumeSize;
+		/** Write the positions as used by the reconstruction (after filtering, time lag and any correction by the
+		 *  algorithm) next to the input data, as <name>.tp.corr and <name>.tts.corr. */
+		bool mWriteProcessedPositions;
 	};
 
 	ReconstructCore(PatientModelServicePtr patientModelService);
@@ -81,9 +95,13 @@ public:
 
 	// published helper methods, also needed for parameter display outside of reconstruction execution:
 	InputParams getInputParams() { return mInput; }
+	ReconstructionMethodService* getAlgorithm() { return mAlgorithm; }
 
 private:
 	bool validInputData() const;
+	void writeProcessedPositions();
+	QString getProcessedPositionsFileBase() const;
+	void writeProcessedPositions(QString base);
 	QString generateOutputUid();
 	QString generateImageName(QString uid) const;
 

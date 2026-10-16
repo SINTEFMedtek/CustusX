@@ -48,6 +48,12 @@ public:
 	StringPropertyPtr getAlgorithmAdapter() { this->createParameters(); return mAlgorithmAdapter; }
 	StringPropertyPtr getMaskReduce() { this->createParameters(); return mMaskReduce; }
     StringPropertyPtr getPosFilterStrength() { this->createParameters(); return mPosFilterStrength; }
+	StringPropertyPtr getPosFilterType() { this->createParameters(); return mPosFilterType; }
+	DoublePropertyPtr getHoltAlpha() { this->createParameters(); return mHoltAlpha; }
+	DoublePropertyPtr getHoltBeta() { this->createParameters(); return mHoltBeta; }
+	BoolPropertyPtr getHoltBothDirections() { this->createParameters(); return mHoltBothDirections; }
+	BoolPropertyPtr getHoltAddTrend() { this->createParameters(); return mHoltAddTrend; }
+	BoolPropertyPtr getWriteProcessedPositions() { this->createParameters(); return mWriteProcessedPositions; }
 	BoolPropertyPtr getAlignTimestamps() { this->createParameters(); return mAlignTimestamps; }
     BoolPropertyPtr getPositionThinning() { this->createParameters(); return mPositionThinning; }
 	DoublePropertyPtr getTimeCalibration() { this->createParameters(); return mTimeCalibration; }
@@ -71,7 +77,13 @@ private:
 	StringPropertyPtr mPresetTFAdapter;
 	StringPropertyPtr mAlgorithmAdapter;
 	StringPropertyPtr mMaskReduce;//Reduce mask size in % in each direction
-    StringPropertyPtr mPosFilterStrength; //position noise filter strength
+    StringPropertyPtr mPosFilterStrength; //position noise filter strength (moving average)
+	StringPropertyPtr mPosFilterType; ///< Off, Moving average or Holt
+	DoublePropertyPtr mHoltAlpha; ///< Holt filter level smoothing
+	DoublePropertyPtr mHoltBeta; ///< Holt filter trend smoothing
+	BoolPropertyPtr mHoltBothDirections; ///< Holt filter forward and backward
+	BoolPropertyPtr mHoltAddTrend; ///< Holt filter output level + trend
+	BoolPropertyPtr mWriteProcessedPositions;
 	BoolPropertyPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
     BoolPropertyPtr mPositionThinning; ///remove outlier positions from position sequence
 	DoublePropertyPtr mTimeCalibration; ///set a offset in the frame timestamps
