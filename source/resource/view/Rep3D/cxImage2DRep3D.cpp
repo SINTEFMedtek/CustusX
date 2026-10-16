@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageSliceMapper.h>
+#include <vtkImageAlgorithm.h>
 #include <vtkImageSlice.h>
 
 #include "cxLogger.h"
@@ -35,6 +36,7 @@ Image2DProxy::Image2DProxy()
 	mSlice->SetMapper(imageSliceMapper);
 
 	mImageWithLUTProxy.reset(new ApplyLUTToImage2DProxy());
+	mSlice->GetMapper()->SetInputConnection(this->getOutputPort()->GetOutputPort());
 }
 
 Image2DProxy::~Image2DProxy()
@@ -50,6 +52,11 @@ Image2DProxyPtr Image2DProxy::New()
 vtkImageSlicePtr Image2DProxy::getSlice()
 {
 	return mSlice;
+}
+
+vtkImageAlgorithmPtr Image2DProxy::getOutputPort()
+{
+	return mImageWithLUTProxy->getOutputPort();
 }
 
 void Image2DProxy::setImage(ImagePtr image)
@@ -99,7 +106,6 @@ void Image2DProxy::vtkImageDataChangedSlot()
 	{
 		this->transferFunctionsChangedSlot();
 	}
-	mSlice->GetMapper()->SetInputData(mImageWithLUTProxy->getOutput());
 }
 
 /**called when transform is changed

@@ -253,6 +253,13 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	{
 		this->updateView();
 	}
+	if (key == "View2D/drawImagesInSlicePlaneDirectly")
+	{
+		for (unsigned i = 0; i < mSliceReps.size(); ++i)
+		{
+			mSliceReps[i]->setDirectDrawingEnabled(settings()->value(key).toBool());
+		}
+	}
 	if (key == "Navigation/anyplaneViewOffset")
 	{
 		this->updateView();
@@ -441,6 +448,7 @@ void ViewWrapper2D::createAndAddSliceReps(int numberOfSlices)
 	{
 		SliceRepSWPtr sliceRep = SliceRepSW::New("SliceRep_" + mView->getName() + "_" + i);
 		sliceRep->setSliceProxy(mSliceProxy);
+		sliceRep->setDirectDrawingEnabled(settings()->value("View2D/drawImagesInSlicePlaneDirectly").toBool());
 		mView->addRep(sliceRep);
 		mSliceReps.push_back(sliceRep);
 	}

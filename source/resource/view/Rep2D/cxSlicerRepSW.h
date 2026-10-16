@@ -33,6 +33,7 @@ typedef std::shared_ptr<class Image2DProxy> Image2DProxyPtr;
  * The image is sliced using a SliceProxy. Only a single
  * volume can be used. A 2D image in the slice plane, e.g. a video stream in a view
  * following the probe, is drawn directly with its transform instead of being sliced.
+ * Both use the same actor, so the drawing order against other reps doesn't change.
  *
  * Used by CustusX.
  *
@@ -56,27 +57,32 @@ public:
 	void update();
 	virtual void printSelf(std::ostream & os, Indent indent);
 	static bool isInSlicePlane(Transform3D sMd, Vector3D center_d); ///< A 2D image with this transform lies in the slice plane
+	static Transform3D moveIntoSlicePlane(Transform3D sMd, Vector3D center_d); ///< Rotate and move a 2D image near the slice plane exactly into it
 	bool isDrawnDirectly() const;
+	void setDirectDrawingEnabled(bool enabled); ///< false: always slice the image, also a 2D image in the slice plane
 
 	static constexpr double kMaxAngleFromSlicePlane_rad = 0.0087; ///< 0.5 degrees
 	static constexpr double kMaxDistanceFromSlicePlane_mm = 0.5;
 
 protected:
 	SliceRepSW();
+	vtkImageSlicePtr getActor() const;
+	virtual void onModifiedStartRender();
 	virtual void addRepActorsToViewRenderer(ViewPtr view) ;
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view) ;
 
 private slots:
-	void updateDrawingMethod();
+	void drawingInputChanged();
 
 private:
-	vtkImageSlicePtr getShownSlice() const;
+	void updateDrawingMethod();
+	void showSlice(bool drawDirectly);
 	SlicedImageProxyPtr mImageSlicer;
 	vtkImageSlicePtr mImageSlice;
-	Image2DProxyPtr mImage2D; ///< draws a 2D image directly, when it is in the slice plane
+	Image2DProxyPtr mImage2D; ///< the 2D image with its LUT, created when it is first drawn directly
 	SliceProxyInterfacePtr mSlicer;
 	bool mDrawDirectly;
-	vtkRendererPtr mRenderer;
+	bool mDirectDrawingEnabled;
 };
 
 }// namespace cx

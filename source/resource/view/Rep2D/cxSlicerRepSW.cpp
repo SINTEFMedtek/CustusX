@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageMapper3D.h>
 #include <vtkImageAlgorithm.h>
 #include <vtkImageSlice.h>
+#include <vtkMatrix4x4.h>
 
 #include "cxView.h"
 #include "cxImage.h"
@@ -31,7 +32,8 @@ namespace cx
 
 SliceRepSW::SliceRepSW() :
 	RepImpl(),
-	mDrawDirectly(false)
+	mDrawDirectly(false),
+	mDirectDrawingEnabled(true)
 {
 	mImageSlicer.reset(new SlicedImageProxy());
 
@@ -56,9 +58,6 @@ ImagePtr SliceRepSW::getImage()
 	return mImageSlicer->getImage(); 
 }
 
-/**This method set the image, that has all the information in it self.
- * color, brigthness, contrast, etc...
- */
 void SliceRepSW::setImage( ImagePtr image )
 {
 	if (image == getImage())
@@ -66,22 +65,17 @@ void SliceRepSW::setImage( ImagePtr image )
 	ImagePtr previous = this->getImage();
 	if (previous)
 	{
-		disconnect(previous.get(), &Image::transformChanged, this, &SliceRepSW::updateDrawingMethod);
+		disconnect(previous.get(), &Image::transformChanged, this, &SliceRepSW::drawingInputChanged);
+		disconnect(previous.get(), &Image::vtkImageDataChanged, this, &SliceRepSW::drawingInputChanged);
 	}
 	mImageSlicer->setImage(image);
 
-	if (mRenderer && mDrawDirectly)
-	{
-		mRenderer->RemoveActor(mImage2D->getSlice());
-		mRenderer->AddActor(mImageSlice);
-	}
-	mDrawDirectly = false;
+	this->showSlice(false);
 	mImage2D.reset();
-	if (image && image->is2D())
+	if (image)
 	{
-		mImage2D = Image2DProxy::New();
-		mImage2D->setImage(image);
-		connect(image.get(), &Image::transformChanged, this, &SliceRepSW::updateDrawingMethod);
+		connect(image.get(), &Image::transformChanged, this, &SliceRepSW::drawingInputChanged);
+		connect(image.get(), &Image::vtkImageDataChanged, this, &SliceRepSW::drawingInputChanged);
 	}
 	this->updateDrawingMethod();
 }
@@ -95,13 +89,13 @@ void SliceRepSW::setSliceProxy(SliceProxyInterfacePtr slicer)
 {
 	if (mSlicer)
 	{
-		disconnect(mSlicer.get(), &SliceProxyInterface::transformChanged, this, &SliceRepSW::updateDrawingMethod);
+		disconnect(mSlicer.get(), &SliceProxyInterface::transformChanged, this, &SliceRepSW::drawingInputChanged);
 	}
 	mSlicer = slicer;
 	mImageSlicer->setSliceProxy(slicer);
 	if (mSlicer)
 	{
-		connect(mSlicer.get(), &SliceProxyInterface::transformChanged, this, &SliceRepSW::updateDrawingMethod);
+		connect(mSlicer.get(), &SliceProxyInterface::transformChanged, this, &SliceRepSW::drawingInputChanged);
 	}
 	this->updateDrawingMethod();
 }
@@ -114,48 +108,91 @@ bool SliceRepSW::isInSlicePlane(Transform3D sMd, Vector3D center_d)
 	return parallel && inPlane;
 }
 
+/** Draw the image exactly at z=0, like the sliced images, so its depth order against the other layers is fixed */
+Transform3D SliceRepSW::moveIntoSlicePlane(Transform3D sMd, Vector3D center_d)
+{
+	Vector3D normal_s = sMd.vector(Vector3D(0, 0, 1)).normal();
+	Vector3D target_s(0, 0, normal_s[2] < 0 ? -1 : 1);
+	Vector3D center_s = sMd.coord(center_d);
+	Transform3D rotation = Transform3D::Identity();
+	rotation.linear() = Eigen::Quaterniond::FromTwoVectors(normal_s, target_s).toRotationMatrix();
+	Transform3D toPlane = createTransformTranslate(Vector3D(center_s[0], center_s[1], 0)) * rotation * createTransformTranslate(-center_s);
+	return toPlane * sMd;
+}
+
 bool SliceRepSW::isDrawnDirectly() const
 {
 	return mDrawDirectly;
 }
 
-/** Only the shown actor is in the renderer: the renderer updates the input of every actor, also hidden ones,
- *  so an image would still be sliced */
+void SliceRepSW::setDirectDrawingEnabled(bool enabled)
+{
+	mDirectDrawingEnabled = enabled;
+	this->updateDrawingMethod();
+	this->setModified();
+}
+
+void SliceRepSW::drawingInputChanged()
+{
+	this->setModified();
+}
+
+void SliceRepSW::onModifiedStartRender()
+{
+	this->updateDrawingMethod();
+}
+
+/** Decided before rendering: the slice plane and the image move in separate signals from the same tool update */
 void SliceRepSW::updateDrawingMethod()
 {
 	ImagePtr image = this->getImage();
 	bool drawDirectly = false;
-	if (mImage2D && mSlicer && image)
+	if (mDirectDrawingEnabled && mSlicer && image && image->is2D())
 	{
-		Transform3D sMr = mSlicer->get_sMr();
-		drawDirectly = isInSlicePlane(sMr * image->get_rMd(), image->boundingBox().center());
-		mImage2D->setTransformOffset(sMr);
+		Transform3D sMd = mSlicer->get_sMr() * image->get_rMd();
+		Vector3D center_d = image->boundingBox().center();
+		drawDirectly = isInSlicePlane(sMd, center_d);
+		if (drawDirectly && !mImage2D)
+		{
+			mImage2D = Image2DProxy::New();
+			mImage2D->setImage(image);
+		}
+		if (drawDirectly)
+		{
+			mImageSlice->SetUserMatrix(moveIntoSlicePlane(sMd, center_d).getVtkMatrix());
+		}
 	}
+	this->showSlice(drawDirectly);
+}
 
-	if (mRenderer && drawDirectly != mDrawDirectly)
+/** The sliced image is disconnected while drawing directly, so the image is not sliced as well */
+void SliceRepSW::showSlice(bool drawDirectly)
+{
+	if (drawDirectly != mDrawDirectly)
 	{
-		mRenderer->RemoveActor(this->getShownSlice());
-		mDrawDirectly = drawDirectly;
-		mRenderer->AddActor(this->getShownSlice());
+		vtkAlgorithm* input = drawDirectly ? mImage2D->getOutputPort().Get() : mImageSlicer->getOutputPort().Get();
+		mImageSlice->GetMapper()->SetInputConnection(input->GetOutputPort());
+		if (!drawDirectly)
+		{
+			mImageSlice->SetUserMatrix(nullptr);
+		}
 	}
 	mDrawDirectly = drawDirectly;
 }
 
-vtkImageSlicePtr SliceRepSW::getShownSlice() const
+vtkImageSlicePtr SliceRepSW::getActor() const
 {
-	return mDrawDirectly ? mImage2D->getSlice() : mImageSlice;
+	return mImageSlice;
 }
 
 void SliceRepSW::addRepActorsToViewRenderer(ViewPtr view)
 {
-	mRenderer = view->getRenderer();
-	mRenderer->AddActor(this->getShownSlice());
+	view->getRenderer()->AddActor(mImageSlice);
 }
 
 void SliceRepSW::removeRepActorsFromViewRenderer(ViewPtr view)
 {
-	view->getRenderer()->RemoveActor(this->getShownSlice());
-	mRenderer = vtkRendererPtr();
+	view->getRenderer()->RemoveActor(mImageSlice);
 }
 
 bool SliceRepSW::hasImage(ImagePtr image) const
@@ -166,6 +203,7 @@ bool SliceRepSW::hasImage(ImagePtr image) const
 void SliceRepSW::update()
 {
 	mImageSlicer->update();
+	this->updateDrawingMethod();
 }
 
 void SliceRepSW::printSelf(std::ostream & os, Indent indent)

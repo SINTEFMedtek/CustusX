@@ -45,4 +45,18 @@ TEST_CASE("Image2DProxy: shows the new image data when it is replaced", "[unit][
 	CHECK(shownValue(proxy) != Approx(before));
 }
 
+TEST_CASE("Image2DProxy: shows new pixel values written into the same image data", "[unit][resource][visualization]")
+{
+	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(10, 10, 1), 50);
+	cx::Image2DProxyPtr proxy = cx::Image2DProxy::New();
+	proxy->setImage(image);
+	double before = shownValue(proxy);
+
+	// e.g. a new video frame
+	vtkImageDataPtr data = image->getBaseVtkImageData();
+	data->SetScalarComponentFromDouble(0, 0, 0, 0, 200);
+	data->Modified();
+	CHECK(shownValue(proxy) != Approx(before));
+}
+
 } // namespace cxtest

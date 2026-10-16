@@ -47,6 +47,7 @@ public:
 	void setImage(ImagePtr image);
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkImageSlicePtr getSlice();
+	vtkImageAlgorithmPtr getOutputPort(); ///< the image with the LUT applied
 
 	void setTransformOffset(Transform3D rMrr);
 protected:
