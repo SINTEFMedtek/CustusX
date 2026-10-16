@@ -80,11 +80,12 @@ void Image2DProxy::setImage(ImagePtr image)
 	{
 		CX_ASSERT(mImage->is2D()); // class only treats 2d images.
 
-		mImageWithLUTProxy->setInputData(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
+		this->transferFunctionsChangedSlot();
 	}
 	else
 	{
 		mImageWithLUTProxy->setInputData(vtkImageDataPtr(), vtkLookupTablePtr());
+		mInputImageData = vtkImageDataPtr();
 	}
 
 	this->vtkImageDataChangedSlot();
@@ -93,6 +94,11 @@ void Image2DProxy::setImage(ImagePtr image)
 
 void Image2DProxy::vtkImageDataChangedSlot()
 {
+	// The image data object is replaced e.g. when a video stream reconnects
+	if (mImage && mImage->getBaseVtkImageData() != mInputImageData)
+	{
+		this->transferFunctionsChangedSlot();
+	}
 	mSlice->GetMapper()->SetInputData(mImageWithLUTProxy->getOutput());
 }
 
@@ -113,7 +119,8 @@ void Image2DProxy::transformChangedSlot()
 
 void Image2DProxy::transferFunctionsChangedSlot()
 {
-	mImageWithLUTProxy->setInputData(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
+	mInputImageData = mImage->getBaseVtkImageData();
+	mImageWithLUTProxy->setInputData(mInputImageData, mImage->getLookupTable2D()->getOutputLookupTable());
 }
 
 void Image2DProxy::setTransformOffset(Transform3D rMrr)

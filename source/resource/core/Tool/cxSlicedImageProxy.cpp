@@ -175,6 +175,11 @@ void SlicedImageProxy::transferFunctionsChangedSlot()
 
 void SlicedImageProxy::updateRedirecterSlot()
 {
+	// The image data object is replaced e.g. when a video stream reconnects
+	if (mImage && mReslicer->GetInput() != mImage->getBaseVtkImageData().Get())
+	{
+		mReslicer->SetInputData(mImage->getBaseVtkImageData());
+	}
 	mRedirecter->SetInputConnection(mReslicer->GetOutputPort());
 	update();
 }

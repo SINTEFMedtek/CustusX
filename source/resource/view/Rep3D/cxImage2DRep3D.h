@@ -58,6 +58,7 @@ private slots:
 	void vtkImageDataChangedSlot();
 private:
 	ApplyLUTToImage2DProxyPtr mImageWithLUTProxy;
+	vtkImageDataPtr mInputImageData; ///< The image data given to mImageWithLUTProxy
 	ImagePtr mImage;
 	vtkImageSlicePtr mSlice;
 	Transform3D m_rMrr;
