@@ -102,6 +102,10 @@ void TrackingSystemIGSTKService::configure()
 	{
 		ToolFileParser toolParser(*it, mLoggingFolder);
 		ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
+		if (!internalTool)
+		{
+			continue; // not a valid tool file, reported by the parser
+		}
 		if ((*it) == referenceToolFile)
 			referenceToolStructure = internalTool;
 		else

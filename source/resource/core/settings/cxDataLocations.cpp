@@ -221,10 +221,7 @@ QStringList DataLocations::getRootConfigPaths()
 
 QString DataLocations::getUserHomePath()
 {
-	QString retval = getenv("HOME");//Ubuntu/Mac
-	if(retval.isEmpty())
-		retval = getenv("USERPROFILE");//Windows
-	return retval;
+	return QDir::homePath();
 }
 
 QString DataLocations::getDocPath()

@@ -36,7 +36,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxStreamPropertiesWidget.h"
 #include "cxVideoConnectionWidget.h"
-#include "cxToolManagerWidget.h"
+#include "cxTrackingTestWidget.h"
 #include "cxFrameTreeWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxVolumePropertiesWidget.h"
@@ -104,7 +104,7 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new ConsoleWidget(this, "console_widget_2", "Extra Console"), "Utility");
 //	this->addAsDockWidget(new ConsoleWidgetCollection(this, "ConsoleWidgets", "Consoles"), "Utility");
 	this->addAsDockWidget(new FrameTreeWidget(mServices->patient(), this), "Browsing");
-	this->addAsDockWidget(new ToolManagerWidget(mServices->tracking(), this), "Debugging");
+	this->addAsDockWidget(new TrackingTestWidget(mServices->tracking(), this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
     this->addAsDockWidget(new FiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
 	this->addAsDockWidget(new ClippingPropertiesWidget(mServices, this), "Properties");

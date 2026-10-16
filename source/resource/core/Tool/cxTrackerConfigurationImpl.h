@@ -29,6 +29,8 @@ public:
 	virtual ~TrackerConfigurationImpl() {}
 
 	virtual void saveConfiguration(const Configuration& config);
+	/** The tools of config, with the OpenIGTLink ids of mToolList. */
+	static ConfigurationFileParser::ToolStructureVector createToolStructures(const Configuration& config);
 	virtual Configuration getConfiguration(QString uid);
 
 	virtual QStringList getSupportedTrackingSystems();

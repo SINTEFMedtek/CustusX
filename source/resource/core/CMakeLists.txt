@@ -65,6 +65,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
   Tool/cxTracker
   Tool/cxManualToolAdapter
   Tool/cxPlaybackTool
+  Tool/cxToolPositionRecorder
+  Tool/cxTrackingSystemComparison
 
   properties/cxProperty
   properties/cxPropertyNull.h

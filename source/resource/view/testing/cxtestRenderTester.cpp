@@ -85,6 +85,10 @@ RenderTester::RenderTester() :
 	mRenderer->GetActiveCamera()->SetParallelProjection(true);
 
 	mRenderWindow->AddRenderer(mRenderer);
+#ifdef CX_WINDOWS
+	// Windows widens an on-screen window below its minimum width, so the rendered image would not match the expected size
+	mRenderWindow->OffScreenRenderingOn();
+#endif
 	mRenderWindow->SetSize(120,120);
 }
 

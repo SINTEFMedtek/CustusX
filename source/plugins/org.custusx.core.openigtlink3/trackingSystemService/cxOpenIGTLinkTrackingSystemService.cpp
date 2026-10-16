@@ -16,6 +16,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxToolConfigurationParser.h"
 #include "cxTrackerConfigurationImpl.h"
+#include "cxNetworkHandler.h"
+#include "cxOpenIGTLinkStreamerService.h"
+#include "cxSettings.h"
+#include "cxXmlOptionItem.h"
 
 namespace cx
 {
@@ -36,7 +40,12 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map, ToolPtr
 OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandlerPtr networkHandler, TrackingServicePtr trackingService) :
 	mNetworkHandler(networkHandler),
 	mTrackingService(trackingService),
-	mLastTrackingState(Tool::tsNONE)
+	mLastTrackingState(Tool::tsNONE),
+	mConfigured(false),
+	mRequestedState(Tool::tsNONE),
+	mConnectionAcquired(false),
+	mFallback(false),
+	m_tsMref(Transform3D::Identity())
 {
 	if(mNetworkHandler == NULL)
 		return;
@@ -54,6 +63,7 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 				this, &OpenIGTLinkTrackingSystemService::applyPendingProbeDefinitions,
 				Qt::QueuedConnection);
 
+	connect(settings(), &Settings::valueChangedFor, this, &OpenIGTLinkTrackingSystemService::globalConfigurationFileChangedSlot);
 	this->setConfigurationFile(profile()->getToolConfigFilePath());
 }
 
@@ -74,9 +84,104 @@ void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 
 void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State val)
 {
-	TrackingSystemService::internalSetState(val);
-	mState = val;
-	emit stateChanged();
+	// A new start ends the fallback: the other system tries its device again, and asks again if it is still in use
+	if (val == Tool::tsNONE || (mFallback && val >= Tool::tsTRACKING))
+	{
+		this->deconfigure();
+	}
+	else
+	{
+		if (!mConfigured)
+		{
+			this->configure();
+		}
+		if (mConfigured)
+		{
+			mRequestedState = val;
+			if (val >= Tool::tsTRACKING)
+			{
+				this->connectToServer();
+			}
+			else
+			{
+				this->disconnectFromServer();
+			}
+		}
+	}
+	this->updateState();
+}
+
+void OpenIGTLinkTrackingSystemService::updateState()
+{
+	Tool::State state = Tool::tsNONE;
+	if (mConfigured)
+	{
+		bool connected = this->isServerConnected();
+		state = (connected && mRequestedState >= Tool::tsINITIALIZED) ? mRequestedState : Tool::tsCONFIGURED;
+	}
+	if (state != mState)
+	{
+		mState = state;
+		emit stateChanged();
+	}
+}
+
+bool OpenIGTLinkTrackingSystemService::isServerConnected() const
+{
+	// Without a network handler (in tests), act as if connected
+	return !mNetworkHandler || mNetworkHandler->isConnected();
+}
+
+void OpenIGTLinkTrackingSystemService::connectToServer()
+{
+	if (mNetworkHandler)
+	{
+		// Also when already acquired: connects again if the last attempt failed
+		QDomElement options = profile()->getXmlSettings().descend("video").getElement("video");
+		QString host = XmlOptionItem(OPENIGTLINK3_STREAMER_IP, options).readNonEmptyValue("127.0.0.1");
+		int port = XmlOptionItem(OPENIGTLINK3_STREAMER_PORT, options).readNonEmptyValue("18944").toInt();
+		mConnectionAcquired = true;
+		mNetworkHandler->acquireConnection("tracking", host, port);
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::disconnectFromServer()
+{
+	if (mNetworkHandler && mConnectionAcquired)
+	{
+		mConnectionAcquired = false;
+		mNetworkHandler->releaseConnection("tracking");
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::startFallbackTracking(QString configurationFile)
+{
+	if (mNetworkHandler)
+	{
+		this->deconfigure();
+		mFallback = true;
+		mFallbackConfigurationFile = configurationFile;
+		this->configure();
+		if (mConfigured)
+		{
+			report("OpenIGTLink: Tracking the tools of " + configurationFile + " from the OpenIGTLink server, since their device is used by another application.");
+			mRequestedState = Tool::tsTRACKING;
+			this->connectToServer();
+		}
+		else
+		{
+			mFallback = false;
+		}
+		this->updateState();
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::globalConfigurationFileChangedSlot(QString key)
+{
+	if (key == "toolConfigFile")
+	{
+		this->setConfigurationFile(profile()->getToolConfigFilePath());
+	}
 }
 
 std::vector<ToolPtr> OpenIGTLinkTrackingSystemService::getTools()
@@ -100,12 +205,11 @@ ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 void OpenIGTLinkTrackingSystemService::configure()
 {
 	//parse
-	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
+	ConfigurationFileParser configParser(mFallback ? mFallbackConfigurationFile : mConfigurationFilePath, mLoggingFolder);
 
-	if(!configParser.getTrackingSystemImplementation().contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
+	if(!mFallback && !configParser.getTrackingSystemImplementation().contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
 	{
 		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Not using OpenIGTLink tracking.";
-		this->setState(Tool::tsNONE);
 		return;
 	}
 	emit updateTrackingSystemImplementation(configParser.getTrackingSystemImplementation());
@@ -113,12 +217,23 @@ void OpenIGTLinkTrackingSystemService::configure()
 	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Using OpenIGTLink3 tracking";
 
 	std::vector<ConfigurationFileParser::ToolStructure> toolList = configParser.getToolListWithMetaInformation();
+	if (mFallback)
+	{
+		// The server replaces the device: positions in tracker space, as from the device itself
+		bool applyReference = settings()->value("openIGTLinkFallbackApplyReference", true).toBool();
+		for (ConfigurationFileParser::ToolStructure& tool : toolList)
+		{
+			tool.mApplyRefToTool = applyReference;
+		}
+	}
 
 	//Create tools
 	for(std::vector<ConfigurationFileParser::ToolStructure>::iterator it = toolList.begin(); it != toolList.end(); ++it)
 	{
 		ToolFileParser toolParser((*it).mAbsoluteToolFilePath, mLoggingFolder);
 		ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
+		if(!internalTool)
+			continue; // not a valid tool file, reported by the parser
 
 		QString devicename = internalTool->mUid;
 		OpenIGTLinkToolPtr newTool = OpenIGTLinkToolPtr(new OpenIGTLinkTool((*it), internalTool));
@@ -131,50 +246,71 @@ void OpenIGTLinkTrackingSystemService::configure()
 	if(!mReference)
 		CX_LOG_WARNING() << "OpenIGTLinkTrackingSystemService::configure() Got no reference tool";
 
-	mState = Tool::tsCONFIGURED;//Setting state directly. Cannot get setState() to work with test
+	mConfigured = true;
+	this->updateState();
 }
 
 void OpenIGTLinkTrackingSystemService::deconfigure()
 {
 	mTransformIdWarningPrinted.clear();
-
-	if (!this->isConfigured())
-		return;
-
-	mState = Tool::tsNONE;//Setting state directly. Cannot get setState() to work with test
-
+	this->disconnectFromServer();
+	mRequestedState = Tool::tsNONE;
+	mConfigured = false;
+	mFallback = false;
 	mTools.clear();
 	mReference.reset();
+	m_tsMref = Transform3D::Identity();
+	this->updateState();
 }
 
 void OpenIGTLinkTrackingSystemService::serverIsConnected()
 {
-	this->setState(Tool::tsINITIALIZED);
-	this->setState(Tool::tsTRACKING);
+	// A connection opened for video also starts tracking with an OpenIGTLink tool configuration
+	if (!mConfigured)
+	{
+		this->configure();
+	}
+	if (mConfigured)
+	{
+		mRequestedState = Tool::tsTRACKING;
+	}
+	this->updateState();
 }
 
 void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 {
-	this->setState(Tool::tsCONFIGURED);
-	this->setState(Tool::tsINITIALIZED);
+	this->updateState();
 }
 
 void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestampMS)
 {
 //	CX_LOG_DEBUG() << "receiveTransform for: " << devicename;
 	OpenIGTLinkToolPtr tool = this->getTool(devicename);
-	if(tool)
+	if(!this->isTracking())
 	{
-		if(tool->applyReference())
+		// Tracking is stopped, but the connection is still used by video
+	}
+	else if(tool)
+	{
+		bool waitingForReference = mReference && !tool->isReference() && mReference->getTimestamp() <= 0;
+		if(tool->applyReference() && waitingForReference)
 		{
+			// No reference position yet: the tool position would be in tracker space
+		}
+		else if(tool->applyReference())
+		{
+			// Positions relative to the reference (pr), as from the NDI and IGSTK tracking systems
 			Transform3D tsMs = transform;
 			Transform3D prMs = tsMs;//If no reference tool: ts==pr (ts = tracking system )
-			if(mReference && !tool->isReference())
+			if(tool->isReference())
 			{
-				Transform3D tsMpr = mReference->get_prMt();
-				prMs = tsMpr.inv() * tsMs;
+				m_tsMref = tsMs;
+				prMs = Transform3D::Identity(); // the reference is the origin of its own space
 			}
-			//Apply ref sensor pos to all tool positions
+			else if(mReference)
+			{
+				prMs = m_tsMref.inv() * tsMs; // the raw reference position, without its calibration or filtering
+			}
 			tool->toolTransformAndTimestampSlot(prMs, timestampMS);
 		}
 		else

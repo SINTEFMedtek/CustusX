@@ -7,6 +7,7 @@ if(BUILD_TESTING)
         cxtestTrackingPlugin.cpp
         cxtestCatchTrackingService.cpp
         cxtestCatchProbe.cpp
+        cxtestTrackingHardware.cpp
         cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
         )
 

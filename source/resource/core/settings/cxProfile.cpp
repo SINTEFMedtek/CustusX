@@ -16,6 +16,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <iostream>
 #include <QApplication>
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QTextStream>
 #include "cxConfig.h"
 #include "cxSettings.h"
 #include "cxFileHelpers.h"
@@ -91,7 +94,7 @@ void Profile::setToolConfigFilePath(QString path)
 	QString expectedPath = this->getApplicationToolConfigPaths().front();
 
 	QFileInfo info(path);
-	if (info.absolutePath() != expectedPath)
+	if (QDir::cleanPath(info.absolutePath()) != QDir::cleanPath(expectedPath))
 		CX_LOG_WARNING() << "Set ref to file " << path << ", should be in folder " << expectedPath;
 
 	settings()->setValue("toolConfigFile", info.fileName());
@@ -341,6 +344,7 @@ void ProfileManager::setActiveProfile(QString uid)
 	}
 
 	// uid now is guaranteed to exist in the custom folder
+	this->addMissingToolConfigs(uid);
 
 	mActive.reset(new Profile(this->getPathForCustom(uid), mSettings));
 	this->getGenericSettings()->setValue("profile", mActive->getUid());
@@ -373,6 +377,86 @@ void ProfileManager::createCustomProfile(QString uid)
 			this->newProfile(uid);
 		}
 	}
+}
+
+namespace
+{
+const char* kOfferedToolConfigsFile = ".offered_tool_configs"; ///< Not an .xml file: not listed as a tool configuration
+
+QStringList readLines(QString filename)
+{
+	QStringList retval;
+	QFile file(filename);
+	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QTextStream stream(&file);
+		while (!stream.atEnd())
+		{
+			QString line = stream.readLine().trimmed();
+			if (!line.isEmpty())
+			{
+				retval << line;
+			}
+		}
+	}
+	return retval;
+}
+
+void writeLines(QString filename, QStringList lines)
+{
+	QFile file(filename);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+	{
+		QTextStream(&file) << lines.join("\n") << "\n";
+	}
+}
+} // namespace
+
+void ProfileManager::addMissingToolConfigs(QString uid)
+{
+	QStringList configPaths = DataLocations::getRootConfigPaths();
+	for (int i=0; i<configPaths.size(); ++i)
+	{
+		QString installedPath = configPaths[i]+"/profiles/"+uid;
+		QStringList copied = copyMissingToolConfigs(installedPath, this->getPathForCustom(uid));
+		if (!copied.isEmpty())
+		{
+			CX_LOG_INFO() << "Added tool configurations to profile " << uid << ": " << copied.join(", ");
+		}
+	}
+}
+
+QStringList ProfileManager::copyMissingToolConfigs(QString installedProfilePath, QString customProfilePath)
+{
+	QStringList retval;
+	QString customToolPath = customProfilePath + "/tool";
+	QStringList installedConfigs = getAbsolutePathToXmlFiles(installedProfilePath + "/tool");
+	if (!installedConfigs.isEmpty())
+	{
+		QDir().mkpath(customToolPath);
+	}
+	// Each shipped configuration is offered once, so that one the user deleted is not copied back
+	QString offeredFile = customToolPath + "/" + kOfferedToolConfigsFile;
+	QStringList offered = readLines(offeredFile);
+	QStringList newlyOffered;
+	foreach(QString installedConfig, installedConfigs)
+	{
+		QString fileName = QFileInfo(installedConfig).fileName();
+		QString target = customToolPath + "/" + fileName;
+		if (!offered.contains(fileName))
+		{
+			newlyOffered << fileName;
+			if (!QFileInfo::exists(target) && QFile::copy(installedConfig, target))
+			{
+				retval << fileName;
+			}
+		}
+	}
+	if (!newlyOffered.isEmpty())
+	{
+		writeLines(offeredFile, offered + newlyOffered);
+	}
+	return retval;
 }
 
 void ProfileManager::profilesChanged()

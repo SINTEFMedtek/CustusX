@@ -117,7 +117,7 @@ void ReconstructPreprocessor::cropInputData()
 {
 	//IntBoundingBox3D
 	ProbeDefinition sector = mFileData.mProbeDefinition.mData;
-	IntBoundingBox3D cropbox(sector.getClipRect_p().begin());
+	IntBoundingBox3D cropbox(sector.getClipRect_p().data());
 	cropbox = this->reduceCropboxToImageSize(cropbox, sector.getSize());
 	Eigen::Vector3i shift = cropbox.corner(0,0,0).cast<int>();
 	Eigen::Vector3i size = cropbox.range().cast<int>() + Eigen::Vector3i(1,1,0); // convert from extent format to size format by adding 1

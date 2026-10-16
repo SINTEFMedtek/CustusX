@@ -66,6 +66,8 @@ public:
 	virtual ~TrackingSystemBronchoscopyService();
 
 	bool setTrackingSystem(QString trackingSystemName);
+	/** The tracking system that has tool, e.g. the IGSTK or the NDI system. Empty if none has it. */
+	static TrackingSystemServicePtr findTrackingSystemWithTool(std::vector<TrackingSystemServicePtr> trackingSystems, ToolPtr tool);
 
 	virtual QString getUid() const { return "org.custusx.bronchoscopynavigation"; }
 	void setTool(ToolPtr tool);
@@ -85,7 +87,7 @@ private slots:
 	void onStateChanged();
 
 private:
-	TrackingSystemServicePtr getIGSTKTrackingSystemService();
+	void setBase(TrackingSystemServicePtr base);
 
 	std::vector<ToolPtr> mTools; ///< all tools
 	ToolPtr mTool;

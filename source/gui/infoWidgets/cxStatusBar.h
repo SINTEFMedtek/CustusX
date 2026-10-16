@@ -76,6 +76,8 @@ public:
   StatusBar(TrackingServicePtr trackingService, ViewServicePtr viewService, VideoServicePtr videoService); ///< connects signals and slots
   virtual ~StatusBar(); ///< empty
 
+  static QString getToolStyle(bool visible, bool initialized, bool active, bool positionWarning); ///< Button style for a tool's tracking status
+
 private slots:
   void connectToToolSignals(); ///< connect to all available tools
   void disconnectFromToolSignals(); ///< disconnect from all tool
@@ -91,7 +93,6 @@ private slots:
 private:
   void fixFlickeringBar();
   void activateTool(QString uid);
-  QString getToolStyle(bool visible, bool initialized, bool active);
 
   QLabel* mRenderingFpsLabel; ///< Label for showing rendering FPS
   QLabel* mGrabbingInfoLabel; ///< Label for showing info about the grabber
