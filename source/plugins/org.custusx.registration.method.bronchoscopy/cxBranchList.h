@@ -31,6 +31,7 @@ typedef std::vector< Eigen::Matrix4d > M4Vector;
 #define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_EXISTING_BRANCH 60 //deg
 #define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_NEW_BRANCH 40 //deg
 #define MAX_ORIENTATION_VARIANCE_IN_NEW_BRANCH 0.6 // To exclude "noisy" branches which are difficult to connect correctly
+#define MAX_MAIN_AIRWAY_SPUR_LENGTH 10 //mm. Branches on the trachea or main bronchi that end within this length, also through their children, are spurs, not airways.
 
 
 class org_custusx_registration_method_bronchoscopy_EXPORT BranchList
@@ -43,8 +44,11 @@ public:
 	void deleteBranch(BranchPtr b);
 	void deleteAllBranches();
 	std::vector<BranchPtr> getBranches();
-	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true, bool connectSeparateSegments = true);
+	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true, bool connectSeparateSegments = true, bool cleanUpAirwayTree = true);
 	void selectGenerations(int maxGeneration);
+	void removeShortEndBranchesFromMainAirways(double maxLength);
+	void selectTracheaAsLargestTree(double maxFragmentLength);
+	void mergeAllSingleChildren();
 //	void findBronchoscopeRotation();
 //	void calculateBronchoscopeRotation(BranchPtr branch);
 	void smoothOrientations();
@@ -68,7 +72,8 @@ private:
 	BranchPtr findBranchToConnect(BranchPtr newBranch, double maxDistanceToExistingBranch);
 	bool findRemainingPointClosestToExistingBranch(bool connectSeparateSegments, Eigen::MatrixXd positionsNotUsed_r, double& minDistance, Eigen::MatrixXd::Index& startIndex, int &splitIndex, BranchPtr& branchToSplit);
 	double maxDistanceToExistingBranch(bool connectSeparateSegments);
-	void mergeTracheasSingleChildIntoTrachea();
+	void mergeSingleChildInto(BranchPtr branch);
+	void removeShortEndBranches(BranchPtr branch, double maxLength);
 	std::vector<BranchPtr> findClosesBranches(Vector3D position, double maxDistance);
 	double findDistance(Vector3D p1, Vector3D p2);
 	BranchPtr findClosestBranch(Vector3D targetCoordinate_r);
