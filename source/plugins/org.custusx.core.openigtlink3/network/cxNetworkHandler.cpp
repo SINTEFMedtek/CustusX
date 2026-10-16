@@ -67,6 +67,11 @@ NetworkHandler::~NetworkHandler()
 igtlioSessionPointer NetworkHandler::requestConnectToServer(std::string serverHost, int serverPort, IGTLIO_SYNCHRONIZATION_TYPE sync, double timeout_s)
 {
 	mSession = mLogic->ConnectToServer(serverHost, serverPort, sync, timeout_s);
+	if (mSession && mSession->GetConnector())
+	{
+		// TCP already detects transfer errors. The CRC of each video frame took about 8% of a CPU core at 40 Hz.
+		mSession->GetConnector()->SetCheckCRC(false);
+	}
 	//This seems to cause the OpenIGTLink crash (#15): Not sure if this use of OpenIGTLink is threadsafe.
 	//Disabled for now
 	// mSession2 = mLogic->ConnectToServer(serverHost, 18945, sync, timeout_s);//Hack for getting video and tracking from two different OpenIGTLink servers
