@@ -40,6 +40,7 @@ if(BUILD_TESTING)
         cxtestActiveData.cpp
         cxtestStreamedTimestampSynchronizer.cpp
         cxtestAcquisitionTimestamps.cpp
+        cxtestSlicedImageProxy.cpp
         cxtestToolPositionRecorder.cpp
         cxtestToolConfigurations.cpp
         cxtestTestDataStructures.h

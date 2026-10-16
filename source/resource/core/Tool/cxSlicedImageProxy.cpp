@@ -246,7 +246,12 @@ void SlicedImageProxy::update()
 	Transform3D iMr = mImage->get_rMd().inv();
 	Transform3D M = iMr * rMs;
 
-	mMatrixAxes->DeepCopy(M.getVtkMatrix());
+	// Only when changed: setting the same axes would slice again. The image and the plane often move together,
+	// e.g. a probe image in a view that follows the probe.
+	if (!similar(Transform3D(mMatrixAxes), M))
+	{
+		mMatrixAxes->DeepCopy(M.getVtkMatrix());
+	}
 }
 
 void SlicedImageProxy::transformChangedSlot()
