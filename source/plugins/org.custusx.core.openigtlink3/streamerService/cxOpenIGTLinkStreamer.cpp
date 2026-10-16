@@ -26,6 +26,7 @@ OpenIGTLinkStreamer::~OpenIGTLinkStreamer()
 void OpenIGTLinkStreamer::startStreaming(SenderPtr sender)
 {
 	mSender = sender;
+	emit startedStreaming();
 }
 
 void OpenIGTLinkStreamer::stopStreaming()

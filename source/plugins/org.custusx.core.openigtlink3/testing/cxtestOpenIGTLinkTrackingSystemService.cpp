@@ -16,6 +16,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTrackerConfiguration.h"
 #include "cxOpenIGTLinkTool.h"
+#include "cxOpenIGTLinkStreamerService.h"
+#include "cxOpenIGTLinkStreamer.h"
+#include <QDomDocument>
 #include <QFileInfo>
 
 namespace {
@@ -33,6 +36,15 @@ public:
 	double getTimestampOffset(QString deviceName = "device")
 	{
 		return mClockSynchronizers.count(deviceName) ? mClockSynchronizers[deviceName].getOffset_ms() : 0.0;
+	}
+	void setSentProbeDefinitions(QString deviceName, int sent)
+	{
+		mDevices[deviceName].deviceName = deviceName;
+		mDevices[deviceName].sentNumProbeDefinitions = sent;
+	}
+	int getSentProbeDefinitions(QString deviceName)
+	{
+		return mDevices[deviceName].sentNumProbeDefinitions;
 	}
 };
 
@@ -675,5 +687,18 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool files with OpenIGTLink id
 }
 
 #endif
+
+TEST_CASE("OpenIGTLinkStreamerService: the probe definition is sent again when the streaming starts", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr connection(new FakeServerNetworkHandler());
+	cx::OpenIGTLinkStreamerService service(connection);
+	QDomDocument document;
+	cx::StreamerPtr streamer = service.createStreamer(document.createElement("root"));
+
+	// Images were already received over the connection used by tracking, using up the probe definitions to send
+	connection->setSentProbeDefinitions("BK", 2);
+	streamer->startStreaming(cx::SenderPtr());
+	CHECK(connection->getSentProbeDefinitions("BK") == 0);
+}
 
 }//cxtest
