@@ -17,6 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxSliceComputer.h"
 #include "cxTool.h"
+#include "cxProbe.h"
+#include "cxProbeDefinition.h"
 
 namespace cx
 {
@@ -59,19 +61,20 @@ void SliceProxy::setTool(ToolPtr tool)
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
 		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
 		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
-		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(changed())); 
+		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChangedSlot()));
 	}
 
 	mTool = tool;
 	if(mTool)
 		mCutplane->setIsProbe(mTool->hasType(Tool::TOOL_US_PROBE));
+	this->updateProbeSectorCenter();
 
 	if (mTool)
 	{
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
 		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
 		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
-		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(changed()));/// not used here, but forwarded to users
+		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChangedSlot())); // also forwarded to users
 
 		emit toolVisible(mTool->getVisible());
 		toolTransformAndTimestampSlot(mTool->get_prMt(), 0); // initial values
@@ -95,6 +98,24 @@ void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestam
 	this->changed();
 	emit toolTransformAndTimestamp(prMt, timestamp);
 
+}
+
+void SliceProxy::probeSectorChangedSlot()
+{
+	this->updateProbeSectorCenter();
+	this->changed();
+}
+
+void SliceProxy::updateProbeSectorCenter()
+{
+	double depth_mm = -1.0;
+	ProbePtr probe = mTool ? mTool->getProbe() : ProbePtr();
+	if (probe && probe->getProbeDefinition().getType() != ProbeDefinition::tNONE)
+	{
+		ProbeDefinition definition = probe->getProbeDefinition();
+		depth_mm = (definition.getDepthStart() + definition.getDepthEnd()) / 2.0;
+	}
+	mCutplane->setProbeSectorCenterDepth(depth_mm);
 }
 
 void SliceProxy::tooltipOffsetSlot(double val)

@@ -109,6 +109,11 @@ Transform3D SliceComputer::getToolPosition() const
 	return m_rMt;
 }
 
+void SliceComputer::setProbeSectorCenterDepth(double depth_mm)
+{
+	mProbeSectorCenterDepth = depth_mm;
+}
+
 void SliceComputer::setIsProbe(bool isProbe)
 {
 	mIsProbe = isProbe;
@@ -237,11 +242,30 @@ SlicePlane SliceComputer::getPlane()  const
  */
 SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 {
-	if (!mUseViewOffset)
+	SlicePlane retval = base;
+	if (mUseViewOffset && mIsProbe && mProbeSectorCenterDepth > 0.0)
 	{
-		return base;
+		retval = this->centerOnProbeSector(base);
 	}
+	else if (mUseViewOffset)
+	{
+		retval = this->applyToolViewOffset(base);
+	}
+	return retval;
+}
 
+/** The middle of the probe sector is in the center of the view. The origin of a curved probe is outside of the image:
+ *  an offset from it moves the image out of the view when zooming in. */
+SlicePlane SliceComputer::centerOnProbeSector(const SlicePlane& base) const
+{
+	SlicePlane retval = base;
+	Vector3D sectorCenter = m_rMt.coord(Vector3D(0, 0, mProbeSectorCenterDepth));
+	retval.c = base.c + dot(sectorCenter - base.c, base.j) * base.j; // the j-component only, as for the tool offset
+	return retval;
+}
+
+SlicePlane SliceComputer::applyToolViewOffset(const SlicePlane& base) const
+{
 	double centerOffset = this->getViewOffsetAbsoluteFromCenter();
 
 	SlicePlane retval = base;

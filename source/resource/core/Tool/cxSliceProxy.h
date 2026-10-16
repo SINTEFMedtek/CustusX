@@ -121,6 +121,7 @@ signals:
 private slots:
 	void clinicalApplicationChangedSlot();
 	void tooltipOffsetSlot(double val);
+	void probeSectorChangedSlot();
 	void toolTransformAndTimestampSlot(Transform3D prMt, double timestamp); 
 	void toolVisibleSlot(bool visible); 
 	void centerChangedSlot();
@@ -130,6 +131,7 @@ private:
 	SliceProxy(PatientModelServicePtr dataManager);
 	Transform3D getSyntheticToolPos(const Vector3D& center) const;
 	void initCutplane();
+	void updateProbeSectorCenter();
 
 	ToolPtr mTool;
 	std::unique_ptr<SliceComputer> mCutplane;
