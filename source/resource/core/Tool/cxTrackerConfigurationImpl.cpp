@@ -22,6 +22,18 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+namespace
+{
+/** Also for different spellings of the path. A missing file has no canonical path: compare its absolute path. */
+bool isSameFile(QString a, QString b)
+{
+	QString canonicalA = QFileInfo(a).canonicalFilePath();
+	QString canonicalB = QFileInfo(b).canonicalFilePath();
+	bool bothExist = !canonicalA.isEmpty() && !canonicalB.isEmpty();
+	return bothExist ? (canonicalA == canonicalB) : (QFileInfo(a).absoluteFilePath() == QFileInfo(b).absoluteFilePath());
+}
+} // namespace
+
 void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 {
 	ConfigurationFileParser::Configuration data;
@@ -29,38 +41,30 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 	data.mClinical_app = config.mClinicalApplication;
 	data.mTrackingSystemImplementation = config.mTrackingSystemImplementation;
 	data.mApplyRefToTools = config.mApplyRefToTools;
-
-	QStringList selectedTools = config.mTools;
-	QString referencePath = config.mReferenceTool;
-
 	TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(config.mTrackingSystemName);
+	data.mTrackersAndTools[selectedTracker] = createToolStructures(config);
+	ConfigurationFileParser::saveConfiguration(data);
+}
 
-	ConfigurationFileParser::ToolStructureVector toolStructureVector;
-//	QFile configFile(data.mFileName);
-//	QFileInfo info(configFile);
-//	QDir dir = info.dir();
-	foreach(QString absoluteToolPath, selectedTools)
+ConfigurationFileParser::ToolStructureVector TrackerConfigurationImpl::createToolStructures(const Configuration& config)
+{
+	ConfigurationFileParser::ToolStructureVector retval;
+	foreach(QString absoluteToolPath, config.mTools)
 	{
-//	  QString relativeToolFilePath = dir.relativeFilePath(absoluteToolPath);
 		ConfigurationFileParser::ToolStructure tool;
 		tool.mAbsoluteToolFilePath = absoluteToolPath;
-		tool.mReference = (absoluteToolPath == referencePath);
-
+		tool.mReference = (absoluteToolPath == config.mReferenceTool);
 		for (unsigned i = 0; i < config.mToolList.size(); ++i)
 		{
-			if(tool.mAbsoluteToolFilePath == config.mToolList[i].mAbsoluteToolFilePath)
+			if(isSameFile(tool.mAbsoluteToolFilePath, config.mToolList[i].mAbsoluteToolFilePath))
 			{
 				tool.mOpenIGTLinkImageId = config.mToolList[i].mOpenIGTLinkImageId;
 				tool.mOpenIGTLinkTransformId = config.mToolList[i].mOpenIGTLinkTransformId;
 			}
 		}
-
-		toolStructureVector.push_back(tool);
+		retval.push_back(tool);
 	}
-
-	data.mTrackersAndTools[selectedTracker] = toolStructureVector;
-
-	ConfigurationFileParser::saveConfiguration(data);
+	return retval;
 }
 
 TrackerConfiguration::Configuration TrackerConfigurationImpl::getConfiguration(QString uid)
@@ -114,11 +118,13 @@ TrackerConfigurationImpl::Tool TrackerConfigurationImpl::getTool(QString uid)
 
 	ToolFileParser parser(absoluteFilePath);
 	ToolFileParser::ToolInternalStructurePtr internal = parser.getTool();
-
-	retval.mTrackingSystemName = enum2string(internal->mTrackerType);
-	retval.mIsReference = internal->mIsReference;
-	retval.mPictureFilename = internal->mPictureFileName;
-	retval.mPortNumber = internal->mPortNumber;
+	if (internal) // empty for a missing or invalid tool file
+	{
+		retval.mTrackingSystemName = enum2string(internal->mTrackerType);
+		retval.mIsReference = internal->mIsReference;
+		retval.mPictureFilename = internal->mPictureFileName;
+		retval.mPortNumber = internal->mPortNumber;
+	}
 
 	return retval;
 }
@@ -208,7 +214,7 @@ ToolFileParser::ToolInternalStructurePtr TrackerConfigurationImpl::getToolIntern
 bool TrackerConfigurationImpl::verifyTool(QString uid)
 {
 	ToolFileParser::ToolInternalStructurePtr internal = this->getToolInternal(uid);
-	return internal->verify();
+	return internal && internal->verify();
 }
 
 QString TrackerConfigurationImpl::getConfigurationApplicationsPath()

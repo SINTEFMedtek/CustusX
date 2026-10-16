@@ -37,6 +37,8 @@ if(BUILD_TESTING)
         cxtestMetricsWidget.cpp
         cxtestEraserWidget.cpp
         cxtestFiltersWidget.cpp
+        cxtestStatusBar.cpp
+        cxtestTrackingComparisonWidget.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})

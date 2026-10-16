@@ -89,5 +89,5 @@ ctkMacroBuildPlugin(
   ${CX_CTK_PLUGIN_NO_INSTALL}
 )
 
-#add_subdirectory(testing)
+add_subdirectory(testing)
 

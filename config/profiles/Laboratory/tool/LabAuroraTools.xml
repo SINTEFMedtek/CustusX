@@ -1,0 +1,11 @@
+<?xml version = "1.0"?>
+<configuration clinical_app="Laboratory">
+    <trackingsystemimplementation type="ndi">
+        <tracker type="aurora">
+            <toolfile reference="yes">Shared/Reference_AURORA_port1/Reference_AURORA_port1.xml</toolfile>
+            <toolfile reference="no">Shared/Pointer_AURORA_port2/Pointer_AURORA_port2.xml</toolfile>
+            <toolfile reference="no">Shared/Sensor_AURORA_port3/Sensor_AURORA_port3.xml</toolfile>
+            <toolfile reference="no">Shared/Sensor_AURORA_port4/Sensor_AURORA_port4.xml</toolfile>
+        </tracker>
+    </trackingsystemimplementation>
+</configuration>

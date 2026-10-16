@@ -40,6 +40,43 @@ public:
 	}
 };
 
+/** Pretends to connect to a server, which answers if mServerAvailable */
+class FakeServerNetworkHandler : public TestNetworkHandler
+{
+public:
+	bool mServerAvailable = true;
+	bool mConnected = false;
+	int mConnectAttempts = 0;
+
+	igtlioSessionPointer requestConnectToServer(std::string serverHost, int serverPort, IGTLIO_SYNCHRONIZATION_TYPE sync, double timeout_s) override
+	{
+		Q_UNUSED(serverHost);
+		Q_UNUSED(serverPort);
+		Q_UNUSED(sync);
+		Q_UNUSED(timeout_s);
+		++mConnectAttempts;
+		mConnected = mServerAvailable;
+		if (mConnected)
+		{
+			emit connected();
+		}
+		return igtlioSessionPointer();
+	}
+	void disconnectFromServer() override
+	{
+		if (mConnected)
+		{
+			mConnected = false;
+			emit disconnected();
+		}
+	}
+	bool isConnected() const override
+	{
+		return mConnected;
+	}
+};
+typedef std::shared_ptr<FakeServerNetworkHandler> FakeServerNetworkHandlerPtr;
+
 class OpenIGTLinkTrackingSystemServiceMoc : public cx::OpenIGTLinkTrackingSystemService
 {
 public:
@@ -171,55 +208,134 @@ void getDeviceNames(std::vector<PositionReceiverPtr> positionReceivers, QString&
 	}
 }
 
+void setCxOpenIGTLinkConfiguration(OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService)
+{
+	// An OpenIGTLink tool configuration in CustusX's own config folder: one tool with transform id AnserNeedle1
+	QStringList configurations = trackingSystemService->getConfiguration()->getAllConfigurations();
+	int posToolConfigFile = 0;
+	REQUIRE(findConfigFileNumberInList(configurations, QString("Bronchoscopy_Anser_one_needle"), posToolConfigFile));
+	trackingSystemService->setConfigurationFile(configurations[posToolConfigFile]);
+}
+
+const QString kCxOpenIGTLinkTool = "AnserNeedle1";
+
 } // namespace
 
 namespace cxtest
 {
 
-TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("OpenIGTLinkTrackingSystemService: Stays in tsNONE without an OpenIGTLink tool configuration", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
-
-	CHECK(trackingSystemService->getState() == cx::Tool::tsNONE);
-	CHECK_FALSE(trackingSystemService->isConfigured());
-	CHECK_FALSE(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
-
-	// Set up
-
-	trackingSystemService->internalSetState(cx::Tool::tsCONFIGURED);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK_FALSE(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
-
-	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
+	trackingSystemService->setConfigurationFile("");
 
 	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK(trackingSystemService->isInitialized());
-	CHECK(trackingSystemService->isTracking());
-
-	//Take down
-
-	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
-
-	trackingSystemService->internalSetState(cx::Tool::tsCONFIGURED);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK_FALSE(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
-
-	trackingSystemService->internalSetState(cx::Tool::tsNONE);
-	CHECK_FALSE(trackingSystemService->isConfigured());
-	CHECK_FALSE(trackingSystemService->isInitialized());
+	CHECK(trackingSystemService->getState() == cx::Tool::tsNONE);
 	CHECK_FALSE(trackingSystemService->isTracking());
 }
 
+TEST_CASE("OpenIGTLinkTrackingSystemService: start tracking connects to the server, and stop disconnects", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService(new OpenIGTLinkTrackingSystemServiceMoc(server));
+	setCxOpenIGTLinkConfiguration(trackingSystemService);
+
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+	CHECK(server->mConnectAttempts == 1);
+	CHECK(server->isConnected());
+	CHECK(trackingSystemService->isTracking());
+
+	// Stop tracking from the toolbar asks for tsINITIALIZED
+	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
+	CHECK_FALSE(server->isConnected());
+	CHECK(trackingSystemService->getState() == cx::Tool::tsCONFIGURED);
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: without an answer from the server, tracking does not start until a new start", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	server->mServerAvailable = false;
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService(new OpenIGTLinkTrackingSystemServiceMoc(server));
+	setCxOpenIGTLinkConfiguration(trackingSystemService);
+
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+	CHECK(trackingSystemService->getState() == cx::Tool::tsCONFIGURED);
+
+	server->mServerAvailable = true;
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+	CHECK(server->mConnectAttempts == 2);
+	CHECK(trackingSystemService->isTracking());
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: a video connection starts tracking, and stopping tracking keeps it", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService(new OpenIGTLinkTrackingSystemServiceMoc(server));
+	setCxOpenIGTLinkConfiguration(trackingSystemService);
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+
+	server->acquireConnection("video", "127.0.0.1", 18944);
+	CHECK(trackingSystemService->isTracking());
+	trackingSystemService->receiveTransform(kCxOpenIGTLinkTool, cx::Transform3D::Identity(), timestampMS);
+	CHECK(trackingSystemService->getTool(kCxOpenIGTLinkTool)->getTimestamp() == Approx(timestampMS));
+
+	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
+	CHECK(server->isConnected());
+	CHECK(trackingSystemService->getState() == cx::Tool::tsINITIALIZED);
+	trackingSystemService->receiveTransform(kCxOpenIGTLinkTool, cx::Transform3D::Identity(), timestampMS + 100);
+	CHECK(trackingSystemService->getTool(kCxOpenIGTLinkTool)->getTimestamp() == Approx(timestampMS));
+
+	server->releaseConnection("video");
+	CHECK(trackingSystemService->getState() == cx::Tool::tsCONFIGURED);
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: tracks the tools of an NDI configuration whose device is in use", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService(new OpenIGTLinkTrackingSystemServiceMoc(server));
+	QStringList configurations = trackingSystemService->getConfiguration()->getAllConfigurations();
+	int posToolConfigFile = 0;
+	REQUIRE(findConfigFileNumberInList(configurations, QString("LabAuroraTools"), posToolConfigFile));
+	QString ndiConfiguration = configurations[posToolConfigFile];
+	trackingSystemService->setConfigurationFile(ndiConfiguration);
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+
+	// Not an OpenIGTLink configuration: only tracked as a fallback
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+	CHECK(trackingSystemService->getState() == cx::Tool::tsNONE);
+
+	trackingSystemService->startFallbackTracking(ndiConfiguration);
+	CHECK(trackingSystemService->isTracking());
+	CHECK(server->mConnectAttempts == 1);
+	// The Aurora sensor on port number 2 is found by the transform name port_2, the reference by port_0
+	REQUIRE(trackingSystemService->getTool("port_2"));
+	CHECK(trackingSystemService->getTool("port_2")->applyReference()); // the server replaces the device
+	trackingSystemService->receiveTransform("port_0", cx::createTransformTranslate(cx::Vector3D(10, 0, 0)), timestampMS);
+	trackingSystemService->receiveTransform("port_2", cx::createTransformTranslate(cx::Vector3D(15, 0, 0)), timestampMS);
+	CHECK(trackingSystemService->getTool("port_2")->getTimestamp() == Approx(timestampMS));
+	// Relative to the reference, which is the origin, as from the NDI and IGSTK tracking systems
+	CHECK(cx::similar(trackingSystemService->getTool("port_0")->get_prMt(), cx::Transform3D::Identity()));
+	CHECK(cx::similar(trackingSystemService->getTool("port_2")->get_prMt().translation(), cx::Vector3D(5, 0, 0)));
+
+	// A new start ends the fallback, so that the NDI system tries its device again
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+	CHECK(trackingSystemService->getState() == cx::Tool::tsNONE);
+	CHECK_FALSE(server->isConnected());
+}
+
+TEST_CASE("NetworkHandler: the connection is shared, and closed when the last user releases it", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+
+	server->acquireConnection("video", "127.0.0.1", 18944);
+	server->acquireConnection("tracking", "127.0.0.1", 18944);
+	CHECK(server->mConnectAttempts == 1);
+
+	server->releaseConnection("video");
+	CHECK(server->isConnected());
+	server->releaseConnection("tracking");
+	CHECK_FALSE(server->isConnected());
+}
 
 TEST_CASE("NetworkHandler: Test timestamp verification", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
@@ -327,6 +443,8 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test timestamp synchronization", "[
 TEST_CASE("OpenIGTLinkTrackingSystemService: receiveTransform print openigtlinktransformid warning", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+	setCxOpenIGTLinkConfiguration(trackingSystemService);
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
 	cx::Transform3D transform = cx::Transform3D::Identity();
 	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
 	QString deviceName = "testDevice";
@@ -350,6 +468,55 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: print openigtlinktransformid warnin
 }
 
 #ifdef CX_CUSTUS_SINTEF
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+
+	CHECK(trackingSystemService->getState() == cx::Tool::tsNONE);
+	CHECK_FALSE(trackingSystemService->isConfigured());
+	CHECK_FALSE(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+
+	QStringList configurations = trackingSystemService->getConfiguration()->getAllConfigurations();
+	int posToolConfigFile = 0;
+	REQUIRE(findConfigFileNumberInList(configurations, QString("PLUS"), posToolConfigFile));
+	trackingSystemService->setConfigurationFile(configurations[posToolConfigFile]);
+
+	// Set up
+
+	trackingSystemService->internalSetState(cx::Tool::tsCONFIGURED);
+	CHECK(trackingSystemService->isConfigured());
+	CHECK_FALSE(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+
+	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
+	CHECK(trackingSystemService->isConfigured());
+	CHECK(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+	CHECK(trackingSystemService->isConfigured());
+	CHECK(trackingSystemService->isInitialized());
+	CHECK(trackingSystemService->isTracking());
+
+	//Take down
+
+	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
+	CHECK(trackingSystemService->isConfigured());
+	CHECK(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+
+	trackingSystemService->internalSetState(cx::Tool::tsCONFIGURED);
+	CHECK(trackingSystemService->isConfigured());
+	CHECK_FALSE(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+
+	trackingSystemService->internalSetState(cx::Tool::tsNONE);
+	CHECK_FALSE(trackingSystemService->isConfigured());
+	CHECK_FALSE(trackingSystemService->isInitialized());
+	CHECK_FALSE(trackingSystemService->isTracking());
+}
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state using tool config file for Plus", "[plugins][org.custusx.core.openigtlink3][integration]")
 {
@@ -403,7 +570,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool config files, and apply r
 	CHECK(trackerConfig.mTrackingSystemImplementation == cx::TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK);
 	CHECK_FALSE(trackerConfig.mApplyRefToTools);
 
-	trackingSystemService->configure();
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
 	CHECK(trackingSystemService->isConfigured());
 
 	std::vector<PositionReceiverPtr> positionReceivers = setupTestTools(trackerConfig, trackingSystemService);
@@ -446,7 +613,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool config files, and apply r
 	CHECK(trackerConfig.mTrackingSystemImplementation == cx::TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK);
 	CHECK(trackerConfig.mApplyRefToTools);
 
-	trackingSystemService->configure();
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
 	CHECK(trackingSystemService->isConfigured());
 
 	positionReceivers = setupTestTools(trackerConfig, trackingSystemService);
@@ -468,6 +635,36 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool config files, and apply r
 
 	trackingSystemService->deconfigure();
 	CHECK_FALSE(trackingSystemService->isConfigured());
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: tool positions wait for the first reference position", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+	cx::TrackerConfigurationPtr config = trackingSystemService->getConfiguration();
+	QStringList configurations = config->getAllConfigurations();
+	int posToolConfigFile = 0;
+	REQUIRE(findConfigFileNumberInList(configurations, QString("BK_LabTest"), posToolConfigFile));
+	QString toolConfigFile = configurations[posToolConfigFile];
+	trackingSystemService->setConfigurationFile(toolConfigFile);
+	cx::TrackerConfiguration::Configuration trackerConfig = config->getConfiguration(toolConfigFile);
+	REQUIRE(trackerConfig.mApplyRefToTools);
+	trackingSystemService->internalSetState(cx::Tool::tsTRACKING);
+
+	std::vector<PositionReceiverPtr> positionReceivers = setupTestTools(trackerConfig, trackingSystemService);
+	QString refToolDeviceName;
+	QString toolDeviceName;
+	PositionReceiverPtr toolPositionReceiver;
+	getDeviceNames(positionReceivers, refToolDeviceName, toolDeviceName, toolPositionReceiver);
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+
+	trackingSystemService->receiveTransform(toolDeviceName, cx::Transform3D::Identity(), timestampMS);
+	CHECK(trackingSystemService->getTool(toolDeviceName)->getTimestamp() == 0);
+
+	trackingSystemService->receiveTransform(refToolDeviceName, cx::Transform3D::Identity(), timestampMS);
+	trackingSystemService->receiveTransform(toolDeviceName, cx::Transform3D::Identity(), timestampMS);
+	CHECK(trackingSystemService->getTool(toolDeviceName)->getTimestamp() == Approx(timestampMS));
+
+	trackingSystemService->deconfigure();
 }
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool files with OpenIGTLink id", "[plugins][org.custusx.core.openigtlink3][unit]")

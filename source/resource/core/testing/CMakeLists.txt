@@ -14,6 +14,7 @@ if(BUILD_TESTING)
         cxtestCatchSharedMemory.cpp
         cxtestCatchTransform3D.cpp
         cxtestCatchVector3D.cpp
+        cxtestMathUtils.cpp
         cxtestImageParameters.cpp
         cxtestCatchImageAlgorithms.cpp
         cxtestBinaryThinning3D.cpp
@@ -38,6 +39,8 @@ if(BUILD_TESTING)
         cxtestVisServices.cpp
         cxtestActiveData.cpp
         cxtestStreamedTimestampSynchronizer.cpp
+        cxtestToolPositionRecorder.cpp
+        cxtestToolConfigurations.cpp
         cxtestTestDataStructures.h
         cxtestTestDataStructures.cpp
         cxtestDataLocations.cpp

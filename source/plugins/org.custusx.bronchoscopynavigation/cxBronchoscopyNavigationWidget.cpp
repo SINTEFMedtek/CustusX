@@ -172,6 +172,12 @@ void BronchoscopyNavigationWidget::enableSlot()
 //			CX_LOG_WARNING() << "Did not find bronchoscopy navigation tracking system.";
 
 		mTrackingSystem = TrackingSystemBronchoscopyServicePtr(new TrackingSystemBronchoscopyService(mTrackingService, mProjectionCenterlinePtr, mToolSelector->getTool()));
+		if (!mTrackingSystem->getBase())
+		{
+			mTrackingSystem.reset();
+			reportError("No tracking system has the selected tool");
+			return;
+		}
 		mTrackingService->unInstallTrackingSystem(mTrackingSystem->getBase());
 		mTrackingService->installTrackingSystem(mTrackingSystem);
 	}

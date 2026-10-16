@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QtWidgets>
 
 #include <iostream>
+#include "cxFileDialogOptions.h"
 
 namespace cx
 {
@@ -159,7 +160,7 @@ void MultiFileInputWidget::browse()
 	if (mUseRelativePath)
 		text = QString("Select file relative to %1").arg(mBasePath);
 
-	QString filename = QFileDialog::getExistingDirectory(this, text, mBasePath);
+	QString filename = QFileDialog::getExistingDirectory(this, text, mBasePath, fileDialogOptions(QFileDialog::ShowDirsOnly));
 	if (filename.isEmpty())
 		return;
 //	QString filename = QFileDialog::getOpenFileName(this, text, mBasePath);

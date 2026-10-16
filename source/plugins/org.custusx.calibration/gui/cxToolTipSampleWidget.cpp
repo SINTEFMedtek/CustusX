@@ -27,6 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStringPropertySelectTool.h"
 #include "cxStringPropertySelectCoordinateSystem.h"
 #include "cxEnumConversion.h"
+#include "cxFileDialogOptions.h"
 
 namespace cx
 {
@@ -80,7 +81,7 @@ void ToolTipSampleWidget::saveFileSlot()
 
   QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                              configPath+"/SampledPoints.txt",
-                             tr("Text (*.txt)"));
+                             tr("Text (*.txt)"), nullptr, fileDialogOptions());
   if(fileName.isEmpty())
     return;
   else if(QFile::exists(fileName))

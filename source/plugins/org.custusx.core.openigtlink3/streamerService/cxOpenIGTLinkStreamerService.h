@@ -22,17 +22,16 @@ namespace cx
 {
 #define OPENIGTLINK3_STREAMER "openigtlink3_streamer"
 #define OPENIGTLINK3_STREAMER_IP "ip_scanner_openigtlink"
-#define OPENIGTLINK3_STREAMER_START_TRACKING "start_tracking"
+#define OPENIGTLINK3_STREAMER_PORT "ip_port"
 
 typedef std::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
-typedef std::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 
 
 class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkStreamerService : public StreamerService
 {
 
 public:
-	OpenIGTLinkStreamerService(NetworkHandlerPtr networkHandler, TrackingServicePtr trackingService);
+	explicit OpenIGTLinkStreamerService(NetworkHandlerPtr networkHandler);
 	virtual ~OpenIGTLinkStreamerService();
 	
 	virtual QString getName();
@@ -43,20 +42,15 @@ public:
 	virtual void stop();
 	
 private slots:
-	void stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject();
+	void releaseConnection();
 
 private:
 	OpenIGTLinkStreamerPtr mStreamer;
 	NetworkHandlerPtr mConnection;
-	TrackingServicePtr mTrackingService;
-	bool mStartedTrackingAndOpenIGTLinkFromHere;
+	bool mConnectionAcquired;
 
 	StringPropertyBasePtr getIPOption(QDomElement root);
 	DoublePropertyBasePtr getStreamPortOption(QDomElement root);
-	BoolPropertyBasePtr trackAndStream(QDomElement root);
-	OpenIGTLinkTrackingSystemServicePtr getOpenIGTLinkTrackingSystemService();
-	void startTracking(QDomElement root);
-	void configureTracking(QDomElement root);
 };
 } //namespace cx
 

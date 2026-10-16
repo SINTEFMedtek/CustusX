@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTypeConversions.h"
 #include <iostream>
+#include "cxFileDialogOptions.h"
 
 namespace cx
 {
@@ -101,7 +102,7 @@ void FileInputWidget::browse()
 	if (mUseRelativePath)
 		text = QString("Select file relative to %1").arg(mBasePath);
 
-	QString filename = QFileDialog::getOpenFileName(this, text, mBasePath);
+	QString filename = QFileDialog::getOpenFileName(this, text, mBasePath, QString(), nullptr, fileDialogOptions());
 	if (filename.isEmpty())
 		return;
 
