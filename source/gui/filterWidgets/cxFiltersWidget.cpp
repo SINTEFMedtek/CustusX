@@ -69,12 +69,10 @@ QString FiltersWidget::generateHelpText() const
 
 void FiltersWidget::filterChangedSlot()
 {
-	for (unsigned i=0; i<mFilters->size(); ++i)
+	std::map<QString, FilterPtr>::iterator selected = mSelectableFilters.find(mFilterSelector->getValue());
+	if (selected != mSelectableFilters.end())
 	{
-		if (mFilters->get(i)->getUid() == mFilterSelector->getValue())
-		{
-			mCurrentFilter = mFilters->get(i);
-		}
+		mCurrentFilter = selected->second;
 	}
 
 	mSetupWidget->setFilter(mCurrentFilter);
@@ -119,6 +117,13 @@ void FiltersWidget::onServiceAdded(Filter* service)
 void FiltersWidget::onServiceRemoved(Filter *service)
 {
 	mFilters->remove(service);
+	for (std::map<QString, FilterPtr>::iterator it = mSelectableFilters.begin(); it != mSelectableFilters.end(); )
+	{
+		if (it->second.get() == service)
+			it = mSelectableFilters.erase(it);
+		else
+			++it;
+	}
 }
 
 void FiltersWidget::appendFiltersThatAreNotServices(VisServicesPtr services)
@@ -168,8 +173,12 @@ void FiltersWidget::configureFilterSelector(XmlOptionFile options)
     std::map<QString,QString> names;
     for (unsigned i=0; i<mFilters->size(); ++i)
     {
-        availableFilters << mFilters->get(i)->getUid();
-        names[mFilters->get(i)->getUid()] = mFilters->get(i)->getName();
+        // A filter service is shared with the other FiltersWidgets, which give it their own uid:
+        // remember the uid it got here.
+        QString uid = mFilters->get(i)->getUid();
+        availableFilters << uid;
+        names[uid] = mFilters->get(i)->getName();
+        mSelectableFilters[uid] = mFilters->get(i);
     }
     if(availableFilters.isEmpty())
     {

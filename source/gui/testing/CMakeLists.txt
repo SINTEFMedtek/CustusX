@@ -36,6 +36,7 @@ if(BUILD_TESTING)
         cxtestMetricManager.cpp
         cxtestMetricsWidget.cpp
         cxtestEraserWidget.cpp
+        cxtestFiltersWidget.cpp
         cxtestStatusBar.cpp
         cxtestTrackingComparisonWidget.cpp
     )
@@ -64,6 +65,7 @@ if(BUILD_TESTING)
         cxPluginUtilities
         cxCatch
         cxtest_org_custusx_core_patientmodel
+        cxResourceFilter
     )
     cx_add_tests_to_catch(cxtestGui)
 

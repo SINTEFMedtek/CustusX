@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXFiltersWidget_H_
 
 #include "cxGuiExport.h"
+#include <map>
 #include <memory>
 
 #include "cxBaseWidget.h"
@@ -76,6 +77,7 @@ private:
 
     QStringList mWantedFilters; //empty list means all available filters
 	FilterGroupPtr mFilters;
+	std::map<QString, FilterPtr> mSelectableFilters; ///< the filters in mFilterSelector, by the uid they got in this widget
 	FilterPtr mCurrentFilter;
 	StringPropertyPtr mFilterSelector;
 	FilterTimedAlgorithmPtr mThread;
