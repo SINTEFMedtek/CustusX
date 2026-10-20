@@ -65,9 +65,7 @@ void SliceProxy::setTool(ToolPtr tool)
 	}
 
 	mTool = tool;
-	if(mTool)
-		mCutplane->setIsProbe(mTool->hasType(Tool::TOOL_US_PROBE));
-	this->updateProbeSectorCenter();
+	this->updateProbe();
 
 	if (mTool)
 	{
@@ -102,12 +100,15 @@ void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestam
 
 void SliceProxy::probeSectorChangedSlot()
 {
-	this->updateProbeSectorCenter();
+	this->updateProbe();
 	this->changed();
 }
 
-void SliceProxy::updateProbeSectorCenter()
+/** Also when the probe changes: a manual tool can get a probe as its base after it is set here */
+void SliceProxy::updateProbe()
 {
+	mCutplane->setIsProbe(mTool && mTool->hasType(Tool::TOOL_US_PROBE));
+
 	double depth_mm = -1.0;
 	ProbePtr probe = mTool ? mTool->getProbe() : ProbePtr();
 	if (probe && probe->getProbeDefinition().getType() != ProbeDefinition::tNONE)

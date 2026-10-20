@@ -131,7 +131,7 @@ private:
 	SliceProxy(PatientModelServicePtr dataManager);
 	Transform3D getSyntheticToolPos(const Vector3D& center) const;
 	void initCutplane();
-	void updateProbeSectorCenter();
+	void updateProbe();
 
 	ToolPtr mTool;
 	std::unique_ptr<SliceComputer> mCutplane;
