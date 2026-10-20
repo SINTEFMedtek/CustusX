@@ -105,6 +105,9 @@ public:
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system);
 	/** Ask the systems other than deviceInUse to track the tools in configurationFile. */
 	static void startFallbackTracking(std::vector<TrackingSystemServicePtr> systems, TrackingSystemService* deviceInUse, QString configurationFile);
+	/** \return false if asked to configure systems that are not configured, and none of them accepted the tool configuration,
+	 *  e.g. because the plugin for its tracking system implementation is not built. */
+	static bool setStateOfTrackingSystems(std::vector<TrackingSystemServicePtr> systems, Tool::State val);
 	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems();
 	virtual void resetTimeSynchronization();
 
