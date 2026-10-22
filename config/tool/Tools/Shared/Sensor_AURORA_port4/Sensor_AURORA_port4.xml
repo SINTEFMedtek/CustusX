@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<!-- Tool -->
+<!-- ==== -->
+<tool>
+  <type>pointer</type>
+  <id>AuroraSensor_port4</id>
+  <name>Aurora sensor port 4</name>
+  <description>Aurora sensor on port 4, without calibration</description>
+  <manufacturer>NDI</manufacturer>
+  <clinical_app>Laboratory</clinical_app>
+  <geo_file></geo_file>
+  <pic_file></pic_file>
+  <doc_file></doc_file>
+  <openigtlinktransformid>port_3</openigtlinktransformid>
+
+  <!-- Instrument -->
+  <instrument>
+    <type></type>
+    <id></id>
+    <name></name>
+    <manufacturer></manufacturer>
+    <description></description>
+  </instrument>
+
+  <!-- Sensor -->
+  <sensor>
+    <type>Aurora</type>
+    <id>AuroraSensor_port4</id>
+    <name>AuroraSensor_port4</name>
+    <wireless>no</wireless>
+    <DOF>6</DOF>
+    <portnumber>3</portnumber>
+    <channelnumber>0</channelnumber>
+    <manufacturer>NDI</manufacturer>
+    <description></description>
+    <rom_file></rom_file>
+  </sensor>
+
+  <!-- Calibration -->
+  <calibration>
+    <cal_file></cal_file>
+  </calibration>
+</tool>

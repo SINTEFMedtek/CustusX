@@ -36,7 +36,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxStreamPropertiesWidget.h"
 #include "cxVideoConnectionWidget.h"
-#include "cxToolManagerWidget.h"
+#include "cxTrackingTestWidget.h"
 #include "cxFrameTreeWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxVolumePropertiesWidget.h"
@@ -57,6 +57,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
+
+namespace
+{
+const QString kHelpWidgetTitle("Help"); ///< Window title of the help widget from the help plugin
+}
 
 MainWindow::MainWindow() :
 	mFullScreenAction(NULL),
@@ -104,7 +109,7 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new ConsoleWidget(this, "console_widget_2", "Extra Console"), "Utility");
 //	this->addAsDockWidget(new ConsoleWidgetCollection(this, "ConsoleWidgets", "Consoles"), "Utility");
 	this->addAsDockWidget(new FrameTreeWidget(mServices->patient(), this), "Browsing");
-	this->addAsDockWidget(new ToolManagerWidget(mServices->tracking(), this), "Debugging");
+	this->addAsDockWidget(new TrackingTestWidget(mServices->tracking(), this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
     this->addAsDockWidget(new FiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
 	this->addAsDockWidget(new ClippingPropertiesWidget(mServices, this), "Properties");
@@ -173,9 +178,14 @@ void MainWindow::onGUIExtenderServiceAdded(GUIExtenderService* service)
 	for (unsigned j = 0; j < widgets.size(); ++j)
 	{
 		if(!widgets[j].mPlaceInSeparateWindow)
-			mDockWidgets->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory, service);
+		{
+			QDockWidget* dockWidget = mDockWidgets->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory, service);
+			this->connectContextSensitiveHelpAction(dockWidget);
+		}
 		else
+		{
 			this->createActionForWidgetInSeparateWindow(widgets[j].mWidget);
+		}
 	}
 
 	std::vector<QToolBar*> toolBars = service->createToolBars();
@@ -257,6 +267,7 @@ void MainWindow::createActions()
 
 	mShowContextSensitiveHelpAction = new QAction(QIcon(":/icons/open_icon_library/help-contents-5.png"),
 												  "Context-sensitive help", this);
+	mShowContextSensitiveHelpAction->setCheckable(true);
 	connect(mShowContextSensitiveHelpAction, &QAction::triggered, this, &MainWindow::onShowContextSentitiveHelp);
 
 	mShowControlPanelAction = new QAction("Show Control Panel", this);
@@ -379,9 +390,26 @@ void MainWindow::resetDesktopSlot()
 	this->onWorkflowStateChangedSlot();
 }
 
-void MainWindow::onShowContextSentitiveHelp()
+void MainWindow::onShowContextSentitiveHelp(bool show)
 {
-	mDockWidgets->showWidget("Help");
+	if (show)
+	{
+		mDockWidgets->showWidget(kHelpWidgetTitle);
+	}
+	else
+	{
+		mDockWidgets->hideWidget(kHelpWidgetTitle);
+	}
+}
+
+void MainWindow::connectContextSensitiveHelpAction(QDockWidget* dockWidget)
+{
+	if (dockWidget && dockWidget == mDockWidgets->getDockWidget(kHelpWidgetTitle))
+	{
+		// visibilityChanged is also false when the dock is a hidden tab: the action then raises it
+		connect(dockWidget, &QDockWidget::visibilityChanged, mShowContextSensitiveHelpAction, &QAction::setChecked);
+		mShowContextSensitiveHelpAction->setChecked(dockWidget->isVisible() && !dockWidget->visibleRegion().isEmpty());
+	}
 }
 
 void MainWindow::toggleFullScreenSlot()

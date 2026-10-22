@@ -140,6 +140,14 @@ public:
 	 */
 	QString getSettingsPath();
 
+	/**
+	 * Copy the tool configurations in installedProfilePath/tool that are missing
+	 * from customProfilePath/tool, each only the first time it is offered, so that a
+	 * configuration the user deleted is not copied back. Existing files are not
+	 * overwritten. Return the names of the copied files.
+	 */
+	static QStringList copyMissingToolConfigs(QString installedProfilePath, QString customProfilePath);
+
 signals:
 	void activeProfileChanged();
 
@@ -165,6 +173,7 @@ private:
 	QString getPathForInstalled(QString uid);
 	QString getPathForCustom(QString uid);
 	void createCustomProfile(QString uid);
+	void addMissingToolConfigs(QString uid);
 };
 
 cxResource_EXPORT ProfilePtr profile();

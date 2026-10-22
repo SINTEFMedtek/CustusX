@@ -133,15 +133,6 @@ Change the matrix to move and/or orient the tool. Tool offset is not applied to 
 See \ref coordinate_systems_specific_spaces for more information on coordinate systems.
 
 
-\addindex tool_manager_widget
-Tool Manager Widget
-===========================================================
-
-ToolManager debugging utilities.
-
-Lets you test different aspects of the toolmanager.
-
-
 Mesh Properties {#property_widgets_mesh}
 ===========================================================
 \subpage mesh_properties

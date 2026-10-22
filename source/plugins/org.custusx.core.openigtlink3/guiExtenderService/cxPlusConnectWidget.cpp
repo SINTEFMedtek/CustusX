@@ -86,14 +86,8 @@ PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
 	layout->addWidget(new CheckBoxWidget(this, mShowPlusOutput), line, 0, 1, 3);
 	++line;
 
-	QString warningText;
-	warningText = "<font color=red>Note! The start/stop tracking button is not correctly synchronized <br> when using the plus server.</font><br>";
-	QLabel* warningInfoLabel = new QLabel(warningText);
-	layout->addWidget(warningInfoLabel, line, 0, 1, 3);
-	++line;
-
 	mConnectButton = new QPushButton(START_TEXT);
-	mConnectButton->setToolTip("Remove all saved clip planes from the selected volume");
+	mConnectButton->setToolTip("Start PlusServer and connect to it with OpenIGTLink, or stop it");
 	connect(mConnectButton, &QPushButton::clicked, this, &PlusConnectWidget::connectButtonClickedSlot);
 	layout->addWidget(mConnectButton, line, 0, 1, 3);
 	++line;
@@ -219,7 +213,7 @@ bool PlusConnectWidget::stopPlus()
 	if(!streamerService)
 		return false;
 
-	//Trigger OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject
+	// Releases the video use of the OpenIGTLink connection
 	streamerService->stop();
 
 	if(mExternalProcess->isRunning())
@@ -245,7 +239,6 @@ bool PlusConnectWidget::startPlus()
 	if(!this->startExternalPlusServer())
 		 return false;
 
-	this->changeOpenIGTLinkStreamerParameter(streamerService, QString(OPENIGTLINK3_STREAMER_START_TRACKING), QVariant("true"));
 	this->changeOpenIGTLinkStreamerParameter(streamerService, QString(OPENIGTLINK3_STREAMER_IP), QVariant("127.0.0.1"));
 	this->startOpenIGTLink3VideoStreaming();
 

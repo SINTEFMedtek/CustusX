@@ -186,26 +186,7 @@ void ToolUsingIGSTK::toolTransformAndTimestampSlot(Transform3D matrix, double ti
 
 void ToolUsingIGSTK::calculateTpsSlot()
 {
-	int tpsNr = 0;
-
-	size_t numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
-	if (	numberOfTransformsToCheck <= 1)
-	{
-		emit tps(0);
-		return;
-	}
-
-	TimedTransformMap::reverse_iterator it = mPositionHistory->rbegin();
-	double lastTransform = it->first;
-	for (size_t i = 0; i < numberOfTransformsToCheck; ++i)
-		++it;
-	double firstTransform = it->first;
-	double secondsPassed = (lastTransform - firstTransform) / 1000;
-
-	if (!similar(secondsPassed, 0))
-		tpsNr = int(numberOfTransformsToCheck / secondsPassed);
-
-	emit tps(tpsNr);
+	emit tps(calculateTrackingRate(*mPositionHistory));
 }
 
 void ToolUsingIGSTK::toolVisibleSlot(bool on)

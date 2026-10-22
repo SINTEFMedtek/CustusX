@@ -10,6 +10,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <QApplication>
+#include <QHeaderView>
+#include <QScrollBar>
+#include <QTableWidget>
+#include <QVBoxLayout>
 #include "cxImportWidget.h"
 #include "cxImportDataTypeWidget.h"
 #include "cxVisServices.h"
@@ -91,4 +96,28 @@ TEST_CASE("ImportDataTypeWidget::setModality", "[unit]")
 	CHECK(image->getImageType() == cx::istTHORAX_CT);
 
 	delete widget;
+}
+
+TEST_CASE("ImportDataTypeWidget::fitQTableWidgetHeightToRows leaves room for a horizontal scrollbar", "[unit][gui][widget]")
+{
+	QWidget container;
+	container.setFixedWidth(150);
+	QVBoxLayout* layout = new QVBoxLayout(&container);
+	QTableWidget* table = new QTableWidget(1, 2);
+	table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	table->verticalHeader()->setVisible(false);
+	table->setItem(0, 0, new QTableWidgetItem("1"));
+	table->setItem(0, 1, new QTableWidgetItem(QString(100, 'x')));
+	layout->addWidget(table);
+	layout->addStretch();
+
+	cx::ImportDataTypeWidget::fitQTableWidgetHeightToRows(table);
+	container.show();
+	qApp->processEvents();
+	table->verticalScrollBar()->setValue(table->verticalScrollBar()->maximum());
+	qApp->processEvents();
+
+	REQUIRE(table->horizontalScrollBar()->isVisible());
+	QRect lastRow = table->visualRect(table->model()->index(0, 1));
+	CHECK(lastRow.bottom() < table->viewport()->height());
 }

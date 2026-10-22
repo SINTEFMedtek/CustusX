@@ -221,10 +221,23 @@ class CppBuilder(object):
         if self._checkGitIsAtTag(tag):
             return
         self._gitFetchWithRetry()
+        self._fetchTagIfMissing(tag)
         if self._checkGitIsAtRef(tag):
             self._warnIfLocalModifications(tag)
             return
         runShell('git checkout %s' % tag)
+
+    def _fetchTagIfMissing(self, tag):
+        '''
+        A clone made at one tag (gitCloneAtTag) only fetches that tag, so a
+        newly pinned tag must be fetched by name. SHAs are left to the checkout.
+        '''
+        is_sha = re.match(r'^[0-9a-f]{7,40}$', tag) is not None
+        if is_sha or shell.evaluate('git rev-parse -q --verify refs/tags/%s' % tag):
+            return
+        shallow = shell.evaluate('git rev-parse --is-shallow-repository')
+        depth = '--depth 1 ' if shallow and shallow.stdout.strip() == 'true' else ''
+        runShell('git fetch %sorigin tag %s' % (depth, tag), ignoreFailure=True)
 
     def gitCheckout(self, tag):
         '''

@@ -21,7 +21,8 @@ namespace cx
 {
 
 UsReconstructionGUIExtenderService::UsReconstructionGUIExtenderService(UsReconstructionServicePtr usReconstructionService, PatientModelServicePtr patientModelService) :
-	mReconstructer(usReconstructionService)
+	mReconstructer(usReconstructionService),
+	mPatientModelService(patientModelService)
 {
 }
 
@@ -34,7 +35,7 @@ std::vector<GUIExtenderService::CategorizedWidget> UsReconstructionGUIExtenderSe
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ReconstructionWidget(NULL, mReconstructer),
+			new ReconstructionWidget(NULL, mReconstructer, mPatientModelService),
 			"Algorithms"));
 
 	return retval;

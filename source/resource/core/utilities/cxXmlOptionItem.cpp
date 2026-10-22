@@ -186,6 +186,27 @@ QString XmlOptionItem::readValue(const QString& defval) const
 	return defval;
 }
 
+QString XmlOptionItem::readNonEmptyValue(const QString& defval) const
+{
+	QString retval = this->readValue(defval);
+	return retval.isEmpty() ? defval : retval;
+}
+
+bool XmlOptionItem::hasValue() const
+{
+	QDomElement item = this->findElemFromUid(mUid, mRoot);
+	return !item.isNull() && item.hasAttribute("value");
+}
+
+void XmlOptionItem::removeValue()
+{
+	QDomElement item = this->findElemFromUid(mUid, mRoot);
+	if (!item.isNull())
+	{
+		item.parentNode().removeChild(item);
+	}
+}
+
 void XmlOptionItem::writeValue(const QString& val)
 {
 	if (mRoot.isNull())

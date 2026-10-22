@@ -53,7 +53,7 @@ DoublePropertyPtr PNNReconstructionMethodService::getInterpolationStepsOption(QD
 
 void optimizedCoordTransform(Vector3D* p, std::array<double, 16> tt)
 {
-	double* t = tt.begin();
+	double* t = tt.data();
 	double x = (*p)[0];
 	double y = (*p)[1];
 	double z = (*p)[2];

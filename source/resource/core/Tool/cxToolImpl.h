@@ -45,6 +45,9 @@ public:
 
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
+	virtual QString getPositionWarning() const;
+
+	static int calculateTrackingRate(const TimedTransformMap& history); ///< Positions per second over the last (up to) 10 positions
 
 	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
 	virtual bool isNull() { return false; }
@@ -59,6 +62,7 @@ public:
 protected:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	void createToolGraphic();
+	void setPositionWarning(QString warning);
 
 	TimedTransformMapPtr mPositionHistory;
 	Transform3D m_prMt; ///< the transform from the tool to the patient reference
@@ -71,6 +75,7 @@ protected:
 	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const { return ToolFileParser::ToolInternalStructurePtr(); }
 private:
 	double mTooltipOffset;
+	QString mPositionWarning;
 };
 typedef std::shared_ptr<ToolImpl> cxToolPtr;
 

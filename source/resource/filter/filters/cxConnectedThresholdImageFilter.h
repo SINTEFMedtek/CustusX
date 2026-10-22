@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceFilterExport.h"
 #include "cxVector3D.h"
 #include "vtkForwardDeclarations.h"
+#include <vtkImageData.h>
 
 namespace cx
 {

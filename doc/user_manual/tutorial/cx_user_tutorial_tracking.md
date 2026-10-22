@@ -37,6 +37,8 @@ correctly from within that application. If NDI Track fails, CustusX will certain
   3. Red: OK but not visible. Try to place the tools in the camera field of view.
   4. Green: OK and visible.
   5. Light Green: As Green. This is the active tool, controlling the navigation.
+  6. Orange: Visible, but the position may be inaccurate, for example when an NDI tool is (partially) outside the
+     measurement volume, or a marker sphere is hidden. Hover over the button to see why.
 8. You should now be able to navigate using the tools. 
    In order to navigate correctly within preoperative data, a *Patient Registration* must be performed. 
 

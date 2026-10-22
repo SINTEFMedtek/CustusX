@@ -110,6 +110,7 @@ void StatusBar::connectToToolSignals()
 		if (tool == mTrackingService->getManualTool())
 			continue;
 		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
+		connect(tool.get(), SIGNAL(toolPositionWarning(QString)), this, SLOT(updateToolButtons()));
 
 		ToolData current;
 		current.mTool = tool;
@@ -139,6 +140,7 @@ void StatusBar::disconnectFromToolSignals()
 		ToolData current = mToolData[i];
 
 		disconnect(current.mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
+		disconnect(current.mTool.get(), SIGNAL(toolPositionWarning(QString)), this, SLOT(updateToolButtons()));
 		this->removeWidget(current.mButton.get());
 	}
 	mToolData.clear();
@@ -165,11 +167,16 @@ void StatusBar::updateToolButtons()
 	{
 		ToolData current = mToolData[i];
 		ToolPtr tool = current.mTool;
-		QString color = this->getToolStyle(tool->getVisible(), tool->isInitialized(), activeTool == tool);
+		QString warning = tool->getPositionWarning();
+		QString color = getToolStyle(tool->getVisible(), tool->isInitialized(), activeTool == tool, !warning.isEmpty());
 		current.mButton->setStyleSheet(QString("QToolButton { %1; }").arg(color));
 
 		if (!tool->isInitialized())
 			current.mAction->setToolTip("Tool is not Initialized");
+		else if (tool->getVisible() && !warning.isEmpty())
+		{
+			current.mAction->setToolTip("Position may be inaccurate: " + warning);
+		}
 		else if (activeTool == tool)
 			current.mAction->setToolTip("Active Tool");
 		else if (!tool->getVisible())
@@ -184,10 +191,19 @@ void StatusBar::updateToolButtons()
 	}
 }
 
-QString StatusBar::getToolStyle(bool visible, bool initialized, bool active)
+QString StatusBar::getToolStyle(bool visible, bool initialized, bool active, bool positionWarning)
 {
 	if (!initialized)
 		return QString("background-color: silver");
+
+	if (visible && positionWarning)
+	{
+		if (active)
+		{
+			return QString("background-color: #ffc04d");
+		}
+		return QString("background-color: orange");
+	}
 
 	if (visible)
 	{

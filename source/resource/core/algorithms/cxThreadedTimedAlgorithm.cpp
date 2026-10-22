@@ -61,11 +61,7 @@ QString Example::calculate()
 {
   std::cout << " QString Test::calculate()" << std::endl;
 
-#ifdef WIN32
-  Sleep(500);
-#else
-  sleep(5);
-#endif
+  sleep_ms(500);
 
   return QString("Test successful!!!");
 }

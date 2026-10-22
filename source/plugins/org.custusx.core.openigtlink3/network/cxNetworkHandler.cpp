@@ -74,9 +74,41 @@ igtlioSessionPointer NetworkHandler::requestConnectToServer(std::string serverHo
 	return mSession;
 }
 
+bool NetworkHandler::isConnected() const
+{
+	// Also connections made from the OpenIGTLink connection widget, which uses the same logic
+	bool retval = false;
+	for (int i = 0; mLogic && i < mLogic->GetNumberOfConnectors() && !retval; ++i)
+	{
+		igtlioConnectorPointer connector = mLogic->GetConnector(i);
+		retval = connector && connector->GetState() == igtlioConnector::STATE_CONNECTED;
+	}
+	return retval;
+}
+
+void NetworkHandler::acquireConnection(QString user, QString serverHost, int serverPort)
+{
+	mConnectionUsers.insert(user);
+	if (!this->isConnected())
+	{
+		this->disconnectFromServer(); // stop an earlier attempt that is still waiting for the server
+		CX_LOG_INFO() << QString("NetworkHandler: Connecting to OpenIGTLink server %1:%2 for %3").arg(serverHost).arg(serverPort).arg(user);
+		this->requestConnectToServer(serverHost.toStdString(), serverPort);
+	}
+}
+
+void NetworkHandler::releaseConnection(QString user)
+{
+	mConnectionUsers.remove(user);
+	if (mConnectionUsers.isEmpty())
+	{
+		this->disconnectFromServer();
+	}
+}
+
 void NetworkHandler::disconnectFromServer()
 {
-	if (mSession->GetConnector() && mSession->GetConnector()->GetState()!=igtlioConnector::STATE_OFF)
+	if (mSession && mSession->GetConnector() && mSession->GetConnector()->GetState()!=igtlioConnector::STATE_OFF)
 	{
 		CX_LOG_DEBUG() << "NetworkHandler: Disconnecting from server" << mSession->GetConnector()->GetName();
 		igtlioConnectorPointer connector = mSession->GetConnector();

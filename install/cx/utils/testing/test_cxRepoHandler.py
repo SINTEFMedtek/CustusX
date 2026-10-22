@@ -350,6 +350,147 @@ class SyncToGitRefTest(unittest.TestCase):
         self.assertEqual(_git(['rev-parse', '--is-shallow-repository'], self.clone), 'false')
 
 
+class PluginMovedIntoRepoTest(unittest.TestCase):
+    '''
+    A plugin that used to be its own repo, cloned inside this one (e.g. in
+    CX/CX/source/plugins), and
+    is now tracked by the branch being checked out (CustusX#55). Without
+    handling, `git checkout` refuses: "untracked working tree files would be
+    overwritten".
+    '''
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix='cxRepoHandler_test_')
+        self.upstream = os.path.join(self.tmp, 'upstream')
+        self.plugin_upstream = os.path.join(self.tmp, 'plugin_upstream')
+        self.clone = os.path.join(self.tmp, 'clone')
+        self.nested = os.path.join(self.clone, 'plugins', 'p')
+
+        _init_repo(self.upstream)
+        _commit(self.upstream)
+        _git(['branch', '-m', 'develop'], self.upstream)
+        _git(['checkout', '-q', '-b', 'moved'], self.upstream)
+        os.makedirs(os.path.join(self.upstream, 'plugins', 'p'))
+        _commit(self.upstream, filename=os.path.join('plugins', 'p', 'plugin.txt'), content='now in the repo', message='move plugin in')
+        _git(['checkout', '-q', 'develop'], self.upstream)
+
+        _init_repo(self.plugin_upstream)
+        _commit(self.plugin_upstream, filename='plugin.txt', content='separate repo')
+
+        _git(['clone', '-q', self.upstream, self.clone], self.tmp)
+        _git(['clone', '-q', self.plugin_upstream, self.nested], self.tmp)
+        _git(['config', 'user.email', 'test@example.com'], self.nested)
+        _git(['config', 'user.name', 'Test'], self.nested)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_clean_pushed_nested_clone_is_replaced(self):
+        handler = _make_handler(self.clone, main_branch='moved')
+        handler.syncToGitRef()
+
+        self.assertEqual(_current_branch(self.clone), 'moved')
+        self.assertFalse(os.path.exists(os.path.join(self.nested, '.git')))
+        with open(os.path.join(self.nested, 'plugin.txt')) as f:
+            self.assertEqual(f.read(), 'now in the repo')
+
+    def test_clean_pushed_nested_clone_is_replaced_for_a_tag(self):
+        _git(['tag', 'v-moved', 'moved'], self.upstream)
+        _git(['fetch', '-q', '--tags'], self.clone)
+
+        handler = _make_handler(self.clone, git_tag='v-moved')
+        handler.syncToGitRef()
+
+        self.assertEqual(_head_sha(self.clone), _git(['rev-parse', 'v-moved^{commit}'], self.clone))
+        self.assertFalse(os.path.exists(os.path.join(self.nested, '.git')))
+
+    def test_nested_clone_with_uncommitted_changes_is_kept(self):
+        with open(os.path.join(self.nested, 'plugin.txt'), 'w') as f:
+            f.write('local work')
+
+        handler = _make_handler(self.clone, main_branch='moved')
+        with self.assertRaises(SystemExit):
+            handler.syncToGitRef()
+
+        self.assertEqual(_current_branch(self.clone), 'develop')
+        with open(os.path.join(self.nested, 'plugin.txt')) as f:
+            self.assertEqual(f.read(), 'local work')
+
+    def test_nested_clone_with_ignored_local_files_is_kept(self):
+        _commit(self.plugin_upstream, filename='.gitignore', content='local.cfg\n', message='ignore local.cfg')
+        _git(['pull', '-q'], self.nested)
+        with open(os.path.join(self.nested, 'local.cfg'), 'w') as f:
+            f.write('local settings')
+
+        handler = _make_handler(self.clone, main_branch='moved')
+        with self.assertRaises(SystemExit):
+            handler.syncToGitRef()
+
+        with open(os.path.join(self.nested, 'local.cfg')) as f:
+            self.assertEqual(f.read(), 'local settings')
+
+    def test_nested_clone_with_unpushed_commit_is_kept(self):
+        _commit(self.nested, filename='local.txt', content='unpushed', message='local commit')
+        local_sha = _head_sha(self.nested)
+
+        handler = _make_handler(self.clone, main_branch='moved')
+        with self.assertRaises(SystemExit):
+            handler.syncToGitRef()
+
+        self.assertEqual(_current_branch(self.clone), 'develop')
+        self.assertEqual(_head_sha(self.nested), local_sha)
+
+
+    def test_nothing_is_removed_when_one_of_several_nested_clones_is_not_safe(self):
+        # A second plugin moved into the repo on the same branch, whose clone has local work
+        second_upstream = os.path.join(self.tmp, 'second_upstream')
+        second_nested = os.path.join(self.clone, 'plugins', 'q')
+        _git(['checkout', '-q', 'moved'], self.upstream)
+        os.makedirs(os.path.join(self.upstream, 'plugins', 'q'))
+        _commit(self.upstream, filename=os.path.join('plugins', 'q', 'plugin.txt'), content='also in the repo', message='move second plugin in')
+        _git(['checkout', '-q', 'develop'], self.upstream)
+        _init_repo(second_upstream)
+        _commit(second_upstream, filename='plugin.txt', content='separate repo')
+        _git(['clone', '-q', second_upstream, second_nested], self.tmp)
+        with open(os.path.join(second_nested, 'plugin.txt'), 'w') as f:
+            f.write('local work')
+
+        handler = _make_handler(self.clone, main_branch='moved')
+        with self.assertRaises(SystemExit):
+            handler.syncToGitRef()
+
+        self.assertEqual(_current_branch(self.clone), 'develop')
+        self.assertTrue(os.path.exists(os.path.join(self.nested, '.git')))  # the safe clone is kept too
+        self.assertTrue(os.path.exists(os.path.join(second_nested, '.git')))
+
+
+class TagCheckoutWithLocalChangesTest(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix='cxRepoHandler_test_')
+        self.upstream = os.path.join(self.tmp, 'upstream')
+        self.clone = os.path.join(self.tmp, 'clone')
+        _init_repo(self.upstream)
+        _commit(self.upstream, content='first')
+        _git(['branch', '-m', 'develop'], self.upstream)
+        _commit(self.upstream, content='second', message='second')
+        _git(['tag', 'v-second'], self.upstream)
+        _git(['clone', '-q', self.upstream, self.clone], self.tmp)
+        _git(['checkout', '-q', 'HEAD~1'], self.clone)
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_local_changes_stop_a_tag_checkout(self):
+        with open(os.path.join(self.clone, 'file.txt'), 'w') as f:
+            f.write('local work')
+
+        handler = _make_handler(self.clone, git_tag='v-second')
+        with self.assertRaises(SystemExit):
+            handler.syncToGitRef()
+
+        with open(os.path.join(self.clone, 'file.txt')) as f:
+            self.assertEqual(f.read(), 'local work')
+
+
 class CloneRepoWithPromptTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix='cxRepoHandler_test_')
@@ -381,6 +522,26 @@ class CloneRepoWithPromptTest(unittest.TestCase):
         self.assertEqual([name for name, _ in events], ['prompt', 'clone'])
         self.assertTrue(events[0][1], 'the directory must still exist when the user is prompted')
         self.assertFalse(events[1][1], 'the directory must be deleted before cloning starts')
+
+    def test_unreadable_git_clone_is_never_deleted(self):
+        '''A clone where "git status" fails may hold local work: stop instead of deleting it, even when silent.'''
+        _init_repo(self.repo_path)
+        _commit(self.repo_path)
+        work = os.path.join(self.repo_path, 'uncommitted.txt')
+        with open(work, 'w') as f:
+            f.write('local work')
+        with open(os.path.join(self.repo_path, '.git', 'HEAD'), 'w') as f:
+            f.write('garbage')  # makes "git status" fail
+
+        handler = _make_handler(self.repo_path)
+        handler._promptToContinue = lambda doprompt: None
+        handler._cloneWithRetry = lambda: self.fail('must not clone over an existing clone')
+
+        # Keep git from finding an enclosing repo when TMPDIR is inside a checkout
+        with mock.patch.dict(os.environ, {'GIT_CEILING_DIRECTORIES': self.tmp}):
+            with self.assertRaises(SystemExit):
+                handler.cloneRepoWithPrompt()
+        self.assertTrue(os.path.exists(work))
 
 
 if __name__ == '__main__':

@@ -83,7 +83,7 @@ protected slots:
 	void resetDesktopSlot();
 
 	// help
-	void onShowContextSentitiveHelp();
+	void onShowContextSentitiveHelp(bool show);
 
 	void dockWidgetVisibilityChanged(bool val);
 	void focusChanged(QWidget * old, QWidget * now);
@@ -108,6 +108,7 @@ private:
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 	QDockWidget* addAsDockWidget(QWidget* widget, QString groupname);
+	void connectContextSensitiveHelpAction(QDockWidget* dockWidget);
 
 	//menus
 	QMenu* mFileMenu; ///< Menu for file operations (ex: save/load)

@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLabel>
 #include <QTableWidget>
 #include <QHeaderView>
+#include <QScrollBar>
 #include <QApplication>
 #include <QGuiApplication>
 #include <QScreen>
@@ -51,6 +52,14 @@ QSize ImportDataTypeWidget::getQTableWidgetSize(QTableWidget *t)
 	for (int i = 0; i < t->rowCount(); i++)
 		h += t->rowHeight(i);
 	return QSize(w, h);
+}
+
+void ImportDataTypeWidget::fitQTableWidgetHeightToRows(QTableWidget *t)
+{
+	QSize size = getQTableWidgetSize(t);
+	size.rheight() += t->horizontalScrollBar()->sizeHint().height();
+	t->setMaximumSize(size);
+	t->setMinimumHeight(size.height());
 }
 
 ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype) :
@@ -140,8 +149,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 		this->createDataSpecificGui(i, modalitySuggestion, subtype);
 	}
 	this->addPointMetricGroupsToTable();
-	mTableWidget->setMaximumSize(getQTableWidgetSize(mTableWidget));
-	mTableWidget->setMinimumHeight(getQTableWidgetSize(mTableWidget).height());
+	fitQTableWidgetHeightToRows(mTableWidget);
 
 	//gui
 	QVBoxLayout *topLayout = new QVBoxLayout(this);

@@ -179,9 +179,11 @@ Waiting also keeps GitLab runner load down, since every push to a branch can sta
 
 For a small fix, keep all its changes in one commit per repo: until the user says to push, fold follow-up changes into that commit (`git commit --amend`, see below) and keep its message describing the whole change. GitLab uses the last commit's message for a new merge request, so one well-described commit makes the MR easy to create. Larger features may keep several commits.
 
-**Review before a merge request**
+**Review before pushing, and before a merge request**
 
-Before a branch goes to a merge request, run a code review of its diff against the target branch (Claude Code's `code-review` skill). Check each finding against the code, and fix the real ones before the MR is created or reviewed. Say what the review found and what was fixed.
+Before pushing, run a code review of the commits that are about to be pushed (Claude Code's `code-review` skill), check each finding against the code, and fix the real ones first. Pushing starts CI pipelines and shares the commits, so fixing review findings afterwards costs extra commits and pipeline runs.
+
+Before a branch goes to a merge request, also run a code review of its whole diff against the target branch. Fix the real findings before the MR is created or reviewed. In both cases, say what the review found and what was fixed.
 
 **Squashing/amending unpushed commits**
 

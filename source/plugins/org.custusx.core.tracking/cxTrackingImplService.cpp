@@ -141,7 +141,24 @@ void TrackingImplService::installTrackingSystem(TrackingSystemServicePtr system)
 	report("Installing tracking system: " + system->getUid());
 	connect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
 	connect(system.get(), &TrackingSystemService::updateTrackingSystemImplementation, this, &TrackingImplService::setCurrentTrackingSystemImplementation, Qt::DirectConnection);
+	connect(system.get(), &TrackingSystemService::deviceInUse, this, &TrackingImplService::onDeviceInUse);
 	this->onSystemStateChanged();
+}
+
+void TrackingImplService::onDeviceInUse(QString configurationFile)
+{
+	startFallbackTracking(mTrackingSystems, qobject_cast<TrackingSystemService*>(this->sender()), configurationFile);
+}
+
+void TrackingImplService::startFallbackTracking(std::vector<TrackingSystemServicePtr> systems, TrackingSystemService* deviceInUse, QString configurationFile)
+{
+	for (unsigned i=0; i<systems.size(); ++i)
+	{
+		if (systems[i].get() != deviceInUse)
+		{
+			systems[i]->startFallbackTracking(configurationFile);
+		}
+	}
 }
 
 void TrackingImplService::unInstallTrackingSystem(TrackingSystemServicePtr system)
@@ -149,6 +166,7 @@ void TrackingImplService::unInstallTrackingSystem(TrackingSystemServicePtr syste
 	report("Uninstalling tracking system: " + system->getUid());
 	disconnect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
 	disconnect(system.get(), &TrackingSystemService::updateTrackingSystemImplementation, this, &TrackingImplService::setCurrentTrackingSystemImplementation);
+	disconnect(system.get(), &TrackingSystemService::deviceInUse, this, &TrackingImplService::onDeviceInUse);
 
 	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
 	{

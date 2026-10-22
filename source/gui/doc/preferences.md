@@ -55,6 +55,10 @@ Tool Configuration {#preferences_tool_config_widget}
 ===
 Setup tool configuration for tracking
 
+The list shows the tool configurations in your copy of the profile. When a profile is selected,
+tool configurations shipped with the application that are missing from your copy are added to it,
+once: a configuration you delete is not added again. Your own configurations and changes are kept.
+
 
 \addindex preferences_operating_table_widget
 Operating table {#preferences_operating_table_widget}

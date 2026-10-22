@@ -609,7 +609,7 @@ class CustusX(CppComponent):
         if self.controlData.mBuildIGSTK:
             add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', True)
-            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', False)
+            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', self.controlData.mBuildNDIWithIGSTK)
             add('CMAKE_CXX_STANDARD:STRING', 14)
             if platform.system() != 'Windows':
                 # old ITK throw() specs are forbidden in C++17. GCC/Clang-only flag: CX_CMAKE_CXX_FLAGS
@@ -620,7 +620,8 @@ class CustusX(CppComponent):
                 append('CX_CMAKE_CXX_FLAGS:STRING', '-fpermissive')
         else:
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False)
-            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', False)
+            # NDI Aurora/Polaris tracking without IGSTK (CustusX#55)
+            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', True)
         #if(platform.system() == 'Linux'):
         #  add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)

@@ -70,6 +70,7 @@ class Common(object):
         self.mBuildExAndTest = False
         self.mCoverage = False
         self.mBuildIGSTK = False
+        self.mBuildNDIWithIGSTK = False
         self.build_developer_doc = False
         self.build_user_doc = False
         self.mGraphviz = False
@@ -117,6 +118,7 @@ class Common(object):
         print('    BuildTesting:', self.mBuildTesting)
         print('    Coverage:', self.mCoverage)
         print('    BuildIGSTK:', self.mBuildIGSTK)
+        print('    BuildNDIWithIGSTK:', self.mBuildNDIWithIGSTK)
         print('    Make dependency graph:', self.mGraphviz)
         print('')
 
@@ -146,6 +148,7 @@ class Common(object):
         p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
         p.add_boolean_inverter('--coverage', default=self.mCoverage, dest='mCoverage', help='gcov code coverage')
         p.add_boolean_inverter('--igstk', default=self.mBuildIGSTK, dest='mBuildIGSTK', help='Build with IGSTK tracking plugin. Uses old ITK (v4.12.0), incompatible with VTK 9.3+.')
+        p.add_boolean_inverter('--ndi_with_igstk', default=self.mBuildNDIWithIGSTK, dest='mBuildNDIWithIGSTK', help='With --igstk: also build the NDI tracking plugin, for comparing the two on the same hardware.')
         p.add_boolean_inverter('--developer_doc', default=self.build_developer_doc, dest='build_developer_doc', help='Build developer documentation')
         p.add_boolean_inverter('--user_doc', default=self.build_user_doc, dest='build_user_doc', help='Build user documentation')
         return p

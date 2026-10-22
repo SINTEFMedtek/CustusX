@@ -16,6 +16,14 @@ Ultrasound streaming and position tracking with Plus Toolkit / OpenIGTLinkIO
 ===========================================================
 \ref org_custusx_core_video_streamer_openigtlink can be used to connect to OpenIGTLink servers.
 
+Video and tracking share one connection to the OpenIGTLink server, set with the Address and Port
+of the OpenIGTLink 3 streamer in the Video Connection widget.
+- With a tool configuration using OpenIGTLink, `Tracking->Start Tracking` connects to the server
+  and starts tracking, also when the acquisition step starts tracking automatically.
+  `Stop Tracking` closes the connection, unless video still uses it.
+- Connecting video to the server also starts tracking when the tool configuration uses OpenIGTLink.
+- The tracking button shows tracking only while the server is connected.
+
 \addindex Object_OpenIGTLink_3
 OpenIGTLink3 Widget
 ===========================================================
@@ -65,7 +73,6 @@ These are in PlusServer created as a combination of **Image Name** and **Embedde
 Known issues
 -----------------------------------------------------------
 ### Running PlusServer from CustusX
-- The start/stop tracking button is not correctly synchronized when using the PlusServer.
 - The CustusX user interface may be unresponsive when PlusServer is starting and stopping.
 - The console may print a lot of messages while the PlusServer is starting (<i>"Failed to connect to server..."</i>).
 - If show PlusServer output is turned on, a lot of warnings may be printed for the image messages (<i>"Unspecified characters received..."</i>).

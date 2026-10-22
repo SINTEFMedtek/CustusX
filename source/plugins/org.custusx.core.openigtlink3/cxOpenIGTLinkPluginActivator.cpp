@@ -44,7 +44,7 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 	OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context, logic);
 
 	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(mNetworkHandler, trackingService);
-	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mNetworkHandler, trackingService);
+	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mNetworkHandler);
 
 	mRegistrationGui = RegisteredService::create<OpenIGTLink3GuiExtenderService>(context, gui, GUIExtenderService_iid);
 	mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);

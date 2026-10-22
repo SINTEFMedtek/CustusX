@@ -129,7 +129,7 @@ void OffsetPoint::setRadius(int radius)
 
 void OffsetPoint::setValue(Vector3D point, RGBColor color)
 {
-	actor->GetProperty()->SetColor(color.begin());
+	actor->GetProperty()->SetColor(color.data());
 	actor->SetPosition(point.begin());
 }
 
@@ -175,7 +175,7 @@ void LineSegment::setPoints(Vector3D point1, Vector3D point2, RGBColor color, in
 	source->SetPoint2(point2.begin());
 	mapper2d->SetInputConnection(source->GetOutputPort());
 	actor2d->SetMapper(mapper2d);
-	actor2d->GetProperty()->SetColor(color.begin());
+	actor2d->GetProperty()->SetColor(color.data());
 	actor2d->GetProperty()->SetLineStipplePattern(stipplePattern);
 	mRenderer->AddActor(actor2d);
 }
@@ -198,7 +198,7 @@ void LineSegment::updatePosition(Vector3D point1, Vector3D point2)
 
 void LineSegment::setColor(RGBColor color)
 {
-	actor2d->GetProperty()->SetColor(color.begin());
+	actor2d->GetProperty()->SetColor(color.data());
 }
 
 void LineSegment::setPattern(int stipplePattern)
@@ -244,7 +244,7 @@ void CrossHair2D::setValue(const Vector3D& focalPoint, int width, int height, do
 	mCursor2D->AxesOn();
 	mCursor2D->PointOn();
 	mCursor2D->OutlineOff();
-	actor->GetProperty()-> SetColor ( c.begin() );
+	actor->GetProperty()-> SetColor ( c.data() );
 }
 
 /**special made update for crosshair in registration
@@ -488,7 +488,7 @@ vtkProp3DPtr Axes3D::getProp()
 void Axes3D::setCaption(vtkCaptionActor2D* captionActor, const QString& caption, RGBColor color)
 {
 	captionActor->SetCaption(cstring_cast(caption));
-	captionActor->GetCaptionTextProperty()->SetColor(color.begin());
+	captionActor->GetCaptionTextProperty()->SetColor(color.data());
 
 	double fontsize = 0.02;
 	captionActor->SetWidth(fontsize);

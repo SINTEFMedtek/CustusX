@@ -36,6 +36,9 @@ if(BUILD_TESTING)
         cxtestMetricManager.cpp
         cxtestMetricsWidget.cpp
         cxtestEraserWidget.cpp
+        cxtestFiltersWidget.cpp
+        cxtestStatusBar.cpp
+        cxtestTrackingComparisonWidget.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
@@ -62,6 +65,7 @@ if(BUILD_TESTING)
         cxPluginUtilities
         cxCatch
         cxtest_org_custusx_core_patientmodel
+        cxResourceFilter
     )
     cx_add_tests_to_catch(cxtestGui)
 

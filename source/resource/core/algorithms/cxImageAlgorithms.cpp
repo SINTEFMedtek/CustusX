@@ -645,7 +645,7 @@ vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox)
 {
 	vtkImageClipPtr clip = vtkImageClipPtr::New();
 	clip->SetInputData(input);
-	clip->SetOutputWholeExtent(cropbox.begin());
+	clip->SetOutputWholeExtent(cropbox.data());
 	clip->ClipDataOn();
 	clip->Update();
 	vtkImageDataPtr rawResult = clip->GetOutput();

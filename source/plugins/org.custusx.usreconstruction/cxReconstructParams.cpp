@@ -82,12 +82,52 @@ void ReconstructParams::createParameters()
 	connect(mMaskReduce.get(), &StringProperty::valueWasSet, this, &ReconstructParams::changedInputSettings);
 	this->add(mMaskReduce);
 
+	mPosFilterType = StringProperty::initialize("Position Filter", "",
+		"Filter for the position (tracking) data. Off: no filtering. Moving average: centered moving average, with length set by Position Filter Strength. "
+		"Holt: Holt's exponential smoothing with level and trend, set by the Holt parameters.", "Moving average",
+		QString("Off,Moving average,Holt").split(","),
+		mSettings.getElement());
+	connect(mPosFilterType.get(), &StringProperty::valueWasSet, this, &ReconstructParams::changedInputSettings);
+	this->add(mPosFilterType);
+
     mPosFilterStrength = StringProperty::initialize("Position Filter Strength", "",
-        "Strength of position data prefiltering - 0 means off", "2",
+        "Strength of the moving average position filter (half window length in tracker samples) - 0 means off", "2",
         QString("0 1 2 3 4 5 6 7").split(" "),
         mSettings.getElement());
     connect(mPosFilterStrength.get(), &StringProperty::valueWasSet, this, &ReconstructParams::changedInputSettings);
     this->add(mPosFilterStrength);
+
+	mHoltAlpha = DoubleProperty::initialize("Holt alpha", "",
+		"Holt position filter: Smoothing of the level, from 0 to 1. A high value follows the tracking data closely (1 = no smoothing), a low value smooths more", 0.5,
+		DoubleRange(0.01, 1, 0.01), 2,
+		mSettings.getElement());
+	connect(mHoltAlpha.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	this->add(mHoltAlpha);
+
+	mHoltBeta = DoubleProperty::initialize("Holt beta", "",
+		"Holt position filter: Smoothing of the trend (the rate of change), from 0 to 1. A high value adapts quickly to changes in the speed, a low value gives a more stable trend", 0.3,
+		DoubleRange(0, 1, 0.01), 2,
+		mSettings.getElement());
+	connect(mHoltBeta.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	this->add(mHoltBeta);
+
+	mHoltBothDirections = BoolProperty::initialize("Holt both directions", "",
+		"Holt position filter: Filter forward and backward in time and use the mean. The Holt filter alone is delayed compared to the tracking data, this removes the delay.", true,
+		mSettings.getElement());
+	connect(mHoltBothDirections.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	this->add(mHoltBothDirections);
+
+	mHoltAddTrend = BoolProperty::initialize("Holt add trend", "",
+		"Holt position filter: Use level + trend as the filtered value (as in the description of the filter), instead of the level. The result is ahead of the level by one sample and has more noise.", false,
+		mSettings.getElement());
+	connect(mHoltAddTrend.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	this->add(mHoltAddTrend);
+
+	mWriteProcessedPositions = BoolProperty::initialize("Save processed positions", "",
+		"Save the positions used by the reconstruction, after filtering, time calibration and any correction by the algorithm, "
+		"next to the input data as .tp.corr and .tts.corr.", false,
+		mSettings.getElement());
+	this->add(mWriteProcessedPositions);
 
     mAlignTimestamps = BoolProperty::initialize("Align timestamps", "",
 		"Align the first of tracker and frame timestamps, ignoring lags.", false,

@@ -71,22 +71,34 @@ QDockWidget* DynamicMainWindowWidgets::createDockWidget(QWidget* widget)
 
 void DynamicMainWindowWidgets::showWidget(QString name)
 {
-	for (unsigned i=0; i<mItems.size(); ++i)
+	QDockWidget* dockWidget = this->getDockWidget(name);
+	if (dockWidget)
 	{
-		DynamicWidget item = mItems[i];
-
-		if (item.mName != name)
-		{
-			continue;
-		}
-
-		QDockWidget* dockWidget = dynamic_cast<QDockWidget*>(item.mWidget);
-		if (!dockWidget)
-			continue;
-
 		dockWidget->show();
 		dockWidget->raise();
 	}
+}
+
+void DynamicMainWindowWidgets::hideWidget(QString name)
+{
+	QDockWidget* dockWidget = this->getDockWidget(name);
+	if (dockWidget)
+	{
+		dockWidget->hide();
+	}
+}
+
+QDockWidget* DynamicMainWindowWidgets::getDockWidget(QString name)
+{
+	QDockWidget* retval = NULL;
+	for (unsigned i=0; i<mItems.size() && !retval; ++i)
+	{
+		if (mItems[i].mName == name)
+		{
+			retval = dynamic_cast<QDockWidget*>(mItems[i].mWidget);
+		}
+	}
+	return retval;
 }
 
 void DynamicMainWindowWidgets::restoreFrom(const Desktop& desktop)

@@ -54,9 +54,14 @@ public:
 
 	void addExternalTool(ToolPtr tool);
 
+	/** Track the tools in configurationFile for another tracking system, whose device is used by
+	 *  another application, e.g. from the positions that application sends. Default: not supported. */
+	virtual void startFallbackTracking(QString configurationFile) { Q_UNUSED(configurationFile); }
+
 signals:
 	void stateChanged();
 	void updateTrackingSystemImplementation(QString trackingSystemImplementation);
+	void deviceInUse(QString configurationFile); ///< The device is used by another application: another system may track the tools in configurationFile
 
 protected slots:
 	virtual void deconfigure() {} ///< deconfigures the software

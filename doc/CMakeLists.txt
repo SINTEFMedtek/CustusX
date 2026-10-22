@@ -408,6 +408,7 @@ cx_add_non_source_file("shared_manual/features/cx_user_doc_widgets_algorithms.md
 cx_add_non_source_file("shared_manual/features/cx_user_doc_widgets_browsing.md")
 cx_add_non_source_file("shared_manual/features/cx_user_doc_widgets_properties.md")
 cx_add_non_source_file("shared_manual/features/cx_user_doc_widgets_utility.md")
+cx_add_non_source_file("shared_manual/features/cx_user_doc_widgets_tracking_test.md")
 cx_add_non_source_file("shared_manual/features/cx_user_group_definitions.h")
 
 cx_add_non_source_file("shared_manual/installation/cx_user_installation.md")

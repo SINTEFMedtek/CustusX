@@ -82,6 +82,9 @@ cx_add_class_qt_moc(cxGui_SRCS
     #----------------------
     toolWidgets/cxToolPropertiesWidget
     toolWidgets/cxToolManagerWidget
+    toolWidgets/cxToolPositionRecorderWidget
+    toolWidgets/cxTrackingComparisonWidget
+    toolWidgets/cxTrackingTestWidget
     #----------------------
     utilities/cxAudioImpl
     utilities/cxToolImagePreviewWidget

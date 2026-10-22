@@ -268,9 +268,14 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 			QString relativeToolFilePath = convertToRelativeToolFilePath(config.mFileName, absoluteToolFilePath);
 
 			ToolFileParser toolparser(absoluteToolFilePath);
+			if (!toolparser.getTool())
+			{
+				reportWarning("When saving configuration, skipping tool " + relativeToolFilePath + ": not a valid tool file");
+				continue;
+			}
 			QString toolTrackerType = enum2string(toolparser.getTool()->mTrackerType);
 
-			if (!trackingSystemName.contains(enum2string(toolparser.getTool()->mTrackerType), Qt::CaseInsensitive))
+			if (!trackingSystemName.contains(toolTrackerType, Qt::CaseInsensitive))
 			{
 				reportWarning("When saving configuration, skipping tool " + relativeToolFilePath + " of type "
 												+ toolTrackerType + " because trackingSystemName is set to " + trackingSystemName);

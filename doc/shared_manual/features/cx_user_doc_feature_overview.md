@@ -67,6 +67,7 @@ All specific widgets are described here:
 - \subpage utility_widgets
 - \subpage browsing_widgets
 - \subpage algorithms_widgets
+- \subpage tracking_test_widget
 - See \ref plugins for more widgets
 
 Workflow Steps {#feature_overview_workflow_steps}

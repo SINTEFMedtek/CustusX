@@ -11,6 +11,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxToolImpl.h"
 
+#include <algorithm>
+#include <iterator>
+
 #include <vtkSTLReader.h>
 #include <QDir>
 #include <vtkConeSource.h>
@@ -75,6 +78,38 @@ void ToolImpl::setTooltipOffset(double val)
 		return;
 	mTooltipOffset = val;
 	emit tooltipOffset(mTooltipOffset);
+}
+
+int ToolImpl::calculateTrackingRate(const TimedTransformMap& history)
+{
+	int retval = 0;
+	size_t numberOfPositions = std::min<size_t>(history.size(), 10);
+	if (numberOfPositions >= 2)
+	{
+		TimedTransformMap::const_reverse_iterator last = history.rbegin();
+		TimedTransformMap::const_reverse_iterator first = last;
+		std::advance(first, numberOfPositions - 1);
+		double secondsPassed = (last->first - first->first) / 1000.0;
+		if (!similar(secondsPassed, 0))
+		{
+			retval = int((numberOfPositions - 1) / secondsPassed + 0.5);
+		}
+	}
+	return retval;
+}
+
+QString ToolImpl::getPositionWarning() const
+{
+	return mPositionWarning;
+}
+
+void ToolImpl::setPositionWarning(QString warning)
+{
+	if (warning != mPositionWarning)
+	{
+		mPositionWarning = warning;
+		emit toolPositionWarning(mPositionWarning);
+	}
 }
 
 TimedTransformMapPtr ToolImpl::getPositionHistory()

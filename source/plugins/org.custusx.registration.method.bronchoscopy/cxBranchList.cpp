@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxBranchList.h"
+#include <algorithm>
 #include "cxBranch.h"
 #include "cxMesh.h"
 #include "cxImage.h"
@@ -44,8 +45,13 @@ void BranchList::addBranch(BranchPtr b)
 
 void BranchList::deleteBranch(BranchPtr b)
 {
-	if(b->getParentBranch())
-		b->getParentBranch()->deleteChildBranches();
+	BranchPtr parent = b->getParentBranch();
+	if (parent)
+	{
+		branchVector siblings = parent->getChildBranches();
+		siblings.erase(std::remove(siblings.begin(), siblings.end(), b), siblings.end());
+		parent->setChildBranches(siblings);
+	}
 
 	for( int i = 0; i < mBranches.size(); i++ )
 	{
@@ -354,7 +360,7 @@ void BranchList::smoothBranchPositions(int controlPointDistance)
 	}
 }
 
-void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex, bool connectSeparateSegments)
+void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex, bool connectSeparateSegments, bool cleanUpAirwayTree)
 {
 	if (sortByZindex)
 		positions_r = sortMatrix(2,positions_r);
@@ -417,42 +423,178 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 		splitBranch(newBranch, branchToSplit, splitIndex);
 	}
 
-	mergeTracheasSingleChildIntoTrachea();
+	if (cleanUpAirwayTree)
+	{
+		selectTracheaAsLargestTree(MAX_MAIN_AIRWAY_SPUR_LENGTH);
+		mergeAllSingleChildren();
+		removeShortEndBranchesFromMainAirways(MAX_MAIN_AIRWAY_SPUR_LENGTH);
+	}
+	else if (!mBranches.empty())
+	{
+		mergeSingleChildInto(mBranches[0]);
+	}
 }
 
-void BranchList::mergeTracheasSingleChildIntoTrachea()
+namespace
 {
-	if (mBranches.empty())
-		return;
-
-	BranchPtr trachea = mBranches[0];
-
-	while (trachea->getChildBranches().size() == 1)
+double branchLength(BranchPtr branch)
+{
+	const Eigen::MatrixXd positions = branch->getPositions();
+	double retval = 0;
+	for (int i = 1; i < positions.cols(); ++i)
 	{
-		BranchPtr onlyChild = trachea->getChildBranches()[0];
+		retval += (positions.col(i) - positions.col(i-1)).norm();
+	}
+	return retval;
+}
 
-		Eigen::MatrixXd combinedPositions(3, trachea->getPositions().cols() + onlyChild->getPositions().cols());
-		combinedPositions.leftCols(trachea->getPositions().cols()) = trachea->getPositions();
-		combinedPositions.rightCols(onlyChild->getPositions().cols()) = onlyChild->getPositions();
+/** Length from the start of branch to its farthest end branch, along the branches. */
+double lengthToFarthestEnd(BranchPtr branch)
+{
+	double longestChild = 0;
+	for (BranchPtr child : branch->getChildBranches())
+	{
+		longestChild = std::max(longestChild, lengthToFarthestEnd(child));
+	}
+	return branchLength(branch) + longestChild;
+}
 
-		trachea->setPositions(combinedPositions);
+/** Appends branch and all branches below it (children, grandchildren, ...) to branches. */
+void appendWithDescendants(BranchPtr branch, branchVector& branches)
+{
+	branches.push_back(branch);
+	for (BranchPtr child : branch->getChildBranches())
+	{
+		appendWithDescendants(child, branches);
+	}
+}
 
-		branchVector grandchildren = onlyChild->getChildBranches();
-		trachea->deleteChildBranches();
-		for (BranchPtr grandchild : grandchildren)
+int countDescendants(BranchPtr branch)
+{
+	int retval = 0;
+	for (BranchPtr child : branch->getChildBranches())
+	{
+		retval += 1 + countDescendants(child);
+	}
+	return retval;
+}
+} // namespace
+
+/** Makes the root branch with the most descendants the first branch (the trachea), and removes
+ *  other root branches without children that are shorter than maxFragmentLength. */
+void BranchList::selectTracheaAsLargestTree(double maxFragmentLength)
+{
+	branchVector roots;
+	for (BranchPtr branch : mBranches)
+	{
+		if (!branch->getParentBranch())
 		{
-			grandchild->setParentBranch(trachea);
-			trachea->addChildBranch(grandchild);
+			roots.push_back(branch);
 		}
-
-		for (int i = 0; i < mBranches.size(); i++)
+	}
+	if (roots.size() > 1)
+	{
+		BranchPtr trachea = *std::max_element(roots.begin(), roots.end(),
+			[](BranchPtr a, BranchPtr b) { return countDescendants(a) < countDescendants(b); });
+		for (BranchPtr root : roots)
 		{
-			if (mBranches[i] == onlyChild)
+			if (root != trachea && root->getChildBranches().empty() && branchLength(root) < maxFragmentLength)
 			{
-				mBranches.erase(mBranches.begin() + i);
-				break;
+				mBranches.erase(std::remove(mBranches.begin(), mBranches.end(), root), mBranches.end());
 			}
 		}
+		mBranches.erase(std::remove(mBranches.begin(), mBranches.end(), trachea), mBranches.end());
+		mBranches.insert(mBranches.begin(), trachea);
+	}
+}
+
+/** A branch with a single child is a continuation, not a bifurcation: merge the child into it. */
+void BranchList::mergeAllSingleChildren()
+{
+	const branchVector branches = mBranches;
+	for (BranchPtr branch : branches)
+	{
+		const bool stillInList = std::find(mBranches.begin(), mBranches.end(), branch) != mBranches.end();
+		if (stillInList)
+		{
+			mergeSingleChildInto(branch);
+		}
+	}
+}
+
+/** Removes spurs ending within maxLength from the trachea, then from the main bronchi. */
+void BranchList::removeShortEndBranchesFromMainAirways(double maxLength)
+{
+	if (!mBranches.empty())
+	{
+		BranchPtr trachea = mBranches[0];
+		removeShortEndBranches(trachea, maxLength);
+		for (BranchPtr mainBronchus : trachea->getChildBranches())
+		{
+			removeShortEndBranches(mainBronchus, maxLength);
+		}
+	}
+}
+
+/** Removes children of branch that end within maxLength, counting their own children too, as long as
+ *  another child remains, then merges a remaining single child into branch. Repeats until no more are removed. */
+void BranchList::removeShortEndBranches(BranchPtr branch, double maxLength)
+{
+	bool removed = true;
+	while (removed)
+	{
+		removed = false;
+		branchVector kept;
+		branchVector spurs;
+		for (BranchPtr child : branch->getChildBranches())
+		{
+			if (lengthToFarthestEnd(child) < maxLength)
+			{
+				spurs.push_back(child);
+			}
+			else
+			{
+				kept.push_back(child);
+			}
+		}
+		if (!spurs.empty() && !kept.empty())
+		{
+			branchVector removedBranches;
+			for (BranchPtr spur : spurs)
+			{
+				appendWithDescendants(spur, removedBranches);
+			}
+			for (BranchPtr removedBranch : removedBranches)
+			{
+				mBranches.erase(std::remove(mBranches.begin(), mBranches.end(), removedBranch), mBranches.end());
+			}
+			branch->setChildBranches(kept);
+			mergeSingleChildInto(branch);
+			removed = true;
+		}
+	}
+}
+
+/** While branch has exactly one child, appends the child's positions to branch and adopts its children. */
+void BranchList::mergeSingleChildInto(BranchPtr branch)
+{
+	while (branch->getChildBranches().size() == 1)
+	{
+		BranchPtr onlyChild = branch->getChildBranches()[0];
+
+		Eigen::MatrixXd combinedPositions(3, branch->getPositions().cols() + onlyChild->getPositions().cols());
+		combinedPositions.leftCols(branch->getPositions().cols()) = branch->getPositions();
+		combinedPositions.rightCols(onlyChild->getPositions().cols()) = onlyChild->getPositions();
+		branch->setPositions(combinedPositions);
+
+		branchVector grandchildren = onlyChild->getChildBranches();
+		branch->deleteChildBranches();
+		for (BranchPtr grandchild : grandchildren)
+		{
+			grandchild->setParentBranch(branch);
+			branch->addChildBranch(grandchild);
+		}
+		mBranches.erase(std::remove(mBranches.begin(), mBranches.end(), onlyChild), mBranches.end());
 	}
 }
 

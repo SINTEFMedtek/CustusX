@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_core_openigtlink3_Export.h"
 #include <memory>
+#include <QSet>
 #include "qfuturewatcher.h"
 #include "igtlioLogic.h"
 #include "igtlioSession.h"
@@ -62,8 +63,14 @@ public:
 	NetworkHandler(igtlioLogicPointer logic);
 	~NetworkHandler();
 
-	igtlioSessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, IGTLIO_SYNCHRONIZATION_TYPE sync=IGTLIO_BLOCKING, double timeout_s=5);
-	void disconnectFromServer();
+	virtual igtlioSessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, IGTLIO_SYNCHRONIZATION_TYPE sync=IGTLIO_BLOCKING, double timeout_s=5);
+	virtual void disconnectFromServer();
+	virtual bool isConnected() const;
+
+	/** Shared connection: connect for user (e.g. video or tracking) unless already connected. */
+	void acquireConnection(QString user, QString serverHost, int serverPort);
+	/** The connection is closed when the last user releases it. */
+	void releaseConnection(QString user);
 
 	void clearTimestampSynchronization();
 
@@ -100,6 +107,7 @@ protected:
 
 	igtlioLogicPointer mLogic;
 	igtlioSessionPointer mSession;//, mSession2;
+	QSet<QString> mConnectionUsers;
 	QTimer *mTimer;
 
 	bool mGotTimeOffset;

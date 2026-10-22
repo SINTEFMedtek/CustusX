@@ -39,6 +39,7 @@ public:
 	~ImportDataTypeWidget();
 
 	static QSize getQTableWidgetSize(QTableWidget *t);
+	static void fitQTableWidgetHeightToRows(QTableWidget *t);
 	static int findRowIndexContainingButton(QPushButton *button, QTableWidget *tableWidget);
 
 	//Functions used by SimpleImportDataDialog

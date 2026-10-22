@@ -444,7 +444,11 @@ TEST_CASE("GenericScriptFilter: Test running of external process", "[unit]")
 	REQUIRE_FALSE(filter->testRunCommandString(invalidCommand));
 	REQUIRE(filter->testDeleteProcess());
 
-	QString validCommand("date");//or echo
+#ifdef CX_WINDOWS
+	QString validCommand("cmd /c date /t");
+#else
+	QString validCommand("date");
+#endif
 	REQUIRE(filter->testCreateProcess());
 	REQUIRE(filter->testRunCommandString(validCommand));
 	REQUIRE(filter->testDeleteProcess());
@@ -462,7 +466,11 @@ TEST_CASE("GenericScriptFilter: Test ProcessWrapper simple usage", "[unit][not_w
 TEST_CASE("GenericScriptFilter: Get output from process", "[unit]")
 {
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+#ifdef CX_WINDOWS
+	QString validCommand("cmd /c echo test");
+#else
 	QString validCommand("echo  test");
+#endif
 	REQUIRE(filter->testCreateProcess());
 	filter->connectTestSlotsAndTurnOffOtherReporting();
 	REQUIRE(filter->testRunCommandString(validCommand));

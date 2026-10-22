@@ -37,6 +37,8 @@ bool ReconstructionExecuter::startNonThreadedReconstruction(ReconstructionMethod
 	for (unsigned i=0; i<mCores.size(); ++i)
 		angio.push_back(mCores[i]->getInputParams().mAngio);
 
+	preprocessor->estimateAndApplyTimeLag(algo);
+
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = preprocessor->createProcessedInput(angio);
 
 	for (unsigned i=0; i<mCores.size(); ++i)
@@ -144,9 +146,13 @@ std::vector<ReconstructCorePtr> ReconstructionExecuter::createCores(Reconstructi
 {
 	std::vector<ReconstructCorePtr> retval;
 
+	// Write the processed positions, if selected, from the first core only. With angio data, that is the B-mode core.
+	ReconstructCore::InputParams firstPar = par;
+	par.mWriteProcessedPositions = false;
+
 	if (createBModeWhenAngio && par.mAngio)
 	{
-		ReconstructCorePtr core = this->createBModeCore(par, algo);
+		ReconstructCorePtr core = this->createBModeCore(firstPar, algo);
 		if (core)
 			retval.push_back(core);
 		core = this->createCore(par, algo);
@@ -156,7 +162,7 @@ std::vector<ReconstructCorePtr> ReconstructionExecuter::createCores(Reconstructi
 	// only one thread
 	else
 	{
-		ReconstructCorePtr core = this->createCore(par, algo);
+		ReconstructCorePtr core = this->createCore(firstPar, algo);
 		if (core)
 			retval.push_back(core);
 	}

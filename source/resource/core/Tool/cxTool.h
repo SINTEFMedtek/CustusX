@@ -106,6 +106,7 @@ public:
 
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
 	virtual bool isInitialized() const	{ return true; }
+	virtual QString getPositionWarning() const { return QString(); } ///< Why the position may be inaccurate (e.g. out of volume), empty if it is OK
 
 	virtual QString getUid() const = 0; ///< \return an unique id for this instance
 	virtual QString getName() const = 0; ///< \return a descriptive name for this instance
@@ -144,6 +145,7 @@ public:
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);
+	void toolPositionWarning(QString warning);
 	void tooltipOffset(double offset);
 	void toolProbeSector();
 	void tps(int);

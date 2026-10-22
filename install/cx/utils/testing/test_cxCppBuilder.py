@@ -83,5 +83,39 @@ class IsAtTagTest(unittest.TestCase):
         self.assertFalse(self.builder.isAtTag('v9.6.1'))
 
 
+
+class CheckoutNewTagInShallowCloneTest(unittest.TestCase):
+    '''
+    A repo shallow-cloned at one tag (gitCloneAtTag, e.g. VTK) must be able to
+    check out a newly pinned tag: its fetch refspec only covers the first tag.
+    Uses throwaway local git repos.
+    '''
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix='cxCppBuilder_test_')
+        self.origin = os.path.join(self.tmp, 'origin')
+        os.makedirs(self.origin)
+        self._git(self.origin, 'init -q')
+        for tag in ['v1', 'v2']:
+            self._git(self.origin, '-c user.name=t -c user.email=t@t commit -q --allow-empty -m %s' % tag)
+            self._git(self.origin, 'tag %s' % tag)
+        self.cwd = os.getcwd()
+
+    def tearDown(self):
+        os.chdir(self.cwd)
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _git(self, folder, args):
+        return cxCppBuilder.shell.evaluate('git -C %s %s' % (folder, args)).stdout.strip()
+
+    def test_checks_out_a_tag_the_shallow_clone_did_not_fetch(self):
+        builder = cxCppBuilder.CppBuilder()
+        clone = os.path.join(self.tmp, 'clone')
+        builder.setPaths(base=self.tmp, build=self.tmp, source=clone)
+        builder.gitCloneAtTag('file://%s' % self.origin, 'v1', 'clone')
+
+        builder.gitCheckoutTag('v2')
+
+        self.assertEqual(self._git(clone, 'rev-parse HEAD'), self._git(self.origin, 'rev-parse v2'))
+
 if __name__ == '__main__':
     unittest.main()
