@@ -21,10 +21,12 @@ namespace cx
 
 /** \brief Timestamps device frames from the device's frame counter instead of the time they were read.
  *
- * Fits the frame numbers against the read times, along the earliest reads: the frame period from the lower convex
- * hull, kept once measured, and the offset from a low percentile. This removes the read jitter, and late or queued
- * frames don't tilt the line.
- * The device's own latency is not subtracted.
+ * Model: received = offset + period * frame + delay, where the delay is 0 or more and short for most frames.
+ * Fits the line along the earliest reads in a 10 s window: the frame period from the lower convex hull,
+ * kept once measured, and the offset from the 5th percentile. This removes the read jitter, and late or
+ * queued frames don't tilt the line. The device's own latency is not subtracted.
+ *
+ * \sa \ref dev_acquisition_timestamps for the whole algorithm and where it is used.
  *
  * \ingroup cx_resource_core_utilities
  */

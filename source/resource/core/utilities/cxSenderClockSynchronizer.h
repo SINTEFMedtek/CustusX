@@ -20,9 +20,13 @@ namespace cx
 
 /** \brief Converts timestamps from a sender's clock to this computer's clock.
  *
- * The offset is the smallest receive minus sender time in a sliding window. Uses the receive
- * time while the sender time is not increasing or is late, and synchronizes again if that lasts.
+ * received - sent = clock offset + transfer delay. The smallest difference in a 10 s window is the
+ * clock offset plus the shortest transfer delay, and is added to the sent time. This keeps the
+ * sender's own timing without the network jitter. Uses the receive time while the sender time is
+ * not increasing or is late, and synchronizes again if that lasts.
  * A sender time of 0 means no timestamp: the receive time is used.
+ *
+ * \sa \ref dev_acquisition_timestamps for where it is used.
  *
  * \ingroup cx_resource_core_utilities
  */
