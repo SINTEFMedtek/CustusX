@@ -46,7 +46,12 @@ public:
 	virtual void startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 	virtual bool isStreaming();
+	static bool isOnThisComputer(const QString& address); ///< a sender here normally uses the same clock as this computer
+	static constexpr double kMaxLocalOffset_ms = 100; ///< a larger clock offset is not this computer's clock, e.g. a tunnel to another computer
 
+protected:
+	void synchronizeTimestamp(ImagePtr image);
+	bool usesThisComputersClock(double sent_ms) const;
 
 private slots:
 	virtual void streamSlot() {}
@@ -65,7 +70,6 @@ private:
 	bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool readOneMessage();
-	void synchronizeTimestamp(ImagePtr image);
 	void addToQueue(IGTLinkUSStatusMessage::Pointer msg);
 	void addToQueue(igtl::ImageMessage::Pointer msg);
 	bool multipleTryConnectToHost();
@@ -74,6 +78,7 @@ private:
 	bool mHeadingReceived;
 	QString mAddress;
 	int mPort;
+	bool mSenderOnThisComputer;
 	SenderClockSynchronizer mClockSynchronizer;
     std::shared_ptr<QTcpSocket> mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;

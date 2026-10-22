@@ -120,6 +120,7 @@ private:
 
 	Transform3D igstk2Transform3D(const igstk::Transform &input) const;
 	void processReceivedTransformResult(igstk::CoordinateSystemTransformToResult result);
+	ToolPositionMetadata createMetadata(const igstk::NDITracker::TrackingSampleInfo& sampleInfo) const;
 };
 
 /**

@@ -11,6 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxIGTLinkClientStreamer.h"
 
 #include <QTcpSocket>
+#include <QHostAddress>
+#include <QNetworkInterface>
 #include "igtlOSUtil.h"
 #include "igtlMessageHeader.h"
 #include "igtlTransformMessage.h"
@@ -37,7 +39,8 @@ namespace cx
 IGTLinkClientStreamer::IGTLinkClientStreamer() :
 	mHeadingReceived(false),
 	mAddress(""),
-	mPort(0)
+	mPort(0),
+	mSenderOnThisComputer(false)
 {
 }
 
@@ -50,12 +53,30 @@ void IGTLinkClientStreamer::setAddress(QString address, int port)
 {
 	mAddress = address;
 	mPort = port;
+	mSenderOnThisComputer = isOnThisComputer(address);
+}
+
+bool IGTLinkClientStreamer::isOnThisComputer(const QString& address)
+{
+	QHostAddress host(address);
+	bool loopback = address.compare("localhost", Qt::CaseInsensitive) == 0 || host.isLoopback();
+	return loopback || (!host.isNull() && QNetworkInterface::allAddresses().contains(host));
+}
+
+/** The synchronizer's offset is then only the shortest transfer delay. Also checks the offset, as e.g. a tunnel
+ *  to another computer has a local address. Late or repeated frames get the synchronizer's receive time. */
+bool IGTLinkClientStreamer::usesThisComputersClock(double sent_ms) const
+{
+	double offset_ms = mClockSynchronizer.getOffset_ms();
+	bool sameClock = mClockSynchronizer.hasOffset() && offset_ms >= 0.0 && offset_ms < kMaxLocalOffset_ms;
+	return mSenderOnThisComputer && sent_ms > 0.0 && sameClock && !mClockSynchronizer.usedReceiveTime();
 }
 
 
 void IGTLinkClientStreamer::startStreaming(SenderPtr sender)
 {
 	mSender = sender;
+	mClockSynchronizer.reset();
 //	this->createSendTimer();
 //	mTestTimer = new QTimer(this);
 //	connect(mTestTimer, SIGNAL(timeout()), this, SLOT(myStreamSlot()));
@@ -360,12 +381,17 @@ void IGTLinkClientStreamer::addToQueue(igtl::ImageMessage::Pointer msg)
 
 void IGTLinkClientStreamer::synchronizeTimestamp(ImagePtr image)
 {
-	// The sender's clock may not be synchronized with this computer, e.g. an ultrasound scanner
 	double received_ms = getMilliSecondsSinceEpoch();
 	QDateTime sent = image->getAcquisitionTime();
+	double sent_ms = double(sent.toMSecsSinceEpoch());
 	image->setOriginalAcquisitionTime(sent);
 	image->setSoftwareAcquisitionTime(QDateTime::fromMSecsSinceEpoch(qint64(received_ms)));
-	double timestamp_ms = mClockSynchronizer.getTimestamp(double(sent.toMSecsSinceEpoch()), received_ms);
+	// The sender's clock may not be synchronized with this computer, e.g. an ultrasound scanner
+	double timestamp_ms = mClockSynchronizer.getTimestamp(sent_ms, received_ms);
+	if (this->usesThisComputersClock(sent_ms))
+	{
+		timestamp_ms = sent_ms;
+	}
 	image->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(qint64(timestamp_ms)));
 }
 

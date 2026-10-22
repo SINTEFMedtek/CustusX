@@ -494,6 +494,7 @@ bool NetworkHandler::convertZeroesInsideSectorToOnes(ThreadResult &result, int t
 	unsigned dimY = maskDims[1];
 	// Row by row, the order of the pixels in memory
 	for (unsigned y = 0; y < dimY; y++)
+	{
 		for (unsigned x = 0; x < dimX; x++)
 		{
 			unsigned pos = x + y * dimX;
@@ -503,13 +504,16 @@ bool NetworkHandler::convertZeroesInsideSectorToOnes(ThreadResult &result, int t
 			if (maskVal != 0 && imageVal <= threshold)
 			{
 				for(unsigned i=0; i < components; ++i)
+				{
 					if(i < 3) //Only set RGB components, not Alpha
 					{
 						imagePtr[imagePos + i] = newValue;
 						retval = true;
 					}
+				}
 			}
 		}
+	}
 	return retval;
 }
 

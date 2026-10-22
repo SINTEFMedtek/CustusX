@@ -10,6 +10,7 @@ if(BUILD_TESTING)
         cxtestTestVideoConnectionWidget.cpp
         cxtestTestVideoConnectionWidget.h
         cxtestCatchStreamingWidgets.cpp
+        cxtestIGTLinkClientStreamer.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_video_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_video_MOC_SOURCE_FILES})
