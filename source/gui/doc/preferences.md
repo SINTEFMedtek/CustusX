@@ -40,6 +40,8 @@ Visualization {#preferences_visualization_widget}
 ===
 Preferences for 2D and 3D visualization.
 
+- View Offset: Position of the virtual tool tip (tool tip plus tooltip offset) in views following the tool, e.g. anyplane, % from top. Not used for a probe with a known US sector: its view is centered on the sector.
+
 
 \addindex preferences_video_widget
 Video {#preferences_video_widget}
