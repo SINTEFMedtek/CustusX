@@ -34,6 +34,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxToolConfigurationParser.h"
 #include "cxManualToolAdapter.h"
 #include "cxSettings.h"
+#include "cxProfile.h"
 #include "cxPlaybackTool.h"
 
 #include "cxPlaybackTime.h"
@@ -213,8 +214,44 @@ Tool::State TrackingImplService::getState() const
 
 void TrackingImplService::setState(const Tool::State val)
 {
-	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
-		mTrackingSystems[i]->setState(val);
+	if (!setStateOfTrackingSystems(mTrackingSystems, val))
+	{
+		QString configurationFile = profile()->getToolConfigFilePath();
+		QString implementation = ConfigurationFileParser(configurationFile).getTrackingSystemImplementation();
+		reportWarning(QString("No tracking system accepted the tool configuration [%1] with tracking system implementation [%2]. "
+							  "Is the tracking plugin for it built?").arg(configurationFile).arg(implementation));
+	}
+}
+
+bool TrackingImplService::setStateOfTrackingSystems(std::vector<TrackingSystemServicePtr> systems, Tool::State val)
+{
+	bool configured = false;
+	for (unsigned i=0; i<systems.size(); ++i)
+		configured = configured || (systems[i]->getState() >= Tool::tsCONFIGURED);
+	bool checkAccepted = (val >= Tool::tsCONFIGURED) && !configured;
+
+	// A system accepting the configuration reports its implementation at once, even when it configures in a thread
+	bool accepted = false;
+	std::vector<QMetaObject::Connection> connections;
+	if (checkAccepted)
+	{
+		for (unsigned i=0; i<systems.size(); ++i)
+			connections.push_back(connect(systems[i].get(), &TrackingSystemService::updateTrackingSystemImplementation,
+										  [&accepted](QString) { accepted = true; }));
+	}
+
+	for (unsigned i=0; i<systems.size(); ++i)
+		systems[i]->setState(val);
+
+	for (unsigned i=0; i<connections.size(); ++i)
+		disconnect(connections[i]);
+	if (!checkAccepted)
+		return true;
+
+	// Systems that configure at once, also systems wrapping another one, are configured now
+	for (unsigned i=0; i<systems.size(); ++i)
+		accepted = accepted || (systems[i]->getState() >= Tool::tsCONFIGURED);
+	return accepted;
 }
 
 void TrackingImplService::listenForTrackingSystemServices(ctkPluginContext *context)
