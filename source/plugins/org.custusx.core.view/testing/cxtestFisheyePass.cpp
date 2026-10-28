@@ -23,6 +23,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkSmartPointer.h>
 
 #include "cxFisheyePass.h"
+#include "cxMaterialOverridePass.h"
+#include <vtkRenderState.h>
+#include <vtkProp.h>
 
 namespace cxtest
 {
@@ -87,6 +90,38 @@ TEST_CASE("FisheyePass: Magnifies the center of the view", "[integration][org.cu
 	REQUIRE(litRectilinear > 0);
 	// With a 110 degree view angle and aspect 1.6, the center is magnified about 2.2 times, the area about 4.8 times
 	CHECK(litFisheye > 3*litRectilinear);
+}
+
+TEST_CASE("MaterialOverridePass: Overrides and restores the material of lit actors", "[unit][org.custusx.core.view]")
+{
+	vtkSmartPointer<vtkActor> lit = vtkSmartPointer<vtkActor>::New();
+	lit->GetProperty()->SetAmbient(0.2);
+	lit->GetProperty()->SetSpecular(0.3);
+	vtkSmartPointer<vtkActor> unlit = vtkSmartPointer<vtkActor>::New();
+	unlit->GetProperty()->LightingOff();
+	unlit->GetProperty()->SetAmbient(0.2);
+
+	vtkSmartPointer<vtkRenderer> renderer = vtkSmartPointer<vtkRenderer>::New();
+	vtkProp* props[2] = { lit, unlit };
+	vtkRenderState state(renderer);
+	state.SetPropArrayAndCount(props, 2);
+
+	vtkSmartPointer<cx::MaterialOverridePass> pass = vtkSmartPointer<cx::MaterialOverridePass>::New();
+	pass->setMaterial(0.02, 0.85, 0.6, 60);
+	pass->Render(&state);
+
+	CHECK(lit->GetProperty()->GetAmbient() == Approx(0.02));
+	CHECK(lit->GetProperty()->GetSpecularPower() == Approx(60));
+	CHECK(unlit->GetProperty()->GetAmbient() == Approx(0.2));
+
+	// The owner resets the material: override again, and restore to the new original
+	lit->GetProperty()->SetAmbient(0.4);
+	pass->Render(&state);
+	CHECK(lit->GetProperty()->GetAmbient() == Approx(0.02));
+
+	pass->restoreMaterials();
+	CHECK(lit->GetProperty()->GetAmbient() == Approx(0.4));
+	CHECK(lit->GetProperty()->GetSpecular() == Approx(0.3));
 }
 
 }//namespace cxtest

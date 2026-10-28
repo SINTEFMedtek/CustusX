@@ -36,6 +36,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxNavigationAlgorithms.h"
 #include "cxDoubleRange.h"
 #include "cxFisheyePass.h"
+#include "cxMaterialOverridePass.h"
 
 namespace cx
 {
@@ -315,7 +316,8 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
  * Replace the default VTK headlight (directional, no attenuation) with a positional
  * spotlight at the camera, so that brightness falls off with distance and towards
  * the edges of the view. Render through a fisheye lens distortion, magnifying the
- * center of the view as a wide angle endoscope lens does.
+ * center of the view as a wide angle endoscope lens does, and give the surfaces a
+ * wet look.
  * Other styles get the default headlight and rendering back.
  */
 void CameraStyleForView::updateScopeRendering()
@@ -331,8 +333,11 @@ void CameraStyleForView::updateScopeRendering()
 			renderer->RemoveLight(mScopeLight);
 			renderer->AutomaticLightCreationOn();
 		}
-		if (mFisheyePass && renderer->GetPass() == mFisheyePass)
+		if (mScopeMaterialPass && renderer->GetPass() == mScopeMaterialPass)
+		{
+			mScopeMaterialPass->restoreMaterials();
 			renderer->SetPass(nullptr);
+		}
 		return;
 	}
 
@@ -346,10 +351,20 @@ void CameraStyleForView::updateScopeRendering()
 		renderer->AddLight(mScopeLight);
 	}
 
-	if (!mFisheyePass)
-		mFisheyePass = vtkSmartPointer<FisheyePass>::New();
-	if (renderer->GetPass() != mFisheyePass)
-		renderer->SetPass(mFisheyePass);
+	if (!mScopeMaterialPass)
+		this->createScopeRenderPasses();
+	if (renderer->GetPass() != mScopeMaterialPass)
+		renderer->SetPass(mScopeMaterialPass);
+}
+
+void CameraStyleForView::createScopeRenderPasses()
+{
+	mFisheyePass = vtkSmartPointer<FisheyePass>::New();
+
+	// Wet mucosa: small, sharp specular highlights. Almost no ambient light inside the airways.
+	mScopeMaterialPass = vtkSmartPointer<MaterialOverridePass>::New();
+	mScopeMaterialPass->setMaterial(0.05, 0.85, 0.6, 60);
+	mScopeMaterialPass->SetDelegatePass(mFisheyePass);
 }
 
 vtkSmartPointer<vtkLight> CameraStyleForView::createScopeLight() const
@@ -365,10 +380,10 @@ vtkSmartPointer<vtkLight> CameraStyleForView::createScopeLight() const
 	// Brightness is 1/(1+d/r0), with d the distance in mm. The light falls off as 1/d^2,
 	// but a video camera applies a gamma of about 2.2, so the displayed brightness
 	// falls off as roughly 1/d. The constant term caps the brightness near the walls.
-	double r0 = 15.0;
+	double r0 = 20.0;
 	light->SetAttenuationValues(1, 1.0/r0, 0);
 	light->SetColor(1.0, 0.96, 0.92); // slightly warm
-	light->SetIntensity(1.0);
+	light->SetIntensity(1.2);
 	return light;
 }
 

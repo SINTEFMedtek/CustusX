@@ -11,6 +11,8 @@ set(PLUGIN_SRCS
     cxCameraStyleForView.cpp
     cxFisheyePass.cpp
     cxFisheyePass.h
+    cxMaterialOverridePass.cpp
+    cxMaterialOverridePass.h
     cxMultiVolume3DRepProducer.cpp
     cxRenderLoop.cpp
     cxRepManager.cpp
