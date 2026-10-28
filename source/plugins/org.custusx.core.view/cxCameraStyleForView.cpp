@@ -350,11 +350,13 @@ vtkSmartPointer<vtkLight> CameraStyleForView::createScopeLight() const
 	light->SetPosition(0, 0, 1);
 	light->SetFocalPoint(0, 0, 0);
 	light->SetPositional(true); // required for cone angle and attenuation to have effect
-	light->SetConeAngle(60); // half angle, must be < 90 to give a spotlight
-	light->SetExponent(2); // falloff towards the cone edge
-	// Brightness is 1/(d/r0)^2, giving normal brightness at the reference distance r0 (mm)
-	double r0 = 8.0;
-	light->SetAttenuationValues(0, 0, 1.0/(r0*r0));
+	light->SetConeAngle(80); // half angle, must be < 90 to give a spotlight. Wider than the view to avoid a hard edge
+	light->SetExponent(1); // falloff towards the cone edge
+	// Brightness is 1/(1+d/r0), with d the distance in mm. The light falls off as 1/d^2,
+	// but a video camera applies a gamma of about 2.2, so the displayed brightness
+	// falls off as roughly 1/d. The constant term caps the brightness near the walls.
+	double r0 = 15.0;
+	light->SetAttenuationValues(1, 1.0/r0, 0);
 	light->SetColor(1.0, 0.96, 0.92); // slightly warm
 	light->SetIntensity(1.0);
 	return light;
@@ -498,8 +500,11 @@ void CameraStyleForView::updateCamera(CameraInfo info)
 	camera->SetFocalPoint(info.focus.begin());
 	camera->SetViewUp(info.vup.begin());
 	camera->SetViewAngle(info.viewAngle);
+	// In the scope style, the walls of small airways at the edges of a wide view
+	// can be closer than 1mm to the camera plane, and would be clipped away.
+	double nearClip = this->isScopeStyle() ? 0.1 : 1;
 	// use 2m, as the camera sometimes can move far from the object during zoom
-	camera->SetClippingRange(1, std::max<double>(2000, info.distance() * 10));
+	camera->SetClippingRange(nearClip, std::max<double>(2000, info.distance() * 10));
 	mBlockCameraUpdate = false;
 }
 
