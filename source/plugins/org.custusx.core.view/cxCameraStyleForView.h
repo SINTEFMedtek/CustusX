@@ -25,6 +25,7 @@ class QWidget;
 class QMenu;
 class QActionGroup;
 class vtkInteractorStyle;
+class vtkLight;
 
 namespace cx
 {
@@ -107,6 +108,7 @@ private:
 	vtkCameraPtr getCamera() const;
 	ToolRep3DPtr getToolRep() const;
 	bool isToolFollowingStyle() const;
+	bool isScopeStyle() const;
 	void onPreRender();
 	void applyCameraStyle(); ///< receives transforms from the tool which the camera should follow
 
@@ -123,12 +125,14 @@ private:
 	bool mBlockCameraUpdate; ///< for breaking a camera update loop
 	ViewPtr mView;
 	CoreServicesPtr mBackend;
+	vtkSmartPointer<vtkLight> mScopeLight; ///< light at the camera, used in the fly-through style
 
 //	Vector3D mPreviousZoomCameraPos;
 	JitterFilter mZoomJitterFilter;
 
 	Vector3D smoothZoomedCameraPosition(Vector3D pos);
-	void handleLights();
+	void updateScopeLight();
+	vtkSmartPointer<vtkLight> createScopeLight() const;
 	CameraInfo viewEntireAutoZoomROI(CameraInfo info);
 	void updateCamera(CameraInfo info);
 	Vector3D getToolTip_r();

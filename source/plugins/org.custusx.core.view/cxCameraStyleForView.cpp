@@ -75,6 +75,7 @@ void CameraStyleForView::setView(ViewPtr widget)
 
 	mViewportListener->startListen(this->getRenderer());
 	mPreRenderListener->startListen(this->getRenderer());
+	this->updateScopeLight();
 }
 
 
@@ -92,6 +93,7 @@ void CameraStyleForView::viewportChangedSlot()
 
 void CameraStyleForView::onPreRender()
 {
+	this->updateScopeLight();
 	this->applyCameraStyle();
 }
 
@@ -307,19 +309,55 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 	return retval;
 }
 
-void CameraStyleForView::handleLights()
+/**
+ * Imitate the light source at the tip of a bronchoscope in the fly-through style:
+ * Replace the default VTK headlight (directional, no attenuation) with a positional
+ * spotlight at the camera, so that brightness falls off with distance and towards
+ * the edges of the view. Other styles get the default headlight back.
+ */
+void CameraStyleForView::updateScopeLight()
 {
 	vtkRendererPtr renderer = this->getRenderer();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "#lights: " << renderer->GetLights()->GetNumberOfItems();
-	renderer->GetLights()->InitTraversal();
-	vtkLight* light = renderer->GetLights()->GetNextItem();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "light ";
-//	light->PrintSelf(std::cout, vtkIndent(2));
+	if (!renderer)
+		return;
 
-	// experiment: set a light to the left of the camera, pointing at focus
-	light->SetConeAngle(160);
+	if (!this->isScopeStyle())
+	{
+		if (mScopeLight && renderer->GetLights()->IsItemPresent(mScopeLight))
+		{
+			renderer->RemoveLight(mScopeLight);
+			renderer->AutomaticLightCreationOn();
+		}
+		return;
+	}
+
+	if (!mScopeLight)
+		mScopeLight = this->createScopeLight();
+
+	if (!renderer->GetLights()->IsItemPresent(mScopeLight))
+	{
+		renderer->AutomaticLightCreationOff();
+		renderer->RemoveAllLights();
+		renderer->AddLight(mScopeLight);
+	}
+}
+
+vtkSmartPointer<vtkLight> CameraStyleForView::createScopeLight() const
+{
+	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 	light->SetLightTypeToCameraLight();
-	light->SetPosition(-0.5,0,1);
+	// Camera light coordinates: the camera is at (0,0,1) looking towards (0,0,0)
+	light->SetPosition(0, 0, 1);
+	light->SetFocalPoint(0, 0, 0);
+	light->SetPositional(true); // required for cone angle and attenuation to have effect
+	light->SetConeAngle(60); // half angle, must be < 90 to give a spotlight
+	light->SetExponent(2); // falloff towards the cone edge
+	// Brightness is 1/(d/r0)^2, giving normal brightness at the reference distance r0 (mm)
+	double r0 = 8.0;
+	light->SetAttenuationValues(0, 0, 1.0/(r0*r0));
+	light->SetColor(1.0, 0.96, 0.92); // slightly warm
+	light->SetIntensity(1.0);
+	return light;
 }
 
 /**
@@ -357,6 +395,12 @@ bool CameraStyleForView::isToolFollowingStyle() const
 	return (mStyle.mCameraFollowTool || mStyle.mFocusFollowTool);
 }
 
+/** The camera sits on the tool, looking along it, as in a bronchoscope. */
+bool CameraStyleForView::isScopeStyle() const
+{
+	return mStyle.mCameraFollowTool && fabs(mStyle.mElevation) < 0.01;
+}
+
 void CameraStyleForView::connectTool()
 {
 	if (!this->isToolFollowingStyle())
@@ -377,7 +421,7 @@ void CameraStyleForView::connectTool()
 	if (rep)
 	{
 		rep->setOffsetPointVisibleAtZeroOffset(false);
-		if (mStyle.mCameraFollowTool && fabs(mStyle.mElevation) < 0.01)
+		if (this->isScopeStyle())
 			rep->setStayHiddenAfterVisible(true);
 	}
 
@@ -417,6 +461,7 @@ void CameraStyleForView::setCameraStyle(CameraStyleData style)
 		this->setInteractor(vtkInteractorStyleTrackballCameraPtr::New());
 
 	mStyle = style;
+	this->updateScopeLight();
 
 	this->connectTool();
 }
@@ -447,8 +492,6 @@ void CameraStyleForView::updateCamera(CameraInfo info)
 	double tol = 0.001;
 	if (similar(cam_old, info, tol))
 		return; // break update loop: this event is triggered by camera change.
-
-//	this->handleLights();
 
 	mBlockCameraUpdate = true;
 	camera->SetPosition(info.pos.begin());
