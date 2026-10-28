@@ -9,6 +9,8 @@ set(PLUGIN_SRCS
     cx2DZoomHandler.cpp
     cxCameraStyle.cpp
     cxCameraStyleForView.cpp
+    cxFisheyePass.cpp
+    cxFisheyePass.h
     cxMultiVolume3DRepProducer.cpp
     cxRenderLoop.cpp
     cxRepManager.cpp

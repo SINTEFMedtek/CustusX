@@ -35,6 +35,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxRegionOfInterestMetric.h"
 #include "cxNavigationAlgorithms.h"
 #include "cxDoubleRange.h"
+#include "cxFisheyePass.h"
 
 namespace cx
 {
@@ -75,7 +76,7 @@ void CameraStyleForView::setView(ViewPtr widget)
 
 	mViewportListener->startListen(this->getRenderer());
 	mPreRenderListener->startListen(this->getRenderer());
-	this->updateScopeLight();
+	this->updateScopeRendering();
 }
 
 
@@ -93,7 +94,7 @@ void CameraStyleForView::viewportChangedSlot()
 
 void CameraStyleForView::onPreRender()
 {
-	this->updateScopeLight();
+	this->updateScopeRendering();
 	this->applyCameraStyle();
 }
 
@@ -310,12 +311,14 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 }
 
 /**
- * Imitate the light source at the tip of a bronchoscope in the fly-through style:
+ * Imitate a bronchoscope in the fly-through style:
  * Replace the default VTK headlight (directional, no attenuation) with a positional
  * spotlight at the camera, so that brightness falls off with distance and towards
- * the edges of the view. Other styles get the default headlight back.
+ * the edges of the view. Render through a fisheye lens distortion, magnifying the
+ * center of the view as a wide angle endoscope lens does.
+ * Other styles get the default headlight and rendering back.
  */
-void CameraStyleForView::updateScopeLight()
+void CameraStyleForView::updateScopeRendering()
 {
 	vtkRendererPtr renderer = this->getRenderer();
 	if (!renderer)
@@ -328,6 +331,8 @@ void CameraStyleForView::updateScopeLight()
 			renderer->RemoveLight(mScopeLight);
 			renderer->AutomaticLightCreationOn();
 		}
+		if (mFisheyePass && renderer->GetPass() == mFisheyePass)
+			renderer->SetPass(nullptr);
 		return;
 	}
 
@@ -340,6 +345,11 @@ void CameraStyleForView::updateScopeLight()
 		renderer->RemoveAllLights();
 		renderer->AddLight(mScopeLight);
 	}
+
+	if (!mFisheyePass)
+		mFisheyePass = vtkSmartPointer<FisheyePass>::New();
+	if (renderer->GetPass() != mFisheyePass)
+		renderer->SetPass(mFisheyePass);
 }
 
 vtkSmartPointer<vtkLight> CameraStyleForView::createScopeLight() const
@@ -463,7 +473,7 @@ void CameraStyleForView::setCameraStyle(CameraStyleData style)
 		this->setInteractor(vtkInteractorStyleTrackballCameraPtr::New());
 
 	mStyle = style;
-	this->updateScopeLight();
+	this->updateScopeRendering();
 
 	this->connectTool();
 }

@@ -31,6 +31,7 @@ namespace cx
 {
 typedef std::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
 typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
+class FisheyePass;
 
 typedef std::shared_ptr<class CameraStyleForView> CameraStyleForViewPtr;
 using cx::Transform3D;
@@ -126,12 +127,13 @@ private:
 	ViewPtr mView;
 	CoreServicesPtr mBackend;
 	vtkSmartPointer<vtkLight> mScopeLight; ///< light at the camera, used in the fly-through style
+	vtkSmartPointer<FisheyePass> mFisheyePass; ///< lens distortion, used in the fly-through style
 
 //	Vector3D mPreviousZoomCameraPos;
 	JitterFilter mZoomJitterFilter;
 
 	Vector3D smoothZoomedCameraPosition(Vector3D pos);
-	void updateScopeLight();
+	void updateScopeRendering();
 	vtkSmartPointer<vtkLight> createScopeLight() const;
 	CameraInfo viewEntireAutoZoomROI(CameraInfo info);
 	void updateCamera(CameraInfo info);
