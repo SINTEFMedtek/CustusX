@@ -126,4 +126,12 @@ TEST_CASE("ViewGroup: ActiveData don't change if ActiveImage is in view group", 
     cx::LogicManager::shutdown();
 }
 
+TEST_CASE("CameraStyleData: Style is kept when the view angle changes", "[unit]")
+{
+	cx::CameraStyleData style(cx::cstTOOL_STYLE);
+	style.mCameraViewAngle = 90.0/180.0*M_PI;
+	CHECK(style.getStyle() == cx::cstTOOL_STYLE);
+	CHECK_FALSE(style == cx::CameraStyleData(cx::cstTOOL_STYLE));
+}
+
 }//namespace cxtest

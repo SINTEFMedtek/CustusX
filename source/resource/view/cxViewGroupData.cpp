@@ -75,7 +75,9 @@ CAMERA_STYLE_TYPE CameraStyleData::getStyle()
 	for (unsigned int i=0; i<cstCOUNT; ++i)
 	{
 		CAMERA_STYLE_TYPE current = static_cast<CAMERA_STYLE_TYPE>(i);
-		if (CameraStyleData(current)==*this)
+		CameraStyleData candidate(current);
+		candidate.mCameraViewAngle = mCameraViewAngle; // the view angle can be changed without changing the style
+		if (candidate==*this)
 			return current;
 	}
 	return cstCOUNT;
