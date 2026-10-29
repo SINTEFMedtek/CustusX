@@ -106,7 +106,6 @@ public:
 	/** Ask the systems other than deviceInUse to track the tools in configurationFile. */
 	static void startFallbackTracking(std::vector<TrackingSystemServicePtr> systems, TrackingSystemService* deviceInUse, QString configurationFile);
 	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems();
-	virtual void resetTimeSynchronization();
 
 	bool isNull();
 	virtual void setCurrentTrackingSystemImplementation(QString trackingSystemImplementation);

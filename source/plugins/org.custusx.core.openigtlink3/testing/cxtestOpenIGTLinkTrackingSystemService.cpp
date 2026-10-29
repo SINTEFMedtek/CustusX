@@ -88,11 +88,8 @@ typedef std::shared_ptr<FakeServerNetworkHandler> FakeServerNetworkHandlerPtr;
 class OpenIGTLinkTrackingSystemServiceMoc : public cx::OpenIGTLinkTrackingSystemService
 {
 public:
-	cxtestNetworkHandlerPtr mTestNetworkHandler;
-
 	OpenIGTLinkTrackingSystemServiceMoc() : cx::OpenIGTLinkTrackingSystemService(cx::NetworkHandlerPtr()) {}
 	OpenIGTLinkTrackingSystemServiceMoc(cxtestNetworkHandlerPtr testNetworkHandler) :
-		mTestNetworkHandler(testNetworkHandler),
 		cx::OpenIGTLinkTrackingSystemService(testNetworkHandler) {}
 
 	virtual bool isConfigured() const;
@@ -100,7 +97,6 @@ public:
 	virtual bool isTracking() const;
 
 	void internalSetState(cx::Tool::State val) {cx::OpenIGTLinkTrackingSystemService::internalSetState(val);}
-	double getNetworkHandlerTimestampOffset();
 	cx::OpenIGTLinkToolPtr getTool(QString devicename) {return cx::OpenIGTLinkTrackingSystemService::getTool(devicename);}
 	QStringList getTransformIdWarningPrinted() {return mTransformIdWarningPrinted;}
 	bool testPrintTransformIdWarning(QString devicename) {return printTransformIdWarning(devicename);}
@@ -128,11 +124,6 @@ bool OpenIGTLinkTrackingSystemServiceMoc::isInitialized() const
 bool OpenIGTLinkTrackingSystemServiceMoc::isTracking() const
 {
 	return cx::OpenIGTLinkTrackingSystemService::isTracking();
-}
-
-double OpenIGTLinkTrackingSystemServiceMoc::getNetworkHandlerTimestampOffset()
-{
-	return mTestNetworkHandler->getTimestampOffset();
 }
 
 typedef std::shared_ptr<OpenIGTLinkTrackingSystemServiceMoc> OpenIGTLinkTrackingSystemServiceMocPtr;
@@ -380,35 +371,18 @@ TEST_CASE("NetworkHandler: Each device has its own timestamp offset", "[plugins]
 	CHECK(cx::similar(networkHandler->getTimestampOffset("image"), received_ms - 3000000, 0.001));
 }
 
-TEST_CASE("NetworkHandler: Test timestamp synchronization reset", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("NetworkHandler: A new connection resets the timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
-	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
 	double received_ms = 5000000;
-	networkHandler->synchronizedTimestamp(1000, received_ms);
-	CHECK(cx::similar(networkHandler->getTimestampOffset(), received_ms - 1000000, 0.001));
+	server->synchronizedTimestamp(1000, received_ms);
+	CHECK(cx::similar(server->getTimestampOffset(), received_ms - 1000000, 0.001));
 
-	networkHandler->clearTimestampSynchronization();
-	CHECK(cx::similar(networkHandler->getTimestampOffset(), 0, 0.001));
+	server->acquireConnection("tracking", "127.0.0.1", 18944);
+	CHECK(cx::similar(server->getTimestampOffset(), 0, 0.001));
 
-	networkHandler->synchronizedTimestamp(3000, received_ms);
-	CHECK(cx::similar(networkHandler->getTimestampOffset(), received_ms - 3000000, 0.001));
-}
-
-TEST_CASE("OpenIGTLinkTrackingSystemService: Test timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
-{
-	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc(networkHandler));
-
-	double tolerance = 10;
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double timestampSec = 1000;
-
-	double synchedTimeMs = trackingSystemService->mTestNetworkHandler->synchronizedTimestamp(timestampSec, latestSystemTime);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-	REQUIRE_FALSE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
-	trackingSystemService->resetTimeSynchronization();
-	REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
+	server->synchronizedTimestamp(3000, received_ms);
+	CHECK(cx::similar(server->getTimestampOffset(), received_ms - 3000000, 0.001));
 }
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: receiveTransform print openigtlinktransformid warning", "[plugins][org.custusx.core.openigtlink3][unit]")

@@ -38,7 +38,6 @@ if(BUILD_TESTING)
         cxtestVisServices.h
         cxtestVisServices.cpp
         cxtestActiveData.cpp
-        cxtestStreamedTimestampSynchronizer.cpp
         cxtestAcquisitionTimestamps.cpp
         cxtestSlicedImageProxy.cpp
         cxtestToolPositionRecorder.cpp

@@ -111,10 +111,15 @@ The receive time is used instead when:
 If this lasts for 2 s, the synchronizer starts again with a new offset, e.g. after the sender's
 clock was set.
 
-Each message type and device has its own offset, so the offset of each includes its own
-shortest transfer delay. For a sender that stamps video and tracking with the same clock, a
-larger shortest delay for images than for transforms shifts the images later relative to the
-tracking. Temporal calibration absorbs a constant shift like this.
+Each message type and device has its own offset, so the offset of each includes its own shortest
+transfer delay. For a sender that stamps video and tracking with the same clock, a larger
+shortest delay for images than for transforms shifts the images later relative to the tracking.
+Temporal calibration absorbs a constant shift like this, but the shift changes with the image
+size, e.g. when the scanner depth is changed, so calibrate again after a depth change. One
+offset per sender would avoid this, but images and transforms can't share a synchronizer: an
+image is sent after transforms with later sent times, so the sent times don't increase, and a
+frozen scanner stops the image timestamps while the tracking runs on. The offsets start again at
+each new connection, as the sender may have changed.
 
 A sender on this computer (localhost, a loopback address or one of this computer's own
 addresses) uses the same clock, so IGTLinkClientStreamer keeps its sent time instead of adding

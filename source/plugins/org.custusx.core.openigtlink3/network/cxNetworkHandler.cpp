@@ -48,6 +48,7 @@ NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 
 	this->connectToConnectionEvents();
 	this->connectToDeviceEvents();
+	connect(this, &NetworkHandler::connected, this, &NetworkHandler::clearTimestampSynchronization);
 
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(periodicProcess()));
 	mTimer->start(5);

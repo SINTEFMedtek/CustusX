@@ -73,8 +73,6 @@ public:
 	/** The connection is closed when the last user releases it. */
 	void releaseConnection(QString user);
 
-	void clearTimestampSynchronization();
-
 signals:
 	void connected();
 	void disconnected();
@@ -102,6 +100,7 @@ protected:
 	bool convertZeroesInsideSectorToOnes(ThreadResult &result, int threshold = 0, int newValue = 1);
 	bool createMask(ThreadResult &result);
 	double synchronizedTimestamp(QString clockId, double sentTimestampSec, double received_ms); ///< The sender's timestamp converted to the system clock, with an offset estimated per clockId
+	void clearTimestampSynchronization(); ///< A new connection may have another sender clock
 	void saveThreadResult(ThreadResult &threadResult);
 	ThreadResult createThreadResultObject(QString deviceName, ImagePtr image = ImagePtr());
 
