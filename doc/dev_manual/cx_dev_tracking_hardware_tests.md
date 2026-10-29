@@ -79,6 +79,10 @@ Environment variables:
   tool in the first and the other systems in the comparison test, default 1.0.
 * CX_TRACKING_TEST_REPEATS: the number of start/stop cycles in the restart test, default 5.
 * CX_TRACKING_TEST_LONG_DURATION_S: the length of the long run, default 3600.
+* CX_TRACKING_TEST_NDI_DEBUG: 1 turns on ndiTrackingDebugLogging, which writes each NDI command
+  with its time to NdiCommunication.txt in the logging folder. It also asks a Polaris for the 3D
+  markers in each frame, so the replies are larger. Needed in the tests, as they start with a new
+  settings file.
 
 The tests:
 

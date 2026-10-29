@@ -93,7 +93,7 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 	else
 	{
 		QString device = hostname.isEmpty() ? this->findSerialDevice() : toSerialDeviceName(hostname);
-		success = !device.isEmpty() && this->openSerial(device, settings.baudRate);
+		success = !device.isEmpty() && !this->isStopRequested() && this->openSerial(device, settings.baudRate, hostname.isEmpty());
 	}
 
 	if (success && this->command("VER:4"))
@@ -218,7 +218,7 @@ QString NdiCapiDevice::findSerialDevice()
 		{
 			inUse << candidate;
 		}
-		else if (ndiSerialProbe(candidate.toLocal8Bit().constData(), false) == NDI_OKAY)
+		else if (this->probeSerial(candidate))
 		{
 			retval = candidate;
 		}
@@ -227,7 +227,11 @@ QString NdiCapiDevice::findSerialDevice()
 	{
 		mLastError = "Stopped while connecting";
 	}
-	else if (retval.isEmpty())
+	else if (!retval.isEmpty())
+	{
+		mLastError.clear();
+	}
+	else
 	{
 		mInUse = !inUse.isEmpty();
 		mLastError = candidates.isEmpty() ? QString("No serial ports found")
@@ -264,7 +268,19 @@ QStringList NdiCapiDevice::getSerialPortCandidates()
 	return retval;
 }
 
-bool NdiCapiDevice::openSerial(QString device, int baudRate)
+bool NdiCapiDevice::probeSerial(const QString& device)
+{
+	int probeResult = ndiSerialProbe(device.toLocal8Bit().constData(), false);
+	bool retval = (probeResult == NDI_OKAY);
+	if (!retval)
+	{
+		mLastError = QString("No NDI device on %1: %2").arg(device).arg(ndiErrorString(probeResult));
+	}
+	this->log(QString("Probe %1: %2").arg(device).arg(ndiErrorString(probeResult)));
+	return retval;
+}
+
+bool NdiCapiDevice::openSerial(const QString& device, int baudRate, bool probed)
 {
 	if (isSerialPortInUse(device)) // checked first: probing sends INIT, which would disturb the other application
 	{
@@ -272,10 +288,8 @@ bool NdiCapiDevice::openSerial(QString device, int baudRate)
 		mLastError = QString("The serial port %1 is used by another application").arg(device);
 		return false;
 	}
-	int probeResult = ndiSerialProbe(device.toLocal8Bit().constData(), false);
-	if (probeResult != NDI_OKAY)
+	if (!probed && !this->probeSerial(device))
 	{
-		mLastError = QString("No NDI device on %1: %2").arg(device).arg(ndiErrorString(probeResult));
 		return false;
 	}
 	mDevice = ndiOpenSerial(device.toLocal8Bit().constData());
