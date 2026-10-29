@@ -111,12 +111,17 @@ void NdiTrackerManager::initializeSlot(bool on)
 	{
 		mLastSystemStatus = 0;
 		mToolsChanged = false;
-		bool success = this->connectToDevice() && this->setupTools();
+		bool success = this->connectToDevice() && !mDevice->isStopRequested() && this->setupTools();
 		if (success)
 		{
 			this->setIlluminatorRate(mIlluminatorRate_Hz);
 			mInitialized = true;
 			emit initialized(true);
+		}
+		else if (mDevice->isStopRequested())
+		{
+			this->disconnectFromDevice();
+			report("NDI Tracker: Stopped while connecting.");
 		}
 		else
 		{
@@ -403,7 +408,7 @@ bool NdiTrackerManager::connectToDevice()
 	{
 		reportSuccess(QString("NDI Tracker: Connected to %1 %2").arg(where).arg(mDevice->getDescription()));
 	}
-	else
+	else if (!mDevice->isStopRequested())
 	{
 		reportError("NDI Tracker: Could not connect to the device: " + mDevice->getLastError()
 					+ ". Check the cable, or set 'ndiTrackingHostname' in the CustusX settings.");
