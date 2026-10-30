@@ -375,6 +375,7 @@ if(CX_BUILD_USER_DOCUMENTATION)
 endif()
 
 
+cx_add_non_source_file("dev_manual/cx_dev_acquisition_timestamps.md")
 cx_add_non_source_file("dev_manual/cx_dev_architecture.md")
 cx_add_non_source_file("dev_manual/cx_dev_build_instructions.md")
 cx_add_non_source_file("dev_manual/cx_dev_code_style.md")

@@ -109,7 +109,6 @@ public:
 	 *  e.g. because the plugin for its tracking system implementation is not built. */
 	static bool setStateOfTrackingSystems(std::vector<TrackingSystemServicePtr> systems, Tool::State val);
 	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems();
-	virtual void resetTimeSynchronization();
 
 	bool isNull();
 	virtual void setCurrentTrackingSystemImplementation(QString trackingSystemImplementation);

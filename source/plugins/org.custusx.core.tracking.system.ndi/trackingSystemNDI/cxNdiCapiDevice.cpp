@@ -93,7 +93,7 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 	else
 	{
 		QString device = hostname.isEmpty() ? this->findSerialDevice() : toSerialDeviceName(hostname);
-		success = !device.isEmpty() && this->openSerial(device, settings.baudRate);
+		success = !device.isEmpty() && !this->isStopRequested() && this->openSerial(device, settings.baudRate, hostname.isEmpty());
 	}
 
 	if (success && this->command("VER:4"))
@@ -103,6 +103,10 @@ bool NdiCapiDevice::open(const NdiConnectionSettings& settings)
 	if (!success)
 	{
 		this->close();
+	}
+	if (this->isStopRequested())
+	{
+		mLastError = "Stopped while connecting";
 	}
 	return success;
 }
@@ -206,7 +210,7 @@ QString NdiCapiDevice::findSerialDevice()
 	QStringList inUse;
 	for (const QString& candidate : candidates)
 	{
-		if (!retval.isEmpty())
+		if (!retval.isEmpty() || this->isStopRequested())
 		{
 			continue;
 		}
@@ -214,15 +218,24 @@ QString NdiCapiDevice::findSerialDevice()
 		{
 			inUse << candidate;
 		}
-		else if (ndiSerialProbe(candidate.toLocal8Bit().constData(), false) == NDI_OKAY)
+		else if (this->probeSerial(candidate))
 		{
 			retval = candidate;
 		}
 	}
-	if (retval.isEmpty())
+	if (this->isStopRequested())
+	{
+		mLastError = "Stopped while connecting";
+	}
+	else if (!retval.isEmpty())
+	{
+		mLastError.clear();
+	}
+	else
 	{
 		mInUse = !inUse.isEmpty();
-		mLastError = QString("No NDI device found on the serial ports (tried %1)").arg(candidates.join(", "));
+		mLastError = candidates.isEmpty() ? QString("No serial ports found")
+										  : QString("No NDI device found on the serial ports (tried %1)").arg(candidates.join(", "));
 		if (mInUse)
 		{
 			mLastError += QString(", used by another application: %1").arg(inUse.join(", "));
@@ -242,7 +255,7 @@ QStringList NdiCapiDevice::getSerialPortCandidates()
 	{
 		retval << "/dev/" + port;
 	}
-#endif
+#else
 	for (int i = 0; i < 20; ++i)
 	{
 		const char* name = ndiSerialDeviceName(i);
@@ -251,10 +264,23 @@ QStringList NdiCapiDevice::getSerialPortCandidates()
 			retval << QString(name);
 		}
 	}
+#endif
 	return retval;
 }
 
-bool NdiCapiDevice::openSerial(QString device, int baudRate)
+bool NdiCapiDevice::probeSerial(const QString& device)
+{
+	int probeResult = ndiSerialProbe(device.toLocal8Bit().constData(), false);
+	bool retval = (probeResult == NDI_OKAY);
+	if (!retval)
+	{
+		mLastError = QString("No NDI device on %1: %2").arg(device).arg(ndiErrorString(probeResult));
+	}
+	this->log(QString("Probe %1: %2").arg(device).arg(ndiErrorString(probeResult)));
+	return retval;
+}
+
+bool NdiCapiDevice::openSerial(const QString& device, int baudRate, bool probed)
 {
 	if (isSerialPortInUse(device)) // checked first: probing sends INIT, which would disturb the other application
 	{
@@ -262,10 +288,8 @@ bool NdiCapiDevice::openSerial(QString device, int baudRate)
 		mLastError = QString("The serial port %1 is used by another application").arg(device);
 		return false;
 	}
-	int probeResult = ndiSerialProbe(device.toLocal8Bit().constData(), false);
-	if (probeResult != NDI_OKAY)
+	if (!probed && !this->probeSerial(device))
 	{
-		mLastError = QString("No NDI device on %1: %2").arg(device).arg(ndiErrorString(probeResult));
 		return false;
 	}
 	mDevice = ndiOpenSerial(device.toLocal8Bit().constData());
@@ -285,7 +309,7 @@ bool NdiCapiDevice::setBaudRate(int baudRate)
 	bool tryNext = true;
 	for (int rate : getBaudRatesToTry(baudRate))
 	{
-		if (tryNext)
+		if (tryNext && !this->isStopRequested())
 		{
 			ndiCommand(mDevice, "COMM:%X%03d%d", baudRateToNdiCode(rate), NDI_8N1, NDI_NOHANDSHAKE);
 			int error = ndiGetError(mDevice);
@@ -296,7 +320,7 @@ bool NdiCapiDevice::setBaudRate(int baudRate)
 			success = (error == NDI_OKAY);
 			this->log(QString("COMM %1 baud: %2").arg(rate).arg(ndiErrorString(error)));
 			tryNext = !success && isSlowerBaudRateWorthTrying(error);
-			if (tryNext && error == NDI_BAD_COMM)
+			if (tryNext && error == NDI_BAD_COMM && !this->isStopRequested())
 			{
 				tryNext = this->resetToDefaultBaudRate(); // the device switched, but this computer couldn't
 			}
@@ -512,7 +536,7 @@ bool NdiCapiDevice::loadToolDefinition(int portHandle, QString sromFile)
 {
 	QByteArray filename = sromFile.toLocal8Bit();
 	bool success = false;
-	for (int attempt = 0; attempt < kToolDefinitionRetries && !success; ++attempt)
+	for (int attempt = 0; attempt < kToolDefinitionRetries && !success && !this->isStopRequested(); ++attempt)
 	{
 		int error = ndiPVWRFromFile(mDevice, portHandle, filename.data());
 		success = (error == NDI_OKAY);
@@ -625,8 +649,10 @@ bool NdiCapiDevice::readFrame(const std::vector<int>& portHandles, NdiFrame& fra
 		frame.samples.clear();
 		for (int portHandle : portHandles)
 		{
-			frame.frameNumber = std::max(frame.frameNumber, ndiGetBXFrame(mDevice, portHandle));
-			frame.samples.push_back(this->getBXSample(portHandle));
+			NdiToolSample sample = this->getBXSample(portHandle);
+			sample.frameNumber = ndiGetBXFrame(mDevice, portHandle);
+			frame.frameNumber = std::max(frame.frameNumber, sample.frameNumber);
+			frame.samples.push_back(sample);
 		}
 	}
 	return success;

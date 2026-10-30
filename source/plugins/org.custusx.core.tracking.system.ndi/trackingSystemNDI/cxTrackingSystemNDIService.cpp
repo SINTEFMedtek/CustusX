@@ -32,7 +32,7 @@ namespace cx
 
 namespace
 {
-const int kThreadStopTimeout_ms = 15000; ///< Longer than a few unanswered commands while closing the device
+const int kThreadStopWarning_ms = 15000; ///< Longer than a few unanswered commands while closing the device
 }
 
 TrackingSystemNDIService::TrackingSystemNDIService() :
@@ -475,12 +475,11 @@ void TrackingSystemNDIService::destroyTrackerThread()
 {
 	if (mTrackerThread)
 	{
+		mTrackerThread->requestInterruption();
 		mTrackerThread->quit();
-		mTrackerThread->wait(kThreadStopTimeout_ms); // closing the device can take a few seconds
-		if (mTrackerThread->isRunning())
+		if (!mTrackerThread->wait(kThreadStopWarning_ms))
 		{
-			reportError("NDI Tracking: The tracker thread did not stop, terminating it.");
-			mTrackerThread->terminate();
+			reportWarning("NDI Tracking: Waiting for the device to answer before the tracker thread can stop. Check the USB cable.");
 			mTrackerThread->wait();
 		}
 		QObject::disconnect(mTrackerThread.get());

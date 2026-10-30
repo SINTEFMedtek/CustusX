@@ -15,6 +15,8 @@ if(BUILD_TESTING)
         cxtestVideoGraphics.cpp
         cxtestImageEnveloper.cpp
         cxtestStream2DRep3D.cpp
+        cxtestImage2DProxy.cpp
+        cxtestSliceRepSW.cpp
         cxtestMultiViewCache.cpp
         cxtestRGBColor.cpp
     )

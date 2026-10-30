@@ -40,6 +40,7 @@ set(PLUGIN_SRCS
     cxNDITrackingPluginActivator.h
     cxNDITrackingPluginActivator.cpp
     trackingSystemNDI/cxNdiDevice.h
+    trackingSystemNDI/cxNdiDevice.cpp
     trackingSystemNDI/cxNdiCapiDevice.h
     trackingSystemNDI/cxNdiCapiDevice.cpp
     trackingSystemNDI/cxNdiToolSetup.h

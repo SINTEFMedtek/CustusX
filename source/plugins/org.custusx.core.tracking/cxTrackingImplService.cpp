@@ -805,12 +805,4 @@ QString TrackingImplService::getCurrentTrackingSystemImplementation()
 	return mTrackingSystemImplementation;
 }
 
-void TrackingImplService::resetTimeSynchronization()
-{
-	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
-	{
-		mTrackingSystems[i]->resetTimeSynchronization();
-	}
-}
-
 } //namespace cx

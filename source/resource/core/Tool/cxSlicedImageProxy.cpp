@@ -128,6 +128,8 @@ SlicedImageProxy::SlicedImageProxy()
 	mReslicer->SetInterpolationModeToLinear();
 	mReslicer->SetOutputDimensionality(2);
 	mReslicer->SetResliceAxes(mMatrixAxes);
+	// A slice is small: with one thread per core, starting the threads costs more than the slicing. Matters for video at 40 Hz.
+	mReslicer->SetNumberOfThreads(2);
 	//mReslicer->SetAutoCropOutput(false); //faster update rate
 	mReslicer->AutoCropOutputOn(); // fix used in 2.0.9, but slower update rate
 
@@ -173,6 +175,11 @@ void SlicedImageProxy::transferFunctionsChangedSlot()
 
 void SlicedImageProxy::updateRedirecterSlot()
 {
+	// The image data object is replaced e.g. when a video stream reconnects
+	if (mImage && mReslicer->GetInput() != mImage->getBaseVtkImageData().Get())
+	{
+		mReslicer->SetInputData(mImage->getBaseVtkImageData());
+	}
 	mRedirecter->SetInputConnection(mReslicer->GetOutputPort());
 	update();
 }
@@ -244,7 +251,12 @@ void SlicedImageProxy::update()
 	Transform3D iMr = mImage->get_rMd().inv();
 	Transform3D M = iMr * rMs;
 
-	mMatrixAxes->DeepCopy(M.getVtkMatrix());
+	// Only when changed: setting the same axes would slice again. The image and the plane often move together,
+	// e.g. a probe image in a view that follows the probe.
+	if (!similar(Transform3D(mMatrixAxes), M))
+	{
+		mMatrixAxes->DeepCopy(M.getVtkMatrix());
+	}
 }
 
 void SlicedImageProxy::transformChangedSlot()

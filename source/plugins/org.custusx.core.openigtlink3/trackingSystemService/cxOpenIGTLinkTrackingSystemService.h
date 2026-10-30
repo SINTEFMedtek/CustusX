@@ -50,7 +50,6 @@ public:
 	virtual TrackerConfigurationPtr getConfiguration();
 	virtual ToolPtr getReference(); ///< reference tool used by entire tracking service - NOTE: system fails if several TrackingSystemServices define this tool
 
-	virtual void resetTimeSynchronization();
 	virtual void startFallbackTracking(QString configurationFile);
 
 protected:

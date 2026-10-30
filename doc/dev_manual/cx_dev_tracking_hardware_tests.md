@@ -79,6 +79,10 @@ Environment variables:
   tool in the first and the other systems in the comparison test, default 1.0.
 * CX_TRACKING_TEST_REPEATS: the number of start/stop cycles in the restart test, default 5.
 * CX_TRACKING_TEST_LONG_DURATION_S: the length of the long run, default 3600.
+* CX_TRACKING_TEST_NDI_DEBUG: 1 turns on ndiTrackingDebugLogging, which writes each NDI command
+  with its time to NdiCommunication.txt in the logging folder. It also asks a Polaris for the 3D
+  markers in each frame, so the replies are larger. Needed in the tests, as they start with a new
+  settings file.
 
 The tests:
 
@@ -101,7 +105,7 @@ One folder per test run, with:
   The columns are label, tool, event, timestamp_ms (from the tracking system), received_ms
   (when CustusX got it), visible, x, y, z (tool tip in the reference space, mm), the rotation
   r00 to r22, the position warning, and the tracking system's metadata (for NDI the RMS error,
-  port status and number of markers used).
+  port status, number of markers used, frame number and the time the frame was read).
 * N_system_toolconfig.xml: the tool configuration used.
 * N_system_command.log: the output of the OpenIGTLink server.
 * summary.txt: OK or FAILED for each run, the statistics of each tool, and the differences in

@@ -11,7 +11,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 
+#include <atomic>
+#include <memory>
 #include <QTemporaryDir>
+#include <QThread>
 #include <QFile>
 #include "cxNdiToolSetup.h"
 #include "cxtestNdiFakeDevice.h"
@@ -118,6 +121,44 @@ TEST_CASE("NdiToolSetup: no port handle for a wireless tool gives a warning", "[
 
 	CHECK_FALSE(result.success());
 	CHECK(result.warnings.size() == 1);
+}
+
+TEST_CASE("NdiToolSetup: a stop request ends the setup without tools", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	QTemporaryDir dir;
+	FakeNdiDevice device;
+	device.stopRequested = true;
+	device.addWiredHandle(0x0A, 0);
+
+	cx::NdiToolSetupResult result = cx::setupNdiTools(device, {
+		wirelessTool("pointer", createRomFile(dir, "pointer.rom")),
+		wiredTool("sensor", 0)});
+
+	CHECK_FALSE(result.success());
+	CHECK(result.warnings == QStringList("Stopped while setting up the tools."));
+	CHECK(device.loadedToolDefinitions.empty());
+	CHECK_FALSE(device.handles[0x0A].initialized);
+}
+
+TEST_CASE("NdiDevice: a stop is requested by interrupting the thread the device is used from", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	FakeNdiDevice device;
+	CHECK_FALSE(device.cx::NdiDevice::isStopRequested());
+
+	std::atomic<bool> stopSeen(false);
+	std::unique_ptr<QThread> thread(QThread::create([&device, &stopSeen]()
+	{
+		for (int i = 0; i < 5000 && !device.cx::NdiDevice::isStopRequested(); ++i)
+		{
+			QThread::msleep(1);
+		}
+		stopSeen = device.cx::NdiDevice::isStopRequested();
+	}));
+	thread->start();
+	thread->requestInterruption();
+
+	thread->wait();
+	CHECK(stopSeen);
 }
 
 TEST_CASE("NdiToolSetup: Aurora wired tools are matched by physical port, not by port handle order", "[unit][org.custusx.core.tracking.system.ndi]")

@@ -72,7 +72,8 @@ public:
 	static int countUsedMarkers(const char markerInfo[10]); ///< From the 10 marker bytes in a BX reply, 4 bits per marker
 
 private:
-	bool openSerial(QString device, int baudRate);
+	bool probeSerial(const QString& device);
+	bool openSerial(const QString& device, int baudRate, bool probed);
 	bool openNetwork(QString hostname, int port, bool takeOverDevice);
 	bool isTrackingForAnotherClient(); ///< BX only succeeds in tracking mode: another client is using the device
 	bool setBaudRate(int baudRate);

@@ -31,6 +31,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBoolProperty.h"
 #include "cxLogger.h"
 #include "cxVideoServerConfig.h"
+#include "cxTime.h"
+#include <chrono>
 
 #ifdef CX_USE_OpenCV
 #include <opencv2/highgui/highgui.hpp>
@@ -177,6 +179,9 @@ ImageStreamerOpenCV::ImageStreamerOpenCV()
 {
 	mGrabbing = false;
 	mAvailableImage = false;
+	mLastFrameTime_ms = 0.0;
+	mLastGrabTime_ms = 0.0;
+	mUseDriverFrameTime = false;
 	setSendInterval(40);
 
 #ifdef CX_USE_OpenCV
@@ -251,6 +256,8 @@ void ImageStreamerOpenCV::initialize_local()
 		std::cerr << "ImageStreamerOpenCV: Failed to open a video device or video file!\n" << endl;
 		return;
 	}
+	// Only V4L2 is known to give the frame time on the monotonic clock
+	mUseDriverFrameTime = sourceIsInt && (mVideoCapture->getBackendName() == "V4L2");
 
 	// try one grab before accepting the streamer
 	// - this fails if no camera is attached
@@ -392,10 +399,31 @@ void ImageStreamerOpenCV::grab()
 	// grab images from camera to opencv internal buffer, do not process
 	bool success = mVideoCapture->grab();
 	if (success)
-		mLastGrabTime = QDateTime::currentDateTime();
+	{
+		mLastGrabTime_ms = getMilliSecondsSinceEpoch();
+		mLastFrameTime_ms = mLastGrabTime_ms;
+		if (mUseDriverFrameTime)
+		{
+			std::chrono::duration<double, std::milli> monotonic = std::chrono::steady_clock::now().time_since_epoch();
+			double driverTime_ms = mVideoCapture->get(cv::CAP_PROP_POS_MSEC);
+			mLastFrameTime_ms = getFrameTime_ms(mLastGrabTime_ms, driverTime_ms, mLastGrabTime_ms - monotonic.count());
+		}
+	}
 	mAvailableImage = success;
 	mGrabbing = false;
 #endif
+}
+
+double ImageStreamerOpenCV::getFrameTime_ms(double grabTime_ms, double driverTime_ms, double driverClockToSystemClock_ms)
+{
+	double retval = grabTime_ms;
+	double frameTime_ms = driverTime_ms + driverClockToSystemClock_ms;
+	double delay_ms = grabTime_ms - frameTime_ms;
+	if (driverTime_ms > 0.0 && delay_ms >= 0.0 && delay_ms < kMaxCaptureDelay_ms)
+	{
+		retval = frameTime_ms;
+	}
+	return retval;
 }
 
 void ImageStreamerOpenCV::send()
@@ -444,7 +472,8 @@ ImagePtr ImageStreamerOpenCV::getImageMessage()
 	vtkImageDataPtr raw = this->convertTovtkImageData(frame);
 	QString uid = "openCV";
 	ImagePtr image(new Image(uid, raw, uid, imUS));
-	image->setAcquisitionTime(mLastGrabTime);
+	image->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(qint64(mLastFrameTime_ms)));
+	image->setSoftwareAcquisitionTime(QDateTime::fromMSecsSinceEpoch(qint64(mLastGrabTime_ms)));
 	return image;
 #else
 	return ImagePtr();

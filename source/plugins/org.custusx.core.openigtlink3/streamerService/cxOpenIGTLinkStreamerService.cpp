@@ -30,6 +30,8 @@ OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(NetworkHandlerPtr network
 
 	connect(mStreamer.get(), &OpenIGTLinkStreamer::stoppedStreaming, this, &OpenIGTLinkStreamerService::releaseConnection);
 	connect(mStreamer.get(), &OpenIGTLinkStreamer::stoppedStreaming, mConnection.get(), &NetworkHandler::resendProbedefinition);
+	// The connection may already receive images, e.g. when tracking uses it: the probe definition must be sent again to this streamer
+	connect(mStreamer.get(), &OpenIGTLinkStreamer::startedStreaming, mConnection.get(), &NetworkHandler::resendProbedefinition);
 }
 
 OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()

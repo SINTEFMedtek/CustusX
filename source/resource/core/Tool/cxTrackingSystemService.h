@@ -50,8 +50,6 @@ public:
 	virtual void setConfigurationFile(QString configurationFile);
 	virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
-	virtual void resetTimeSynchronization() {}; ///< Reset time synchronization. Used for resetting time synchronization of incoming timestamps in OpenIGTLinkTrackingSystemService
-
 	void addExternalTool(ToolPtr tool);
 
 	/** Track the tools in configurationFile for another tracking system, whose device is used by

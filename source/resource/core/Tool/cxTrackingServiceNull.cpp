@@ -144,9 +144,4 @@ std::vector<TrackingSystemServicePtr> TrackingServiceNull::getTrackingSystems()
 	return std::vector<TrackingSystemServicePtr> ();
 }
 
-void TrackingServiceNull::resetTimeSynchronization()
-{
-
-}
-
 } //cx

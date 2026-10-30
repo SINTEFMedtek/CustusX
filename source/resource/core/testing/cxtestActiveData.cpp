@@ -10,6 +10,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <vtkImageData.h>
+#include "cxRegistrationTransform.h"
+#include "cxImageLUT2D.h"
 #include "cxActiveData.h"
 #include "cxMesh.h"
 #include "cxImage.h"
@@ -155,6 +158,31 @@ TEST_CASE("ActiveData: Get image from TrackedStream with VideoSource", "[unit]")
 	REQUIRE(activeData.getDerivedActiveImage());
 	CHECK(activeData.getDerivedActiveImage()->getUid() != testData.trackedStream1->getUid());
 	CHECK(activeData.getDerivedActiveImage()->getUid().contains(testData.trackedStream1->getUid()));
+}
+
+TEST_CASE("TrackedStream: a new video source gives a new image with the settings of the old one", "[unit]")
+{
+	cxtest::TestDataStructures testData;
+	cx::TrackedStreamPtr stream = testData.trackedStream1;
+	cx::TestVideoSourcePtr source(new cx::TestVideoSource("TestVideoSourceUid", "TestVideoSource" , 80, 40));
+	stream->setVideoSource(source);
+	cx::ImagePtr oldImage = stream->getChangingImage();
+	oldImage->getLookupTable2D()->setWindow(77);
+	cx::Transform3D rMd = cx::createTransformTranslate(cx::Vector3D(1, 2, 3));
+	oldImage->get_rMd_History()->setRegistration(rMd);
+	stream->setVideoSource(source);
+	CHECK(stream->getChangingImage() == oldImage);
+
+	cx::TestVideoSourcePtr newSource(new cx::TestVideoSource("TestVideoSourceUid", "TestVideoSource" , 80, 40));
+	stream->setVideoSource(newSource);
+	cx::ImagePtr newImage = stream->getChangingImage();
+	CHECK(newImage != oldImage);
+	CHECK(newImage->getBaseVtkImageData() == newSource->getVtkImageData());
+	CHECK(newImage->getLookupTable2D()->getWindow() == Approx(77));
+	CHECK(cx::similar(newImage->get_rMd(), rMd));
+
+	oldImage->getLookupTable2D()->setWindow(50); // e.g. a widget that still edits the old image
+	CHECK(newImage->getLookupTable2D()->getWindow() == Approx(50));
 }
 
 TEST_CASE("ActiveData: getActiveImageUid", "[unit]")

@@ -22,6 +22,7 @@ Parameters affecting the performance of the application.
 - Max Render Size: Volumes are downsampled to this size before rendered in 3D (2D still shows slices through original data).
 - Smart Render: Render only once per second if there is no changes in the scene.
 - 2D Overlay: Enable multiple volumes in 2D (GPU based multi slicer, can only handle up to 4 images).
+- Draw 2D images in the slice plane directly: A 2D image lying in the slice plane, e.g. a video stream in a view following the probe, is drawn directly instead of being sliced. This uses less CPU. Turn it off if such images are drawn incorrectly.
 - Optimized views: Speedup by merging all 2D views into a single vtkRenderWindow
 - Depth peeling: Used to show transparent meshes correctly. See also \ref mesh_property_transparent.
 - Still Update Rate: Property in vtkRenderWindow. Increasing this value may improve rendering speed at the cost of quality.
@@ -38,6 +39,8 @@ Turn on/off automated operations.
 Visualization {#preferences_visualization_widget}
 ===
 Preferences for 2D and 3D visualization.
+
+- View Offset: Position of the virtual tool tip (tool tip plus tooltip offset) in views following the tool, e.g. anyplane, % from top. Not used for a probe with a known US sector: its view is centered on the sector.
 
 
 \addindex preferences_video_widget

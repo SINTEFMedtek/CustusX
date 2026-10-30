@@ -209,7 +209,8 @@ cx_add_class(cxResource_SOURCE
   utilities/cxSharedPointerChecker
   utilities/cxNullDeleter.h
   utilities/cxSpaceProviderImpl
-  utilities/cxStreamedTimestampSynchronizer
+  utilities/cxFrameCounterTimestamper
+  utilities/cxSenderClockSynchronizer
   utilities/cxEnumConverter.h
   utilities/cxEnumConversion.h
   utilities/cxSpaceProviderNull

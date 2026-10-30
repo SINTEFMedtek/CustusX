@@ -106,6 +106,12 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 		disconnect(mVideoSource.get(), &VideoSource::streaming, this, &TrackedStream::streaming);
 	}
 
+	if (videoSource != mVideoSource && mImage)
+	{
+		// The views get a new image from the new source, as they do when the stream is shown again
+		mReplacedImage = mImage;
+		this->deleteImageToStopEmittingFrames();
+	}
 	mVideoSource = videoSource;
 	emit streamChanged(this->getUid());
 	emit newVideoSource(mVideoSource);
@@ -176,8 +182,21 @@ ImagePtr TrackedStream::getChangingImage()
 					  this->getName()+"_TrackedStreamHelper",
 					  mVideoSource->getModality()));
 		mImage->getLookupTable2D()->setLLR(1);
+		this->keepSettingsFromReplacedImage();
 	}
 	return mImage;
+}
+
+/** The lookup tables are shared, so a widget still editing the replaced image also changes the new one */
+void TrackedStream::keepSettingsFromReplacedImage()
+{
+	if (mReplacedImage)
+	{
+		mImage->setLookupTable2D(mReplacedImage->getLookupTable2D());
+		mImage->setTransferFunctions3D(mReplacedImage->getTransferFunctions3D());
+		mImage->get_rMd_History()->setRegistration(mReplacedImage->get_rMd());
+		mReplacedImage.reset();
+	}
 }
 
 void TrackedStream::deleteImageToStopEmittingFrames()

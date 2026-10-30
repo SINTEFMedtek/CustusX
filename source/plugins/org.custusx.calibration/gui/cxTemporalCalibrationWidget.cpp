@@ -44,7 +44,8 @@ typedef unsigned char uchar;
 
 TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService, QWidget* parent) :
 	BaseWidget(parent, "temporal_calibration_widget", "Temporal Calibration"),
-	mInfoLabel(new QLabel(""))
+	mInfoLabel(new QLabel("")),
+	mRecordingHasUsData(false)
 {
 	mServices = services;
 
@@ -53,6 +54,12 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
   connect(mServices->patient().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
   connect(acquisitionService.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
+  // Calibrate the new recording, not the previous one, while the new one is being saved
+  connect(acquisitionService.get(), &AcquisitionService::started, this, &TemporalCalibrationWidget::recordingStartedSlot);
+  connect(acquisitionService.get(), &AcquisitionService::cancelled, this, &TemporalCalibrationWidget::recordingCancelledSlot);
+  connect(acquisitionService.get(), &AcquisitionService::acquisitionDataReady, this, &TemporalCalibrationWidget::usDataRecordedSlot);
+  // Queued: after the US acquisition has handled the stop, and emitted acquisitionDataReady if there is US data
+  connect(acquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &TemporalCalibrationWidget::recordingStoppedSlot, Qt::QueuedConnection);
 
   cx::AcquisitionService::TYPES context(cx::AcquisitionService::tTRACKING | cx::AcquisitionService::tUS);
   mRecordSessionWidget = new RecordSessionWidget(acquisitionService, this, context, "temp_cal");
@@ -83,14 +90,14 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, Ac
   mVerbose = new QCheckBox("Save data to temporal_calib.txt");
   topLayout->addWidget(mVerbose);
 
-	QPushButton* calibrateButton = new QPushButton("Calibrate");
-	calibrateButton->setToolTip("Calculate the temporal shift for the selected acqusition."
+	mCalibrateButton = new QPushButton("Calibrate");
+	mCalibrateButton->setToolTip("Calculate the temporal shift for the selected acqusition."
 															"The shift is not applied in any way."
 															"<p><b>NB:</b>"
 															" The calculation takes a few seconds, and in this time the program will be unresponsive</p>");
 
-  connect(calibrateButton, SIGNAL(clicked()), this, SLOT(calibrateSlot()));
-  topLayout->addWidget(calibrateButton);
+  connect(mCalibrateButton, SIGNAL(clicked()), this, SLOT(calibrateSlot()));
+  topLayout->addWidget(mCalibrateButton);
 
   mResult = new QLineEdit;
   mResult->setReadOnly(true);
@@ -120,6 +127,34 @@ void TemporalCalibrationWidget::selectData(QString filename)
 	mAlgorithm->selectData(filename, mServices->file());
   mFileSelectWidget->setFilename(filename);
   mResult->setText("");
+  mCalibrateButton->setEnabled(true);
+}
+
+void TemporalCalibrationWidget::recordingStartedSlot()
+{
+	mRecordingHasUsData = false;
+	mCalibrateButton->setEnabled(false);
+	mResult->setText("Waiting for the recording to be saved");
+}
+
+void TemporalCalibrationWidget::usDataRecordedSlot()
+{
+	mRecordingHasUsData = true;
+}
+
+void TemporalCalibrationWidget::recordingStoppedSlot()
+{
+	// A recording without US data is not saved, so selectData() isn't called
+	if (!mRecordingHasUsData)
+	{
+		this->recordingCancelledSlot();
+	}
+}
+
+void TemporalCalibrationWidget::recordingCancelledSlot()
+{
+	mCalibrateButton->setEnabled(true);
+	mResult->setText("");
 }
 
 /**
@@ -136,7 +171,8 @@ void TemporalCalibrationWidget::calibrateSlot()
   double shift = mAlgorithm->calibrate(&success);
   if (success)
   {
-	  reportSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));
+	  reportSuccess(QString("Completed temporal calibration of %1, found shift %2 ms")
+					.arg(QFileInfo(mFileSelectWidget->getFilename()).baseName()).arg(shift,0,'f',0));
 	  mResult->setText(QString("Shift = %1 ms").arg(shift, 0, 'f', 0));
   }
   else

@@ -72,9 +72,11 @@ private:
 	ToolPtr mProbeTool;
 	VideoSourcePtr mVideoSource;
 	ImagePtr mImage;
+	ImagePtr mReplacedImage; ///< The image from the previous video source, its settings are kept in the new image
 
 	SpaceProviderPtr mSpaceProvider;
 	Transform3D get_tMu();
+	void keepSettingsFromReplacedImage();
 };
 
 typedef std::shared_ptr<TrackedStream> TrackedStreamPtr;

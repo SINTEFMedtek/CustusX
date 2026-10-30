@@ -88,6 +88,10 @@ public:
 	virtual QString getType();
 	virtual QStringList getArgumentDescription();
 
+	static constexpr double kMaxCaptureDelay_ms = 1000.0;
+	/** The driver's frame time on the system clock if it is plausible, otherwise the grab time */
+	static double getFrameTime_ms(double grabTime_ms, double driverTime_ms, double driverClockToSystemClock_ms);
+
 private slots:
 	void grab();
 	void send();
@@ -105,7 +109,9 @@ private:
 	QSize mRescaleSize;
 
 	VideoCapturePtr mVideoCapture; // OpenCV video grabber
-	QDateTime mLastGrabTime;
+	double mLastFrameTime_ms;
+	double mLastGrabTime_ms;
+	bool mUseDriverFrameTime;
 	bool mAvailableImage;
 	bool mGrabbing;
 
