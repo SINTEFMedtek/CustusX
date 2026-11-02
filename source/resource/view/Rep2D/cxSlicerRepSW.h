@@ -33,7 +33,8 @@ typedef std::shared_ptr<class Image2DProxy> Image2DProxyPtr;
  * The image is sliced using a SliceProxy. Only a single
  * volume can be used. A 2D image in the slice plane, e.g. a video stream in a view
  * following the probe, is drawn directly with its transform instead of being sliced.
- * Both use the same actor, so the drawing order against other reps doesn't change.
+ * Both use the same actor. A directly drawn image is placed just in front of the sliced
+ * images, so it is shown on top of a volume in the same view, but behind the 2D metrics.
  *
  * Used by CustusX.
  *
@@ -58,11 +59,13 @@ public:
 	virtual void printSelf(std::ostream & os, Indent indent);
 	static bool isInSlicePlane(Transform3D sMd, Vector3D center_d); ///< A 2D image with this transform lies in the slice plane
 	static Transform3D moveIntoSlicePlane(Transform3D sMd, Vector3D center_d); ///< Rotate and move a 2D image near the slice plane exactly into it
+	static Transform3D placeInFrontOfSlices(Transform3D sMd, Vector3D center_d); ///< As moveIntoSlicePlane(), then kInFrontOfSlices_mm towards the camera
 	bool isDrawnDirectly() const;
 	void setDirectDrawingEnabled(bool enabled); ///< false: always slice the image, also a 2D image in the slice plane
 
 	static constexpr double kMaxAngleFromSlicePlane_rad = 0.0087; ///< 0.5 degrees
 	static constexpr double kMaxDistanceFromSlicePlane_mm = 0.5;
+	static constexpr double kInFrontOfSlices_mm = 0.001; ///< Larger than the float rounding of the plane, and behind the 2D metrics at 0.01 mm
 
 protected:
 	SliceRepSW();
