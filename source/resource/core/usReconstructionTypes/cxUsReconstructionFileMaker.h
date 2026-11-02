@@ -75,7 +75,8 @@ public:
 											  ToolPtr tool,
 											  QString streamUid,
 											  bool writeColor,
-											  Transform3D rMpr);
+											  Transform3D rMpr,
+											  ToolPtr reference = ToolPtr());
 	void setReconstructData(USReconstructInputData data) { mReconstructData = data; }
 
 private:
@@ -93,7 +94,9 @@ private:
 	bool writeMetadata(QString filename, const std::map<double, ToolPositionMetadata>& ts, QString type);
 	bool writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
 	bool writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
-	void writeProbeConfiguration(QString reconstructionFolder, QString session, ProbeDefinition data, QString uid);
+	void writeProbeConfiguration(QString reconstructionFolder, QString session, const USReconstructInputData& data);
+	bool writeMatrix(QString filename, Transform3D matrix, QString type);
+	static USRecordingInfo createRecordingInfo(ToolPtr tool, ToolPtr reference, Transform3D rMpr);
 	void writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<TimedPosition> pos);
 	void writeMask(QString path, QString session, vtkImageDataPtr mask);
 	void writeREADMEFile(QString reconstructionFolder, QString session);

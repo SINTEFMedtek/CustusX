@@ -51,6 +51,26 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 	this->toolVisibleSlot(true);
 }
 
+QString OpenIGTLinkTool::getOpenIGTLinkImageId() const
+{
+	QString retval = mConfigFileToolStructure.mOpenIGTLinkImageId;
+	if (retval.isEmpty())
+	{
+		retval = ToolImpl::getOpenIGTLinkImageId();
+	}
+	return retval;
+}
+
+QString OpenIGTLinkTool::getOpenIGTLinkTransformId() const
+{
+	QString retval = mConfigFileToolStructure.mOpenIGTLinkTransformId;
+	if (retval.isEmpty())
+	{
+		retval = ToolImpl::getOpenIGTLinkTransformId();
+	}
+	return retval;
+}
+
 bool OpenIGTLinkTool::doIdCorrespondToTool(QString openIGTLinkId)
 {
 	bool retval = false;

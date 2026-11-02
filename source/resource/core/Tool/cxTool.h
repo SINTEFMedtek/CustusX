@@ -117,6 +117,7 @@ public:
 
 	virtual ProbePtr getProbe() const { return ProbePtr(); } ///< additional information if the tool represents an US Probe. Extends getProbeSector()
 	virtual QString getOpenIGTLinkImageId() const { return ""; } ///< OpenIGTLink image device name associated with this tool, empty if none
+	virtual QString getOpenIGTLinkTransformId() const { return ""; } ///< OpenIGTLink transform device name of this tool, empty if none
 	virtual double getTimestamp() const = 0; ///< latest valid timestamp for the position matrix. 0 means indeterminate (for f.ex. manual tools)
 	virtual void printSelf(std::ostream &os, Indent indent) { Q_UNUSED(os); Q_UNUSED(indent); } ///< dump internal debug data
 
