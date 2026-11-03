@@ -9,7 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
-#include "cxNdiPositionQuality.h"
+#include "cxPositionQuality.h"
 
 #include <QFile>
 
@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-NdiPositionQuality::NdiPositionQuality(double maxErrorRMS_mm) :
+PositionQuality::PositionQuality(double maxErrorRMS_mm) :
 	mMaxErrorRMS_mm(maxErrorRMS_mm),
 	mExpectedMarkers(0),
 	mBadFrames(0),
@@ -26,7 +26,7 @@ NdiPositionQuality::NdiPositionQuality(double maxErrorRMS_mm) :
 {
 }
 
-QString NdiPositionQuality::evaluate(const NdiToolSample& sample, double maxErrorRMS_mm, int expectedMarkers)
+QString PositionQuality::evaluate(const PositionQualitySample& sample, double maxErrorRMS_mm, int expectedMarkers)
 {
 	QStringList problems;
 	if (sample.portStatus & NdiPortStatus::OutOfVolume)
@@ -56,7 +56,7 @@ QString NdiPositionQuality::evaluate(const NdiToolSample& sample, double maxErro
 	return problems.join(", ");
 }
 
-QString NdiPositionQuality::update(const NdiToolSample& sample)
+QString PositionQuality::update(const PositionQualitySample& sample)
 {
 	if (sample.visible)
 	{
@@ -84,29 +84,29 @@ QString NdiPositionQuality::update(const NdiToolSample& sample)
 	return mWarning;
 }
 
-QString NdiPositionQuality::getWarning() const
+QString PositionQuality::getWarning() const
 {
 	return mWarning;
 }
 
-void NdiPositionQuality::reset()
+void PositionQuality::reset()
 {
 	mBadFrames = 0;
 	mGoodFrames = 0;
 	mWarning.clear();
 }
 
-void NdiPositionQuality::setMaxErrorRMS(double maxErrorRMS_mm)
+void PositionQuality::setMaxErrorRMS(double maxErrorRMS_mm)
 {
 	mMaxErrorRMS_mm = maxErrorRMS_mm;
 }
 
-void NdiPositionQuality::setMarkerCount(int markers)
+void PositionQuality::setMarkerCount(int markers)
 {
 	mExpectedMarkers = std::max(mExpectedMarkers, markers);
 }
 
-int NdiPositionQuality::readMarkerCount(QString romFile)
+int PositionQuality::readMarkerCount(QString romFile)
 {
 	// An NDI tool definition starts with "NDI", and has the number of markers as a 32 bit integer at byte 28
 	int retval = -1;
@@ -123,7 +123,13 @@ int NdiPositionQuality::readMarkerCount(QString romFile)
 	return retval;
 }
 
-int NdiPositionQuality::getExpectedMarkers() const
+double PositionQuality::getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType)
+{
+	bool aurora = (trackerType == tsAURORA);
+	return aurora ? kDefaultMaxErrorRMSAurora_mm : kDefaultMaxErrorRMSPolaris_mm;
+}
+
+int PositionQuality::getExpectedMarkers() const
 {
 	return mExpectedMarkers;
 }

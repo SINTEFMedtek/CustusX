@@ -52,7 +52,7 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 
 	connect(mNetworkHandler.get(), &NetworkHandler::connected,this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
 	connect(mNetworkHandler.get(), &NetworkHandler::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
-	connect(mNetworkHandler.get(), &NetworkHandler::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
+	connect(mNetworkHandler.get(), &NetworkHandler::transformWithStatus, this, &OpenIGTLinkTrackingSystemService::receiveTransformWithStatus);
 	//connect(mNetworkHandler.get(), &NetworkHandler::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
 	connect(mNetworkHandler.get(), &NetworkHandler::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
 
@@ -292,10 +292,10 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 	}
 	else if(tool)
 	{
-		bool waitingForReference = mReference && !tool->isReference() && mReference->getTimestamp() <= 0;
+		bool waitingForReference = mReference && !tool->isReference() && !mReference->getVisible();
 		if(tool->applyReference() && waitingForReference)
 		{
-			// No reference position yet: the tool position would be in tracker space
+			// No current reference position: the tool position can't be made relative to it
 		}
 		else if(tool->applyReference())
 		{
@@ -318,6 +318,42 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 	}
 	else
 		this->printTransformIdWarning(devicename);
+}
+
+void OpenIGTLinkTrackingSystemService::receiveTransformWithStatus(QString devicename, Transform3D transform, double timestampMS, TransformStatus status)
+{
+	OpenIGTLinkToolPtr tool = this->getTool(devicename);
+	if (status.valid)
+	{
+		this->receiveTransform(devicename, transform, timestampMS);
+		if (tool && status.hasQuality && tool->getVisible())
+		{
+			tool->updatePositionQuality(status.quality);
+		}
+	}
+	else if (tool && this->isTracking())
+	{
+		this->setMissing(tool);
+	}
+	else if (this->isTracking())
+	{
+		this->printTransformIdWarning(devicename);
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::setMissing(OpenIGTLinkToolPtr tool)
+{
+	tool->setMissing();
+	if (tool->isReference())
+	{
+		for (std::map<QString, OpenIGTLinkToolPtr>::iterator it = mTools.begin(); it != mTools.end(); ++it)
+		{
+			if (it->second->applyReference())
+			{
+				it->second->setMissing();
+			}
+		}
+	}
 }
 
 bool OpenIGTLinkTrackingSystemService::printTransformIdWarning(QString devicename)

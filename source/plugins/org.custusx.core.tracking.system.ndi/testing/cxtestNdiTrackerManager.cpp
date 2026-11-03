@@ -519,12 +519,12 @@ TEST_CASE("NdiTrackerManager: a tool partially out of the volume gets a position
 	pollFrames(fixture, 1, createSample(ManagerFixture::kPointerHandle, true), reference);
 	CHECK(warning.isEmpty());
 
-	pollFrames(fixture, cx::NdiPositionQuality::kFramesBeforeWarning,
+	pollFrames(fixture, cx::PositionQuality::kFramesBeforeWarning,
 			   createSampleWithStatus(ManagerFixture::kPointerHandle, cx::NdiPortStatus::PartiallyInVolume), reference);
 	CHECK(warning == "partially out of the measurement volume");
 	CHECK(fixture.pointer()->isVisible());
 
-	pollFrames(fixture, cx::NdiPositionQuality::kFramesBeforeClearing, createSample(ManagerFixture::kPointerHandle, true), reference);
+	pollFrames(fixture, cx::PositionQuality::kFramesBeforeClearing, createSample(ManagerFixture::kPointerHandle, true), reference);
 	CHECK(warning.isEmpty());
 }
 
@@ -537,7 +537,7 @@ TEST_CASE("NdiTrackerManager: a reference warning is also a warning for the othe
 	QObject::connect(fixture.manager->getReferenceTool().get(), &cx::NdiTool::positionWarning, [&referenceWarning](QString w) { referenceWarning = w; });
 	fixture.startTracking();
 
-	pollFrames(fixture, cx::NdiPositionQuality::kFramesBeforeWarning, createSample(ManagerFixture::kPointerHandle, true),
+	pollFrames(fixture, cx::PositionQuality::kFramesBeforeWarning, createSample(ManagerFixture::kPointerHandle, true),
 			   createSampleWithStatus(ManagerFixture::kReferenceHandle, cx::NdiPortStatus::OutOfVolume));
 
 	CHECK(referenceWarning == "out of the measurement volume");
@@ -550,7 +550,7 @@ TEST_CASE("NdiTrackerManager: stop tracking clears the position warning", "[unit
 	ManagerFixture fixture;
 	QObject::connect(fixture.pointer().get(), &cx::NdiTool::positionWarning, [&warning](QString w) { warning = w; });
 	fixture.startTracking();
-	pollFrames(fixture, cx::NdiPositionQuality::kFramesBeforeWarning,
+	pollFrames(fixture, cx::PositionQuality::kFramesBeforeWarning,
 			   createSampleWithStatus(ManagerFixture::kPointerHandle, cx::NdiPortStatus::OutOfVolume),
 			   createSample(ManagerFixture::kReferenceHandle, true));
 	REQUIRE_FALSE(warning.isEmpty());
@@ -578,8 +578,8 @@ TEST_CASE("NdiTrackerManager: marker information is requested from Polaris only"
 	CHECK(cx::NdiTrackerManager::isPolaris(cx::tsPOLARIS_SPECTRA));
 	CHECK(cx::NdiTrackerManager::isPolaris(cx::tsPOLARIS_VICRA));
 	CHECK_FALSE(cx::NdiTrackerManager::isPolaris(cx::tsAURORA));
-	CHECK(cx::NdiTrackerManager::getDefaultMaxErrorRMS(cx::tsAURORA) == Approx(cx::NdiPositionQuality::kDefaultMaxErrorRMSAurora_mm));
-	CHECK(cx::NdiTrackerManager::getDefaultMaxErrorRMS(cx::tsPOLARIS) == Approx(cx::NdiPositionQuality::kDefaultMaxErrorRMSPolaris_mm));
+	CHECK(cx::PositionQuality::getDefaultMaxErrorRMS(cx::tsAURORA) == Approx(cx::PositionQuality::kDefaultMaxErrorRMSAurora_mm));
+	CHECK(cx::PositionQuality::getDefaultMaxErrorRMS(cx::tsPOLARIS) == Approx(cx::PositionQuality::kDefaultMaxErrorRMSPolaris_mm));
 }
 
 TEST_CASE("NdiTrackerManager: the illuminator rate is set on Polaris only", "[unit][org.custusx.core.tracking.system.ndi]")
@@ -606,7 +606,7 @@ TEST_CASE("NdiTrackerManager: the RMS error limit from the settings is used", "[
 
 	cx::NdiToolSample pointer = createSample(ManagerFixture::kPointerHandle, true);
 	pointer.errorRMS_mm = 0.3;
-	pollFrames(fixture, cx::NdiPositionQuality::kFramesBeforeWarning, pointer, createSample(ManagerFixture::kReferenceHandle, true));
+	pollFrames(fixture, cx::PositionQuality::kFramesBeforeWarning, pointer, createSample(ManagerFixture::kReferenceHandle, true));
 
 	CHECK(warning == "RMS error 0.30 (limit 0.20)");
 }

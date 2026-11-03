@@ -69,6 +69,21 @@ must correspond to the **openigtlinktransformid** tag in the CustusX tool config
 - The *deviceName* in Image OpenIGTLink messages must correspond to the **openigtlinkimageid** tag in the CustusX tool config file.
 These are in PlusServer created as a combination of **Image Name** and **EmbeddedTransformToFrame**, with an underscore `_` between.
 
+Tool visibility and position warnings {#org_custusx_core_openigtlink_tool_status}
+-----------------------------------------------------------
+A tool is hidden when no position has arrived for 500 ms. A server can also send this metadata with
+each transform message (OpenIGTLink header version 2), as the bkinterface streamserver does:
+- **TransformStatus**: OK, or INVALID when the tool is missing. The tool is then hidden at once, until its next position.
+- **PortStatus**: the NDI port status bits, as a decimal number. Out of the measurement volume (0x40) or partially
+  in it (0x80) gives a warning.
+- **errorRMS_mm**: the NDI RMS error. Above 1.0 mm for an Aurora tool, or 0.5 mm for other tools (from the tracker
+  type in the tool file), gives a warning.
+
+A tool positioned relative to the reference is also hidden while the reference is hidden.
+
+As for NDI tools, a warning is shown after 3 inaccurate positions in a row, and cleared after 10 good ones. The tool
+button is then orange, with the reason as its tooltip.
+
 
 Known issues
 -----------------------------------------------------------

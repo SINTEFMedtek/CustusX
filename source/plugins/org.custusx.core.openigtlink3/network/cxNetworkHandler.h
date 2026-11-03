@@ -24,6 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMesh.h"
 #include "cxProbeDefinitionFromStringMessages.h"
 #include "cxSenderClockSynchronizer.h"
+#include "cxPositionQuality.h"
 
 #include "ctkVTKObject.h"
 
@@ -55,6 +56,14 @@ struct ThreadResult
 	}
 };
 
+/** The status of a TRANSFORM message, from its metadata. Missing metadata gives a valid transform without quality. */
+struct TransformStatus
+{
+	bool valid = true; ///< false: TransformStatus=INVALID, the tool is missing and the matrix is its last known position
+	bool hasQuality = false; ///< PortStatus or errorRMS_mm was sent
+	PositionQualitySample quality;
+};
+
 class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
 {
 	Q_OBJECT
@@ -77,7 +86,8 @@ signals:
 	void connected();
 	void disconnected();
 
-	void transform(QString devicename, Transform3D transform, double timestamp);
+	void transform(QString devicename, Transform3D transform, double timestamp); ///< Not emitted for a missing tool
+	void transformWithStatus(QString devicename, Transform3D transform, double timestamp, TransformStatus status);
 	void image(ImagePtr image);
 	void commandRespons(QString devicename, QString xml);
 	void string_message(QString message);
@@ -96,6 +106,7 @@ protected slots:
 protected:
 	void connectToConnectionEvents();
 	void connectToDeviceEvents();
+	static TransformStatus readTransformStatus(igtlioDevicePointer device);
 	ThreadResult processImage(ThreadResult result);
 	bool convertZeroesInsideSectorToOnes(ThreadResult &result, int threshold = 0, int newValue = 1);
 	bool createMask(ThreadResult &result);
@@ -117,5 +128,7 @@ protected:
 };
 
 } // namespace cx
+
+Q_DECLARE_METATYPE(cx::TransformStatus)
 
 #endif /* CX_NETWORKHANDLER_H_ */

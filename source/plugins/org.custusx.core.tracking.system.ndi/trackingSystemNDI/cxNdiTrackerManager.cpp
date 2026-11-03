@@ -339,12 +339,6 @@ QString NdiTrackerManager::combinePositionWarnings(QString toolWarning, QString 
 	return retval;
 }
 
-double NdiTrackerManager::getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType)
-{
-	bool aurora = (trackerType == tsAURORA);
-	return aurora ? NdiPositionQuality::kDefaultMaxErrorRMSAurora_mm : NdiPositionQuality::kDefaultMaxErrorRMSPolaris_mm;
-}
-
 int NdiTrackerManager::getIlluminatorRateToSet(TRACKING_SYSTEM trackerType, int rate_Hz)
 {
 	return isPolaris(trackerType) ? rate_Hz : 0;
@@ -400,7 +394,7 @@ bool NdiTrackerManager::connectToDevice()
 	}
 	connection.requestMarkerInfo = isPolaris(mTrackerStructure.mType);
 	mIlluminatorRate_Hz = getIlluminatorRateToSet(mTrackerStructure.mType, connection.illuminatorRate_Hz);
-	this->setMaxErrorRMS(connection.maxErrorRMS_mm > 0.0 ? connection.maxErrorRMS_mm : getDefaultMaxErrorRMS(mTrackerStructure.mType));
+	this->setMaxErrorRMS(connection.maxErrorRMS_mm > 0.0 ? connection.maxErrorRMS_mm : PositionQuality::getDefaultMaxErrorRMS(mTrackerStructure.mType));
 	QString where = connection.hostname.isEmpty() ? QString("(searching serial ports)") : connection.hostname;
 	report("NDI Tracker: Connecting to device " + where + "...");
 	bool success = mDevice->open(connection);
@@ -453,7 +447,7 @@ bool NdiTrackerManager::setupTools()
 		if (isPolaris(mTrackerStructure.mType))
 		{
 			// Warn about a hidden or missing sphere from the start, not only after all were seen once
-			tool->setMarkerCount(NdiPositionQuality::readMarkerCount(tool->getInternalStructure()->mSROMFilename));
+			tool->setMarkerCount(PositionQuality::readMarkerCount(tool->getInternalStructure()->mSROMFilename));
 		}
 		mPortHandleToTool[entry.first] = tool;
 		mPortHandles.push_back(entry.first);

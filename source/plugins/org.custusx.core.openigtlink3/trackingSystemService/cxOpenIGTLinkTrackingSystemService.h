@@ -67,6 +67,7 @@ protected slots:
 	virtual void configure(); ///< sets up the software
 	virtual void deconfigure(); ///< deconfigures the software
 	virtual void receiveTransform(QString devicename, Transform3D transform, double timestampMS);
+	void receiveTransformWithStatus(QString devicename, Transform3D transform, double timestampMS, TransformStatus status);
 
 private slots:
 	void serverIsConnected();
@@ -79,6 +80,7 @@ private slots:
 
 private:
 	void applyProbeDefinition(ToolPtr tool, ProbeDefinitionPtr definition);
+	void setMissing(OpenIGTLinkToolPtr tool); ///< Also hides the tools positioned relative to a missing reference
 
 	std::map<QString, OpenIGTLinkToolPtr> mTools;
 	ToolPtr mReference;

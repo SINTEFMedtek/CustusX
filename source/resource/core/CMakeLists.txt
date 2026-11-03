@@ -59,6 +59,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
   Tool/cxSliceProxy
   Tool/cxSlicedImageProxy
   Tool/cxToolImpl
+  Tool/cxPositionQuality
   Tool/cxTrackingService
   Tool/cxActiveToolProxy
   Tool/cxTrackingSystemService

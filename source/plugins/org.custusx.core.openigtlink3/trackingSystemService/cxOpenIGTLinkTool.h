@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTransform3D.h"
 #include "cxToolConfigurationParser.h"
+#include "cxPositionQuality.h"
 
 class QStringList;
 
@@ -74,6 +75,11 @@ public:
 	//virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	virtual void setVisible(bool vis);
 
+	void setMissing(); ///< Hide the tool at once, until the next position
+	void updatePositionQuality(const PositionQualitySample& sample); ///< Shows a warning for inaccurate positions, as for NDI tools
+	static const int kMaxPositionAge_ms = 500; ///< Hidden when no position has arrived for this long
+	static const int kVisibleCheckInterval_ms = 100;
+
 	bool doIdCorrespondToTool(QString openIGTLinkId);
 	bool isReference();
 	bool applyReference();
@@ -88,6 +94,8 @@ private slots:
 private:
 	ProbePtr mProbe;
 	QTimer mTpsTimer;
+	QTimer mVisibleTimer;
+	PositionQuality mQuality;
 	double mTimestamp;
 	bool mVisible;
 	qint64 mLastReceivedPositionTime;

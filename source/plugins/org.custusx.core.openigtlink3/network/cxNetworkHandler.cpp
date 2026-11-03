@@ -43,6 +43,7 @@ NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 {
 	qRegisterMetaType<Transform3D>("Transform3D");
 	qRegisterMetaType<ImagePtr>("ImagePtr");
+	qRegisterMetaType<TransformStatus>("TransformStatus");
 
 	mLogic = logic;
 
@@ -281,11 +282,14 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		// and added to the messages from Plus.
 		std::string openigtlinktransformid;
 		bool gotTransformId = receivedDevice->GetMetaDataElement("equipmentId", openigtlinktransformid);
+		QString transformId = gotTransformId ? qstring_cast(openigtlinktransformid) : deviceName;
 
-		if (gotTransformId)
-			emit transform(qstring_cast(openigtlinktransformid), cxtransform, timestampMS);
-		else
-			emit transform(deviceName, cxtransform, timestampMS);
+		TransformStatus status = readTransformStatus(receivedDevice);
+		if (status.valid)
+		{
+			emit transform(transformId, cxtransform, timestampMS);
+		}
+		emit transformWithStatus(transformId, cxtransform, timestampMS, status);
 	}
 	else if(device_type == igtlioStatusConverter::GetIGTLTypeName())
 	{
@@ -447,6 +451,28 @@ void NetworkHandler::connectToDeviceEvents()
 		qvtkReconnect(NULL, mLogic, eventId,
 					this, SLOT(onDeviceAddedOrRemoved(vtkObject*, void*, unsigned long, void*)));
 	}
+}
+
+TransformStatus NetworkHandler::readTransformStatus(igtlioDevicePointer device)
+{
+	TransformStatus retval;
+	std::string value;
+	if (device->GetMetaDataElement("TransformStatus", value))
+	{
+		retval.valid = qstring_cast(value).compare("INVALID", Qt::CaseInsensitive) != 0;
+	}
+	retval.quality.visible = retval.valid;
+	if (device->GetMetaDataElement("PortStatus", value))
+	{
+		retval.hasQuality = true;
+		retval.quality.portStatus = qstring_cast(value).toInt();
+	}
+	if (device->GetMetaDataElement("errorRMS_mm", value))
+	{
+		retval.hasQuality = true;
+		retval.quality.errorRMS_mm = qstring_cast(value).toDouble();
+	}
+	return retval;
 }
 
 ThreadResult NetworkHandler::processImage(ThreadResult result)

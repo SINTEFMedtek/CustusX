@@ -77,6 +77,9 @@ the NDI tool configuration from that server instead, without changing the tool c
   toolfile in the tool configuration, or port_N for an Aurora tool on port number N.
 * The positions are made relative to the reference tool, as when tracking with the device itself.
   For a server that already does this, set openIGTLinkFallbackApplyReference=false.
+* A server that sends the tool status with the positions, like the bkinterface streamserver, shows
+  inaccurate positions in orange and hides missing tools at once, as when tracking with the device
+  itself. See \ref org_custusx_core_openigtlink_tool_status.
 * Only one of them tracks at a time. Every Start Tracking tries the NDI device first, and uses the
   server only if the device is still in use.
 

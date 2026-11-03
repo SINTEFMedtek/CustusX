@@ -62,7 +62,6 @@ public:
 	static QStringList describeNewSystemStatus(int previousStatus, int status);
 	/** A tool was plugged in or removed: the tools are set up again before tracking starts the next time. */
 	static bool hasNewToolChange(int previousStatus, int status);
-	static double getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType);
 	static bool isPolaris(TRACKING_SYSTEM trackerType);
 	static int getIlluminatorRateToSet(TRACKING_SYSTEM trackerType, int rate_Hz); ///< 0: leave the device's default
 	static const int kMaxConsecutiveReadFailures = 3;
