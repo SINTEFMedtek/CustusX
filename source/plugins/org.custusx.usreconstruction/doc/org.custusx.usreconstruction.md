@@ -12,6 +12,25 @@ US Reconstruction Widget {#org_custusx_usreconstruction_widgets_us_reconstructio
 
 Reconstruct 3D US data from acquired 2D sequence.
 
+The widget has these tabs:
+
+- **Reconstruct**: select the **2D US sequence** (a recording, .fts) and check what to create:
+  - **3D US volume**: the B-mode volume
+  - **Angio volume**: a volume of the color (Doppler) data. The recording must have color data.
+  - **Angio mesh**: a mesh of the angio volume where it is above the *Angio mesh threshold*.
+    Also creates the angio volume.
+  - Outputs of plugins, such as segmentations.
+
+  Press **Reconstruct** to create all of them, one after the other. **Cancel** stops after the
+  current step. The created data are listed when the reconstruction is finished, each with an icon
+  for its type (volume or mesh), a button that shows or hides it in the active view group, a color
+  button for meshes and colored volumes, and a button that deletes it (press twice).
+- **US settings**: the reconstruction settings and the size of the output volume.
+- Tabs with the settings of plugins.
+
+The angio settings of the reconstruction (Angio data, Dual Angio, and the US Angio or US B-Mode
+preset) are set from the checked outputs.
+
 Select a US Reconstruction algorithm from the list in \ref cx_user_doc_group_usreconstruction.
 
 Position filter

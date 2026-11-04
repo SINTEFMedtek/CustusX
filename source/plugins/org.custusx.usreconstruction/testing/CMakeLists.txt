@@ -1,6 +1,7 @@
 
 if(BUILD_TESTING)
     set(CXTEST_SOURCES_TO_MOC
+        cxtestFakeReconstructionExtension.h
     )
     set(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES
         cxtestReconstructionManagerFixture.h
@@ -11,6 +12,8 @@ if(BUILD_TESTING)
         cxtestReconstructRealData.h
         cxtestReconstructRealData.cpp
         cxtestPositionFilter.cpp
+        cxtestFakeReconstructionExtension.h
+        cxtestReconstructionWidget.cpp
     )
     
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})

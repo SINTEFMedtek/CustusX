@@ -51,7 +51,7 @@ void UsReconstructionPluginActivator::start(ctkPluginContext* context)
 
 	UsReconstructionServicePtr usReconstructionServiceProxy = UsReconstructionServicePtr(new UsReconstructionServiceProxy(context));
 
-	UsReconstructionGUIExtenderService *guiService = new UsReconstructionGUIExtenderService(usReconstructionServiceProxy, patientModelService);
+	UsReconstructionGUIExtenderService *guiService = new UsReconstructionGUIExtenderService(usReconstructionServiceProxy, patientModelService, viewService, context);
 	mRegisteredGui = RegisteredServicePtr(new RegisteredService(context, guiService, GUIExtenderService_iid));
 
 }

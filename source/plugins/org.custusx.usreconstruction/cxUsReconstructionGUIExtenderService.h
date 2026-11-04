@@ -16,6 +16,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxGUIExtenderService.h"
 
+class ctkPluginContext;
+
 namespace cx
 {
 //typedef std::shared_ptr<class ReconstructionManager> ReconstructManagerPtr;
@@ -31,7 +33,7 @@ class org_custusx_usreconstruction_EXPORT UsReconstructionGUIExtenderService : p
 {
 	Q_INTERFACES(cx::GUIExtenderService)
 public:
-	UsReconstructionGUIExtenderService(UsReconstructionServicePtr usReconstructionService, PatientModelServicePtr patientModelService);
+	UsReconstructionGUIExtenderService(UsReconstructionServicePtr usReconstructionService, PatientModelServicePtr patientModelService, ViewServicePtr viewService, ctkPluginContext* pluginContext);
 	virtual ~UsReconstructionGUIExtenderService();
 
   UsReconstructionServicePtr getReconstructer() { return mReconstructer; }
@@ -40,6 +42,8 @@ public:
 private:
   UsReconstructionServicePtr mReconstructer;
   PatientModelServicePtr mPatientModelService;
+  ViewServicePtr mViewService;
+  ctkPluginContext* mPluginContext;
 
 };
 

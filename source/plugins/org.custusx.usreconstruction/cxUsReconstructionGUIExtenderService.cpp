@@ -20,9 +20,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-UsReconstructionGUIExtenderService::UsReconstructionGUIExtenderService(UsReconstructionServicePtr usReconstructionService, PatientModelServicePtr patientModelService) :
+UsReconstructionGUIExtenderService::UsReconstructionGUIExtenderService(UsReconstructionServicePtr usReconstructionService, PatientModelServicePtr patientModelService, ViewServicePtr viewService, ctkPluginContext* pluginContext) :
 	mReconstructer(usReconstructionService),
-	mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService),
+	mViewService(viewService),
+	mPluginContext(pluginContext)
 {
 }
 
@@ -35,7 +37,7 @@ std::vector<GUIExtenderService::CategorizedWidget> UsReconstructionGUIExtenderSe
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new ReconstructionWidget(NULL, mReconstructer, mPatientModelService),
+			new ReconstructionWidget(NULL, mReconstructer, mPatientModelService, mViewService, mPluginContext),
 			"Algorithms"));
 
 	return retval;
