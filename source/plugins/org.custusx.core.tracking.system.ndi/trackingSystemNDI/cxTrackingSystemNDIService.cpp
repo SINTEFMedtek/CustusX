@@ -37,7 +37,8 @@ const int kThreadStopWarning_ms = 15000; ///< Longer than a few unanswered comma
 
 TrackingSystemNDIService::TrackingSystemNDIService() :
 	mDeviceInUse(false),
-	mTrackingRequested(false)
+	mTrackingRequested(false),
+	mTrackerThreadNumber(0)
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 	this->setConfigurationFile(profile()->getToolConfigFilePath());
@@ -129,12 +130,38 @@ bool TrackingSystemNDIService::createTrackerThread()
 	}
 
 	mTrackerThread.reset(new NdiTrackerThread(trackerStructure, toolStructures, referenceToolStructure));
+	unsigned number = ++mTrackerThreadNumber;
 
-	connect(mTrackerThread.get(), &NdiTrackerThread::configured, this, &TrackingSystemNDIService::trackerConfiguredSlot);
-	connect(mTrackerThread.get(), &NdiTrackerThread::initialized, this, &TrackingSystemNDIService::initializedSlot);
-	connect(mTrackerThread.get(), &NdiTrackerThread::tracking, this, &TrackingSystemNDIService::trackerTrackingSlot);
-	connect(mTrackerThread.get(), &NdiTrackerThread::deviceInUse, this, &TrackingSystemNDIService::deviceInUseSlot);
-	connect(mTrackerThread.get(), &NdiTrackerThread::error, this, &TrackingSystemNDIService::trackerErrorSlot);
+	NdiTrackerThread* thread = mTrackerThread.get();
+	connect(thread, &NdiTrackerThread::configured, this, [this, number](bool on) { this->trackerConfigured(number, on); });
+	connect(thread, &NdiTrackerThread::initialized, this, [this, number](bool on)
+	{
+		if (this->isCurrentTrackerThread(number))
+		{
+			this->initializedSlot(on);
+		}
+	});
+	connect(thread, &NdiTrackerThread::tracking, this, [this, number](bool on)
+	{
+		if (this->isCurrentTrackerThread(number))
+		{
+			this->trackerTrackingSlot(on);
+		}
+	});
+	connect(thread, &NdiTrackerThread::deviceInUse, this, [this, number]()
+	{
+		if (this->isCurrentTrackerThread(number))
+		{
+			this->deviceInUseSlot();
+		}
+	});
+	connect(thread, &NdiTrackerThread::error, this, [this, number]()
+	{
+		if (this->isCurrentTrackerThread(number))
+		{
+			this->trackerErrorSlot();
+		}
+	});
 
 	mTrackerThread->start();
 	return true;
@@ -162,11 +189,16 @@ bool TrackingSystemNDIService::isIgstkPluginBuilt()
 #endif
 }
 
-void TrackingSystemNDIService::trackerConfiguredSlot(bool on)
+bool TrackingSystemNDIService::isCurrentTrackerThread(unsigned trackerThreadNumber) const
 {
-	if (this->sender() != mTrackerThread.get())
+	return mTrackerThread && trackerThreadNumber == mTrackerThreadNumber;
+}
+
+void TrackingSystemNDIService::trackerConfigured(unsigned trackerThreadNumber, bool on)
+{
+	if (!this->isCurrentTrackerThread(trackerThreadNumber))
 	{
-		return; // from a tracker thread replaced by a new configuration
+		return; // from a replaced or destroyed tracker thread
 	}
 	if (!on)
 	{
@@ -179,12 +211,6 @@ void TrackingSystemNDIService::trackerConfiguredSlot(bool on)
 			this->destroyTrackerThread(); // configuring failed: let the next configure() start again
 			this->cancelPendingStateChanges();
 		}
-		return;
-	}
-
-	if (!mTrackerThread)
-	{
-		reportDebug("NDI Tracking: Received configured signal but mTrackerThread is null.");
 		return;
 	}
 

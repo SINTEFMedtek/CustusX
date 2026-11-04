@@ -108,7 +108,7 @@ bool SliceRepSW::isInSlicePlane(Transform3D sMd, Vector3D center_d)
 	return parallel && inPlane;
 }
 
-/** Draw the image exactly at z=0, like the sliced images, so its depth order against the other layers is fixed */
+/** Rotate the image into the slice plane, and move its center to z=0 */
 Transform3D SliceRepSW::moveIntoSlicePlane(Transform3D sMd, Vector3D center_d)
 {
 	Vector3D normal_s = sMd.vector(Vector3D(0, 0, 1)).normal();
@@ -118,6 +118,12 @@ Transform3D SliceRepSW::moveIntoSlicePlane(Transform3D sMd, Vector3D center_d)
 	rotation.linear() = Eigen::Quaterniond::FromTwoVectors(normal_s, target_s).toRotationMatrix();
 	Transform3D toPlane = createTransformTranslate(Vector3D(center_s[0], center_s[1], 0)) * rotation * createTransformTranslate(-center_s);
 	return toPlane * sMd;
+}
+
+/** In front of the sliced images at z=0, since the image only gets z=0 up to float rounding */
+Transform3D SliceRepSW::placeInFrontOfSlices(Transform3D sMd, Vector3D center_d)
+{
+	return createTransformTranslate(Vector3D(0, 0, kInFrontOfSlices_mm)) * moveIntoSlicePlane(sMd, center_d);
 }
 
 bool SliceRepSW::isDrawnDirectly() const
@@ -159,7 +165,7 @@ void SliceRepSW::updateDrawingMethod()
 		}
 		if (drawDirectly)
 		{
-			mImageSlice->SetUserMatrix(moveIntoSlicePlane(sMd, center_d).getVtkMatrix());
+			mImageSlice->SetUserMatrix(placeInFrontOfSlices(sMd, center_d).getVtkMatrix());
 		}
 	}
 	this->showSlice(drawDirectly);
