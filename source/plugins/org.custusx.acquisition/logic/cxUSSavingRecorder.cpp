@@ -143,7 +143,8 @@ USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorder
 																		   mRecordingTool,
 																		   videoRecorder->getSource()->getUid(),
 																		   mDoWriteColor,
-																		   m_rMpr);
+																		   m_rMpr,
+																		   mReference);
 	return reconstructData;
 }
 
@@ -168,6 +169,7 @@ void USSavingRecorder::clearRecording()
 	mVideoRecorder.clear();
 	mSession.reset();
 	mRecordingTool.reset();
+	mReference.reset();
 }
 
 

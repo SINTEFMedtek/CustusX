@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxCreateProbeDefinitionFromConfiguration.h"
 #include "cxVolumeHelpers.h"
 #include "cxUSFrameData.h"
+#include "cxTransformFile.h"
 
 namespace cx
 {
@@ -76,6 +77,7 @@ USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName
     probeDefinition.setSpacing(Vector3D(retval.mUsRaw->getSpacing()));
   retval.mProbeDefinition.setData(probeDefinition);
   retval.mProbeUid = probeDefinitionFull.first;
+  retval.mRecordingInfo = this->readRecordingInfo(fileName);
 
   retval.mFrames = this->readFrameTimestamps(fileName);
   retval.mPositions = this->readPositions(fileName);
@@ -220,6 +222,44 @@ std::pair<QString, ProbeDefinition> UsReconstructionFileReader::readProbeDefinit
 
 	retval.first = file.getElement("tool").toElement().attribute("toolID");
 
+	return retval;
+}
+
+USRecordingInfo UsReconstructionFileReader::readRecordingInfo(QString fileName)
+{
+	USRecordingInfo retval;
+	QString probeDataFilename = changeExtension(fileName, "probedata.xml");
+	if (QFileInfo(probeDataFilename).exists())
+	{
+		XmlOptionFile file = XmlOptionFile(probeDataFilename);
+		QDomElement tool = file.getElement().firstChildElement("tool");
+		retval.mProbeOpenIGTLinkTransformId = tool.attribute("openigtlinktransformid");
+		retval.mProbeOpenIGTLinkImageId = tool.attribute("openigtlinkimageid");
+		QDomElement reference = file.getElement().firstChildElement("reference");
+		retval.mReferenceUid = reference.attribute("toolID");
+		retval.mReferenceOpenIGTLinkTransformId = reference.attribute("openigtlinktransformid");
+	}
+	retval.mProbe_sMt = readOptionalMatrix(changeExtension(fileName, "probe.cal"));
+	retval.rMpr = readOptionalMatrix(changeExtension(fileName, "rMpr"));
+	return retval;
+}
+
+Transform3D UsReconstructionFileReader::readOptionalMatrix(QString filename)
+{
+	Transform3D retval = Transform3D::Identity();
+	if (QFileInfo(filename).exists())
+	{
+		bool ok = false;
+		Transform3D matrix = TransformFile(filename).read(&ok);
+		if (ok)
+		{
+			retval = matrix;
+		}
+		else
+		{
+			reportWarning("Invalid matrix in " + filename);
+		}
+	}
 	return retval;
 }
 

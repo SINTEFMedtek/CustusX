@@ -195,5 +195,11 @@ QString ToolImpl::getOpenIGTLinkImageId() const
 	return structure ? structure->mOpenigtlinkImageId : "";
 }
 
+QString ToolImpl::getOpenIGTLinkTransformId() const
+{
+	ToolFileParser::ToolInternalStructurePtr structure = this->getToolFileToolStructure();
+	return structure ? structure->mOpenigtlinkTransformId : "";
+}
+
 } // namespace cx
 

@@ -46,6 +46,22 @@ cxResource_EXPORT inline bool operator<(const TimedPosition& lhs, const TimedPos
 	return lhs.mTime < rhs.mTime;
 }
 
+/** \brief The tools and patient registration used when recording an acquisition.
+ *
+ * Saved with the acquisition, so that it can be interpreted or replayed without the
+ * tool configuration and the patient. Not used by the reconstruction.
+ */
+struct cxResource_EXPORT USRecordingInfo
+{
+	USRecordingInfo();
+	QString mProbeOpenIGTLinkTransformId;
+	QString mProbeOpenIGTLinkImageId;
+	Transform3D mProbe_sMt; ///< probe calibration, identity if not recorded
+	QString mReferenceUid;
+	QString mReferenceOpenIGTLinkTransformId;
+	Transform3D rMpr; ///< patient registration, identity if not recorded
+};
+
 struct cxResource_EXPORT USReconstructInputData
 {
 	QString mFilename; ///< filename used for current data read
@@ -57,6 +73,7 @@ struct cxResource_EXPORT USReconstructInputData
 	std::map<double, ToolPositionMetadata> mReferenceRecordedMetadata;
 	ProbeSector mProbeDefinition;
 	QString mProbeUid;
+	USRecordingInfo mRecordingInfo;
 	Transform3D rMpr; ///< patient registration
 
 	vtkImageDataPtr getMask();
