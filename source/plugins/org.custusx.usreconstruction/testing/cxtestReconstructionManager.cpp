@@ -267,6 +267,55 @@ TEST_CASE("ReconstructPreprocessor: the reconstruction reuses the frames convert
 	CHECK(newInput[0]->getFrame(0) != algorithm.mEstimateFrames[0]);
 }
 
+TEST_CASE("ReconstructPreprocessor: flipping the images mirrors the frames and the mask laterally", "[unit][usreconstruction][synthetic]")
+{
+	SyntheticReconstructInputPtr generator(new SyntheticReconstructInput);
+	generator->defineProbe(cx::DummyToolTestUtilities::createProbeDefinitionLinear(100, 100, Eigen::Array2i(150,150)));
+	generator->setSpherePhantom();
+	cx::USReconstructInputData inputData = generator->generateSynthetic_USReconstructInputData();
+
+	cx::ReconstructCore::InputParams normalParams;
+	cx::ReconstructPreprocessorPtr normalPreprocessor(new cx::ReconstructPreprocessor(cx::PatientModelService::getNullObject()));
+	normalPreprocessor->initialize(normalParams, inputData);
+	std::vector<cx::ProcessedUSInputDataPtr> normalInput = normalPreprocessor->createProcessedInput(std::vector<bool>(1, false));
+
+	cx::ReconstructCore::InputParams flipParams;
+	flipParams.mFlipImages = true;
+	cx::ReconstructPreprocessorPtr flipPreprocessor(new cx::ReconstructPreprocessor(cx::PatientModelService::getNullObject()));
+	flipPreprocessor->initialize(flipParams, inputData);
+	std::vector<cx::ProcessedUSInputDataPtr> flipInput = flipPreprocessor->createProcessedInput(std::vector<bool>(1, false));
+
+	REQUIRE(normalInput.size() == 1);
+	REQUIRE(flipInput.size() == 1);
+	Eigen::Array3i dims = normalInput[0]->getDimensions();
+	REQUIRE(flipInput[0]->getDimensions().isApprox(dims));
+
+	// All pixels are mirrored (x -> width-1-x), the rows are unchanged
+	unsigned nMismatch = 0;
+	for (int frame = 0; frame < dims[2]; ++frame)
+	{
+		const unsigned char* normal = normalInput[0]->getFrame(frame);
+		const unsigned char* flipped = flipInput[0]->getFrame(frame);
+		for (int y = 0; y < dims[1]; ++y)
+			for (int x = 0; x < dims[0]; ++x)
+				if (flipped[x + y*dims[0]] != normal[(dims[0]-1-x) + y*dims[0]])
+					++nMismatch;
+	}
+	CHECK(nMismatch == 0);
+
+	// The mask follows the images, as it is made from the mirrored probe definition
+	const unsigned char* normalMask = static_cast<unsigned char*>(normalInput[0]->getMask()->GetScalarPointer());
+	const unsigned char* flipMask = static_cast<unsigned char*>(flipInput[0]->getMask()->GetScalarPointer());
+	int maskWidth = normalInput[0]->getMask()->GetDimensions()[0];
+	int maskHeight = normalInput[0]->getMask()->GetDimensions()[1];
+	unsigned nMaskMismatch = 0;
+	for (int y = 0; y < maskHeight; ++y)
+		for (int x = 0; x < maskWidth; ++x)
+			if (flipMask[x + y*maskWidth] != normalMask[(maskWidth-1-x) + y*maskWidth])
+				++nMaskMismatch;
+	CHECK(nMaskMismatch == 0);
+}
+
 TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic][not_win32]")
 {
 	ReconstructionManagerTestFixture fixture;

@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxReconstructCore.h"
 #include <vtkImageData.h>
+#include <cstring>
 #include <vtkPolyData.h>
 #include <QFileInfo>
 #include "cxTime.h"
@@ -37,6 +38,31 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+namespace
+{
+/** A copy of the image, mirrored laterally (along x). The input image is not changed, as it may be kept for reuse. */
+vtkImageDataPtr flipImageLaterally(vtkImageDataPtr image)
+{
+	vtkImageDataPtr retval = vtkImageDataPtr::New();
+	retval->DeepCopy(image);
+	int dims[3];
+	image->GetDimensions(dims);
+	size_t pixelSize = size_t(image->GetScalarSize()) * size_t(image->GetNumberOfScalarComponents());
+	const unsigned char* source = static_cast<const unsigned char*>(image->GetScalarPointer());
+	unsigned char* target = static_cast<unsigned char*>(retval->GetScalarPointer());
+	for (int row = 0; row < dims[1]*dims[2]; ++row) //All rows (lines of constant y and z)
+	{
+		size_t rowStart = size_t(row) * size_t(dims[0]);
+		for (int x = 0; x < dims[0]; ++x)
+		{
+			std::memcpy(target + (rowStart + x)*pixelSize, source + (rowStart + dims[0] - 1 - x)*pixelSize, pixelSize);
+		}
+	}
+	retval->Modified();
+	return retval;
+}
+}
+
 ReconstructPreprocessor::ReconstructPreprocessor(PatientModelServicePtr patientModelService) :
 	mInput(ReconstructCore::InputParams()),
 	mPatientModelService(patientModelService)
@@ -56,6 +82,13 @@ std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInp
 {
 
 	std::vector<std::vector<vtkImageDataPtr> > frames = mFileData.mUsRaw->initializeFrames(angio);
+
+	if (mInput.mFlipImages) // The probe geometry is mirrored in flipProbeDefinitionLaterally(), so the mask and the frame positions match
+	{
+		for (unsigned i=0; i<frames.size(); ++i)
+			for (unsigned j=0; j<frames[i].size(); ++j)
+				frames[i][j] = flipImageLaterally(frames[i][j]);
+	}
 
 	std::vector<ProcessedUSInputDataPtr> retval;
 
@@ -118,6 +151,30 @@ void ReconstructPreprocessor::alignTimeSeries()
 /**Crop the input data with the image cliprect.
  * Update probe sector info accordingly
  */
+/**
+ * Mirror the lateral position of the probe origin and the clip rect (in pixels), for images that are flipped laterally
+ * (left to right) by flipImageLaterally(). The sector (or linear) shape is symmetric about the origin.
+ * Must be done after the cropping, as it uses the size of the cropped image.
+ */
+void ReconstructPreprocessor::flipProbeDefinitionLaterally()
+{
+	ProbeDefinition sector = mFileData.mProbeDefinition.mData;
+	double lastColumn = sector.getSize().width() - 1;
+
+	Vector3D origin_p = sector.getOrigin_p();
+	origin_p[0] = lastColumn - origin_p[0];
+
+	DoubleBoundingBox3D clipRect_p = sector.getClipRect_p();
+	double xMin = clipRect_p[0];
+	double xMax = clipRect_p[1];
+	clipRect_p[0] = lastColumn - xMax;
+	clipRect_p[1] = lastColumn - xMin;
+
+	sector.setOrigin_p(origin_p);
+	sector.setClipRect_p(clipRect_p);
+	mFileData.mProbeDefinition.setData(sector);
+}
+
 void ReconstructPreprocessor::cropInputData()
 {
 	//IntBoundingBox3D
@@ -458,6 +515,8 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
 {
 	// uncomment to test cropping of data before reconstructing
 	this->cropInputData();
+	if (mInput.mFlipImages)
+		this->flipProbeDefinitionLaterally();
 	// Keep the cropped data, so that the position processing can be repeated with other time calibration
 	mCroppedFileData = mFileData;
 

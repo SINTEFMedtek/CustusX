@@ -265,6 +265,7 @@ ReconstructCore::InputParams UsReconstructionImplService::createCoreParameters()
 	par.mWriteProcessedPositions = mParams->getWriteProcessedPositions()->getValue();
 	par.mMaskReduce = mParams->getMaskReduce()->getValue().toDouble();
 	par.mOrientation = mParams->getOrientationAdapter()->getValue();
+	par.mFlipImages = mParams->getFlipImages()->getValue();
 	return par;
 }
 

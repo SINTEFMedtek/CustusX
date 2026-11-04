@@ -202,6 +202,7 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	sscCreateDataWidget(this, mReconstructer->getParam("Angio data"), layout, line++);
 	sscCreateDataWidget(this, mReconstructer->getParam("Dual Angio"), layout, line++);
 	sscCreateDataWidget(this, mReconstructer->getParam("Orientation"), layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParam("Flip images"), layout, line++);
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 2);
 
 	sscCreateDataWidget(this, mReconstructer->getParam("Align timestamps"), layout, line++);
