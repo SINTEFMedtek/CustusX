@@ -68,7 +68,7 @@ void ReconstructParams::createParameters()
 	connect(mOrientationAdapter.get(), &StringProperty::valueWasSet, this, &ReconstructParams::changedInputSettings);
 	this->add(mOrientationAdapter);
 
-	mFlipImages = BoolProperty::initialize("Flip images", "",
+	mFlipImages = BoolProperty::initialize("Flip images", "Flip images L/R",
 		"Mirror the images laterally (left to right) before they are used, both in the reconstruction and in any image based correction by the algorithm. "
 		"For acquisitions where the scanner image was flipped.", false,
 		mSettings.getElement());
