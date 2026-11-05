@@ -172,7 +172,7 @@ class RepoHandler(object):
             print('Checking out %s to tag=%s' % (self.getName(), tag))
             result = runShell('git checkout %s' % tag, self.repo_path)
             if result is returnCode():
-                result = self._retryCheckoutAfterRemovingReplacedNestedRepos(tag, tag)
+                result = self._retryAfterRemovingReplacedNestedRepos('git checkout %s' % tag, tag)
             # returnCode() (untracked files in the way) and localChangesCode() are failures
             # too: they used to pass this check silently and leave the repo on the previous
             # checkout, which would then be built as the tag.
@@ -211,7 +211,7 @@ class RepoHandler(object):
                 continue
             result = runShell('git checkout %s' % branch, self.repo_path)
             if result is returnCode():
-                result = self._retryCheckoutAfterRemovingReplacedNestedRepos(branch, 'origin/%s' % branch if is_branch else branch)
+                result = self._retryAfterRemovingReplacedNestedRepos('git checkout %s' % branch, 'origin/%s' % branch if is_branch else branch)
             self.checkSuccess(result)
             if result is localChangesCode():
                 # Warned already via checkSuccess(); this branch didn't work,
@@ -253,6 +253,8 @@ class RepoHandler(object):
                 # vanish the next time this repo gets synced.
                 self._ensureGitIdentityForMerge(self.repo_path)
                 merge_result = runShell('git merge origin/%s' % branch, self.repo_path)
+                if merge_result is returnCode():
+                    merge_result = self._retryAfterRemovingReplacedNestedRepos('git merge origin/%s' % branch, 'origin/%s' % branch, merge=True)
                 self.checkSuccess(merge_result)
                 if merge_result is None:
                     # Unlike the checkout above, there's no next candidate to
@@ -266,35 +268,37 @@ class RepoHandler(object):
                     sys.exit(1)
             break
 
-    def _retryCheckoutAfterRemovingReplacedNestedRepos(self, checkout_target, ref):
+    def _retryAfterRemovingReplacedNestedRepos(self, command, ref, merge=False):
         '''
-        A checkout refused with "untracked working tree files would be
+        A checkout or merge refused with "untracked working tree files would be
         overwritten" can be a plugin that used to be its own repo, cloned
         inside this one, and is now part of this repo on the target branch
-        (e.g. a tracking plugin, CustusX#55). Such a clone
-        is removed when nothing would be lost (no uncommitted changes, no
-        stashes, no unpushed commits), and the checkout is retried. Anything
-        else is left alone, so checkSuccess() stops the build as before.
+        (e.g. a tracking plugin, CustusX#55). The merge case happens when an old
+        local branch is checked out first, and the plugin came in on the remote
+        branch since. Such a clone is removed when nothing would be lost (no
+        uncommitted changes, no stashes, no unpushed commits), and the command
+        is retried. Anything else is left alone, so checkSuccess() stops the
+        build as before. A merge adds the files of ref since the merge base.
         '''
-        nested_paths = [os.path.join(self.repo_path, nested) for nested in self._findNestedReposTrackedBy(ref)]
+        nested_paths = [os.path.join(self.repo_path, nested) for nested in self._findNestedReposAddedBy(['HEAD...%s' % ref] if merge else ['HEAD', ref])]
         unsafe = [path for path in nested_paths if not self._isNestedRepoSafeToRemove(path)]
         for path in unsafe:
             print('NOT removing %s: it has local changes or unpushed commits.' % path)
             print('It is now part of %s at %s. Push or save its work, delete it, and re-run.' % (self.getName(), ref))
         result = returnCode()
-        # Remove none unless all can go: the checkout can only succeed then
+        # Remove none unless all can go: the command can only succeed then
         if nested_paths and not unsafe:
             for path in nested_paths:
                 print('Removing %s: it is a separate clone of what is now part of %s at %s,' % (path, self.getName(), ref))
                 print('with no local changes or unpushed commits.')
                 removeTree(path)
-            result = runShell('git checkout %s' % checkout_target, self.repo_path)
+            result = runShell(command, self.repo_path)
         return result
 
-    def _findNestedReposTrackedBy(self, ref):
-        '''Paths (relative) of git clones inside this repo that ref tracks as its own files.'''
-        # Only the folders of files ref adds can be such a clone. Not runShell(): it would print every file.
-        added = subprocess.run(['git', 'diff', '--name-only', '--diff-filter=A', 'HEAD', ref],
+    def _findNestedReposAddedBy(self, diff_range):
+        '''Paths (relative) of git clones inside this repo where the git diff range adds tracked files.'''
+        # Only the folders of added files can be such a clone. Not runShell(): it would print every file.
+        added = subprocess.run(['git', 'diff', '--name-only', '--diff-filter=A'] + diff_range,
                                cwd=self.repo_path, capture_output=True, text=True).stdout.splitlines()
         retval = []
         for path in added:
