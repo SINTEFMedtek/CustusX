@@ -320,6 +320,33 @@ TEST_CASE("ReconstructPreprocessor: flipping the images mirrors the frames and t
 	CHECK(nMaskMismatch == 0);
 }
 
+TEST_CASE("ReconstructManager: Flip images L/R is kept for the same recording, and turned off for another", "[unit][usreconstruction][synthetic]")
+{
+	ReconstructionManagerTestFixture fixture;
+	SyntheticReconstructInputPtr generator(new SyntheticReconstructInput);
+	generator->setOverallBoundsAndSpacing(100, 5);
+	generator->setSpherePhantom();
+	cx::USReconstructInputData inputData = generator->generateSynthetic_USReconstructInputData();
+	inputData.mFilename = "recording1";
+
+	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
+	reconstructer->selectData(inputData);
+	cx::PropertyPtr flip = reconstructer->getParam("Flip images");
+	REQUIRE(flip);
+	flip->setValueFromVariant(true);
+	CHECK(reconstructer->createCoreParameters().mFlipImages);
+
+	reconstructer->selectData(inputData);
+	CHECK(flip->getValueAsVariant().toBool());
+
+	inputData.mFilename = "recording2";
+	reconstructer->selectData(inputData);
+	CHECK_FALSE(flip->getValueAsVariant().toBool());
+	CHECK_FALSE(reconstructer->createCoreParameters().mFlipImages);
+	CHECK(reconstructer->getSelectedFileData().mFilename == "recording2");
+	CHECK(reconstructer->getOutputVolumeParams().isValid());
+}
+
 TEST_CASE("ReconstructManager: Preprocessor handles too large clip rect","[integration][usreconstruction][synthetic][not_win32]")
 {
 	ReconstructionManagerTestFixture fixture;

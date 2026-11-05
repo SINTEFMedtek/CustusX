@@ -219,9 +219,17 @@ void UsReconstructionImplService::selectData(QString filename, QString calFilesP
 
 void UsReconstructionImplService::selectData(USReconstructInputData fileData)
 {
+	bool resetFlip = (fileData.mFilename != mOriginalFileData.mFilename) && mParams->getFlipImages()->getValue();
 	this->clearAll();
 	mOriginalFileData = fileData;
-	this->updateFromOriginalFileData();
+	if (resetFlip)
+	{
+		mParams->getFlipImages()->setValue(false);
+	}
+	else
+	{
+		this->updateFromOriginalFileData();
+	}
 	emit inputDataSelected(fileData.mFilename);
 }
 
