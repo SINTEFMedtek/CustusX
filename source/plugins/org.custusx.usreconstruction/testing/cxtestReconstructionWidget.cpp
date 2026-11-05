@@ -146,8 +146,25 @@ TEST_CASE("ReconstructionWidget: adds the outputs and the settings tab of an ext
 	CHECK(widget.findChild<QCheckBox*>("usVolume"));
 
 	registered.reset();
+	QCoreApplication::sendPostedEvents(NULL, QEvent::DeferredDelete);
 	CHECK(tabs->count() == tabCount);
 	CHECK_FALSE(widget.findChild<QCheckBox*>("fakeA"));
+}
+
+TEST_CASE("ReconstructionWidget: the angio checkboxes set the Angio data parameter", "[unit][usreconstruction][gui]")
+{
+	ReconstructionManagerTestFixture fixture;
+	cx::PatientModelServicePtr patientModel = cx::PatientModelServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::ReconstructionWidget widget(NULL, fixture.getManager(), patientModel, cx::ViewService::getNullObject(), NULL);
+	QCheckBox* angioVolume = widget.findChild<QCheckBox*>("angioVolume");
+	REQUIRE(angioVolume);
+	cx::PropertyPtr angioData = fixture.getManager()->getParam("Angio data");
+
+	widget.findChild<QCheckBox*>("angioMesh")->setChecked(false);
+	angioVolume->setChecked(true);
+	CHECK(angioData->getValueAsVariant().toBool());
+	angioVolume->setChecked(false);
+	CHECK_FALSE(angioData->getValueAsVariant().toBool());
 }
 
 TEST_CASE("ReconstructionResultsWidget: lists the data, and drops removed data", "[unit][usreconstruction][gui]")

@@ -29,7 +29,9 @@ The widget has these tabs:
 - Tabs with the settings of plugins.
 
 The angio settings of the reconstruction (Angio data, Dual Angio, and the US Angio or US B-Mode
-preset) are set from the checked outputs.
+preset) are set from the checked outputs. They are also used by the reconstruction after an
+acquisition, and with 8 bit acquisition data, an acquisition only records color data when Angio
+volume or Angio mesh is checked.
 
 Select a US Reconstruction algorithm from the list in \ref cx_user_doc_group_usreconstruction.
 

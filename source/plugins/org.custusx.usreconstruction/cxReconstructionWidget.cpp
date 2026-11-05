@@ -112,33 +112,13 @@ QWidget* ReconstructionWidget::createReconstructTab(ViewServicePtr viewService)
 	QWidget* retval = new QWidget(this);
 	QVBoxLayout* layout = new QVBoxLayout(retval);
 
-	mFileSelectWidget = new FileSelectWidget(retval);
-	connect(mFileSelectWidget, &FileSelectWidget::fileSelected, this, &ReconstructionWidget::selectData);
-	mFileSelectWidget->setNameFilter(QStringList() << "*.fts");
-	// The Select data dialog starts in the US_Acq folder of the active patient
-	PatientModelServicePtr patientModelService = mPatientModelService;
-	mFileSelectWidget->setDialogFolderProvider([patientModelService]() -> QString
-	{
-		QString folder;
-		if (patientModelService && patientModelService->isPatientValid())
-		{
-			folder = patientModelService->getActivePatientFolder() + "/US_Acq";
-		}
-		return folder;
-	});
-	connect(mReconstructer.get(), &UsReconstructionService::newInputDataAvailable, mFileSelectWidget, &FileSelectWidget::refresh);
-	connect(mReconstructer.get(), &UsReconstructionService::newInputDataPath, this, &ReconstructionWidget::updateFileSelectorPath);
 	QLabel* recordingLabel = new QLabel("2D US sequence", retval);
 	recordingLabel->setToolTip("The recorded 2D ultrasound sequence to reconstruct from");
 	layout->addWidget(recordingLabel);
+	mFileSelectWidget = this->createFileSelectWidget(retval);
 	layout->addWidget(mFileSelectWidget);
-
-	QGroupBox* outputsGroup = new QGroupBox("Create", retval);
-	mOutputsLayout = new QVBoxLayout(outputsGroup);
-	mUsVolumeCheckBox = this->createOutputCheckBox("usVolume", "3D US volume", "The B-mode ultrasound volume", true);
-	mAngioVolumeCheckBox = this->createOutputCheckBox("angioVolume", "Angio volume", "A volume of the color (Doppler) data of the recording", false);
-	mAngioMeshCheckBox = this->createOutputCheckBox("angioMesh", "Angio mesh", "A mesh of the angio volume, at the angio mesh threshold. Also creates the angio volume", false);
-	layout->addWidget(outputsGroup);
+	this->createOutputCheckBoxes(retval);
+	layout->addWidget(mOutputsLayout->parentWidget());
 
 	mReconstructButton = new QPushButton("Reconstruct", retval);
 	connect(mReconstructButton, &QPushButton::clicked, this, &ReconstructionWidget::reconstruct);
@@ -158,6 +138,50 @@ QWidget* ReconstructionWidget::createReconstructTab(ViewServicePtr viewService)
 	layout->addWidget(mResultsWidget);
 	layout->addStretch();
 	return retval;
+}
+
+FileSelectWidget* ReconstructionWidget::createFileSelectWidget(QWidget* parent)
+{
+	FileSelectWidget* retval = new FileSelectWidget(parent);
+	connect(retval, &FileSelectWidget::fileSelected, this, &ReconstructionWidget::selectData);
+	retval->setNameFilter(QStringList() << "*.fts");
+	// The Select data dialog starts in the US_Acq folder of the active patient
+	PatientModelServicePtr patientModelService = mPatientModelService;
+	retval->setDialogFolderProvider([patientModelService]() -> QString
+	{
+		QString folder;
+		if (patientModelService && patientModelService->isPatientValid())
+		{
+			folder = patientModelService->getActivePatientFolder() + "/US_Acq";
+		}
+		return folder;
+	});
+	connect(mReconstructer.get(), &UsReconstructionService::newInputDataAvailable, retval, &FileSelectWidget::refresh);
+	connect(mReconstructer.get(), &UsReconstructionService::newInputDataPath, this, &ReconstructionWidget::updateFileSelectorPath);
+	return retval;
+}
+
+/** The angio checkboxes start from, and set, the Angio data parameter, which also decides if 8 bit acquisitions record color. */
+void ReconstructionWidget::createOutputCheckBoxes(QWidget* parent)
+{
+	QGroupBox* outputsGroup = new QGroupBox("Create", parent);
+	mOutputsLayout = new QVBoxLayout(outputsGroup);
+	bool angio = mReconstructer->getParam("Angio data")->getValueAsVariant().toBool();
+	mUsVolumeCheckBox = this->createOutputCheckBox("usVolume", "3D US volume", "The B-mode ultrasound volume", true);
+	mAngioVolumeCheckBox = this->createOutputCheckBox("angioVolume", "Angio volume", "A volume of the color (Doppler) data of the recording", angio);
+	mAngioMeshCheckBox = this->createOutputCheckBox("angioMesh", "Angio mesh", "A mesh of the angio volume, at the angio mesh threshold. Also creates the angio volume", false);
+	QList<QCheckBox*> checkBoxes = QList<QCheckBox*>() << mUsVolumeCheckBox << mAngioVolumeCheckBox << mAngioMeshCheckBox;
+	for (int i = 0; i < checkBoxes.size(); ++i)
+	{
+		connect(checkBoxes[i], &QCheckBox::toggled, this, &ReconstructionWidget::setAngioParameters);
+	}
+	this->setAngioParameters();
+}
+
+void ReconstructionWidget::setAngioParameters()
+{
+	bool angio = mAngioVolumeCheckBox->isChecked() || mAngioMeshCheckBox->isChecked();
+	UsReconstructionRunner::setAngioParameters(mReconstructer, mUsVolumeCheckBox->isChecked(), angio);
 }
 
 QCheckBox* ReconstructionWidget::createOutputCheckBox(QString uid, QString name, QString help, bool defaultValue)
@@ -490,10 +514,11 @@ void ReconstructionWidget::onExtensionRemoved(UsReconstructionExtensionService* 
 		{
 			for (unsigned j = 0; j < mExtensions[i].mOutputs.size(); ++j)
 			{
-				delete mExtensions[i].mOutputs[j].second;
+				mOutputsLayout->removeWidget(mExtensions[i].mOutputs[j].second);
+				mExtensions[i].mOutputs[j].second->deleteLater();
 			}
 			mTabs->removeTab(mTabs->indexOf(mExtensions[i].mTab));
-			delete mExtensions[i].mTab;
+			mExtensions[i].mTab->deleteLater();
 			mExtensions.erase(mExtensions.begin() + i);
 			break;
 		}
@@ -568,8 +593,20 @@ void ReconstructionWidget::reconstructFinishedSlot()
 {
 	std::set<cx::TimedAlgorithmPtr> threads = mReconstructer->getThreadedReconstruction();
 	mTimedAlgorithmProgressBar->detach(threads);
-	mUsReconstructing = false;
+	mUsReconstructing = this->isUsReconstructing();
 	this->updateButtons();
+}
+
+/** Several reconstructions can run, e.g. one started after an acquisition. */
+bool ReconstructionWidget::isUsReconstructing() const
+{
+	bool retval = false;
+	std::set<cx::TimedAlgorithmPtr> threads = mReconstructer->getThreadedReconstruction();
+	for (std::set<cx::TimedAlgorithmPtr>::iterator iter = threads.begin(); iter != threads.end(); ++iter)
+	{
+		retval = retval || (*iter && !(*iter)->isFinished());
+	}
+	return retval;
 }
 
 void ReconstructionWidget::runFinished()
@@ -590,7 +627,7 @@ void ReconstructionWidget::updateButtons()
 	bool canStart = !mReconstructer->getSelectedFilename().isEmpty() && this->isAnyOutputSelected();
 	mReconstructButton->setText(running ? "Cancel" : "Reconstruct");
 	mReconstructButton->setEnabled(running || (canStart && !mUsReconstructing));
-	mProgressBar->setVisible(running);
+	mProgressBar->setVisible(running && !mUsReconstructing);
 	mFileSelectWidget->setEnabled(!running && !mUsReconstructing);
 	mOutputsLayout->parentWidget()->setEnabled(!running);
 }

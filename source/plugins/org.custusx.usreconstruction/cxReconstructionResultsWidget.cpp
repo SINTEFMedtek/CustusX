@@ -124,7 +124,7 @@ QColor ReconstructionResultsWidget::getColor(DataPtr data) const
 void ReconstructionResultsWidget::setColor(DataPtr data, QColor color)
 {
 	MeshPtr mesh = std::dynamic_pointer_cast<Mesh>(data);
-	if (mColorGetter && mColorSetter && mColorGetter(data).isValid())
+	if (data && mColorGetter && mColorSetter && mColorGetter(data).isValid())
 	{
 		mColorSetter(data, color);
 	}

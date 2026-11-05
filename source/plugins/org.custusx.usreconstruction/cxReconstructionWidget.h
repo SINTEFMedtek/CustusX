@@ -123,6 +123,10 @@ private:
 	std::vector<int> mHoltRows; ///< Rows in mOptionsLayout with the parameters of the Holt filter
 	PropertyPtr mApplyLagProperty; ///< Option 'Apply estimated time lag' of the selected algorithm, if it has one
 	QWidget* createReconstructTab(ViewServicePtr viewService);
+	FileSelectWidget* createFileSelectWidget(QWidget* parent);
+	void createOutputCheckBoxes(QWidget* parent);
+	void setAngioParameters();
+	bool isUsReconstructing() const;
 	QWidget* createSettingsTab();
 	QWidget* createOptionsWidget(QWidget* parent);
 	QCheckBox* createOutputCheckBox(QString uid, QString name, QString help, bool defaultValue);

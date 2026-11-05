@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 typedef std::shared_ptr<class UsReconstructionService> UsReconstructionServicePtr;
+typedef std::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
 class UsReconstructionExtensionService;
 
 /** \brief Reconstructs the selected outputs from the selected recording, one after the other.
@@ -71,7 +72,7 @@ private slots:
 
 private:
 	bool startUsReconstruction();
-	void startAngioMeshes();
+	TimedAlgorithmPtr startUsReconstructionThread(bool angio);
 	void startNextAngioMesh();
 	void startNextExtension();
 	void finish();
@@ -88,6 +89,7 @@ private:
 	QPointer<UsReconstructionExtensionService> mCurrentExtension;
 	QStringList mDataBefore;
 	QStringList mCreatedData;
+	TimedAlgorithmPtr mUsThread;
 	std::vector<ImagePtr> mAngioVolumes;
 	ImagePtr mMeshBase;
 	QFutureWatcher<vtkPolyDataPtr> mMeshWatcher;

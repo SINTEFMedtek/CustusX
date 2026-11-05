@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxPatientModelService.h"
 #include "cxProperty.h"
+#include "cxTimedAlgorithm.h"
 #include "cxUSReconstructInputData.h"
 #include "cxUsReconstructionExtensionService.h"
 #include "cxUsReconstructionService.h"
@@ -73,6 +74,7 @@ bool UsReconstructionRunner::start(Outputs outputs, std::vector<ExtensionOutputs
 void UsReconstructionRunner::cancel()
 {
 	mCancel = true;
+	emit statusChanged("Cancelling after the current step");
 	if (mCurrentExtension)
 	{
 		mCurrentExtension->cancel();
@@ -114,31 +116,56 @@ bool UsReconstructionRunner::startUsReconstruction()
 		reportWarning("The recording has no color data, so no angio volume is reconstructed");
 		angio = false;
 	}
-	bool retval = mOutputs.mUsVolume || angio;
-	if (retval)
+	mUsThread.reset();
+	if (mOutputs.mUsVolume || angio)
 	{
 		emit statusChanged("Reconstructing US volumes");
-		setAngioParameters(mReconstruction, mOutputs.mUsVolume, angio);
 		connect(mReconstruction.get(), &UsReconstructionService::reconstructFinished, this, &UsReconstructionRunner::usReconstructionFinished);
-		mReconstruction->startReconstruction();
-		if (mReconstruction->getThreadedReconstruction().empty())
+		mUsThread = this->startUsReconstructionThread(angio);
+		if (!mUsThread)
 		{
 			disconnect(mReconstruction.get(), &UsReconstructionService::reconstructFinished, this, &UsReconstructionRunner::usReconstructionFinished);
-			retval = false;
 		}
+	}
+	return bool(mUsThread);
+}
+
+/** The angio parameters are set for this reconstruction only. Returns the thread of the new reconstruction, or null. */
+TimedAlgorithmPtr UsReconstructionRunner::startUsReconstructionThread(bool angio)
+{
+	QVariant preset = mReconstruction->getParam("Preset")->getValueAsVariant();
+	QVariant angioData = mReconstruction->getParam("Angio data")->getValueAsVariant();
+	QVariant dualAngio = mReconstruction->getParam("Dual Angio")->getValueAsVariant();
+	std::set<TimedAlgorithmPtr> before = mReconstruction->getThreadedReconstruction();
+	setAngioParameters(mReconstruction, mOutputs.mUsVolume, angio);
+	mReconstruction->startReconstruction();
+	mReconstruction->getParam("Preset")->setValueFromVariant(preset);
+	mReconstruction->getParam("Angio data")->setValueFromVariant(angioData);
+	mReconstruction->getParam("Dual Angio")->setValueFromVariant(dualAngio);
+
+	TimedAlgorithmPtr retval;
+	std::set<TimedAlgorithmPtr> after = mReconstruction->getThreadedReconstruction();
+	for (std::set<TimedAlgorithmPtr>::iterator iter = after.begin(); iter != after.end(); ++iter)
+	{
+		retval = (*iter && !before.count(*iter)) ? *iter : retval;
 	}
 	return retval;
 }
 
+/** Other reconstructions, e.g. after an acquisition, can finish first. */
 void UsReconstructionRunner::usReconstructionFinished()
 {
-	disconnect(mReconstruction.get(), &UsReconstructionService::reconstructFinished, this, &UsReconstructionRunner::usReconstructionFinished);
-	if (mOutputs.mAngioMesh && !mCancel)
+	bool ourFinished = !mUsThread || mUsThread->isFinished();
+	if (ourFinished)
+	{
+		disconnect(mReconstruction.get(), &UsReconstructionService::reconstructFinished, this, &UsReconstructionRunner::usReconstructionFinished);
+	}
+	if (ourFinished && mOutputs.mAngioMesh && !mCancel)
 	{
 		mAngioVolumes = this->findNewAngioVolumes();
 		this->startNextAngioMesh();
 	}
-	else
+	else if (ourFinished)
 	{
 		this->startNextExtension();
 	}
@@ -167,6 +194,7 @@ void UsReconstructionRunner::startNextAngioMesh()
 	else
 	{
 		emit statusChanged("Creating the angio mesh");
+		emit progress(0, 0);
 		mMeshBase = mAngioVolumes.back();
 		mAngioVolumes.pop_back();
 		vtkImageDataPtr data = mMeshBase->getBaseVtkImageData();
@@ -181,11 +209,11 @@ void UsReconstructionRunner::startNextAngioMesh()
 void UsReconstructionRunner::angioMeshFinished()
 {
 	vtkPolyDataPtr contour = mMeshWatcher.result();
-	if (contour && contour->GetNumberOfPoints() > 0)
+	if (!mCancel && contour && contour->GetNumberOfPoints() > 0)
 	{
 		ContourFilter::postProcess(mPatientModel, contour, mMeshBase, QColor(Qt::red));
 	}
-	else
+	else if (!mCancel)
 	{
 		reportWarning(QString("No angio mesh from %1: no voxels above the threshold").arg(mMeshBase->getName()));
 	}
@@ -203,6 +231,7 @@ void UsReconstructionRunner::startNextExtension()
 		if (next.mExtension && !next.mOutputs.isEmpty())
 		{
 			mCurrentExtension = next.mExtension;
+			emit progress(0, 0);
 			this->connectExtension(mCurrentExtension, true);
 			started = mCurrentExtension->start(next.mOutputs);
 			if (!started)
@@ -225,6 +254,7 @@ void UsReconstructionRunner::connectExtension(UsReconstructionExtensionService* 
 		connect(extension, &UsReconstructionExtensionService::progress, this, &UsReconstructionRunner::progress);
 		connect(extension, &UsReconstructionExtensionService::statusChanged, this, &UsReconstructionRunner::statusChanged);
 		connect(extension, &UsReconstructionExtensionService::finished, this, &UsReconstructionRunner::extensionFinished);
+		connect(extension, &QObject::destroyed, this, &UsReconstructionRunner::extensionFinished);
 	}
 	else
 	{
