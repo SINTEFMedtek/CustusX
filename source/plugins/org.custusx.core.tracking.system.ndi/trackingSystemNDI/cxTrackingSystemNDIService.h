@@ -88,7 +88,6 @@ private slots:
 	virtual void startTracking();
 	virtual void stopTracking();
 
-	void trackerConfiguredSlot(bool on);
 	void initializedSlot(bool on);
 	void trackerTrackingSlot(bool on);
 
@@ -103,16 +102,20 @@ private slots:
 
 protected:
 	NdiConnectionSettings readConnectionSettings() const;
+	void trackerConfigured(unsigned trackerThreadNumber, bool on);
+	unsigned getTrackerThreadNumber() const { return mTrackerThreadNumber; }
 
 private:
 	bool createTrackerThread(); ///< false if the configuration is not for NDI, or not valid
 	void cancelPendingStateChanges();
+	bool isCurrentTrackerThread(unsigned trackerThreadNumber) const;
 	void destroyTrackerThread();
 
 	std::vector<ToolPtr> mTools;
 	ToolPtr mReference;
 
 	NdiTrackerThreadPtr mTrackerThread;
+	unsigned mTrackerThreadNumber; ///< Counts the tracker threads, to ignore signals from replaced threads
 	bool mDeviceInUse; ///< The last connection failed because another application uses the device
 	bool mTrackingRequested; ///< The last requested state was tracking
 };

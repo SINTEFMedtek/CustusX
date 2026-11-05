@@ -57,6 +57,20 @@ TEST_CASE("SliceRepSW: a 2D image near the slice plane is moved exactly into it"
 	CHECK(flipped.vector(cx::Vector3D(0, 0, 1)).normal()[2] == Approx(-1.0));
 }
 
+TEST_CASE("SliceRepSW: a 2D image drawn directly is placed in front of the sliced images", "[unit][resource][visualization]")
+{
+	cx::Vector3D center(10, 10, 0);
+	cx::Vector3D corner(400, 300, 0);
+	for (double angle : {0.0, 0.005, M_PI})
+	{
+		cx::Transform3D sMd = cx::createTransformRotateX(angle) * cx::createTransformTranslate(cx::Vector3D(30, -5, 0.3));
+		cx::Transform3D placed = cx::SliceRepSW::placeInFrontOfSlices(sMd, center);
+		// The camera of a 2D view looks along -z, so +z is towards the camera
+		CHECK(placed.coord(center)[2] == Approx(cx::SliceRepSW::kInFrontOfSlices_mm));
+		CHECK(placed.coord(corner)[2] == Approx(cx::SliceRepSW::kInFrontOfSlices_mm));
+	}
+}
+
 TEST_CASE("SliceRepSW: draws a 2D image in the slice plane directly, and slices other images", "[unit][resource][visualization]")
 {
 	cx::SimpleSliceProxyPtr slicer(new cx::SimpleSliceProxy());

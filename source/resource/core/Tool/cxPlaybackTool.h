@@ -57,6 +57,8 @@ public:
 	virtual TimedTransformMapPtr getPositionHistory() { return mBase->getPositionHistory(); }
 	virtual bool isInitialized() const;
 	virtual ProbePtr getProbe() const { return mBase->getProbe(); }
+	virtual QString getOpenIGTLinkImageId() const { return mBase->getOpenIGTLinkImageId(); }
+	virtual QString getOpenIGTLinkTransformId() const { return mBase->getOpenIGTLinkTransformId(); }
 	virtual bool hasReferencePointWithId(QString id) { return mBase->hasReferencePointWithId(id); }
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) { return mBase->getSessionHistory(startTime, stopTime); }
 
