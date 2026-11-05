@@ -290,6 +290,10 @@ TEST_CASE("ReconstructPreprocessor: flipping the images mirrors the frames and t
 	Eigen::Array3i dims = normalInput[0]->getDimensions();
 	REQUIRE(flipInput[0]->getDimensions().isApprox(dims));
 
+	// The processed input tells whether the images were flipped (used for the image orientation check in VIC)
+	CHECK_FALSE(normalInput[0]->getImagesFlipped());
+	CHECK(flipInput[0]->getImagesFlipped());
+
 	// All pixels are mirrored (x -> width-1-x), the rows are unchanged
 	unsigned nMismatch = 0;
 	for (int frame = 0; frame < dims[2]; ++frame)

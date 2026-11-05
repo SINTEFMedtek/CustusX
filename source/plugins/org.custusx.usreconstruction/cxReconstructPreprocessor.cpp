@@ -107,6 +107,7 @@ std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInp
 		}
 		// Lets the frame positions be converted back to tracking positions (prMt)
 		input->setTrackingTransforms(mPrMd, mFileData.mProbeDefinition.get_tMu() * mFileData.mProbeDefinition.get_uMv());
+		input->setImagesFlipped(mInput.mFlipImages);
 		CX_ASSERT(Eigen::Array3i(frames[i][0]->GetDimensions()).isApprox(Eigen::Array3i(mFileData.getMask()->GetDimensions())));
 		retval.push_back(input);
 	}
