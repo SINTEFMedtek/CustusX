@@ -170,9 +170,7 @@ class RepoHandler(object):
         tag = self.args.git_tag
         if tag:
             print('Checking out %s to tag=%s' % (self.getName(), tag))
-            result = runShell('git checkout %s' % tag, self.repo_path)
-            if result is returnCode():
-                result = self._retryAfterRemovingReplacedNestedRepos('git checkout %s' % tag, tag)
+            result = self._runReplacingMovedNestedRepos('git checkout %s' % tag, tag)
             # returnCode() (untracked files in the way) and localChangesCode() are failures
             # too: they used to pass this check silently and leave the repo on the previous
             # checkout, which would then be built as the tag.
@@ -209,9 +207,7 @@ class RepoHandler(object):
             is_tag = (not is_branch) and runShell('git ls-remote --exit-code --tags origin refs/tags/%s' % branch, self.repo_path) is not None
             if not (is_branch or is_tag):
                 continue
-            result = runShell('git checkout %s' % branch, self.repo_path)
-            if result is returnCode():
-                result = self._retryAfterRemovingReplacedNestedRepos('git checkout %s' % branch, 'origin/%s' % branch if is_branch else branch)
+            result = self._runReplacingMovedNestedRepos('git checkout %s' % branch, 'origin/%s' % branch if is_branch else branch)
             self.checkSuccess(result)
             if result is localChangesCode():
                 # Warned already via checkSuccess(); this branch didn't work,
@@ -252,9 +248,7 @@ class RepoHandler(object):
                 # `git push`) must survive this sync rather than silently
                 # vanish the next time this repo gets synced.
                 self._ensureGitIdentityForMerge(self.repo_path)
-                merge_result = runShell('git merge origin/%s' % branch, self.repo_path)
-                if merge_result is returnCode():
-                    merge_result = self._retryAfterRemovingReplacedNestedRepos('git merge origin/%s' % branch, 'origin/%s' % branch, merge=True)
+                merge_result = self._runReplacingMovedNestedRepos('git merge origin/%s' % branch, 'origin/%s' % branch, merge=True)
                 self.checkSuccess(merge_result)
                 if merge_result is None:
                     # Unlike the checkout above, there's no next candidate to
@@ -268,10 +262,20 @@ class RepoHandler(object):
                     sys.exit(1)
             break
 
-    def _retryAfterRemovingReplacedNestedRepos(self, command, ref, merge=False):
+    def _runReplacingMovedNestedRepos(self, command, ref, merge=False):
         '''
-        A checkout or merge refused with "untracked working tree files would be
-        overwritten" can be a plugin that used to be its own repo, cloned
+        Run the git checkout or merge command to ref. If it is refused with
+        "untracked working tree files would be overwritten", retry after
+        removing clones that ref replaces.
+        '''
+        result = runShell(command, self.repo_path)
+        if result is returnCode():
+            result = self._retryAfterRemovingMovedNestedRepos(command, ref, merge)
+        return result
+
+    def _retryAfterRemovingMovedNestedRepos(self, command, ref, merge):
+        '''
+        The untracked files can be a plugin that used to be its own repo, cloned
         inside this one, and is now part of this repo on the target branch
         (e.g. a tracking plugin, CustusX#55). The merge case happens when an old
         local branch is checked out first, and the plugin came in on the remote
@@ -283,7 +287,7 @@ class RepoHandler(object):
         nested_paths = [os.path.join(self.repo_path, nested) for nested in self._findNestedReposAddedBy(['HEAD...%s' % ref] if merge else ['HEAD', ref])]
         unsafe = [path for path in nested_paths if not self._isNestedRepoSafeToRemove(path)]
         for path in unsafe:
-            print('NOT removing %s: it has local changes or unpushed commits.' % path)
+            print('NOT removing %s: it has local changes, ignored files, stashes or commits that are not pushed.' % path)
             print('It is now part of %s at %s. Push or save its work, delete it, and re-run.' % (self.getName(), ref))
         result = returnCode()
         # Remove none unless all can go: the command can only succeed then
@@ -298,8 +302,14 @@ class RepoHandler(object):
     def _findNestedReposAddedBy(self, diff_range):
         '''Paths (relative) of git clones inside this repo where the git diff range adds tracked files.'''
         # Only the folders of added files can be such a clone. Not runShell(): it would print every file.
-        added = subprocess.run(['git', 'diff', '--name-only', '--diff-filter=A'] + diff_range,
-                               cwd=self.repo_path, capture_output=True, text=True).stdout.splitlines()
+        # --no-renames: a file added where a similar one is deleted is an addition too.
+        diff = subprocess.run(['git', 'diff', '--name-only', '--no-renames', '-z', '--diff-filter=A'] + diff_range,
+                              cwd=self.repo_path, capture_output=True, encoding='utf-8', errors='surrogateescape')
+        added = []
+        if diff.returncode == 0:
+            added = [path for path in diff.stdout.split('\0') if path]
+        else:
+            print('Cannot find replaced clones, so none are removed. git diff %s: %s' % (' '.join(diff_range), diff.stderr.strip()))
         retval = []
         for path in added:
             parts = path.split('/')[:-1]

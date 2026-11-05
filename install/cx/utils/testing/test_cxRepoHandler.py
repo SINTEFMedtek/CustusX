@@ -429,6 +429,52 @@ class PluginMovedIntoRepoTest(unittest.TestCase):
         with open(os.path.join(self.nested, 'plugin.txt')) as f:
             self.assertEqual(f.read(), 'local work')
 
+    def _merge_moved_into_upstream_develop(self):
+        _git(['checkout', '-q', 'develop'], self.upstream)
+        _git(['merge', '-q', 'moved'], self.upstream)
+
+    def test_nested_clone_with_unpushed_commit_is_kept_when_merging(self):
+        self._merge_moved_into_upstream_develop()
+        _commit(self.nested, filename='local.txt', content='unpushed', message='local commit')
+        local_sha = _head_sha(self.nested)
+
+        handler = _make_handler(self.clone, main_branch='develop')
+        with self.assertRaises(SystemExit):
+            handler.syncToGitRef()
+
+        self.assertEqual(_head_sha(self.nested), local_sha)
+
+    def test_nested_clone_with_stash_is_kept_when_merging(self):
+        self._merge_moved_into_upstream_develop()
+        with open(os.path.join(self.nested, 'plugin.txt'), 'w') as f:
+            f.write('stashed work')
+        _git(['stash', '-q'], self.nested)
+
+        handler = _make_handler(self.clone, main_branch='develop')
+        with self.assertRaises(SystemExit):
+            handler.syncToGitRef()
+
+        self.assertNotEqual(_git(['stash', 'list'], self.nested), '')
+
+    def test_nested_clone_is_replaced_when_merging_a_move_that_git_sees_as_a_rename(self):
+        content = ''.join('line %d of the plugin\n' % i for i in range(20))
+        os.makedirs(os.path.join(self.upstream, 'old'))
+        _commit(self.upstream, filename=os.path.join('old', 'plugin.txt'), content=content, message='old plugin')
+        _git(['pull', '-q'], self.clone)
+        _git(['config', 'diff.renames', 'true'], self.clone)  # whatever the global git config says
+        _git(['rm', '-q', os.path.join('old', 'plugin.txt')], self.upstream)
+        os.makedirs(os.path.join(self.upstream, 'plugins', 'p'))
+        _commit(self.upstream, filename=os.path.join('plugins', 'p', 'plugin.txt'), content=content + 'new line\n', message='replace plugin')
+
+        handler = _make_handler(self.clone, main_branch='develop')
+        handler.syncToGitRef()
+
+        self.assertEqual(_current_branch(self.clone), 'develop')
+        self.assertEqual(_head_sha(self.clone), _head_sha(self.upstream))
+        self.assertFalse(os.path.exists(os.path.join(self.nested, '.git')))
+        with open(os.path.join(self.nested, 'plugin.txt')) as f:
+            self.assertEqual(f.read(), content + 'new line\n')
+
     def test_nested_clone_with_uncommitted_changes_is_kept(self):
         with open(os.path.join(self.nested, 'plugin.txt'), 'w') as f:
             f.write('local work')
