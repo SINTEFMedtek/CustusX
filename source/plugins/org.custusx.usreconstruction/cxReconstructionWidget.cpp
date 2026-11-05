@@ -591,6 +591,8 @@ void ReconstructionWidget::updateButtons()
 	mReconstructButton->setText(running ? "Cancel" : "Reconstruct");
 	mReconstructButton->setEnabled(running || (canStart && !mUsReconstructing));
 	mProgressBar->setVisible(running);
+	mFileSelectWidget->setEnabled(!running && !mUsReconstructing);
+	mOutputsLayout->parentWidget()->setEnabled(!running);
 }
 
 
