@@ -126,6 +126,7 @@ private:
 	FileSelectWidget* createFileSelectWidget(QWidget* parent);
 	void createOutputCheckBoxes(QWidget* parent);
 	void setAngioParameters();
+	void showAngioData(bool angio);
 	bool isUsReconstructing() const;
 	QWidget* createSettingsTab();
 	QWidget* createOptionsWidget(QWidget* parent);

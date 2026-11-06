@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include "cxReconstructionWidget.h"
 
+#include <QSignalBlocker>
 #include "cxReconstructOutputValueParamsInterfaces.h"
 #include "cxLogger.h"
 #include "cxHelperWidgets.h"
@@ -170,12 +171,29 @@ void ReconstructionWidget::createOutputCheckBoxes(QWidget* parent)
 	mUsVolumeCheckBox = this->createOutputCheckBox("usVolume", "3D US volume", "The B-mode ultrasound volume", true);
 	mAngioVolumeCheckBox = this->createOutputCheckBox("angioVolume", "Angio volume", "A volume of the color (Doppler) data of the recording", angio);
 	mAngioMeshCheckBox = this->createOutputCheckBox("angioMesh", "Angio mesh", "A mesh of the angio volume, at the angio mesh threshold. Also creates the angio volume", false);
+	this->showAngioData(angio);
 	QList<QCheckBox*> checkBoxes = QList<QCheckBox*>() << mUsVolumeCheckBox << mAngioVolumeCheckBox << mAngioMeshCheckBox;
 	for (int i = 0; i < checkBoxes.size(); ++i)
 	{
 		connect(checkBoxes[i], &QCheckBox::toggled, this, &ReconstructionWidget::setAngioParameters);
 	}
-	this->setAngioParameters();
+}
+
+/** The saved angio checkboxes are only kept if they agree with Angio data. */
+void ReconstructionWidget::showAngioData(bool angio)
+{
+	QSignalBlocker volumeBlocker(mAngioVolumeCheckBox);
+	QSignalBlocker meshBlocker(mAngioMeshCheckBox);
+	bool anyChecked = mAngioVolumeCheckBox->isChecked() || mAngioMeshCheckBox->isChecked();
+	if (!angio)
+	{
+		mAngioVolumeCheckBox->setChecked(false);
+		mAngioMeshCheckBox->setChecked(false);
+	}
+	else if (!anyChecked)
+	{
+		mAngioVolumeCheckBox->setChecked(true);
+	}
 }
 
 void ReconstructionWidget::setAngioParameters()
@@ -516,6 +534,7 @@ void ReconstructionWidget::onExtensionRemoved(UsReconstructionExtensionService* 
 			for (unsigned j = 0; j < mExtensions[i].mOutputs.size(); ++j)
 			{
 				mOutputsLayout->removeWidget(mExtensions[i].mOutputs[j].second);
+				mExtensions[i].mOutputs[j].second->hide();
 				mExtensions[i].mOutputs[j].second->deleteLater();
 			}
 			mTabs->removeTab(mTabs->indexOf(mExtensions[i].mTab));
@@ -628,7 +647,7 @@ void ReconstructionWidget::updateButtons()
 	bool canStart = !mReconstructer->getSelectedFilename().isEmpty() && this->isAnyOutputSelected();
 	mReconstructButton->setText(running ? "Cancel" : "Reconstruct");
 	mReconstructButton->setEnabled(running || (canStart && !mUsReconstructing));
-	mProgressBar->setVisible(running && !mUsReconstructing);
+	mProgressBar->setVisible(running && !mRunner->isReconstructingUs());
 	mFileSelectWidget->setEnabled(!running && !mUsReconstructing);
 	mOutputsLayout->parentWidget()->setEnabled(!running);
 }

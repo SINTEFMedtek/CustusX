@@ -132,7 +132,7 @@ void UsReconstructionImplService::reconstructFinishedSlot()
 
 	for (unsigned i=0; i<mExecuters.size(); ++i)
 	{
-		if (mExecuters[i]->getThread()->isFinished())
+		if (!mExecuters[i]->getThread() || mExecuters[i]->getThread()->isFinished())
 		{
 			ReconstructionExecuterPtr executer = mExecuters[i];
 			disconnect(executer.get(), SIGNAL(reconstructAboutToStart()), this, SIGNAL(reconstructAboutToStart()));

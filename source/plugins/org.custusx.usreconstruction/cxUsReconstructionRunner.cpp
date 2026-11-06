@@ -86,6 +86,11 @@ bool UsReconstructionRunner::isRunning() const
 	return mRunning;
 }
 
+bool UsReconstructionRunner::isReconstructingUs() const
+{
+	return mRunning && mUsThread && !mUsThread->isFinished();
+}
+
 void UsReconstructionRunner::setAngioParameters(UsReconstructionServicePtr reconstruction, bool usVolume, bool angio)
 {
 	PropertyPtr preset = reconstruction->getParam("Preset");

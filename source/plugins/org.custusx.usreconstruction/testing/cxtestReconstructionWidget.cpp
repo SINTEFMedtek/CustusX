@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelServiceProxy.h"
 #include "cxProperty.h"
 #include "cxRegisteredService.h"
+#include "cxSettings.h"
 #include "cxReconstructionWidget.h"
 #include "cxReconstructionResultsWidget.h"
 #include "cxColorSelectButton.h"
@@ -165,6 +166,23 @@ TEST_CASE("ReconstructionWidget: the angio checkboxes set the Angio data paramet
 	CHECK(angioData->getValueAsVariant().toBool());
 	angioVolume->setChecked(false);
 	CHECK_FALSE(angioData->getValueAsVariant().toBool());
+}
+
+TEST_CASE("ReconstructionWidget: opening the widget does not change the angio parameters", "[unit][usreconstruction][gui]")
+{
+	ReconstructionManagerTestFixture fixture;
+	cx::PatientModelServicePtr patientModel = cx::PatientModelServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::UsReconstructionServicePtr reconstruction = fixture.getManager();
+	reconstruction->getParam("Angio data")->setValueFromVariant(false);
+	reconstruction->getParam("Dual Angio")->setValueFromVariant(false);
+	QVariant savedAngioVolume = cx::settings()->value("reconstruction/create/angioVolume");
+	cx::settings()->setValue("reconstruction/create/angioVolume", true);
+
+	cx::ReconstructionWidget widget(NULL, reconstruction, patientModel, cx::ViewService::getNullObject(), NULL);
+	CHECK_FALSE(widget.findChild<QCheckBox*>("angioVolume")->isChecked());
+	CHECK_FALSE(reconstruction->getParam("Angio data")->getValueAsVariant().toBool());
+	CHECK_FALSE(reconstruction->getParam("Dual Angio")->getValueAsVariant().toBool());
+	cx::settings()->setValue("reconstruction/create/angioVolume", savedAngioVolume);
 }
 
 TEST_CASE("ReconstructionResultsWidget: lists the data, and drops removed data", "[unit][usreconstruction][gui]")

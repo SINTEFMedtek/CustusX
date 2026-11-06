@@ -56,6 +56,7 @@ public:
 	bool start(Outputs outputs, std::vector<ExtensionOutputs> extensions);
 	void cancel();
 	bool isRunning() const;
+	bool isReconstructingUs() const; ///< True in the US volume step of a run
 	std::vector<DataPtr> getCreatedData() const; ///< The data added to the patient by the last run
 
 	static void setAngioParameters(UsReconstructionServicePtr reconstruction, bool usVolume, bool angio);
