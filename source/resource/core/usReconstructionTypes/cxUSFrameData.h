@@ -73,9 +73,16 @@ public:
 	Transform3D get_prMd() const;
 	Transform3D get_tMu() const;
 
+	/** Set by the preprocessor when the images were mirrored laterally on user request ('Flip images L/R').
+	 *  Used by reconstruction algorithms that check the image orientation against the tracking data.
+	 */
+	void setImagesFlipped(bool flipped);
+	bool getImagesFlipped() const;
+
 private:
 	std::vector<TimedPosition> mFramePositionsUsed;
 	bool mHasTrackingTransforms;
+	bool mImagesFlipped;
 	Transform3D mPrMd;
 	Transform3D mTMu;
 	std::vector<vtkImageDataPtr> mProcessedImage;
