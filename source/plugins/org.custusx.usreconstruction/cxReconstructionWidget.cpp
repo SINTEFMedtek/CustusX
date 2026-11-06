@@ -280,6 +280,7 @@ QWidget* ReconstructionWidget::createOptionsWidget(QWidget* parent)
 	++line;
 
 	sscCreateDataWidget(retval, mReconstructer->getParam("Orientation"), layout, line++);
+	sscCreateDataWidget(retval, mReconstructer->getParam("Flip images"), layout, line++);
 	sscCreateDataWidget(retval, mReconstructer->getParam("Angio mesh threshold"), layout, line++);
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 2);
 

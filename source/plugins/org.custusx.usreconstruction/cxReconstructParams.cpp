@@ -68,6 +68,13 @@ void ReconstructParams::createParameters()
 	connect(mOrientationAdapter.get(), &StringProperty::valueWasSet, this, &ReconstructParams::changedInputSettings);
 	this->add(mOrientationAdapter);
 
+	mFlipImages = BoolProperty::initialize("Flip images", "Flip images L/R",
+		"Mirror the images laterally (left to right) before they are used, both in the reconstruction and in any image based correction by the algorithm. "
+		"For acquisitions where the scanner image was flipped. Not saved, and turned off when another recording is selected.", false,
+		QDomElement());
+	connect(mFlipImages.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	this->add(mFlipImages);
+
 	// note: value range initialized by onPatientChanged()
 	mPresetTFAdapter = StringProperty::initialize("Preset", "",
 		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", QStringList(),
