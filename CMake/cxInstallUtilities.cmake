@@ -341,6 +341,7 @@ macro(cx_initialize_custusx_install)
 	# used as a global variable: clear at start of run
 	unset(CX_APPLE_TARGETS_TO_COPY CACHE)
 	unset(CX_ALL_LIBRARY_DIRS CACHE)
+	unset(CX_BUNDLE_IGNORE_ITEMS CACHE)
 
 endmacro()
 
@@ -355,6 +356,19 @@ macro(cx_install_add_library_dirs)
         ${CX_ALL_LIBRARY_DIRS}
         ${ARGV}
         CACHE INTERNAL "List of dirs to look for libraries to use in fixup_bundle")
+endmacro()
+
+###############################################################################
+#
+# Add file names of installed libraries that fixup_bundle should not examine,
+# e.g. libraries loaded at runtime that depend on libraries the user installs.
+#
+###############################################################################
+macro(cx_install_add_bundle_ignore_items)
+    set(CX_BUNDLE_IGNORE_ITEMS
+        ${CX_BUNDLE_IGNORE_ITEMS}
+        ${ARGV}
+        CACHE INTERNAL "List of library file names for fixup_bundle to ignore")
 endmacro()
 
 ###############################################################################
@@ -711,6 +725,11 @@ install(DIRECTORY "${QT_QML_DIR}/"
 
         set(_cx_bundle_ignore_gestreamer "IGNORE_ITEM libGEStreamer.so;IGNORE_ITEM libStreaming.so")
 
+        set(_cx_bundle_ignore_items "")
+        foreach(_item ${CX_BUNDLE_IGNORE_ITEMS})
+            list(APPEND _cx_bundle_ignore_items IGNORE_ITEM ${_item})
+        endforeach()
+
         install(CODE "
     # Begin inserted fixup_bundle snippet
     ${LIB_PATTERN_CODE}
@@ -731,7 +750,7 @@ endfunction()
     file(TO_CMAKE_PATH \"\${CMAKE_INSTALL_PREFIX}/${APPS_LOCAL}\" _APP_PATH)
     message(STATUS \"_APP_PATH:  \${_APP_PATH}\")
     #fixup_bundle(\"\${_APP_PATH}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\")
-    cx_fixup_bundle(\"\${_APP_PATH}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\" ${_cx_bundle_ignore_igstk} ${_cx_bundle_ignore_gestreamer})
+    cx_fixup_bundle(\"\${_APP_PATH}\"   \"\${PLUGINS}\"   \"${DIRS_LOCAL}\" ${_cx_bundle_ignore_igstk} ${_cx_bundle_ignore_gestreamer} ${_cx_bundle_ignore_items})
     # End inserted fixup_bundle snippet
     ")
 endfunction()

@@ -52,6 +52,7 @@ public:
 			mHoltBothDirections(true),
 			mHoltAddTrend(false),
 			mMaskReduce(0),
+			mFlipImages(false),
 			mAngio(false),
 			mMaxOutputVolumeSize(1024*1024),
 			mWriteProcessedPositions(false)
@@ -67,6 +68,7 @@ public:
 		bool mHoltAddTrend; ///< Holt filter: output level + trend instead of the level
 		double mMaskReduce;
 		QString mOrientation;
+		bool mFlipImages; ///< Mirror the images laterally (and the probe geometry) before they are used
 
 		QString mAlgorithmUid;
 		QDomElement mAlgoSettings;

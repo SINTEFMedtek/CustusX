@@ -62,7 +62,8 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataCo
 																	 std::map<double, ToolPositionMetadata> trackerRecordedMetadata,
 																	 std::map<double, ToolPositionMetadata> referenceRecordedMetadata,
 																	 ToolPtr tool, QString streamUid,
-																	 bool writeColor, Transform3D rMpr)
+																	 bool writeColor, Transform3D rMpr,
+																	 ToolPtr reference)
 {
 	if(trackerRecordedData.empty())
 		reportWarning("No tracking data for writing to reconstruction file.");
@@ -102,9 +103,28 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataCo
 
 	if (tool)
 		retval.mProbeUid = tool->getUid();
+	retval.mRecordingInfo = createRecordingInfo(tool, reference, rMpr);
 
 	this->fillFramePositions(&retval);
 
+	return retval;
+}
+
+USRecordingInfo UsReconstructionFileMaker::createRecordingInfo(ToolPtr tool, ToolPtr reference, Transform3D rMpr)
+{
+	USRecordingInfo retval;
+	retval.rMpr = rMpr;
+	if (tool)
+	{
+		retval.mProbeOpenIGTLinkTransformId = tool->getOpenIGTLinkTransformId();
+		retval.mProbeOpenIGTLinkImageId = tool->getOpenIGTLinkImageId();
+		retval.mProbe_sMt = tool->getCalibration_sMt();
+	}
+	if (reference)
+	{
+		retval.mReferenceUid = reference->getUid();
+		retval.mReferenceOpenIGTLinkTransformId = reference->getOpenIGTLinkTransformId();
+	}
 	return retval;
 }
 
@@ -269,14 +289,52 @@ bool UsReconstructionFileMaker::writeTransforms(QString filename, std::vector<Ti
 	return success;
 }
 
+bool UsReconstructionFileMaker::writeMatrix(QString filename, Transform3D matrix, QString type)
+{
+	bool success = false;
+	QFile file(filename);
+	if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	{
+		QTextStream stream(&file);
+		stream.setRealNumberPrecision(12);
+		for (int row=0; row<4; ++row)
+		{
+			stream << matrix(row,0) << " " << matrix(row,1) << " " << matrix(row,2) << " " << matrix(row,3) << "\n";
+		}
+		stream.flush();
+		success = (stream.status() == QTextStream::Ok) && (file.error() == QFileDevice::NoError);
+		file.close();
+	}
+	if (success)
+	{
+		QFileInfo info(file);
+		mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, " + type + ".";
+	}
+	else
+	{
+		reportError("Cannot write "+file.fileName());
+	}
+	return success;
+}
+
 /**
  * Write probe configuration to file. This works even for configs not saved to the ProbeCalibConfigs.xml file.
  */
-void UsReconstructionFileMaker::writeProbeConfiguration(QString reconstructionFolder, QString session, ProbeDefinition data, QString uid)
+void UsReconstructionFileMaker::writeProbeConfiguration(QString reconstructionFolder, QString session, const USReconstructInputData& data)
 {
+	const USRecordingInfo& info = data.mRecordingInfo;
 	XmlOptionFile file = XmlOptionFile(reconstructionFolder + "/" + session + ".probedata.xml");
-	data.addXml(file.getElement("configuration"));
-	file.getElement("tool").toElement().setAttribute("toolID", uid);
+	data.mProbeDefinition.mData.addXml(file.getElement("configuration"));
+	QDomElement tool = file.getElement("tool");
+	tool.setAttribute("toolID", data.mProbeUid);
+	tool.setAttribute("openigtlinktransformid", info.mProbeOpenIGTLinkTransformId);
+	tool.setAttribute("openigtlinkimageid", info.mProbeOpenIGTLinkImageId);
+	if (!info.mReferenceUid.isEmpty())
+	{
+		QDomElement reference = file.getElement("reference");
+		reference.setAttribute("toolID", info.mReferenceUid);
+		reference.setAttribute("openigtlinktransformid", info.mReferenceOpenIGTLinkTransformId);
+	}
 	file.save();
 }
 
@@ -403,13 +461,24 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	mReport << "Made reconstruction folder: " + path;
 	QString session = mSessionDescription;
 
-	this->writeTrackerMetadata(path, session, mReconstructData.mTrackerRecordedMetadata);
-	this->writeReferenceMetadata(path, session, mReconstructData.mReferenceRecordedMetadata);
+	if (!mReconstructData.mTrackerRecordedMetadata.empty())
+	{
+		this->writeTrackerMetadata(path, session, mReconstructData.mTrackerRecordedMetadata);
+	}
+	if (!mReconstructData.mReferenceRecordedMetadata.empty())
+	{
+		this->writeReferenceMetadata(path, session, mReconstructData.mReferenceRecordedMetadata);
+	}
 	this->writeTrackerTimestamps(path, session, mReconstructData.mPositions);
 	this->writeTrackerTransforms(path, session, mReconstructData.mPositions);
 	this->writeUSTimestamps(path, session, mReconstructData.mFrames);
 	this->writeUSTransforms(path, session, mReconstructData.mFrames);
-	this->writeProbeConfiguration(path, session, mReconstructData.mProbeDefinition.mData, mReconstructData.mProbeUid);
+	this->writeProbeConfiguration(path, session, mReconstructData);
+	if (!mReconstructData.mProbeUid.isEmpty())
+	{
+		this->writeMatrix(path+"/"+session+".probe.cal", mReconstructData.mRecordingInfo.mProbe_sMt, "probe calibration sMt");
+	}
+	this->writeMatrix(path+"/"+session+".rMpr", mReconstructData.mRecordingInfo.rMpr, "patient registration rMpr");
 	this->writeMask(path, session, mReconstructData.getMask());
 	this->writeREADMEFile(path, session);
 

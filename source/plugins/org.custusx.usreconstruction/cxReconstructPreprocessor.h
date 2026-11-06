@@ -58,6 +58,7 @@ public:
 
 private:
 	void cropInputData();
+	void flipProbeDefinitionLaterally(); ///< Mirror the probe origin and clip rect, to match laterally flipped images
 	IntBoundingBox3D reduceCropboxToImageSize(IntBoundingBox3D cropbox, QSize size);
 	void updateFromOriginalFileData();
 	void processPositions(bool reportRemovedFrames); ///< reportRemovedFrames: false when repeated with other settings

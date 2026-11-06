@@ -265,6 +265,8 @@ class TestTrackingSystemNDIService : public cx::TrackingSystemNDIService
 {
 public:
 	using cx::TrackingSystemNDIService::readConnectionSettings;
+	using cx::TrackingSystemNDIService::trackerConfigured;
+	using cx::TrackingSystemNDIService::getTrackerThreadNumber;
 };
 
 TEST_CASE("TrackingSystemNDIService: a network device in use is only taken over when set", "[unit][org.custusx.core.tracking.system.ndi]")
@@ -332,6 +334,30 @@ TEST_CASE("TrackingSystemNDIService: a new tool configuration replaces the confi
 	service.setConfigurationFile(twoTools);
 	REQUIRE(waitUntilConfigured(service));
 	CHECK(service.getTools().size() == configuredTools - 2);
+}
+
+TEST_CASE("TrackingSystemNDIService: a late signal from a replaced tracker thread is ignored", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	cx::DataLocations::setTestMode();
+	QTemporaryDir folder;
+	QString fourTools = writeAuroraConfiguration(folder.path(), "four.xml", {"1", "2", "3", "4"});
+	QString twoTools = writeAuroraConfiguration(folder.path(), "two.xml", {"1", "2"});
+
+	TestTrackingSystemNDIService service;
+	service.setConfigurationFile(fourTools);
+	service.setState(cx::Tool::tsCONFIGURED);
+	REQUIRE(waitUntilConfigured(service));
+	unsigned replacedThread = service.getTrackerThreadNumber();
+
+	// The replaced thread's signal that it stopped is queued after the new thread was started
+	service.setConfigurationFile(twoTools);
+	QMetaObject::invokeMethod(&service, [&service, replacedThread]() { service.trackerConfigured(replacedThread, false); }, Qt::QueuedConnection);
+	REQUIRE(waitUntilConfigured(service));
+	QCoreApplication::processEvents();
+	CHECK(service.getTrackerThreadNumber() == replacedThread + 1);
+
+	service.trackerConfigured(replacedThread, false);
+	CHECK(service.getState() >= cx::Tool::tsCONFIGURED);
 }
 
 } // namespace cxtest

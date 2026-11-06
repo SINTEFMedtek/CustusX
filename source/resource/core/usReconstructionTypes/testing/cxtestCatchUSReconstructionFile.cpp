@@ -19,6 +19,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxLogicManager.h"
 #include "cxFileManagerServiceProxy.h"
+#include "cxUtilHelpers.h"
+#include <QFile>
+#include <QFileInfo>
 
 
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Create unique folders", "[unit][resource][usReconstructionTypes]")
@@ -78,4 +81,40 @@ TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Sav
 
 	this->assertCorrespondence(input, hasBeenRead);
 	cx::LogicManager::shutdown();
+}
+
+TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save and read recording info", "[unit][resource][usReconstructionTypes]")
+{
+	cx::DataLocations::setTestMode();
+	ReconstructionData input = this->createSampleReconstructData();
+
+	QString filename = this->write(input);
+	cx::USRecordingInfo hasBeenRead = cx::UsReconstructionFileReader::readRecordingInfo(filename);
+
+	this->assertRecordingInfoCorrespondence(input, hasBeenRead);
+	CHECK(!QFileInfo(cx::changeExtension(filename, "probe.toolmeta")).exists());
+	CHECK(!QFileInfo(cx::changeExtension(filename, "ref.toolmeta")).exists());
+}
+
+TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Read recording info from an older recording", "[unit][resource][usReconstructionTypes]")
+{
+	cx::DataLocations::setTestMode();
+	QString folder = cx::UsReconstructionFileMaker::createFolder(this->getDataPath(), "old_session");
+	QString filename = folder + "/old_session.fts";
+	QFile probeData(cx::changeExtension(filename, "probedata.xml"));
+	REQUIRE(probeData.open(QIODevice::WriteOnly));
+	probeData.write("<root>\n"
+					"    <configuration type=\"1\" uid=\"BK\"/>\n"
+					"    <tool toolID=\"old_probe\"/>\n"
+					"</root>\n");
+	probeData.close();
+
+	cx::USRecordingInfo hasBeenRead = cx::UsReconstructionFileReader::readRecordingInfo(filename);
+
+	CHECK(hasBeenRead.mProbeOpenIGTLinkTransformId.isEmpty());
+	CHECK(hasBeenRead.mProbeOpenIGTLinkImageId.isEmpty());
+	CHECK(hasBeenRead.mReferenceUid.isEmpty());
+	CHECK(cx::similar(hasBeenRead.mProbe_sMt, cx::Transform3D::Identity()));
+	CHECK(cx::similar(hasBeenRead.rMpr, cx::Transform3D::Identity()));
+	CHECK(cx::UsReconstructionFileReader::readProbeDefinitionFromFile(filename).first == "old_probe");
 }
