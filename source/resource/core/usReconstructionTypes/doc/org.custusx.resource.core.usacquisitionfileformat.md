@@ -74,7 +74,7 @@ Patient Registration {filebase}.rMpr {#us_acq_file_format_rMpr}
 This file contains the patient registration `rMpr` at the time of recording,
 i.e. the transform from patient reference to global reference. It relates the
 frame positions in \ref us_acq_file_format_fp to the tracking positions in
-\ref us_acq_file_format_tp: each frame position is `rMpr * prMt * tMu * uMv`, where
+\ref us_acq_file_format_tp. Each frame position is `rMpr * prMt * tMu * uMv`, where
 `prMt` is interpolated at the frame timestamp, and `tMu * uMv` comes from the probe definition.
 
 The format is the same as \ref us_acq_file_format_probe_cal. Added in CustusX#66.

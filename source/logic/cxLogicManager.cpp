@@ -184,6 +184,9 @@ void LogicManager::restartServicesWithProfile(QString uid)
 	this->shutdownServices();
 	ProfileManager::getInstance()->setActiveProfile(uid);
 	this->initializeServices();
+
+	// Plugin widgets were recreated; notify them as setApplicationComponent() does at startup.
+	emit pluginsStarted();
 }
 
 void LogicManager::shutdownServices()
