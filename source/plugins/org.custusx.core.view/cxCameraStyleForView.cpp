@@ -377,13 +377,15 @@ vtkSmartPointer<vtkLight> CameraStyleForView::createScopeLight() const
 	light->SetPositional(true); // required for cone angle and attenuation to have effect
 	light->SetConeAngle(80); // half angle, must be < 90 to give a spotlight. Wider than the view to avoid a hard edge
 	light->SetExponent(1); // falloff towards the cone edge
-	// Brightness is 1/(1+d/r0), with d the distance in mm. The light falls off as 1/d^2,
-	// but a video camera applies a gamma of about 2.2, so the displayed brightness
-	// falls off as roughly 1/d. The constant term caps the brightness near the walls.
-	double r0 = 20.0;
-	light->SetAttenuationValues(1, 1.0/r0, 0);
+	// Brightness is 1/(1+d/r0+(d/r1)^2), with d the distance in mm. The constant term
+	// caps the brightness near the walls. Near the camera the linear term dominates
+	// (a video camera's gamma makes the physical 1/d^2 falloff look roughly like 1/d),
+	// while the quadratic term darkens branch openings far ahead, as in real bronchoscopy.
+	double r0 = 30.0;
+	double r1 = 30.0;
+	light->SetAttenuationValues(1, 1.0/r0, 1.0/(r1*r1));
 	light->SetColor(1.0, 0.96, 0.92); // slightly warm
-	light->SetIntensity(1.2);
+	light->SetIntensity(1.5);
 	return light;
 }
 
