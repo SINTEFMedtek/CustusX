@@ -38,13 +38,19 @@ TEST_CASE("Profile change with running gui", "[gui][integration]")
 	CustusXController custusX(NULL);
 	custusX.start();
 
+	// Plugin widgets (e.g. Fraxinus' VB widget) rely on pluginsStarted after a profile change.
+	int pluginsStartedCount = 0;
+	QMetaObject::Connection connection = QObject::connect(cx::LogicManager::getInstance(), &cx::LogicManager::pluginsStarted,
+														  [&pluginsStartedCount](){ ++pluginsStartedCount; qApp->quit(); });
+
 	QTimer::singleShot(200, &custusX, SLOT(changeToNewProfile()));
-	QTimer::singleShot(400,   qApp, SLOT(quit()) );
+	QTimer::singleShot(20000, qApp, SLOT(quit())); // Fallback if pluginsStarted never comes
 
 	qApp->exec();
+	QObject::disconnect(connection);
 	custusX.stop();
 
-	CHECK(true);
+	CHECK(pluginsStartedCount == 1);
 }
 
 
