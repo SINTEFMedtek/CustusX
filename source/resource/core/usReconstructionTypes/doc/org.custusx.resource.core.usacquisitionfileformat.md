@@ -43,7 +43,43 @@ Replaces \ref us_acq_file_format_mhd.
 Profile Definition {filebase}.probedata.xml {#us_acq_file_format_file_probedata}
 -----------------------------------------------------------
 
-This file contains the [probe definition](#cx_us_probe_definition). Replaces \ref us_acq_file_format_file_xml .
+This file contains the [probe definition](#cx_us_probe_definition) in the
+`configuration` element. Replaces \ref us_acq_file_format_file_xml .
+
+It also contains the tools used in the recording:
+- `tool`: the probe tool. `toolID` is the tool uid, and `openigtlinktransformid`
+  and `openigtlinkimageid` are its OpenIGTLink device names (empty if none).
+- `reference`: the reference tool, with `toolID` and `openigtlinktransformid`.
+  Not written if there was no reference tool.
+
+The tool attributes, except the probe `toolID`, and the `reference` element were added in
+CustusX#66, and are missing in older recordings.
+
+
+Probe Calibration {filebase}.probe.cal {#us_acq_file_format_probe_cal}
+-----------------------------------------------------------
+
+This file contains the calibration `sMt` of the probe tool used in the recording,
+i.e. the transform from tool to sensor space. The tracking positions in
+\ref us_acq_file_format_tp are `prMt = prMs * sMt`.
+
+The format is the same as the tool .cal files: a 4x4 matrix,
+whitespace-separated with newline between rows.
+Added in CustusX#66. Not written if there was no probe tool.
+
+
+Patient Registration {filebase}.rMpr {#us_acq_file_format_rMpr}
+-----------------------------------------------------------
+
+This file contains the patient registration `rMpr` at the time of recording,
+i.e. the transform from patient reference to global reference. It relates the
+frame positions in \ref us_acq_file_format_fp to the tracking positions in
+\ref us_acq_file_format_tp. Each frame position is `rMpr * prMt * tMu * uMv`, where
+`prMt` is interpolated at the frame timestamp, and `tMu * uMv` comes from the probe definition.
+
+The format is the same as \ref us_acq_file_format_probe_cal. Added in CustusX#66.
+
+The reconstruction doesn't use this file. It uses the patient registration at the time of reconstruction.
 
 
 Frame Timestamps {filebase}.fts {#us_acq_file_format_file_fts}
@@ -87,6 +123,14 @@ This is a newline-separated sequence of matrices, one for each position.
 The last line of the matrix (always containing 0 0 0 1) is omitted. The matrix
 numbers is whitespace-separated with newline between rows. Thus the number of
 lines in this file is (# tracking positions) x 3.
+
+
+Tool Metadata {filebase}.probe.toolmeta and {filebase}.ref.toolmeta {#us_acq_file_format_toolmeta}
+-----------------------------------------------------------
+
+Metadata from the tracking system for each tracking sample of the probe and reference tool,
+one line per sample. Only some tracking systems give metadata. The files are only written
+if there is metadata (since CustusX#66; older recordings may have empty files).
 
 
 Image Mask {filebase}.mask.mhd {#us_acq_file_format_mask}

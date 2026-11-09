@@ -131,7 +131,8 @@ void VisualizationTab::init()
 	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
 	mAnyplaneViewOffset = DoubleProperty::initialize("AnyplaneViewOffset",
 														 "View Offset",
-														 "Position of virtual tool tip in anyplane view, % from top.",
+														 "Position of the virtual tool tip (tool tip plus tooltip offset) in views following the tool, e.g. anyplane, % from top. "
+														 "Not used for a probe with a known US sector: its view is centered on the sector.",
 														 anyplaneViewOffset, DoubleRange(-0.5,0.5,0.05), 2, QDomNode());
 	mAnyplaneViewOffset->setInternal2Display(100);
 

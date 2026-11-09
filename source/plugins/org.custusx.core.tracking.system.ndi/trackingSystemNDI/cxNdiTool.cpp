@@ -109,8 +109,9 @@ void NdiTool::updateTransform(const Transform3D& transform, double timestamp, bo
 	if (mVisible && visible)
 	{
 		ToolPositionMetadata metadata;
-		metadata.mData = QString("errorRMS_mm:%1 portStatus:0x%2 markersUsed:%3")
-				.arg(sample.errorRMS_mm).arg(sample.portStatus, 0, 16).arg(sample.markersUsed);
+		metadata.mData = QString("errorRMS_mm:%1 portStatus:0x%2 markersUsed:%3 frame:%4 received_ms:%5")
+				.arg(sample.errorRMS_mm).arg(sample.portStatus, 0, 16).arg(sample.markersUsed)
+				.arg(sample.frameNumber).arg(sample.received_ms, 0, 'f', 1);
 		emit toolTransformAndTimestamp(transform, timestamp, metadata);
 	}
 }

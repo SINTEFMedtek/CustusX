@@ -37,6 +37,7 @@ namespace cx
 
 ProcessedUSInputData::ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<TimedPosition> pos, vtkImageDataPtr mask, QString path, QString uid) :
 	mHasTrackingTransforms(false),
+	mImagesFlipped(false),
 	mProcessedImage(frames),
 	mFrames(pos),
 	mMask(mask),
@@ -51,6 +52,16 @@ ProcessedUSInputData::ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, 
 void ProcessedUSInputData::setFramePositionsUsed(std::vector<TimedPosition> frames)
 {
 	mFramePositionsUsed = frames;
+}
+
+void ProcessedUSInputData::setImagesFlipped(bool flipped)
+{
+	mImagesFlipped = flipped;
+}
+
+bool ProcessedUSInputData::getImagesFlipped() const
+{
+	return mImagesFlipped;
 }
 
 std::vector<TimedPosition> ProcessedUSInputData::getFramePositionsUsed() const

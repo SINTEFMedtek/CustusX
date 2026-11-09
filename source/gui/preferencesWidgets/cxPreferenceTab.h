@@ -71,6 +71,7 @@ protected:
   QCheckBox* mSmartRenderCheckBox;
   QCheckBox* mGPU2DRenderCheckBox;
 	QCheckBox* mLinearInterpolationIn2DCheckBox;
+	QCheckBox* mDirect2DImageDrawingCheckBox;
   QCheckBox* mOptimizedViewsCheckBox;
   QCheckBox* mGPU3DDepthPeelingCheckBox;
   QCheckBox* mShadingCheckBox;

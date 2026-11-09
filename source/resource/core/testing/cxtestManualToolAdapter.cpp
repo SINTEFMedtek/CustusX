@@ -10,6 +10,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include "catch.hpp"
 #include "cxManualToolAdapter.h"
+#include "cxDummyTool.h"
+#include "cxSliceProxy.h"
+#include "cxSliceComputer.h"
+#include "cxPatientModelService.h"
 
 namespace cxtest
 {
@@ -23,6 +27,14 @@ int countVisibleSignals(cx::ToolPtr adapter, cx::ManualToolPtr toolToChange)
 	toolToChange->setVisible(!toolToChange->getVisible());
 	QObject::disconnect(connection);
 	return count;
+}
+
+cx::SliceProxyPtr createProbeViewSliceProxy(cx::ToolPtr tool)
+{
+	cx::SliceProxyPtr proxy = cx::SliceProxy::create(cx::PatientModelService::getNullObject());
+	proxy->setTool(tool);
+	proxy->initializeFromPlane(cx::ptANYPLANE, false, true, 200, 0.5);
+	return proxy;
 }
 }
 
@@ -51,6 +63,25 @@ TEST_CASE("ManualToolAdapter: Created from base tool uses and forwards that base
 	adapter->setBase(cx::ToolPtr());
 	CHECK(countVisibleSignals(adapter, other) == 0);
 	CHECK(countVisibleSignals(adapter, base) == 1);
+}
+
+TEST_CASE("ManualToolAdapter: A slice proxy following it views a probe base set later like one set before", "[unit][resource][core]")
+{
+	cx::DummyToolPtr probe(new cx::DummyTool("probe"));
+	probe->setType(cx::Tool::TOOL_US_PROBE);
+	probe->setProbeSector(cx::DummyToolTestUtilities::createProbeDefinition(cx::ProbeDefinition::tSECTOR, 100, 60));
+	probe->setVisible(true);
+
+	cx::ManualToolAdapterPtr baseSetBefore(new cx::ManualToolAdapter("before"));
+	baseSetBefore->setBase(probe);
+	cx::SliceProxyPtr proxyBefore = createProbeViewSliceProxy(baseSetBefore);
+
+	// e.g. the EBUS simulator: the views follow the manual tool before it gets the configured probe
+	cx::ManualToolAdapterPtr baseSetLater(new cx::ManualToolAdapter("later"));
+	cx::SliceProxyPtr proxyLater = createProbeViewSliceProxy(baseSetLater);
+	baseSetLater->setBase(probe);
+
+	CHECK(cx::similar(proxyLater->getComputer().getPlane(), proxyBefore->getComputer().getPlane()));
 }
 
 } // namespace cxtest

@@ -41,6 +41,7 @@ protected:
 		std::map<double, cx::Transform3D> trackerData;
 		bool writeColor;
 		cx::ToolPtr tool;
+		cx::ToolPtr reference;
 		cx::ImageDataContainerPtr imageData;
 		QString streamUid;
 		std::vector<cx::TimeInfo> imageTimestamps;
@@ -57,6 +58,7 @@ protected:
 	QString write(ReconstructionData input);
 	cx::USReconstructInputData read(QString filename, cx::FileManagerServicePtr filemanagerservice);
 	void assertCorrespondence(ReconstructionData input, cx::USReconstructInputData output);
+	void assertRecordingInfoCorrespondence(ReconstructionData input, cx::USRecordingInfo output);
 };
 
 } // namespace cxtest

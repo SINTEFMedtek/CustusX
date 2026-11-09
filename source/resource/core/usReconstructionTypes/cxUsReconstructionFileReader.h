@@ -145,8 +145,14 @@ public:
 	  * named \<mhdfilename-base\>.probedata.xml
 	  */
 	static std::pair<QString, ProbeDefinition>  readProbeDefinitionFromFile(QString mhdFileName);
+	/**
+	  * Read the tools and patient registration saved with the acquisition.
+	  * Missing values (older acquisitions) are left empty or identity.
+	  */
+	static USRecordingInfo readRecordingInfo(QString fileName);
 
 private:
+	static Transform3D readOptionalMatrix(QString filename);
 	bool valid(USReconstructInputData input);
 	std::vector<TimedPosition> readPositions(QString fileName);
 	bool readMaskFile(QString mhdFileName, ImagePtr mask);

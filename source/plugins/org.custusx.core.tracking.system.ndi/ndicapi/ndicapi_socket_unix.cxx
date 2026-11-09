@@ -74,7 +74,10 @@ ndicapiExport bool ndiSocketTimeout(NDISocketHandle socket, int timeoutMs)
 {
   if (timeoutMs > 0)
   {
-    setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (char*) & (timeoutMs), sizeof(timeoutMs));
+    struct timeval timeout;
+    timeout.tv_sec = timeoutMs / 1000;
+    timeout.tv_usec = (timeoutMs % 1000) * 1000;
+    setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, (char*) &timeout, sizeof(timeout));
     return true;
   }
   return false;

@@ -44,6 +44,7 @@ public:
 	QStringList getParameterUids() const;
 
 	StringPropertyPtr getOrientationAdapter() { this->createParameters(); return mOrientationAdapter; }
+	BoolPropertyPtr getFlipImages() { this->createParameters(); return mFlipImages; }
 	StringPropertyPtr getPresetTFAdapter() { this->createParameters(); return mPresetTFAdapter; }
 	StringPropertyPtr getAlgorithmAdapter() { this->createParameters(); return mAlgorithmAdapter; }
 	StringPropertyPtr getMaskReduce() { this->createParameters(); return mMaskReduce; }
@@ -74,6 +75,7 @@ private:
 	void createParameters();
 
 	StringPropertyPtr mOrientationAdapter;
+	BoolPropertyPtr mFlipImages; ///< Mirror the images laterally before they are used
 	StringPropertyPtr mPresetTFAdapter;
 	StringPropertyPtr mAlgorithmAdapter;
 	StringPropertyPtr mMaskReduce;//Reduce mask size in % in each direction

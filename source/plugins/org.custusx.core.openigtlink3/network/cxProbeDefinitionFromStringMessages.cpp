@@ -159,15 +159,15 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 	}
 	else if (name == IGTLIO_KEY_TIMESTAMP)
 	{
-		mOriginalTime = intValue;
-		mSectorInfo->mImage->setOriginalAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(mOriginalTime)));
+		mOriginalTime = qint64(doubleValue); // ms since epoch does not fit in an int
+		mSectorInfo->mImage->setOriginalAcquisitionTime(QDateTime::fromMSecsSinceEpoch(mOriginalTime));
 	}
 }
 
 void ProbeDefinitionFromStringMessages::setImage(ImagePtr image)
 {
 	mSectorInfo->mImage = image;
-	mSectorInfo->mImage->setOriginalAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(mOriginalTime)));
+	mSectorInfo->mImage->setOriginalAcquisitionTime(QDateTime::fromMSecsSinceEpoch(mOriginalTime));
 }
 
 bool ProbeDefinitionFromStringMessages::haveValidValues()

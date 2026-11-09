@@ -118,6 +118,12 @@ void PerformanceTab::init()
 									 "instead of nearest.</p>"
 										"<p>Requires restart.<p>");
 
+	mDirect2DImageDrawingCheckBox = new QCheckBox("Draw 2D images in the slice plane directly");
+	mDirect2DImageDrawingCheckBox->setChecked(settings()->value("View2D/drawImagesInSlicePlaneDirectly").toBool());
+	mDirect2DImageDrawingCheckBox->setToolTip("<p>Draw a 2D image lying in the slice plane, e.g. a video stream "
+											  "in a view following the probe, directly instead of slicing it.</p>"
+											  "<p>Uses less CPU. Turn off if such images are drawn incorrectly.<p>");
+
   bool optimizedViews = settings()->value("optimizedViews").toBool();
   mOptimizedViewsCheckBox = new QCheckBox("Optimized Views");
   mOptimizedViewsCheckBox->setChecked(optimizedViews);
@@ -138,10 +144,11 @@ void PerformanceTab::init()
 	mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
 	mMainLayout->addWidget(mGPU2DRenderCheckBox, 5, 0);
 	mMainLayout->addWidget(mLinearInterpolationIn2DCheckBox, 6, 0);
-	mMainLayout->addWidget(mOptimizedViewsCheckBox, 7, 0);
-	mMainLayout->addWidget(mGPU3DDepthPeelingCheckBox, 8, 0);
-	new SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 9);
-	mMainLayout->addWidget(sscCreateDataWidget(this, m3DVisualizer), 10, 0, 1, 2);
+	mMainLayout->addWidget(mDirect2DImageDrawingCheckBox, 7, 0);
+	mMainLayout->addWidget(mOptimizedViewsCheckBox, 8, 0);
+	mMainLayout->addWidget(mGPU3DDepthPeelingCheckBox, 9, 0);
+	new SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 10);
+	mMainLayout->addWidget(sscCreateDataWidget(this, m3DVisualizer), 11, 0, 1, 2);
 
   mMainLayout->setColumnStretch(0, 2);
   mMainLayout->setColumnStretch(1, 2);
@@ -184,6 +191,7 @@ void PerformanceTab::saveParametersSlot()
 	settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
 	settings()->setValue("View2D/useGPU2DRendering", mGPU2DRenderCheckBox->isChecked());
 	settings()->setValue("View2D/useLinearInterpolationIn2DRendering", mLinearInterpolationIn2DCheckBox->isChecked());
+	settings()->setValue("View2D/drawImagesInSlicePlaneDirectly", mDirect2DImageDrawingCheckBox->isChecked());
   settings()->setValue("optimizedViews", mOptimizedViewsCheckBox->isChecked());
 
   settings()->setValue("View3D/maxRenderSize",     mMaxRenderSize->getValue());

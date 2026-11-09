@@ -129,6 +129,20 @@ TEST_CASE("NdiTrackerManager: failing to connect gives an error and no initializ
 	CHECK(fixture.errors == 1);
 }
 
+TEST_CASE("NdiTrackerManager: a stop request while connecting gives no tool setup and no initialization", "[unit][org.custusx.core.tracking.system.ndi]")
+{
+	ManagerFixture fixture;
+	fixture.device->stopRequested = true;
+
+	fixture.manager->initializeSlot(true);
+
+	CHECK_FALSE(fixture.manager->isInitialized());
+	CHECK_FALSE(fixture.pointer()->isInitialized());
+	CHECK_FALSE(fixture.device->handles[ManagerFixture::kPointerHandle].initialized);
+	CHECK(fixture.device->closeCount == 1);
+	CHECK(fixture.errors == 0);
+}
+
 TEST_CASE("NdiTrackerManager: a configured reference that is not found gives an error and no initialization", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	ManagerFixture fixture;

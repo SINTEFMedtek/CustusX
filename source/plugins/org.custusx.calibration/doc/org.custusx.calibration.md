@@ -55,6 +55,9 @@ Refer to the log folder for the calibration curves.<br>
 
 > **NB:** Previous temporal calibration is applied to probe frames during acqusition.
 
+The temporal calibration is subtracted from the timestamps of the probe frames:
+it is positive when the video is delayed more than the tracking.
+
 
 \addindex tool_manual_calibration_widget
 Manual Tool Calibration Widget {#org_custusx_calibration_widgets_manual_tool}

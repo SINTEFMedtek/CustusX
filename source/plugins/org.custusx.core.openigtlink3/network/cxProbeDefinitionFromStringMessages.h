@@ -141,7 +141,7 @@ public:
 
 protected:
 	SectorInfoPtr mSectorInfo;
-	int mOriginalTime;
+	qint64 mOriginalTime;
 
 private:
 	std::vector<double> toDoubleVector(QString values, QString separator = QString(" ")) const;

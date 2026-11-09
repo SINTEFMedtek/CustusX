@@ -80,7 +80,7 @@ void BasicVideoSource::timeout()
 	if (mTimeout)
 		return;
 
-	reportWarning("Timeout!");
+	reportWarning(QString("No new image from %1 in the last second, e.g. a frozen scanner").arg(this->getName()));
 	mTimeout = true;
 	emit newFrame();
 }

@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxNdiDevice.h"
 #include "cxNdiFrameRateEstimator.h"
+#include "cxFrameCounterTimestamper.h"
 #include "cxNdiTool.h"
 #include "cxNdiToolSetup.h"
 #include "cxToolFileParser.h"
@@ -116,6 +117,7 @@ private:
 	bool mToolsChanged;
 	int mIlluminatorRate_Hz;
 	NdiFrameRateEstimator mFrameRate;
+	FrameCounterTimestamper mFrameTimestamper;
 	int mQuickRepeats; ///< Polls that quickly gave the last frame again, since the last new frame
 	ToolFileParser::TrackerInternalStructure mTrackerStructure;
 	bool mInitialized;

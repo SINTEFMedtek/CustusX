@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDefinitions.h"
 #include "cxLogicManager.h"
 #include "cxProfile.h"
+#include "cxSettings.h"
 #include "cxTrackingService.h"
 #include "cxTrackingSystemComparison.h"
 #include "cxTime.h"
@@ -82,12 +83,22 @@ int getMaxDuration_ms(const cx::TrackingComparisonSettings& settings)
 	return static_cast<int>(settings.runs.size()) * perRun;
 }
 
+void applyNdiDebugLogging()
+{
+	QString value = getEnvironment("CX_TRACKING_TEST_NDI_DEBUG");
+	if (!value.isEmpty())
+	{
+		cx::settings()->setValue("ndiTrackingDebugLogging", value != "0");
+	}
+}
+
 /** Run the comparison with the LogicManager's services, return true if all runs got positions. */
 bool runComparison(cx::TrackingComparisonSettings settings, double* maxMeanDifference_mm = nullptr, int* comparedTools = nullptr)
 {
 	INFO("Set CX_TRACKING_TEST_CONFIG to the tool configuration file");
 	REQUIRE(QFile::exists(settings.toolConfigFile));
 
+	applyNdiDebugLogging();
 	cx::TrackingSystemComparison comparison(cx::logicManager()->getTrackingService());
 	QEventLoop loop;
 	QObject::connect(&comparison, &cx::TrackingSystemComparison::finished, &loop, &QEventLoop::quit);
@@ -214,6 +225,7 @@ TEST_CASE("Tracking hardware: shut down while tracking, then track again", "[man
 	{
 		cx::DataLocations::setTestMode();
 		cx::LogicManager::initialize();
+		applyNdiDebugLogging();
 		cx::profile()->setToolConfigFilePath(copyToProfileToolFolder(config));
 		cx::logicManager()->getTrackingService()->setState(cx::Tool::tsTRACKING);
 		CHECK(waitForTrackingState(cx::Tool::tsTRACKING, 30000));

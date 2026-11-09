@@ -55,7 +55,7 @@ double DoublePropertyTimeCalibration::getValue() const
 
 QString DoublePropertyTimeCalibration::getHelp() const
 {
-	return "Set a temporal shift to add to input probe frames (the frames will be stored with this shift applied).\n"
+	return "Set a temporal shift in ms to subtract from the timestamps of input probe frames: positive when the video is delayed more than the tracking (the frames will be stored with this shift applied).\n"
 		"Changes done here will NOT be saved.";
 }
 

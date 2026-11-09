@@ -16,6 +16,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTrackerConfiguration.h"
 #include "cxOpenIGTLinkTool.h"
+#include "cxOpenIGTLinkStreamerService.h"
+#include "cxOpenIGTLinkStreamer.h"
+#include <QDomDocument>
 #include <QFileInfo>
 
 namespace {
@@ -26,17 +29,22 @@ class TestNetworkHandler : public cx::NetworkHandler
 public:
 	TestNetworkHandler() : cx::NetworkHandler(nullptr) {}
 
-	double synchronizedTimestamp(double receivedTimestampSec)
+	double synchronizedTimestamp(double sentTimestampSec, double received_ms, QString deviceName = "device")
 	{
-		return NetworkHandler::synchronizedTimestamp(receivedTimestampSec);
+		return NetworkHandler::synchronizedTimestamp(deviceName, sentTimestampSec, received_ms);
 	}
-	bool verifyTimestamp(double &timestampMS)
+	double getTimestampOffset(QString deviceName = "device")
 	{
-		return NetworkHandler::verifyTimestamp(timestampMS);
+		return mClockSynchronizers.count(deviceName) ? mClockSynchronizers[deviceName].getOffset_ms() : 0.0;
 	}
-	double getTimestampOffset()
+	void setSentProbeDefinitions(QString deviceName, int sent)
 	{
-		return mTimestampOffsetMS;
+		mDevices[deviceName].deviceName = deviceName;
+		mDevices[deviceName].sentNumProbeDefinitions = sent;
+	}
+	int getSentProbeDefinitions(QString deviceName)
+	{
+		return mDevices[deviceName].sentNumProbeDefinitions;
 	}
 };
 
@@ -80,11 +88,8 @@ typedef std::shared_ptr<FakeServerNetworkHandler> FakeServerNetworkHandlerPtr;
 class OpenIGTLinkTrackingSystemServiceMoc : public cx::OpenIGTLinkTrackingSystemService
 {
 public:
-	cxtestNetworkHandlerPtr mTestNetworkHandler;
-
 	OpenIGTLinkTrackingSystemServiceMoc() : cx::OpenIGTLinkTrackingSystemService(cx::NetworkHandlerPtr()) {}
 	OpenIGTLinkTrackingSystemServiceMoc(cxtestNetworkHandlerPtr testNetworkHandler) :
-		mTestNetworkHandler(testNetworkHandler),
 		cx::OpenIGTLinkTrackingSystemService(testNetworkHandler) {}
 
 	virtual bool isConfigured() const;
@@ -92,7 +97,6 @@ public:
 	virtual bool isTracking() const;
 
 	void internalSetState(cx::Tool::State val) {cx::OpenIGTLinkTrackingSystemService::internalSetState(val);}
-	double getNetworkHandlerTimestampOffset();
 	cx::OpenIGTLinkToolPtr getTool(QString devicename) {return cx::OpenIGTLinkTrackingSystemService::getTool(devicename);}
 	QStringList getTransformIdWarningPrinted() {return mTransformIdWarningPrinted;}
 	bool testPrintTransformIdWarning(QString devicename) {return printTransformIdWarning(devicename);}
@@ -120,11 +124,6 @@ bool OpenIGTLinkTrackingSystemServiceMoc::isInitialized() const
 bool OpenIGTLinkTrackingSystemServiceMoc::isTracking() const
 {
 	return cx::OpenIGTLinkTrackingSystemService::isTracking();
-}
-
-double OpenIGTLinkTrackingSystemServiceMoc::getNetworkHandlerTimestampOffset()
-{
-	return mTestNetworkHandler->getTimestampOffset();
 }
 
 typedef std::shared_ptr<OpenIGTLinkTrackingSystemServiceMoc> OpenIGTLinkTrackingSystemServiceMocPtr;
@@ -337,107 +336,53 @@ TEST_CASE("NetworkHandler: the connection is shared, and closed when the last us
 	CHECK_FALSE(server->isConnected());
 }
 
-TEST_CASE("NetworkHandler: Test timestamp verification", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("NetworkHandler: Timestamps follow the sender, with the offset of the fastest message", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double timestamp = latestSystemTime;
-
-	REQUIRE(networkHandler->verifyTimestamp(timestamp));
-	timestamp += 500;
-	REQUIRE(networkHandler->verifyTimestamp(timestamp));
-	timestamp += 1000;
-	REQUIRE_FALSE(networkHandler->verifyTimestamp(timestamp));
-	timestamp -= 3000;
-	REQUIRE_FALSE(networkHandler->verifyTimestamp(timestamp));
-}
-
-TEST_CASE("NetworkHandler: Test timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
-{
-	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-
-	double tolerance = 10;
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double synchValue = 1000;
-	double timestampSec = synchValue;
-
-	double synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-	double timeIncrementSec = 0.005;
-
-	for(int i = 1; i < 40; ++i)
+	double start_ms = 5000000;
+	double latency_ms = 2;
+	for (int i = 0; i < 40; ++i)
 	{
-		timestampSec += timeIncrementSec;
-		synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-		{
-			double targetTime = latestSystemTime + timeIncrementSec*1000*i;
-			INFO("iteration: "+qstring_cast(i)+" "+qstring_cast(synchedTimeMs)+" == "+qstring_cast(targetTime));
-			REQUIRE(cx::similar(synchedTimeMs, targetTime, tolerance));
-		}
+		double sentSec = 1000 + i * 0.005;
+		double received_ms = start_ms + i * 5 + latency_ms + (i % 3);
+		double synchedTimeMs = networkHandler->synchronizedTimestamp(sentSec, received_ms);
+		INFO("iteration: " + qstring_cast(i));
+		CHECK(cx::similar(synchedTimeMs, received_ms - (i % 3), 0.001));
 	}
-
-	//Adding a difference from system time above 1 sec will cause NetworkHandler::verifyTimestamp to change timestamp to system time
-	timestampSec += 1;
-	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	INFO(qstring_cast(synchedTimeMs)+" == "+qstring_cast(latestSystemTime));
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-	timestampSec -= 3;
-	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
+	CHECK(cx::similar(networkHandler->getTimestampOffset(), start_ms + latency_ms - 1000000, 0.001));
 }
 
-TEST_CASE("NetworkHandler: Test timestamp synchronization reset", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("NetworkHandler: Uses the receive time when the sender time jumps back", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-
-	double tolerance = 10;
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double timestampSec = 1000;
-
-	double synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-
-	double offset = latestSystemTime - timestampSec*1000;
-	{
-		INFO(qstring_cast(offset)+"=="+qstring_cast(networkHandler->getTimestampOffset()));
-		REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
-	}
-
-	networkHandler->clearTimestampSynchronization();
-	REQUIRE_FALSE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
-	REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
-
-
-	timestampSec = 3000;
-	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-	offset = latestSystemTime - timestampSec*1000;
-	REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
+	double received_ms = 5000000;
+	networkHandler->synchronizedTimestamp(1000, received_ms);
+	received_ms += 5;
+	CHECK(cx::similar(networkHandler->synchronizedTimestamp(1000 - 3, received_ms), received_ms, 0.001));
 }
 
-TEST_CASE("OpenIGTLinkTrackingSystemService: Test timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("NetworkHandler: Each device has its own timestamp offset", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc(networkHandler));
+	double received_ms = 5000000;
+	networkHandler->synchronizedTimestamp(1000, received_ms, "tracking");
+	networkHandler->synchronizedTimestamp(3000, received_ms, "image");
+	CHECK(cx::similar(networkHandler->getTimestampOffset("tracking"), received_ms - 1000000, 0.001));
+	CHECK(cx::similar(networkHandler->getTimestampOffset("image"), received_ms - 3000000, 0.001));
+}
 
-	double tolerance = 10;
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double timestampSec = 1000;
+TEST_CASE("NetworkHandler: A new connection resets the timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	double received_ms = 5000000;
+	server->synchronizedTimestamp(1000, received_ms);
+	CHECK(cx::similar(server->getTimestampOffset(), received_ms - 1000000, 0.001));
 
-	double synchedTimeMs = trackingSystemService->mTestNetworkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
+	server->acquireConnection("tracking", "127.0.0.1", 18944);
+	CHECK(cx::similar(server->getTimestampOffset(), 0, 0.001));
 
-	REQUIRE_FALSE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
-	trackingSystemService->resetTimeSynchronization();
-	REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
+	server->synchronizedTimestamp(3000, received_ms);
+	CHECK(cx::similar(server->getTimestampOffset(), received_ms - 3000000, 0.001));
 }
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: receiveTransform print openigtlinktransformid warning", "[plugins][org.custusx.core.openigtlink3][unit]")
@@ -716,5 +661,18 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool files with OpenIGTLink id
 }
 
 #endif
+
+TEST_CASE("OpenIGTLinkStreamerService: the probe definition is sent again when the streaming starts", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr connection(new FakeServerNetworkHandler());
+	cx::OpenIGTLinkStreamerService service(connection);
+	QDomDocument document;
+	cx::StreamerPtr streamer = service.createStreamer(document.createElement("root"));
+
+	// Images were already received over the connection used by tracking, using up the probe definitions to send
+	connection->setSentProbeDefinitions("BK", 2);
+	streamer->startStreaming(cx::SenderPtr());
+	CHECK(connection->getSentProbeDefinitions("BK") == 0);
+}
 
 }//cxtest

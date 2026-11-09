@@ -28,6 +28,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxIgstkTracker.h"
 #include "vtkForwardDeclarations.h"
 #include "igstkNDITracker.h"
+#include "cxFrameCounterTimestamper.h"
 
 namespace cx
 {
@@ -109,6 +110,7 @@ private:
 	itk::StdStreamLogOutput::Pointer mLogOutput; ///< output to write the log to
 
 	double mLatestEmittedTimestamp;
+	FrameCounterTimestamper mFrameTimestamper;
 	//internal states
 	//TODO is volatile enough for thread safety?
 	volatile bool mValid; ///< whether or not the tool is valid or not
@@ -118,6 +120,7 @@ private:
 
 	Transform3D igstk2Transform3D(const igstk::Transform &input) const;
 	void processReceivedTransformResult(igstk::CoordinateSystemTransformToResult result);
+	ToolPositionMetadata createMetadata(const igstk::NDITracker::TrackingSampleInfo& sampleInfo) const;
 };
 
 /**

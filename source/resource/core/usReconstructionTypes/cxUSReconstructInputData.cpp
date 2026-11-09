@@ -17,6 +17,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
+USRecordingInfo::USRecordingInfo() :
+	mProbe_sMt(Transform3D::Identity()),
+	rMpr(Transform3D::Identity())
+{
+}
+
 vtkImageDataPtr USReconstructInputData::getMask()
 {
 	vtkImageDataPtr retval = mProbeDefinition.getMask();

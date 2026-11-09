@@ -117,7 +117,6 @@ AcquisitionService::STATE AcquisitionImplService::getState() const
 
 void AcquisitionImplService::startRecord(TYPES context, QString category, RecordSessionPtr session)
 {
-    mServices->tracking()->resetTimeSynchronization();
 	mAcquisition->startRecord(context, category, session);
 }
 

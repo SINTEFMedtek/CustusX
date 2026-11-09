@@ -154,10 +154,6 @@ std::vector<TrackingSystemServicePtr> DummyToolManager::getTrackingSystems()
 	return std::vector<TrackingSystemServicePtr> ();
 }
 
-void DummyToolManager::resetTimeSynchronization()
-{
-}
-
 std::vector<TrackerConfigurationPtr> DummyToolManager::getConfigurations()
 {
 	std::vector<TrackerConfigurationPtr> retval;

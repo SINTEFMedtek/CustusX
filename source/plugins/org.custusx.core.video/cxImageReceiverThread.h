@@ -97,8 +97,6 @@ private:
 	std::list<ImagePtr> mMutexedImageMessageQueue;
 	std::list<ProbeDefinitionPtr> mMutexedSonixStatusMessageQueue;
 
-//    StreamedTimestampSynchronizer mStreamSynchronizer;
-
 	StreamerServicePtr mStreamerInterface;
 	StreamerPtr mImageStreamer;
 	DirectlyLinkedSenderPtr mSender;
