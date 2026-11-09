@@ -277,6 +277,10 @@ configure_file(
 
 # extra definitions:
 add_subdirectory(settings)
+list(APPEND cxResource_SOURCE
+  settings/cxVersion.h
+  ${CMAKE_CURRENT_BINARY_DIR}/settings/cxVersion.cpp
+  )
 
 #Trying to reduce the number of included libs, as the Windows build for
 #org_custusx_core_tracking_system_igstk.dir\cxIGSTKTrackingPluginActivator.cpp.obj fails. (Too long command)

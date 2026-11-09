@@ -46,4 +46,8 @@ configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cxConfig.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cxConfig.h"
   )
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cxVersion.cpp.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cxVersion.cpp"
+  )
 
