@@ -152,6 +152,7 @@ cx_add_class(cxResource_SOURCE
   Tool/ProbeXmlConfigParserMock
   Tool/cxCreateProbeDefinitionFromConfiguration
   Tool/cxTrackingPositionFilter
+  Tool/cxPositionQuality
   Tool/cxTrackerConfiguration
   Tool/cxToolNull
   Tool/cxProbeImpl

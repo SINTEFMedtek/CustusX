@@ -30,6 +30,7 @@ if(BUILD_TESTING)
         cxtestSpaceListenerMock.h
         cxtestSpaceListenerMock.cpp
         cxtestTrackingPositionFilter.cpp
+        cxtestPositionQuality.cpp
         cxtestCoreServices.cpp
         cxtestReporter.cpp
         cxtestImage.cpp
