@@ -40,13 +40,13 @@ void addSamples(cx::PositionQuality& quality, const cx::PositionQualitySample& s
 
 } // namespace
 
-TEST_CASE("PositionQuality: a good sample has no problems", "[unit]")
+TEST_CASE("PositionQuality: a good sample has no problems", "[unit][resource][core]")
 {
 	CHECK(cx::PositionQuality::evaluate(createGoodSample(), 0.5, 0).isEmpty());
 	CHECK(cx::PositionQuality::evaluate(createGoodSample(4), 0.5, 4).isEmpty());
 }
 
-TEST_CASE("PositionQuality: out of volume", "[unit]")
+TEST_CASE("PositionQuality: out of volume", "[unit][resource][core]")
 {
 	cx::PositionQualitySample sample = createGoodSample();
 	sample.portStatus = cx::NdiPortStatus::PartiallyInVolume;
@@ -56,7 +56,7 @@ TEST_CASE("PositionQuality: out of volume", "[unit]")
 	CHECK(cx::PositionQuality::evaluate(sample, 0.5, 0) == "out of the measurement volume");
 }
 
-TEST_CASE("PositionQuality: RMS error above the limit", "[unit]")
+TEST_CASE("PositionQuality: RMS error above the limit", "[unit][resource][core]")
 {
 	cx::PositionQualitySample sample = createGoodSample();
 	sample.errorRMS_mm = 0.75;
@@ -65,7 +65,7 @@ TEST_CASE("PositionQuality: RMS error above the limit", "[unit]")
 	CHECK(cx::PositionQuality::evaluate(sample, 0.0, 0).isEmpty());
 }
 
-TEST_CASE("PositionQuality: Polaris marker problems", "[unit]")
+TEST_CASE("PositionQuality: Polaris marker problems", "[unit][resource][core]")
 {
 	CHECK(cx::PositionQuality::evaluate(createGoodSample(3), 0.5, 4) == "3 of 4 markers used");
 	CHECK(cx::PositionQuality::evaluate(createGoodSample(-1), 0.5, 4).isEmpty());
@@ -75,7 +75,7 @@ TEST_CASE("PositionQuality: Polaris marker problems", "[unit]")
 	CHECK(cx::PositionQuality::evaluate(sample, 0.5, 4) == "bad marker fit, not enough markers");
 }
 
-TEST_CASE("PositionQuality: warns after a few bad frames and clears after a few good ones", "[unit]")
+TEST_CASE("PositionQuality: warns after a few bad frames and clears after a few good ones", "[unit][resource][core]")
 {
 	cx::PositionQuality quality(0.5);
 	cx::PositionQualitySample bad = createGoodSample();
@@ -92,7 +92,7 @@ TEST_CASE("PositionQuality: warns after a few bad frames and clears after a few 
 	CHECK(quality.getWarning().isEmpty());
 }
 
-TEST_CASE("PositionQuality: a single bad frame between good ones gives no warning", "[unit]")
+TEST_CASE("PositionQuality: a single bad frame between good ones gives no warning", "[unit][resource][core]")
 {
 	cx::PositionQuality quality(0.5);
 	cx::PositionQualitySample bad = createGoodSample();
@@ -105,7 +105,7 @@ TEST_CASE("PositionQuality: a single bad frame between good ones gives no warnin
 	CHECK(quality.getWarning().isEmpty());
 }
 
-TEST_CASE("PositionQuality: learns the number of markers and warns when one is hidden", "[unit]")
+TEST_CASE("PositionQuality: learns the number of markers and warns when one is hidden", "[unit][resource][core]")
 {
 	cx::PositionQuality quality(0.5);
 	addSamples(quality, createGoodSample(4), 5);
@@ -116,7 +116,7 @@ TEST_CASE("PositionQuality: learns the number of markers and warns when one is h
 	CHECK(quality.getWarning() == "3 of 4 markers used");
 }
 
-TEST_CASE("PositionQuality: invisible samples are ignored, reset clears the warning", "[unit]")
+TEST_CASE("PositionQuality: invisible samples are ignored, reset clears the warning", "[unit][resource][core]")
 {
 	cx::PositionQuality quality(0.5);
 	cx::PositionQualitySample bad = createGoodSample();
@@ -132,7 +132,7 @@ TEST_CASE("PositionQuality: invisible samples are ignored, reset clears the warn
 	CHECK(quality.getWarning().isEmpty());
 }
 
-TEST_CASE("PositionQuality: the number of markers is read from the tool definition", "[unit]")
+TEST_CASE("PositionQuality: the number of markers is read from the tool definition", "[unit][resource][core]")
 {
 	QTemporaryDir folder;
 	QByteArray rom(752, 0);
@@ -147,7 +147,7 @@ TEST_CASE("PositionQuality: the number of markers is read from the tool definiti
 	CHECK(cx::PositionQuality::readMarkerCount(folder.path() + "/missing.rom") == -1);
 }
 
-TEST_CASE("PositionQuality: a tool with a hidden sphere from the start gets a warning when its marker count is known", "[unit]")
+TEST_CASE("PositionQuality: a tool with a hidden sphere from the start gets a warning when its marker count is known", "[unit][resource][core]")
 {
 	cx::PositionQualitySample threeMarkers;
 	threeMarkers.visible = true;
@@ -163,6 +163,14 @@ TEST_CASE("PositionQuality: a tool with a hidden sphere from the start gets a wa
 	}
 	CHECK(unknown.getWarning().isEmpty()); // only the most markers seen so far are expected
 	CHECK(known.getWarning().contains("3 of 4 markers used"));
+}
+
+TEST_CASE("PositionQuality: combine tool and reference warnings", "[unit][resource][core]")
+{
+	CHECK(cx::PositionQuality::combineWarnings("", "").isEmpty());
+	CHECK(cx::PositionQuality::combineWarnings("a", "") == "a");
+	CHECK(cx::PositionQuality::combineWarnings("", "b") == "Reference: b");
+	CHECK(cx::PositionQuality::combineWarnings("a", "b") == "a; reference: b");
 }
 
 } // namespace cxtest

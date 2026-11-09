@@ -66,6 +66,7 @@ public:
 	/** The problems with one sample, empty if it is OK. expectedMarkers <= 0: don't check markers. */
 	static QString evaluate(const PositionQualitySample& sample, double maxErrorRMS_mm, int expectedMarkers);
 	static double getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType);
+	static QString combineWarnings(QString toolWarning, QString referenceWarning); ///< The warning of a tool positioned relative to the reference
 
 	QString update(const PositionQualitySample& sample); ///< Add a sample, return the current warning. Invisible samples are ignored.
 	QString getWarning() const;

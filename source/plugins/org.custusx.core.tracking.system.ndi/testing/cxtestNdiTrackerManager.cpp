@@ -560,14 +560,6 @@ TEST_CASE("NdiTrackerManager: stop tracking clears the position warning", "[unit
 	CHECK(warning.isEmpty());
 }
 
-TEST_CASE("NdiTrackerManager: combine tool and reference warnings", "[unit][org.custusx.core.tracking.system.ndi]")
-{
-	CHECK(cx::NdiTrackerManager::combinePositionWarnings("", "").isEmpty());
-	CHECK(cx::NdiTrackerManager::combinePositionWarnings("a", "") == "a");
-	CHECK(cx::NdiTrackerManager::combinePositionWarnings("", "b") == "Reference: b");
-	CHECK(cx::NdiTrackerManager::combinePositionWarnings("a", "b") == "a; reference: b");
-}
-
 TEST_CASE("NdiTrackerManager: marker information is requested from Polaris only", "[unit][org.custusx.core.tracking.system.ndi]")
 {
 	ManagerFixture aurora;

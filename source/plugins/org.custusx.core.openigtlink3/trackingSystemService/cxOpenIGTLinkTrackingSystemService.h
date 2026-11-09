@@ -80,10 +80,14 @@ private slots:
 
 private:
 	void applyProbeDefinition(ToolPtr tool, ProbeDefinitionPtr definition);
-	void setMissing(OpenIGTLinkToolPtr tool); ///< Also hides the tools positioned relative to a missing reference
+	void hideToolsRelativeToReference();
+	bool isWaitingForReference(OpenIGTLinkToolPtr tool) const; ///< The tool position can't be made relative to the reference
+	void updatePositionWarnings(OpenIGTLinkToolPtr tool); ///< All tools for the reference, as they include its warning
+	void updatePositionWarning(OpenIGTLinkToolPtr tool);
+	void referenceVisibleChanged(bool visible); ///< The tools positioned relative to the reference are hidden with it
 
 	std::map<QString, OpenIGTLinkToolPtr> mTools;
-	ToolPtr mReference;
+	OpenIGTLinkToolPtr mReference;
 	NetworkHandlerPtr mNetworkHandler;
 	TrackingServicePtr mTrackingService;
 	std::map<QString, ProbeDefinitionPtr> mPendingProbeDefinitions;

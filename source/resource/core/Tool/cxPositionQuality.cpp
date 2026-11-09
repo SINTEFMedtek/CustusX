@@ -129,6 +129,16 @@ double PositionQuality::getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType)
 	return aurora ? kDefaultMaxErrorRMSAurora_mm : kDefaultMaxErrorRMSPolaris_mm;
 }
 
+QString PositionQuality::combineWarnings(QString toolWarning, QString referenceWarning)
+{
+	QString retval = toolWarning;
+	if (!referenceWarning.isEmpty())
+	{
+		retval = toolWarning.isEmpty() ? "Reference: " + referenceWarning : toolWarning + "; reference: " + referenceWarning;
+	}
+	return retval;
+}
+
 int PositionQuality::getExpectedMarkers() const
 {
 	return mExpectedMarkers;

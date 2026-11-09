@@ -78,7 +78,8 @@ public:
 	virtual void setVisible(bool vis);
 
 	void setMissing(); ///< Hide the tool at once, until the next position
-	void updatePositionQuality(const PositionQualitySample& sample); ///< Shows a warning for inaccurate positions, as for NDI tools
+	void updatePositionQuality(const PositionQualitySample& sample); ///< Evaluates the position quality with the NDI rules
+	QString getOwnPositionWarning() const; ///< The warning from the tool's own position quality, without the reference's
 	static const int kMaxPositionAge_ms = 500; ///< Hidden when no position has arrived for this long
 	static const int kVisibleCheckInterval_ms = 100;
 
@@ -108,6 +109,7 @@ private:
 	ToolFileParser::ToolInternalStructurePtr mToolFileToolStructure;
 
 	void calculateVisible();
+	void updatePosition(Transform3D prMs);
 	void checkTimestampMismatch();
 	void printWarningAboutTimestampMismatch(double diff);
 };

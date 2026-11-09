@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxOpenIGTLinkTool.h"
+#include "cxSettings.h"
 
 #include <QDateTime>
 
@@ -33,8 +34,8 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 //	CX_LOG_DEBUG() << "OpenIGTLinkTool constr mOpenIGTLinkTransformId: " << mConfigFileToolStructure.mOpenIGTLinkTransformId << " mOpenIGTLinkImageId: " << mConfigFileToolStructure.mOpenIGTLinkImageId;
 	connect(&mTpsTimer, &QTimer::timeout, this, &OpenIGTLinkTool::calculateTpsSlot);
 	connect(&mVisibleTimer, &QTimer::timeout, this, &OpenIGTLinkTool::calculateVisible);
-	mVisibleTimer.start(kVisibleCheckInterval_ms);
-	mQuality.setMaxErrorRMS(PositionQuality::getDefaultMaxErrorRMS(toolFileToolStructure->mTrackerType));
+	double maxErrorRMS_mm = settings()->value("ndiTrackingMaxErrorRMS", 0.0).toDouble();
+	mQuality.setMaxErrorRMS(maxErrorRMS_mm > 0.0 ? maxErrorRMS_mm : PositionQuality::getDefaultMaxErrorRMS(toolFileToolStructure->mTrackerType));
 
 	if(toolFileToolStructure->mIsProbe)
 	{
@@ -182,16 +183,22 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double tim
 {
 	mTimestamp = timestampMS;
 	this->checkTimestampMismatch();
-	this->calculateVisible();
 
 	//Only use reference transform if this is to be applied to the other tools
-	if(isReference() && !applyReference())
-		return;
+	if(!isReference() || applyReference())
+	{
+		this->updatePosition(prMs);
+	}
+	this->calculateVisible();
+	if (mVisible && !mVisibleTimer.isActive())
+	{
+		mVisibleTimer.start(kVisibleCheckInterval_ms);
+	}
+}
 
-	//-----------------------------------------------------------------------------------------------
+void OpenIGTLinkTool::updatePosition(Transform3D prMs)
+{
 	// Ref sensor pos is applied to tools in OpenIGTLinkTrackingSystemService::receiveTransform()
-	//-----------------------------------------------------------------------------------------------
-
 	Transform3D prMt = prMs * this->getCalibration_sMt();
 	Transform3D prMt_filtered = prMt;
 
@@ -213,7 +220,7 @@ bool OpenIGTLinkTool::applyReference()
 
 void OpenIGTLinkTool::checkTimestampMismatch()
 {
-	mLastReceivedPositionTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	mLastReceivedPositionTime = QDateTime::currentMSecsSinceEpoch();
 	double diff = mLastReceivedPositionTime - mTimestamp;
 
 	//Use system time if time difference is more than a second
@@ -263,7 +270,7 @@ void OpenIGTLinkTool::calculateVisible()
 {
 	//Compare only timestamps from this computer, and not the received timestamps
 	//(as this computer man not be in sync with the one creating the messages)
-	qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 	double diff = currentTime - mLastReceivedPositionTime;
 	bool visible = diff <= kMaxPositionAge_ms;
 	if (visible != mVisible)
@@ -280,7 +287,12 @@ void OpenIGTLinkTool::setMissing()
 
 void OpenIGTLinkTool::updatePositionQuality(const PositionQualitySample& sample)
 {
-	this->setPositionWarning(mQuality.update(sample));
+	mQuality.update(sample);
+}
+
+QString OpenIGTLinkTool::getOwnPositionWarning() const
+{
+	return mQuality.getWarning();
 }
 
 void OpenIGTLinkTool::toolVisibleSlot(bool on)
@@ -296,6 +308,7 @@ void OpenIGTLinkTool::setVisible(bool vis)
 	mVisible = vis;
 	if (!vis)
 	{
+		mVisibleTimer.stop();
 		mQuality.reset();
 		this->setPositionWarning(QString());
 	}

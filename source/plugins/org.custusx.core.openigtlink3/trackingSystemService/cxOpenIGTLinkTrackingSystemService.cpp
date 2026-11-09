@@ -241,7 +241,10 @@ void OpenIGTLinkTrackingSystemService::configure()
 			CX_LOG_WARNING() << "Tool configuration already contain tool: " << devicename << ". Existing tool will be overwritten";
 		mTools[devicename] = newTool;
 		if(newTool->isReference())
+		{
 			mReference = newTool;
+			connect(newTool.get(), &Tool::toolVisible, this, &OpenIGTLinkTrackingSystemService::referenceVisibleChanged);
+		}
 	}
 	if(!mReference)
 		CX_LOG_WARNING() << "OpenIGTLinkTrackingSystemService::configure() Got no reference tool";
@@ -292,10 +295,9 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 	}
 	else if(tool)
 	{
-		bool waitingForReference = mReference && !tool->isReference() && !mReference->getVisible();
-		if(tool->applyReference() && waitingForReference)
+		if(this->isWaitingForReference(tool))
 		{
-			// No current reference position: the tool position can't be made relative to it
+			// The reference is not visible: the tool position can't be made relative to it
 		}
 		else if(tool->applyReference())
 		{
@@ -326,14 +328,18 @@ void OpenIGTLinkTrackingSystemService::receiveTransformWithStatus(QString device
 	if (status.valid)
 	{
 		this->receiveTransform(devicename, transform, timestampMS);
-		if (tool && status.hasQuality && tool->getVisible())
+		if (tool && this->isTracking() && !this->isWaitingForReference(tool))
 		{
-			tool->updatePositionQuality(status.quality);
+			if (status.hasQuality)
+			{
+				tool->updatePositionQuality(status.quality);
+			}
+			this->updatePositionWarnings(tool);
 		}
 	}
 	else if (tool && this->isTracking())
 	{
-		this->setMissing(tool);
+		tool->setMissing();
 	}
 	else if (this->isTracking())
 	{
@@ -341,18 +347,55 @@ void OpenIGTLinkTrackingSystemService::receiveTransformWithStatus(QString device
 	}
 }
 
-void OpenIGTLinkTrackingSystemService::setMissing(OpenIGTLinkToolPtr tool)
+bool OpenIGTLinkTrackingSystemService::isWaitingForReference(OpenIGTLinkToolPtr tool) const
 {
-	tool->setMissing();
+	return tool->applyReference() && mReference && !tool->isReference() && !mReference->getVisible();
+}
+
+void OpenIGTLinkTrackingSystemService::hideToolsRelativeToReference()
+{
+	for (std::map<QString, OpenIGTLinkToolPtr>::iterator it = mTools.begin(); it != mTools.end(); ++it)
+	{
+		if (it->second->applyReference() && it->second != mReference)
+		{
+			it->second->setMissing();
+		}
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::updatePositionWarnings(OpenIGTLinkToolPtr tool)
+{
 	if (tool->isReference())
 	{
 		for (std::map<QString, OpenIGTLinkToolPtr>::iterator it = mTools.begin(); it != mTools.end(); ++it)
 		{
-			if (it->second->applyReference())
-			{
-				it->second->setMissing();
-			}
+			this->updatePositionWarning(it->second);
 		}
+	}
+	else
+	{
+		this->updatePositionWarning(tool);
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::updatePositionWarning(OpenIGTLinkToolPtr tool)
+{
+	QString warning = tool->getOwnPositionWarning();
+	if (mReference && tool->applyReference() && !tool->isReference())
+	{
+		warning = PositionQuality::combineWarnings(warning, mReference->getOwnPositionWarning());
+	}
+	if (tool->getVisible())
+	{
+		tool->setPositionWarning(warning);
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::referenceVisibleChanged(bool visible)
+{
+	if (!visible)
+	{
+		this->hideToolsRelativeToReference();
 	}
 }
 

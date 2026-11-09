@@ -282,7 +282,7 @@ void NdiTrackerManager::distributeFrame(const NdiFrame& frame, double timestamp)
 		}
 		else if (visible)
 		{
-			tool->setPositionWarning(combinePositionWarnings(tool->updateQuality(sample), referenceWarning));
+			tool->setPositionWarning(PositionQuality::combineWarnings(tool->updateQuality(sample), referenceWarning));
 		}
 		// a port handle may not have been updated in the newest frame
 		double sampleTimestamp = (sample.frameNumber != 0) ? mFrameTimestamper.getTimestampOfEarlierFrame(sample.frameNumber) : timestamp;
@@ -325,16 +325,6 @@ QStringList NdiTrackerManager::describeNewSystemStatus(int previousStatus, int s
 		{
 			retval << description.second;
 		}
-	}
-	return retval;
-}
-
-QString NdiTrackerManager::combinePositionWarnings(QString toolWarning, QString referenceWarning)
-{
-	QString retval = toolWarning;
-	if (!referenceWarning.isEmpty())
-	{
-		retval = toolWarning.isEmpty() ? "Reference: " + referenceWarning : toolWarning + "; reference: " + referenceWarning;
 	}
 	return retval;
 }

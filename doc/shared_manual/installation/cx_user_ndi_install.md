@@ -48,7 +48,7 @@ while CustusX is closed:
   default (20 Hz). A Polaris that can't use the rate, e.g. a Vicra, tracks at its default rate,
   with a warning in the log.
 * ndiTrackingMaxErrorRMS: warn about positions with a larger RMS error (mm). 0 (default): the
-  default for the device type.
+  default for the device type. Also used for the RMS error sent by an OpenIGTLink server.
 * ndiTrackingDebugLogging: true to log the commands sent to the device and its replies, in
   NdiCommunication.txt in the logging folder. For Polaris, the number of markers of each tool is
   also written to the log ("NDI Tracker debug" lines) whenever it changes.

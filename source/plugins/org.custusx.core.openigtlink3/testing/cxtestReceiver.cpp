@@ -31,7 +31,7 @@ Receiver::Receiver(igtlioLogicPointer logic) :
 {
 	mNetwork = new cx::NetworkHandler(logic);
 	QObject::connect(mNetwork, &cx::NetworkHandler::image, this, &Receiver::checkImage);
-	QObject::connect(mNetwork, &cx::NetworkHandler::transform, this, &Receiver::checkTransform);
+	QObject::connect(mNetwork, &cx::NetworkHandler::transformWithStatus, this, &Receiver::checkTransform);
 	QObject::connect(mNetwork, &cx::NetworkHandler::commandRespons, this, &Receiver::checkCommandRespons);
 	QObject::connect(mNetwork, &cx::NetworkHandler::string_message, this, &Receiver::checkString);
 }
@@ -160,7 +160,7 @@ void Receiver::checkImage(cx::ImagePtr image)
 	image_received = true;
 }
 
-void Receiver::checkTransform(QString devicename, cx::Transform3D transform, double timestamp)
+void Receiver::checkTransform(QString devicename, cx::Transform3D transform, double timestamp, cx::TransformStatus status)
 {
 	transform_received = true;
 }

@@ -50,6 +50,7 @@ NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 	this->connectToConnectionEvents();
 	this->connectToDeviceEvents();
 	connect(this, &NetworkHandler::connected, this, &NetworkHandler::clearTimestampSynchronization);
+	connect(this, &NetworkHandler::connected, this, [this]() { mInvalidMetadataReported.clear(); });
 
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(periodicProcess()));
 	mTimer->start(5);
@@ -285,10 +286,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		QString transformId = gotTransformId ? qstring_cast(openigtlinktransformid) : deviceName;
 
 		TransformStatus status = readTransformStatus(receivedDevice);
-		if (status.valid)
-		{
-			emit transform(transformId, cxtransform, timestampMS);
-		}
+		this->reportInvalidMetadata(transformId, status.invalidMetadata);
 		emit transformWithStatus(transformId, cxtransform, timestampMS, status);
 	}
 	else if(device_type == igtlioStatusConverter::GetIGTLTypeName())
@@ -462,17 +460,32 @@ TransformStatus NetworkHandler::readTransformStatus(igtlioDevicePointer device)
 		retval.valid = qstring_cast(value).compare("INVALID", Qt::CaseInsensitive) != 0;
 	}
 	retval.quality.visible = retval.valid;
+	bool ok = false;
 	if (device->GetMetaDataElement("PortStatus", value))
 	{
-		retval.hasQuality = true;
-		retval.quality.portStatus = qstring_cast(value).toInt();
+		QString text = qstring_cast(value);
+		retval.quality.portStatus = text.toInt(&ok, text.startsWith("0x", Qt::CaseInsensitive) ? 16 : 10);
+		ok = ok && retval.quality.portStatus >= 0;
+		retval.hasQuality = retval.hasQuality || ok;
+		retval.invalidMetadata += ok ? "" : QString(" PortStatus=%1").arg(qstring_cast(value));
 	}
 	if (device->GetMetaDataElement("errorRMS_mm", value))
 	{
-		retval.hasQuality = true;
-		retval.quality.errorRMS_mm = qstring_cast(value).toDouble();
+		retval.quality.errorRMS_mm = qstring_cast(value).toDouble(&ok);
+		retval.hasQuality = retval.hasQuality || ok;
+		retval.invalidMetadata += ok ? "" : QString(" errorRMS_mm=%1").arg(qstring_cast(value));
 	}
+	retval.invalidMetadata = retval.invalidMetadata.trimmed();
 	return retval;
+}
+
+void NetworkHandler::reportInvalidMetadata(QString devicename, QString invalidMetadata)
+{
+	if (!invalidMetadata.isEmpty() && !mInvalidMetadataReported.contains(devicename))
+	{
+		CX_LOG_WARNING() << "OpenIGTLink: Can't read the metadata of transform " << devicename << ": " << invalidMetadata;
+		mInvalidMetadataReported.insert(devicename);
+	}
 }
 
 ThreadResult NetworkHandler::processImage(ThreadResult result)
