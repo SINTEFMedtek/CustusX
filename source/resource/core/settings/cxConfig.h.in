@@ -15,7 +15,6 @@
 #define CX_CONFIG_ROOT "@CX_CONFIG_ROOT@"
 #define CX_OPTIONAL_CONFIG_ROOT "@CX_OPTIONAL_CONFIG_ROOT@"
 
-// The version is in a generated source file, so this header does not change with each commit
 #include "cxVersion.h"
 
 // location of configuration folders after install, relative to executable.

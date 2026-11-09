@@ -277,6 +277,10 @@ configure_file(
 
 # extra definitions:
 add_subdirectory(settings)
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/settings/cxVersion.cpp.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/settings/cxVersion.cpp"
+  )
 list(APPEND cxResource_SOURCE
   settings/cxVersion.h
   ${CMAKE_CURRENT_BINARY_DIR}/settings/cxVersion.cpp
