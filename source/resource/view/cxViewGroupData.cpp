@@ -537,6 +537,19 @@ void ViewGroupData::setOptions(ViewGroupData::Options options)
 	emit optionsChanged();
 }
 
+void ViewGroupData::setScopeExposure(double exposure)
+{
+	if (similar(exposure, mScopeExposure))
+		return;
+	mScopeExposure = exposure;
+	emit scopeExposureChanged();
+}
+
+double ViewGroupData::getScopeExposure() const
+{
+	return mScopeExposure;
+}
+
 void ViewGroupData::initializeGlobal2DZoom(SyncedValuePtr val)
 {
 	mGlobal2DZoom = val;

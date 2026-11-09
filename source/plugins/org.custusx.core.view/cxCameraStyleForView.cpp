@@ -342,7 +342,10 @@ void CameraStyleForView::updateScopeRendering()
 	}
 
 	if (!mScopeLight)
+	{
 		mScopeLight = this->createScopeLight();
+		this->updateScopeLightIntensity();
+	}
 
 	if (!renderer->GetLights()->IsItemPresent(mScopeLight))
 	{
@@ -385,8 +388,25 @@ vtkSmartPointer<vtkLight> CameraStyleForView::createScopeLight() const
 	double r1 = 30.0;
 	light->SetAttenuationValues(1, 1.0/r0, 1.0/(r1*r1));
 	light->SetColor(1.0, 0.96, 0.92); // slightly warm
-	light->SetIntensity(1.5);
 	return light;
+}
+
+void CameraStyleForView::setScopeExposure(double exposure)
+{
+	if (similar(exposure, mScopeExposure))
+		return;
+	mScopeExposure = exposure;
+	if (!mScopeLight)
+		return;
+	this->updateScopeLightIntensity();
+	if (this->getView())
+		this->getView()->setModified();
+}
+
+void CameraStyleForView::updateScopeLightIntensity()
+{
+	const double baseIntensity = 1.5;
+	mScopeLight->SetIntensity(baseIntensity * mScopeExposure);
 }
 
 /**

@@ -99,6 +99,8 @@ public:
 	  */
 	void setCameraStyle(CameraStyleData style);
 	CameraStyleData getCameraStyle();
+	/** Brightness factor for the light in the fly-through style, like the automatic exposure of a bronchoscope. */
+	void setScopeExposure(double exposure);
 
 private slots:
 	void setModified();
@@ -128,6 +130,7 @@ private:
 	ViewPtr mView;
 	CoreServicesPtr mBackend;
 	vtkSmartPointer<vtkLight> mScopeLight; ///< light at the camera, used in the fly-through style
+	double mScopeExposure = 1.0; ///< factor on the scope light intensity
 	vtkSmartPointer<FisheyePass> mFisheyePass; ///< lens distortion, used in the fly-through style
 	vtkSmartPointer<MaterialOverridePass> mScopeMaterialPass; ///< airway wall material, used in the fly-through style
 
@@ -137,6 +140,7 @@ private:
 	Vector3D smoothZoomedCameraPosition(Vector3D pos);
 	void updateScopeRendering();
 	vtkSmartPointer<vtkLight> createScopeLight() const;
+	void updateScopeLightIntensity();
 	void createScopeRenderPasses();
 	CameraInfo viewEntireAutoZoomROI(CameraInfo info);
 	void updateCamera(CameraInfo info);

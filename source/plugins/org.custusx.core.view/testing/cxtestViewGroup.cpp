@@ -134,4 +134,17 @@ TEST_CASE("CameraStyleData: Style is kept when the view angle changes", "[unit]"
 	CHECK_FALSE(style == cx::CameraStyleData(cx::cstTOOL_STYLE));
 }
 
+TEST_CASE("ViewGroupData: Scope exposure defaults to 1 and signals changes", "[unit]")
+{
+	cx::ViewGroupData viewGroupData(cx::CoreServicesPtr(), "0");
+	CHECK(viewGroupData.getScopeExposure() == Approx(1.0));
+
+	int changes = 0;
+	QObject::connect(&viewGroupData, &cx::ViewGroupData::scopeExposureChanged, [&changes](){ ++changes; });
+	viewGroupData.setScopeExposure(1.4);
+	viewGroupData.setScopeExposure(1.4);
+	CHECK(viewGroupData.getScopeExposure() == Approx(1.4));
+	CHECK(changes == 1);
+}
+
 }//namespace cxtest

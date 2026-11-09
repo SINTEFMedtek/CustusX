@@ -67,6 +67,7 @@ public:
 signals:
 	void cameraStyleChanged();
 private:
+	void scopeExposureChanged();
 	CameraStyleData mCameraStyle; ///< the current camerastyle
 	std::vector<CameraStyleForViewPtr> mViews;
 	CoreServicesPtr mBackend;
