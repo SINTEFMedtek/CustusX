@@ -44,7 +44,11 @@ TEST_CASE("Profile change with running gui", "[gui][integration]")
 														  [&pluginsStartedCount](){ ++pluginsStartedCount; qApp->quit(); });
 
 	QTimer::singleShot(200, &custusX, SLOT(changeToNewProfile()));
-	QTimer::singleShot(20000, qApp, SLOT(quit())); // Fallback if pluginsStarted never comes
+	// Fallback if pluginsStarted never comes. Local, so it can't quit a later test's event loop.
+	QTimer fallbackTimer;
+	fallbackTimer.setSingleShot(true);
+	QObject::connect(&fallbackTimer, &QTimer::timeout, qApp, &QCoreApplication::quit);
+	fallbackTimer.start(20000);
 
 	qApp->exec();
 	QObject::disconnect(connection);
