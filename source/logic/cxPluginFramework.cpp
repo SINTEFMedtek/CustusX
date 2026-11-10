@@ -167,9 +167,30 @@ void PluginFrameworkManager::saveState()
 	QStringList names = this->getPluginSymbolicNames();
 	for (unsigned i=0; i<names.size(); ++i)
 	{
-		QString name = names[i];
-		ctkPlugin::State state = this->getStateFromSymbolicName(name);
-		settings()->setValue(mSettingsBase+"/"+name, getStringForctkPluginState(state));
+		QString key = mSettingsBase+"/"+names[i];
+		ctkPlugin::State state = this->getStateFromSymbolicName(names[i]);
+		bool failedToLoad = mPluginsFailedToLoad.contains(names[i]);
+		QString storedState = settings()->value(key).toString();
+		settings()->setValue(key, getStateToSave(state, failedToLoad, storedState));
+	}
+}
+
+QString PluginFrameworkManager::getStateToSave(ctkPlugin::State currentState, bool failedToLoad, const QString& storedState)
+{
+	QString retval = getStringForctkPluginState(currentState);
+	if (failedToLoad)
+	{
+		retval = storedState;
+	}
+	return retval;
+}
+
+void PluginFrameworkManager::setFailedToLoad(const QString& symbolicName, bool failed)
+{
+	mPluginsFailedToLoad.removeAll(symbolicName);
+	if (failed)
+	{
+		mPluginsFailedToLoad << symbolicName;
 	}
 }
 
@@ -283,9 +304,11 @@ void PluginFrameworkManager::install(const QString& symbolicName)
 	{
 		ctkPluginContext* pc = this->getPluginContext();
 		pc->installPlugin(QUrl::fromLocalFile(pluginPath))->getPluginId();
+		this->setFailedToLoad(symbolicName, false);
 	}
 	catch (const ctkException& exc)
 	{
+		this->setFailedToLoad(symbolicName, true);
 		this->handlePluginException(QString("Failed to install plugin %1").arg(symbolicName), exc);
 	}
 }
@@ -351,6 +374,7 @@ bool PluginFrameworkManager::stop()
 
 void PluginFrameworkManager::uninstall(const QString& symbolicName)
 {
+	this->setFailedToLoad(symbolicName, false);
 	QString pluginPath = getPluginPath(symbolicName);
 	if (pluginPath.isEmpty())
 		return;
@@ -385,10 +409,12 @@ bool PluginFrameworkManager::start(const QString& symbolicName, ctkPlugin::Start
 		ctkPluginContext* pc = this->getPluginContext();
 		QSharedPointer<ctkPlugin> plugin = pc->installPlugin(QUrl::fromLocalFile(pluginPath));
 		plugin->start(options);
+		this->setFailedToLoad(symbolicName, false);
 	}
 	catch (ctkException& exc)
 	{
-		this->handlePluginException(QString("Failed to stop plugin %1.").arg(symbolicName), exc);
+		this->setFailedToLoad(symbolicName, true);
+		this->handlePluginException(QString("Failed to start plugin %1.").arg(symbolicName), exc);
 		return false;
 	}
 
@@ -425,6 +451,7 @@ bool PluginFrameworkManager::stop(const QString& symbolicName, ctkPlugin::StopOp
 	try
 	{
 		plugin->stop(options);
+		this->setFailedToLoad(symbolicName, false);
 	}
 	catch (const ctkException& exc)
 	{

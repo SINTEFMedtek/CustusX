@@ -71,14 +71,24 @@ void USReconstructionFileFixture::assertValidFolderForSession(QString path, QStr
 
 QString USReconstructionFileFixture::write(ReconstructionData input)
 {
-	QString path = cx::UsReconstructionFileMaker::createFolder(this->getDataPath(), input.sessionName);
-	cx::USReconstructInputData toBeWritten = this->createUSReconstructData(input);
+	return this->write(this->createUSReconstructData(input), input.sessionName);
+}
 
-	cx::UsReconstructionFileMakerPtr fileMaker(new cx::UsReconstructionFileMaker(input.sessionName));
+QString USReconstructionFileFixture::write(cx::USReconstructInputData toBeWritten, QString sessionName)
+{
+	QString path = cx::UsReconstructionFileMaker::createFolder(this->getDataPath(), sessionName);
+
+	cx::UsReconstructionFileMakerPtr fileMaker(new cx::UsReconstructionFileMaker(sessionName));
 	fileMaker->setReconstructData(toBeWritten);
 	bool compress = true;
 	fileMaker->writeToNewFolder(path, compress);
 	return fileMaker->getReconstructData().mFilename;
+}
+
+bool USReconstructionFileFixture::imageFileExists(QString filename, QString sessionName, unsigned index)
+{
+	QString imageFilename = QString("%1/%2_%3.mhd").arg(QFileInfo(filename).absolutePath()).arg(sessionName).arg(index);
+	return QFileInfo(imageFilename).exists();
 }
 
 cx::USReconstructInputData USReconstructionFileFixture::read(QString filename, cx::FileManagerServicePtr filemanagerservice)

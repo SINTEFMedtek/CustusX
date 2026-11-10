@@ -45,6 +45,8 @@ public:
 	  */
 	QString getFilename() { return mFilename; }
 	vtkImageDataPtr getImage(FileManagerServicePtr filemanager);
+	/// Read a cached .mhd frame directly, used when the file manager isn't available.
+	static vtkImageDataPtr loadMetaImage(QString filename);
 	/**
 	  * Clear the image contents from memory, if possible.
 	  * Return true if purge was successful.

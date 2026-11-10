@@ -13,8 +13,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDir>
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
+#include <vtkMetaImageReader.h>
+#include <vtkImageChangeInformation.h>
 #include <iostream>
 #include "cxFileManagerService.h"
+#include "cxErrorObserver.h"
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
@@ -41,10 +44,34 @@ vtkImageDataPtr CachedImageData::getImage(FileManagerServicePtr filemanager)
 {
 	if (!mImageData)
 	{
-		//mImageData = MetaImageReader().loadVtkImageData(mFilename);
-		mImageData = filemanager->loadVtkImageData(mFilename);
+		if (filemanager && !filemanager->isNull())
+		{
+			mImageData = filemanager->loadVtkImageData(mFilename);
+		}
+		else
+		{
+			mImageData = CachedImageData::loadMetaImage(mFilename);
+		}
 	}
 	return mImageData;
+}
+
+vtkImageDataPtr CachedImageData::loadMetaImage(QString filename)
+{
+	vtkImageDataPtr retval;
+	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
+	reader->SetFileName(cstring_cast(filename));
+	reader->ReleaseDataFlagOn();
+
+	if (ErrorObserver::checkedRead(reader, filename))
+	{
+		vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
+		zeroer->SetInputConnection(reader->GetOutputPort());
+		zeroer->SetOutputOrigin(0, 0, 0);
+		zeroer->Update();
+		retval = zeroer->GetOutput();
+	}
+	return retval;
 }
 
 bool CachedImageData::purge()

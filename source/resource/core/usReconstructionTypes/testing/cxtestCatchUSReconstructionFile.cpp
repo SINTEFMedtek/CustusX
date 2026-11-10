@@ -19,9 +19,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxLogicManager.h"
 #include "cxFileManagerServiceProxy.h"
+#include "cxFileManagerServiceNull.h"
+#include "cxImageDataContainer.h"
+#include "cxMessageListener.h"
+#include "cxReporter.h"
 #include "cxUtilHelpers.h"
 #include <QFile>
 #include <QFileInfo>
+#include <QElapsedTimer>
+#include <QThread>
 
 
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Create unique folders", "[unit][resource][usReconstructionTypes]")
@@ -94,6 +100,89 @@ TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Sav
 	this->assertRecordingInfoCorrespondence(input, hasBeenRead);
 	CHECK(!QFileInfo(cx::changeExtension(filename, "probe.toolmeta")).exists());
 	CHECK(!QFileInfo(cx::changeExtension(filename, "ref.toolmeta")).exists());
+}
+
+namespace
+{
+bool waitForText(cx::MessageListenerPtr messageListener, const QString& text)
+{
+	QElapsedTimer timer;
+	timer.start();
+	bool found = messageListener->containsText(text);
+	while (!found && timer.elapsed() < 1000)
+	{
+		QThread::msleep(10);
+		found = messageListener->containsText(text);
+	}
+	return found;
+}
+} // namespace
+
+TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save skips images that can't be read from the recording cache", "[unit][resource][usReconstructionTypes]")
+{
+	cx::DataLocations::setTestMode();
+	ReconstructionData input = this->createSampleReconstructData();
+	std::vector<QString> missingCacheFiles;
+	for (unsigned i=0; i<input.imageTimestamps.size(); ++i)
+	{
+		missingCacheFiles.push_back(this->getDataPath() + QString("missing_cache_%1.mhd").arg(i));
+	}
+	cx::FileManagerServicePtr nullFileManager(new cx::FileManagerServiceNull());
+	input.imageData.reset(new cx::CachedImageDataContainer(missingCacheFiles, nullFileManager));
+	cx::Reporter::initialize();
+	cx::MessageListenerPtr messageListener = cx::MessageListener::createWithQueue();
+
+	QString filename = this->write(input);
+
+	CHECK(QFileInfo(filename).exists());
+	CHECK(!this->imageFileExists(filename, input.sessionName, 0));
+	CHECK(waitForText(messageListener, "the saved recording is incomplete"));
+	messageListener.reset();
+	cx::Reporter::shutdown();
+}
+
+TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save images from the recording cache without the file manager", "[unit][resource][usReconstructionTypes]")
+{
+	cx::DataLocations::setTestMode();
+	ReconstructionData input = this->createSampleReconstructData();
+	QString cacheFilename = this->write(input);
+	std::vector<QString> cacheFiles;
+	for (unsigned i=0; i<input.imageTimestamps.size(); ++i)
+	{
+		cacheFiles.push_back(QString("%1/%2_%3.mhd").arg(QFileInfo(cacheFilename).absolutePath()).arg(input.sessionName).arg(i));
+	}
+	cx::FileManagerServicePtr nullFileManager(new cx::FileManagerServiceNull());
+	input.imageData.reset(new cx::CachedImageDataContainer(cacheFiles, nullFileManager));
+	input.sessionName = "saved_session";
+
+	QString filename = this->write(input);
+
+	CHECK(this->imageFileExists(filename, input.sessionName, 0));
+	CHECK(this->imageFileExists(filename, input.sessionName, cacheFiles.size()-1));
+}
+
+TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save only images that have a frame position", "[unit][resource][usReconstructionTypes]")
+{
+	cx::DataLocations::setTestMode();
+	ReconstructionData input = this->createSampleReconstructData();
+	cx::USReconstructInputData toBeWritten = this->createUSReconstructData(input);
+	unsigned framesCount = toBeWritten.mFrames.size() / 2;
+	toBeWritten.mFrames.resize(framesCount);
+
+	QString filename = this->write(toBeWritten, input.sessionName);
+
+	CHECK(this->imageFileExists(filename, input.sessionName, framesCount-1));
+	CHECK(!this->imageFileExists(filename, input.sessionName, framesCount));
+}
+
+TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save data without images", "[unit][resource][usReconstructionTypes]")
+{
+	cx::DataLocations::setTestMode();
+	ReconstructionData input = this->createEmptyReconstructData();
+
+	QString filename = this->write(input);
+
+	CHECK(QFileInfo(filename).exists());
 }
 
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Read recording info from an older recording", "[unit][resource][usReconstructionTypes]")

@@ -390,29 +390,50 @@ void UsReconstructionFileMaker::report()
 	}
 }
 
-void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<TimedPosition> pos)
+unsigned UsReconstructionFileMaker::writeUSImages(const QString& path, ImageDataContainerPtr images, bool compression, const std::vector<TimedPosition>& pos)
 {
-	CX_ASSERT(images->size()==pos.size());
+	if (images->size() != pos.size())
+	{
+		reportError(QString("Mismatch between %1 images and %2 frame positions in %3, only images with a position are saved.")
+					.arg(images->size()).arg(pos.size()).arg(mSessionDescription));
+	}
+	unsigned count = std::min<unsigned>(images->size(), pos.size());
+	unsigned written = 0;
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
+	writer->SetCompression(compression);
 
-	for (unsigned i=0; i<images->size(); ++i)
+	for (unsigned i=0; i<count; ++i)
 	{
 		vtkImageDataPtr currentImage = images->get(i);
-		QString filename = QString("%1/%2_%3.mhd").arg(path).arg(mSessionDescription).arg(i);
-
-		writer->SetInputData(currentImage);
-		writer->SetFileName(cstring_cast(filename));
-		writer->SetCompression(compression);
+		if (currentImage)
 		{
-			StaticMutexVtkLocker lock;
-			writer->Write();
+			QString filename = QString("%1/%2_%3.mhd").arg(path).arg(mSessionDescription).arg(i);
+			this->writeUSImage(writer, filename, currentImage, pos[i].mPos);
+			++written;
 		}
-
-		CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
-		customReader->setTransform(pos[i].mPos);
-		customReader->setModality(imUS);
-		customReader->setImageType(convertToImageSubType(mSessionDescription));
 	}
+
+	if (written < count)
+	{
+		reportError(QString("Failed to read %1 of %2 images in %3 from the recording cache, the saved recording is incomplete.")
+					.arg(count-written).arg(count).arg(mSessionDescription));
+	}
+	return written;
+}
+
+void UsReconstructionFileMaker::writeUSImage(vtkMetaImageWriterPtr writer, const QString& filename, vtkImageDataPtr image, const Transform3D& rMu)
+{
+	writer->SetInputData(image);
+	writer->SetFileName(cstring_cast(filename));
+	{
+		StaticMutexVtkLocker lock;
+		writer->Write();
+	}
+
+	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
+	customReader->setTransform(rMu);
+	customReader->setModality(imUS);
+	customReader->setImageType(convertToImageSubType(mSessionDescription));
 }
 
 void UsReconstructionFileMaker::writeMask(QString path, QString session, vtkImageDataPtr mask)
@@ -482,14 +503,23 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	this->writeMask(path, session, mReconstructData.getMask());
 	this->writeREADMEFile(path, session);
 
-	ImageDataContainerPtr imageData = mReconstructData.mUsRaw->getImageContainer();
+	ImageDataContainerPtr imageData;
+	if (mReconstructData.mUsRaw)
+	{
+		imageData = mReconstructData.mUsRaw->getImageContainer();
+	}
+	unsigned imageCount = 0;
 	if (imageData)
-		this->writeUSImages(path, imageData, compression, mReconstructData.mFrames);
+	{
+		imageCount = this->writeUSImages(path, imageData, compression, mReconstructData.mFrames);
+	}
 	else
+	{
 		mReport << "failed to find frame data, save failed.";
+	}
 
 	int time = std::max(1, timer.getElapsedms());
-	mReport << QString("Completed save to %1. Spent %2s, %3fps").arg(mSessionDescription).arg(time/1000).arg(imageData->size()*1000/time);
+	mReport << QString("Completed save to %1. Spent %2s, %3fps").arg(mSessionDescription).arg(time/1000).arg(imageCount*1000/time);
 
 	this->report();
 	mReport.clear();
