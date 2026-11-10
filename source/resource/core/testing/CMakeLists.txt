@@ -46,6 +46,7 @@ if(BUILD_TESTING)
         cxtestTestDataStructures.h
         cxtestTestDataStructures.cpp
         cxtestDataLocations.cpp
+        cxtestVersion.cpp
         #cxtestDataReaderWriter.cpp
         cxtestTrackingSystemService.cpp
         cxtestFileManagerServiceMock.h
