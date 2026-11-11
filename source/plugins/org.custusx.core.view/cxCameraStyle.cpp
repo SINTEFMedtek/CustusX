@@ -26,13 +26,17 @@ CameraStyle::CameraStyle(CoreServicesPtr backend, ViewGroupDataPtr viewGroupData
 	mViewGroupData(viewGroupData)
 {
 	if (mViewGroupData)
+	{
 		connect(mViewGroupData.get(), &ViewGroupData::scopeExposureChanged, this, &CameraStyle::scopeExposureChanged);
+	}
 }
 
 void CameraStyle::scopeExposureChanged()
 {
 	for (unsigned i=0; i<mViews.size(); ++i)
+	{
 		mViews[i]->setScopeExposure(mViewGroupData->getScopeExposure());
+	}
 }
 
 void CameraStyle::addView(ViewPtr view)
@@ -44,7 +48,9 @@ void CameraStyle::addView(ViewPtr view)
 	style->setView(view);
 	style->setCameraStyle(CameraStyleData(mCameraStyle));
 	if (mViewGroupData)
+	{
 		style->setScopeExposure(mViewGroupData->getScopeExposure());
+	}
 	mViews.push_back(style);
 }
 

@@ -22,6 +22,8 @@ class vtkRenderStepsPass;
 class vtkDualDepthPeelingPass;
 class vtkOrderIndependentTranslucentPass;
 class vtkOverlayPass;
+class vtkOpenGLRenderWindow;
+class vtkOpenGLState;
 
 namespace cx
 {
@@ -69,6 +71,9 @@ private:
 	void operator=(const FisheyePass&) = delete;
 
 	void updateTranslucentPass(vtkRenderer* renderer);
+	void createRenderTarget(vtkOpenGLRenderWindow* renWin);
+	bool readyWarpShader(vtkOpenGLRenderWindow* renWin);
+	void renderWarp(vtkRenderer* renderer, vtkOpenGLState* ostate, int x, int y, int w, int h);
 
 	double Strength;
 	int Supersampling; ///< render the scene at this multiple of the viewport size, as the center is magnified

@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <QDomDocument>
 #include <memory>
 #include "cxtestVisServices.h"
 #include "cxViewGroup.h"
@@ -132,6 +133,37 @@ TEST_CASE("CameraStyleData: Style is kept when the view angle changes", "[unit]"
 	style.mCameraViewAngle = 90.0/180.0*M_PI;
 	CHECK(style.getStyle() == cx::cstTOOL_STYLE);
 	CHECK_FALSE(style == cx::CameraStyleData(cx::cstTOOL_STYLE));
+}
+
+TEST_CASE("CameraStyleData: Only the endoscope style has scope rendering", "[unit]")
+{
+	cx::CameraStyleData endoscope(cx::cstENDOSCOPE_STYLE);
+	CHECK(endoscope.mScopeRendering);
+	CHECK(endoscope.mCameraFollowTool);
+	CHECK(endoscope.mFocusFollowTool);
+	CHECK(endoscope.mCameraViewAngle == Approx(110.0/180.0*M_PI));
+	CHECK(endoscope.getStyle() == cx::cstENDOSCOPE_STYLE);
+
+	CHECK_FALSE(cx::CameraStyleData(cx::cstTOOL_STYLE).mScopeRendering);
+	CHECK_FALSE(cx::CameraStyleData(cx::cstDEFAULT_STYLE).mScopeRendering);
+
+	cx::CameraStyleData toolWithScopeRendering(cx::cstTOOL_STYLE);
+	toolWithScopeRendering.mScopeRendering = true;
+	CHECK(toolWithScopeRendering.getStyle() == cx::cstENDOSCOPE_STYLE);
+}
+
+TEST_CASE("CameraStyleData: Scope rendering is saved and loaded", "[unit]")
+{
+	cx::CameraStyleData saved(cx::cstENDOSCOPE_STYLE);
+	QDomDocument doc;
+	QDomElement node = doc.createElement("cameraStyle");
+	doc.appendChild(node);
+	saved.addXml(node);
+
+	cx::CameraStyleData loaded;
+	loaded.parseXml(node);
+	CHECK(loaded.mScopeRendering);
+	CHECK(loaded.getStyle() == cx::cstENDOSCOPE_STYLE);
 }
 
 TEST_CASE("ViewGroupData: Scope exposure defaults to 1 and signals changes", "[unit]")

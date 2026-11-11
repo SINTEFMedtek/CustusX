@@ -62,9 +62,13 @@ FisheyePass::~FisheyePass()
 {
 	delete mQuadHelper;
 	if (mFrameBufferObject)
+	{
 		mFrameBufferObject->Delete();
+	}
 	if (mColorTexture)
+	{
 		mColorTexture->Delete();
+	}
 }
 
 void FisheyePass::updateTranslucentPass(vtkRenderer* renderer)
@@ -98,11 +102,31 @@ void FisheyePass::Render(const vtkRenderState* s)
 
 	int x, y, w, h;
 	r->GetTiledSizeAndOrigin(&w, &h, &x, &y);
-	if (w <= 0 || h <= 0)
-		return;
-	int sceneWidth = w * Supersampling;
-	int sceneHeight = h * Supersampling;
+	if (w > 0 && h > 0)
+	{
+		this->createRenderTarget(renWin);
 
+		// Render the scene into the texture. Using the same size as both old and new size keeps the view angle.
+		int sceneWidth = w * Supersampling;
+		int sceneHeight = h * Supersampling;
+		ostate->PushFramebufferBindings();
+		this->RenderDelegate(s, sceneWidth, sceneHeight, sceneWidth, sceneHeight, mFrameBufferObject, mColorTexture);
+		ostate->PopFramebufferBindings();
+
+		if (this->readyWarpShader(renWin))
+		{
+			this->renderWarp(r, ostate, x, y, w, h);
+			ostate->vtkglEnable(GL_BLEND);
+			mOverlayPass->Render(s);
+			this->NumberOfRenderedProps += mOverlayPass->GetNumberOfRenderedProps();
+		}
+	}
+
+	vtkOpenGLCheckErrorMacro("failed after Render");
+}
+
+void FisheyePass::createRenderTarget(vtkOpenGLRenderWindow* renWin)
+{
 	if (!mColorTexture)
 	{
 		mColorTexture = vtkTextureObject::New();
@@ -117,12 +141,11 @@ void FisheyePass::Render(const vtkRenderState* s)
 		mFrameBufferObject = vtkOpenGLFramebufferObject::New();
 		mFrameBufferObject->SetContext(renWin);
 	}
+}
 
-	// Render the scene into the texture. Using the same size as both old and new size keeps the view angle.
-	ostate->PushFramebufferBindings();
-	this->RenderDelegate(s, sceneWidth, sceneHeight, sceneWidth, sceneHeight, mFrameBufferObject, mColorTexture);
-	ostate->PopFramebufferBindings();
-
+/** Create the warp shader, or make it current. Returns false if it could not be built. */
+bool FisheyePass::readyWarpShader(vtkOpenGLRenderWindow* renWin)
+{
 	if (!mQuadHelper)
 	{
 		std::string FSSource = vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
@@ -154,13 +177,18 @@ void FisheyePass::Render(const vtkRenderState* s)
 		renWin->GetShaderCache()->ReadyShaderProgram(mQuadHelper->Program);
 	}
 
-	if (!mQuadHelper->Program || !mQuadHelper->Program->GetCompiled())
+	bool ready = mQuadHelper->Program && mQuadHelper->Program->GetCompiled();
+	if (!ready)
 	{
 		vtkErrorMacro("Couldn't build the fisheye shader program.");
-		return;
 	}
+	return ready;
+}
 
-	double viewAngle = r->GetActiveCamera()->GetViewAngle() / 180.0 * M_PI;
+/** Draw the rendered scene texture into the viewport, warped by the fisheye shader. */
+void FisheyePass::renderWarp(vtkRenderer* renderer, vtkOpenGLState* ostate, int x, int y, int w, int h)
+{
+	double viewAngle = renderer->GetActiveCamera()->GetViewAngle() / 180.0 * M_PI;
 	mColorTexture->Activate();
 	mQuadHelper->Program->SetUniformi("source", mColorTexture->GetTextureUnit());
 	float halfSize[2] = { static_cast<float>(w) / static_cast<float>(h), 1.0f };
@@ -177,12 +205,6 @@ void FisheyePass::Render(const vtkRenderState* s)
 	mQuadHelper->Render();
 
 	mColorTexture->Deactivate();
-
-	ostate->vtkglEnable(GL_BLEND);
-	mOverlayPass->Render(s);
-	this->NumberOfRenderedProps += mOverlayPass->GetNumberOfRenderedProps();
-
-	vtkOpenGLCheckErrorMacro("failed after Render");
 }
 
 void FisheyePass::ReleaseGraphicsResources(vtkWindow* w)

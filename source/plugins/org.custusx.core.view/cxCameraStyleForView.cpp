@@ -312,7 +312,7 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 }
 
 /**
- * Imitate a bronchoscope in the fly-through style:
+ * Imitate an endoscope when the camera style has scope rendering on:
  * Replace the default VTK headlight (directional, no attenuation) with a positional
  * spotlight at the camera, so that brightness falls off with distance and towards
  * the edges of the view. Render through a fisheye lens distortion, magnifying the
@@ -323,24 +323,18 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 void CameraStyleForView::updateScopeRendering()
 {
 	vtkRendererPtr renderer = this->getRenderer();
-	if (!renderer)
-		return;
-
-	if (!this->isScopeStyle())
+	if (renderer && this->isScopeStyle())
 	{
-		if (mScopeLight && renderer->GetLights()->IsItemPresent(mScopeLight))
-		{
-			renderer->RemoveLight(mScopeLight);
-			renderer->AutomaticLightCreationOn();
-		}
-		if (mScopeMaterialPass && renderer->GetPass() == mScopeMaterialPass)
-		{
-			mScopeMaterialPass->restoreMaterials();
-			renderer->SetPass(nullptr);
-		}
-		return;
+		this->enableScopeRendering(renderer);
 	}
+	else if (renderer)
+	{
+		this->disableScopeRendering(renderer);
+	}
+}
 
+void CameraStyleForView::enableScopeRendering(vtkRendererPtr renderer)
+{
 	if (!mScopeLight)
 	{
 		mScopeLight = this->createScopeLight();
@@ -355,9 +349,29 @@ void CameraStyleForView::updateScopeRendering()
 	}
 
 	if (!mScopeMaterialPass)
+	{
 		this->createScopeRenderPasses();
+	}
 	if (renderer->GetPass() != mScopeMaterialPass)
+	{
 		renderer->SetPass(mScopeMaterialPass);
+	}
+}
+
+void CameraStyleForView::disableScopeRendering(vtkRendererPtr renderer)
+{
+	if (mScopeLight && renderer->GetLights()->IsItemPresent(mScopeLight))
+	{
+		renderer->RemoveLight(mScopeLight);
+		renderer->AutomaticLightCreationOn();
+	}
+	if (mScopeMaterialPass && renderer->GetPass() == mScopeMaterialPass)
+	{
+		mScopeMaterialPass->restoreMaterials();
+		// The renderer only releases the pass that is set
+		mScopeMaterialPass->ReleaseGraphicsResources(renderer->GetRenderWindow());
+		renderer->SetPass(nullptr);
+	}
 }
 
 void CameraStyleForView::createScopeRenderPasses()
@@ -383,7 +397,7 @@ vtkSmartPointer<vtkLight> CameraStyleForView::createScopeLight() const
 	// Brightness is 1/(1+d/r0+(d/r1)^2), with d the distance in mm. The constant term
 	// caps the brightness near the walls. Near the camera the linear term dominates
 	// (a video camera's gamma makes the physical 1/d^2 falloff look roughly like 1/d),
-	// while the quadratic term darkens branch openings far ahead, as in real bronchoscopy.
+	// while the quadratic term darkens branch openings far ahead, as in real endoscopy.
 	double r0 = 30.0;
 	double r1 = 30.0;
 	light->SetAttenuationValues(1, 1.0/r0, 1.0/(r1*r1));
@@ -393,14 +407,18 @@ vtkSmartPointer<vtkLight> CameraStyleForView::createScopeLight() const
 
 void CameraStyleForView::setScopeExposure(double exposure)
 {
-	if (similar(exposure, mScopeExposure))
-		return;
-	mScopeExposure = exposure;
-	if (!mScopeLight)
-		return;
-	this->updateScopeLightIntensity();
-	if (this->getView())
-		this->getView()->setModified();
+	if (!similar(exposure, mScopeExposure))
+	{
+		mScopeExposure = exposure;
+		if (mScopeLight)
+		{
+			this->updateScopeLightIntensity();
+		}
+		if (mScopeLight && this->getView())
+		{
+			this->getView()->setModified();
+		}
+	}
 }
 
 void CameraStyleForView::updateScopeLightIntensity()
@@ -444,8 +462,13 @@ bool CameraStyleForView::isToolFollowingStyle() const
 	return (mStyle.mCameraFollowTool || mStyle.mFocusFollowTool);
 }
 
-/** The camera sits on the tool, looking along it, as in a bronchoscope. */
 bool CameraStyleForView::isScopeStyle() const
+{
+	return mStyle.mScopeRendering;
+}
+
+/** The camera sits on the tool, looking along it. */
+bool CameraStyleForView::isCameraOnToolStyle() const
 {
 	return mStyle.mCameraFollowTool && fabs(mStyle.mElevation) < 0.01;
 }
@@ -470,7 +493,7 @@ void CameraStyleForView::connectTool()
 	if (rep)
 	{
 		rep->setOffsetPointVisibleAtZeroOffset(false);
-		if (this->isScopeStyle())
+		if (this->isCameraOnToolStyle())
 			rep->setStayHiddenAfterVisible(true);
 	}
 

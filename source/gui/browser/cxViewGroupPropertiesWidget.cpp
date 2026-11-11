@@ -95,6 +95,7 @@ void ViewGroupPropertiesWidget::updateFrontend()
 	mCameraNotBehindROI->setValue(data.mCameraNotBehindROI);
 	mTableLock->setValue(data.mTableLock);
 	mUniCam->setValue(data.mUniCam);
+	mScopeRendering->setValue(data.mScopeRendering);
 	mElevation->setValue(data.mElevation);
 	mAutoZoomROI->setValue(data.mAutoZoomROI);
 	mFocusROI->setValue(data.mFocusROI);
@@ -167,6 +168,11 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 									   "Use the VTK Unicam interactor. Overrides other style settings",
 									   true);
 	mCameraStyleProperties.push_back(mUniCam);
+
+	mScopeRendering = BoolProperty::initialize("Endoscope rendering", "",
+											   "Fisheye lens, light at the camera tip and wet surface material",
+											   false);
+	mCameraStyleProperties.push_back(mScopeRendering);
 
 	StringPropertySelectDataPtr autozoom = StringPropertySelectData::New(mServices->patient());
 	autozoom->setValueName("Auto Zoom ROI");
@@ -254,6 +260,7 @@ void ViewGroupPropertiesWidget::onCameraStyleChanged()
 	data.mCameraNotBehindROI = mCameraNotBehindROI->getValue();
 	data.mTableLock = mTableLock->getValue();
 	data.mUniCam = mUniCam->getValue();
+	data.mScopeRendering = mScopeRendering->getValue();
 	data.mElevation = mElevation->getValue();
 	data.mAutoZoomROI = mAutoZoomROI->getValue();
 	data.mFocusROI = mFocusROI->getValue();

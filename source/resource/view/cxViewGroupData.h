@@ -57,6 +57,7 @@ struct cxResourceVisualization_EXPORT CameraStyleData
 	bool mTableLock;
 	double mElevation;
 	bool mUniCam;
+	bool mScopeRendering; ///< Look like an endoscope: fisheye lens, light at the camera, wet surfaces
 	QString mCameraNotBehindROI; // never move camera behind this roi
 	QString mFocusROI; // name of ROI to set focus in.
 	QString mAutoZoomROI; // name of ROI to zoom to.
@@ -143,7 +144,7 @@ public:
 	void setControllingTool(ToolPtr tool);
 
 	/** Brightness factor for the light in the fly-through (scope) camera style, like the
-	 *  automatic exposure of a bronchoscope. 1 gives the default brightness. Not saved. */
+	 *  automatic exposure of an endoscope. 1 gives the default brightness. Not saved. */
 	void setScopeExposure(double exposure);
 	double getScopeExposure() const;
 

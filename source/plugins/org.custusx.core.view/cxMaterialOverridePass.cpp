@@ -66,28 +66,40 @@ void MaterialOverridePass::applyMaterial(vtkProperty* property, Material materia
 void MaterialOverridePass::overrideMaterial(vtkProperty* property)
 {
 	Material current = getMaterial(property);
-	if (current == mMaterial)
-		return;
+	if (!(current == mMaterial))
+	{
+		std::map<vtkProperty*, OriginalMaterial>::iterator iter = mOriginalMaterials.find(property);
+		if (iter == mOriginalMaterials.end() || iter->second.property != property)
+		{
+			mOriginalMaterials[property] = {property, current};
+		}
+		else
+		{
+			this->updateOriginalMaterial(iter->second.material, current);
+		}
+		applyMaterial(property, mMaterial);
+	}
+}
 
-	std::map<vtkProperty*, OriginalMaterial>::iterator iter = mOriginalMaterials.find(property);
-	if (iter == mOriginalMaterials.end() || iter->second.property != property)
+/** The owner has reset some of the values: these are the new originals. A reset to the override value is not noticed. */
+void MaterialOverridePass::updateOriginalMaterial(Material& original, const Material& current) const
+{
+	if (current.ambient != mMaterial.ambient)
 	{
-		mOriginalMaterials[property] = {property, current};
+		original.ambient = current.ambient;
 	}
-	else
+	if (current.diffuse != mMaterial.diffuse)
 	{
-		// The owner has reset some of the values: these are the new originals
-		Material& original = iter->second.material;
-		if (current.ambient != mMaterial.ambient)
-			original.ambient = current.ambient;
-		if (current.diffuse != mMaterial.diffuse)
-			original.diffuse = current.diffuse;
-		if (current.specular != mMaterial.specular)
-			original.specular = current.specular;
-		if (current.specularPower != mMaterial.specularPower)
-			original.specularPower = current.specularPower;
+		original.diffuse = current.diffuse;
 	}
-	applyMaterial(property, mMaterial);
+	if (current.specular != mMaterial.specular)
+	{
+		original.specular = current.specular;
+	}
+	if (current.specularPower != mMaterial.specularPower)
+	{
+		original.specularPower = current.specularPower;
+	}
 }
 
 void MaterialOverridePass::restoreMaterials()
@@ -96,7 +108,9 @@ void MaterialOverridePass::restoreMaterials()
 	{
 		vtkProperty* property = iter->second.property;
 		if (property && getMaterial(property) == mMaterial)
+		{
 			applyMaterial(property, iter->second.material);
+		}
 	}
 	mOriginalMaterials.clear();
 }
@@ -109,7 +123,9 @@ void MaterialOverridePass::Render(const vtkRenderState* s)
 	{
 		vtkActor* actor = vtkActor::SafeDownCast(s->GetPropArray()[i]);
 		if (actor && actor->GetProperty() && actor->GetProperty()->GetLighting())
+		{
 			this->overrideMaterial(actor->GetProperty());
+		}
 	}
 
 	if (mDelegatePass)
@@ -122,7 +138,9 @@ void MaterialOverridePass::Render(const vtkRenderState* s)
 void MaterialOverridePass::ReleaseGraphicsResources(vtkWindow* w)
 {
 	if (mDelegatePass)
+	{
 		mDelegatePass->ReleaseGraphicsResources(w);
+	}
 }
 
 } //namespace cx

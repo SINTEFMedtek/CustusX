@@ -99,7 +99,7 @@ public:
 	  */
 	void setCameraStyle(CameraStyleData style);
 	CameraStyleData getCameraStyle();
-	/** Brightness factor for the light in the fly-through style, like the automatic exposure of a bronchoscope. */
+	/** Brightness factor for the light in the fly-through style, like the automatic exposure of an endoscope. */
 	void setScopeExposure(double exposure);
 
 private slots:
@@ -113,6 +113,7 @@ private:
 	ToolRep3DPtr getToolRep() const;
 	bool isToolFollowingStyle() const;
 	bool isScopeStyle() const;
+	bool isCameraOnToolStyle() const;
 	void onPreRender();
 	void applyCameraStyle(); ///< receives transforms from the tool which the camera should follow
 
@@ -139,6 +140,8 @@ private:
 
 	Vector3D smoothZoomedCameraPosition(Vector3D pos);
 	void updateScopeRendering();
+	void enableScopeRendering(vtkRendererPtr renderer);
+	void disableScopeRendering(vtkRendererPtr renderer);
 	vtkSmartPointer<vtkLight> createScopeLight() const;
 	void updateScopeLightIntensity();
 	void createScopeRenderPasses();

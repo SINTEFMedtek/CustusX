@@ -70,6 +70,7 @@ private:
 	static Material getMaterial(vtkProperty* property);
 	static void applyMaterial(vtkProperty* property, Material material);
 	void overrideMaterial(vtkProperty* property);
+	void updateOriginalMaterial(Material& original, const Material& current) const;
 
 	vtkSmartPointer<vtkRenderPass> mDelegatePass;
 	Material mMaterial;
