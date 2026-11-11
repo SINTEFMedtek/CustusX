@@ -15,10 +15,7 @@
 #define CX_CONFIG_ROOT "@CX_CONFIG_ROOT@"
 #define CX_OPTIONAL_CONFIG_ROOT "@CX_OPTIONAL_CONFIG_ROOT@"
 
-#define CustusX_VERSION_STRING "@CustusX_VERSION_STRING@"
-#define CustusX_VERSION_MAJOR "@CustusX_VERSION_MAJOR@"
-#define CustusX_VERSION_MINOR "@CustusX_VERSION_MINOR@"
-#define CustusX_VERSION_PATCH "@CustusX_VERSION_PATCH@"
+#include "cxVersion.h"
 
 // location of configuration folders after install, relative to executable.
 #define CX_CONFIG_ROOT_RELATIVE_INSTALLED "@CX_CONFIG_ROOT_RELATIVE_INSTALLED@"

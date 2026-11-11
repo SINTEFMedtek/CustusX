@@ -333,6 +333,15 @@ cx_create_export_header("cxResource")
 
 add_msvc_precompiled_header("cxPrecompiledHeader.h" "cxPrecompiledHeader.cpp" cxResource_SOURCE)
 
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/settings/cxVersion.cpp.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/settings/cxVersion.cpp"
+  )
+list(APPEND cxResource_SOURCE
+  settings/cxVersion.h
+  ${CMAKE_CURRENT_BINARY_DIR}/settings/cxVersion.cpp
+  )
+
 add_library(cxResource ${cxResource_SOURCE})
 target_include_directories(cxResource
   PUBLIC
