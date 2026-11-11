@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxFisheyePass.h"
 
+#include <algorithm>
 #include <cmath>
 #include <vtkObjectFactory.h>
 #include <vtkCamera.h>
@@ -102,24 +103,32 @@ void FisheyePass::Render(const vtkRenderState* s)
 
 	int x, y, w, h;
 	r->GetTiledSizeAndOrigin(&w, &h, &x, &y);
-	if (w > 0 && h > 0)
+	if (w > 0 && h > 0 && this->createWarpShader(renWin))
 	{
 		this->createRenderTarget(renWin);
 
 		// Render the scene into the texture. Using the same size as both old and new size keeps the view angle.
-		int sceneWidth = w * Supersampling;
-		int sceneHeight = h * Supersampling;
+		double scale = this->getSceneScale(renWin, w, h);
+		int sceneWidth = static_cast<int>(w * scale);
+		int sceneHeight = static_cast<int>(h * scale);
 		ostate->PushFramebufferBindings();
 		this->RenderDelegate(s, sceneWidth, sceneHeight, sceneWidth, sceneHeight, mFrameBufferObject, mColorTexture);
 		ostate->PopFramebufferBindings();
 
-		if (this->readyWarpShader(renWin))
-		{
-			this->renderWarp(r, ostate, x, y, w, h);
-			ostate->vtkglEnable(GL_BLEND);
-			mOverlayPass->Render(s);
-			this->NumberOfRenderedProps += mOverlayPass->GetNumberOfRenderedProps();
-		}
+		this->renderWarp(r, renWin, x, y, w, h);
+	}
+	else if (w > 0 && h > 0)
+	{
+		// Without the warp shader: render the scene undistorted
+		mSceneSteps->Render(s);
+		this->NumberOfRenderedProps += mSceneSteps->GetNumberOfRenderedProps();
+	}
+
+	if (w > 0 && h > 0)
+	{
+		ostate->vtkglEnable(GL_BLEND);
+		mOverlayPass->Render(s);
+		this->NumberOfRenderedProps += mOverlayPass->GetNumberOfRenderedProps();
 	}
 
 	vtkOpenGLCheckErrorMacro("failed after Render");
@@ -143,10 +152,22 @@ void FisheyePass::createRenderTarget(vtkOpenGLRenderWindow* renWin)
 	}
 }
 
-/** Create the warp shader, or make it current. Returns false if it could not be built. */
-bool FisheyePass::readyWarpShader(vtkOpenGLRenderWindow* renWin)
+/** Supersampling factor, reduced if the scene texture would exceed the maximum texture size. */
+double FisheyePass::getSceneScale(vtkOpenGLRenderWindow* renWin, int w, int h) const
 {
-	if (!mQuadHelper)
+	double maxSize = vtkTextureObject::GetMaximumTextureSize(renWin);
+	double scale = Supersampling;
+	if (maxSize > 0)
+	{
+		scale = std::min(scale, maxSize / std::max(w, h));
+	}
+	return scale;
+}
+
+/** Create the warp shader the first time. Returns false if it could not be built. */
+bool FisheyePass::createWarpShader(vtkOpenGLRenderWindow* renWin)
+{
+	if (!mQuadHelper && !mWarpShaderFailed)
 	{
 		std::string FSSource = vtkOpenGLRenderUtilities::GetFullScreenQuadFragmentShaderTemplate();
 		vtkShaderProgram::Substitute(FSSource, "//VTK::FSQ::Decl",
@@ -171,23 +192,20 @@ bool FisheyePass::readyWarpShader(vtkOpenGLRenderWindow* renWin)
 
 		mQuadHelper = new vtkOpenGLQuadHelper(renWin,
 			vtkOpenGLRenderUtilities::GetFullScreenQuadVertexShader().c_str(), FSSource.c_str(), "");
+		mWarpShaderFailed = !mQuadHelper->Program || !mQuadHelper->Program->GetCompiled();
+		if (mWarpShaderFailed)
+		{
+			vtkErrorMacro("Couldn't build the fisheye shader program. Rendering without the fisheye lens.");
+		}
 	}
-	else
-	{
-		renWin->GetShaderCache()->ReadyShaderProgram(mQuadHelper->Program);
-	}
-
-	bool ready = mQuadHelper->Program && mQuadHelper->Program->GetCompiled();
-	if (!ready)
-	{
-		vtkErrorMacro("Couldn't build the fisheye shader program.");
-	}
-	return ready;
+	return !mWarpShaderFailed;
 }
 
 /** Draw the rendered scene texture into the viewport, warped by the fisheye shader. */
-void FisheyePass::renderWarp(vtkRenderer* renderer, vtkOpenGLState* ostate, int x, int y, int w, int h)
+void FisheyePass::renderWarp(vtkRenderer* renderer, vtkOpenGLRenderWindow* renWin, int x, int y, int w, int h)
 {
+	vtkOpenGLState* ostate = renWin->GetState();
+	renWin->GetShaderCache()->ReadyShaderProgram(mQuadHelper->Program);
 	double viewAngle = renderer->GetActiveCamera()->GetViewAngle() / 180.0 * M_PI;
 	mColorTexture->Activate();
 	mQuadHelper->Program->SetUniformi("source", mColorTexture->GetTextureUnit());
@@ -218,6 +236,7 @@ void FisheyePass::ReleaseGraphicsResources(vtkWindow* w)
 
 	delete mQuadHelper;
 	mQuadHelper = nullptr;
+	mWarpShaderFailed = false; // Try again in a new context
 	if (mFrameBufferObject)
 	{
 		mFrameBufferObject->Delete();

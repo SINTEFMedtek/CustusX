@@ -66,10 +66,26 @@ CameraStyleForView::CameraStyleForView(CoreServicesPtr backend) :
 			this, &CameraStyleForView::activeToolChangedSlot);
 }
 
+/** Views are reused by other view groups: leave the view with the default rendering. */
+CameraStyleForView::~CameraStyleForView()
+{
+	vtkRendererPtr renderer = this->getRenderer();
+	if (renderer)
+	{
+		this->disableScopeRendering(renderer);
+	}
+}
+
 void CameraStyleForView::setView(ViewPtr widget)
 {
 	mViewportListener->stopListen();
 	mPreRenderListener->stopListen();
+
+	vtkRendererPtr oldRenderer = this->getRenderer();
+	if (oldRenderer)
+	{
+		this->disableScopeRendering(oldRenderer);
+	}
 
 	this->disconnectTool();
 	mView = widget;

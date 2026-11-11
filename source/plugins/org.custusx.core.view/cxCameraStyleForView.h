@@ -93,6 +93,7 @@ class org_custusx_core_view_EXPORT CameraStyleForView: public QObject
 Q_OBJECT
 public:
 	explicit CameraStyleForView(CoreServicesPtr backend);
+	~CameraStyleForView();
 	void setView(ViewPtr widget);
 
 	/** Select tool style. This replaces the vtkInteractor Style.

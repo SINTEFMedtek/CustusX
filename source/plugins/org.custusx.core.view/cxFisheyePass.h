@@ -23,7 +23,6 @@ class vtkDualDepthPeelingPass;
 class vtkOrderIndependentTranslucentPass;
 class vtkOverlayPass;
 class vtkOpenGLRenderWindow;
-class vtkOpenGLState;
 
 namespace cx
 {
@@ -72,8 +71,9 @@ private:
 
 	void updateTranslucentPass(vtkRenderer* renderer);
 	void createRenderTarget(vtkOpenGLRenderWindow* renWin);
-	bool readyWarpShader(vtkOpenGLRenderWindow* renWin);
-	void renderWarp(vtkRenderer* renderer, vtkOpenGLState* ostate, int x, int y, int w, int h);
+	double getSceneScale(vtkOpenGLRenderWindow* renWin, int w, int h) const;
+	bool createWarpShader(vtkOpenGLRenderWindow* renWin);
+	void renderWarp(vtkRenderer* renderer, vtkOpenGLRenderWindow* renWin, int x, int y, int w, int h);
 
 	double Strength;
 	int Supersampling; ///< render the scene at this multiple of the viewport size, as the center is magnified
@@ -84,6 +84,7 @@ private:
 	vtkOpenGLFramebufferObject* mFrameBufferObject;
 	vtkTextureObject* mColorTexture;
 	vtkOpenGLQuadHelper* mQuadHelper;
+	bool mWarpShaderFailed = false; ///< then render without distortion
 };
 
 /**
