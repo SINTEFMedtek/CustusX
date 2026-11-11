@@ -56,6 +56,7 @@ public:
 	SliceComputer();
 	~SliceComputer();
 	void setIsProbe(bool isProbe);
+	void setProbeSectorCenterDepth(double depth_mm); ///< Distance from the probe origin to the middle of the sector, along the beam. Negative if unknown.
 	void setToolPosition(const Transform3D& rMt);
 	void setOrientationType(ORIENTATION_TYPE val);
 	void setPlaneType(PLANE_TYPE val);
@@ -79,6 +80,8 @@ private:
 	Vector3D generateFixedIJCenter(const Vector3D& center_r, const Vector3D& cross_r, const Vector3D& i, const Vector3D& j) const;
 	SlicePlane orientToGravity(const SlicePlane& base) const;
     SlicePlane orientToGravityAroundToolZAxisAndAlongTheOperatingTable(const SlicePlane& base) const;
+	SlicePlane centerOnProbeSector(const SlicePlane& base) const;
+	SlicePlane applyToolViewOffset(const SlicePlane& base) const;
 	SlicePlane applyViewOffset(const SlicePlane& base) const;
 	double getViewOffsetAbsoluteFromCenter() const;
 
@@ -92,6 +95,7 @@ private:
 	FOLLOW_TYPE mFollowType;
 	Vector3D mFixedCenter;
 	bool mIsProbe = false;
+	double mProbeSectorCenterDepth = -1.0; ///< Negative if unknown
 
 	Transform3D m_rMt;
 	double mToolOffset;

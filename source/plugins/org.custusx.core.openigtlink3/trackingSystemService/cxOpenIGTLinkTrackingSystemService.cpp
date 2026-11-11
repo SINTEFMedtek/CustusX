@@ -52,7 +52,7 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 
 	connect(mNetworkHandler.get(), &NetworkHandler::connected,this, &OpenIGTLinkTrackingSystemService::serverIsConnected);
 	connect(mNetworkHandler.get(), &NetworkHandler::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
-	connect(mNetworkHandler.get(), &NetworkHandler::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
+	connect(mNetworkHandler.get(), &NetworkHandler::transformWithStatus, this, &OpenIGTLinkTrackingSystemService::receiveTransformWithStatus);
 	//connect(mNetworkHandler.get(), &NetworkHandler::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
 	connect(mNetworkHandler.get(), &NetworkHandler::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
 
@@ -241,7 +241,10 @@ void OpenIGTLinkTrackingSystemService::configure()
 			CX_LOG_WARNING() << "Tool configuration already contain tool: " << devicename << ". Existing tool will be overwritten";
 		mTools[devicename] = newTool;
 		if(newTool->isReference())
+		{
 			mReference = newTool;
+			connect(newTool.get(), &Tool::toolVisible, this, &OpenIGTLinkTrackingSystemService::referenceVisibleChanged);
+		}
 	}
 	if(!mReference)
 		CX_LOG_WARNING() << "OpenIGTLinkTrackingSystemService::configure() Got no reference tool";
@@ -292,10 +295,9 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 	}
 	else if(tool)
 	{
-		bool waitingForReference = mReference && !tool->isReference() && mReference->getTimestamp() <= 0;
-		if(tool->applyReference() && waitingForReference)
+		if(this->isWaitingForReference(tool))
 		{
-			// No reference position yet: the tool position would be in tracker space
+			// The reference is not visible: the tool position can't be made relative to it
 		}
 		else if(tool->applyReference())
 		{
@@ -318,6 +320,83 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 	}
 	else
 		this->printTransformIdWarning(devicename);
+}
+
+void OpenIGTLinkTrackingSystemService::receiveTransformWithStatus(QString devicename, Transform3D transform, double timestampMS, TransformStatus status)
+{
+	OpenIGTLinkToolPtr tool = this->getTool(devicename);
+	if (status.valid)
+	{
+		this->receiveTransform(devicename, transform, timestampMS);
+		if (tool && this->isTracking() && !this->isWaitingForReference(tool))
+		{
+			if (status.hasQuality)
+			{
+				tool->updatePositionQuality(status.quality);
+			}
+			this->updatePositionWarnings(tool);
+		}
+	}
+	else if (tool && this->isTracking())
+	{
+		tool->setMissing();
+	}
+	else if (this->isTracking())
+	{
+		this->printTransformIdWarning(devicename);
+	}
+}
+
+bool OpenIGTLinkTrackingSystemService::isWaitingForReference(OpenIGTLinkToolPtr tool) const
+{
+	return tool->applyReference() && mReference && !tool->isReference() && !mReference->getVisible();
+}
+
+void OpenIGTLinkTrackingSystemService::hideToolsRelativeToReference()
+{
+	for (std::map<QString, OpenIGTLinkToolPtr>::iterator it = mTools.begin(); it != mTools.end(); ++it)
+	{
+		if (it->second->applyReference() && it->second != mReference)
+		{
+			it->second->setMissing();
+		}
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::updatePositionWarnings(OpenIGTLinkToolPtr tool)
+{
+	if (tool->isReference())
+	{
+		for (std::map<QString, OpenIGTLinkToolPtr>::iterator it = mTools.begin(); it != mTools.end(); ++it)
+		{
+			this->updatePositionWarning(it->second);
+		}
+	}
+	else
+	{
+		this->updatePositionWarning(tool);
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::updatePositionWarning(OpenIGTLinkToolPtr tool)
+{
+	QString warning = tool->getOwnPositionWarning();
+	if (mReference && tool->applyReference() && !tool->isReference())
+	{
+		warning = PositionQuality::combineWarnings(warning, mReference->getOwnPositionWarning());
+	}
+	if (tool->getVisible())
+	{
+		tool->setPositionWarning(warning);
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::referenceVisibleChanged(bool visible)
+{
+	if (!visible)
+	{
+		this->hideToolsRelativeToReference();
+	}
 }
 
 bool OpenIGTLinkTrackingSystemService::printTransformIdWarning(QString devicename)
@@ -430,12 +509,6 @@ OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename)
 		}
 	}
 	return OpenIGTLinkToolPtr();
-}
-
-
-void OpenIGTLinkTrackingSystemService::resetTimeSynchronization()
-{
-	mNetworkHandler->clearTimestampSynchronization();
 }
 
 } /* namespace cx */

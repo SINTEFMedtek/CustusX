@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageSliceMapper.h>
+#include <vtkImageAlgorithm.h>
 #include <vtkImageSlice.h>
 
 #include "cxLogger.h"
@@ -35,6 +36,7 @@ Image2DProxy::Image2DProxy()
 	mSlice->SetMapper(imageSliceMapper);
 
 	mImageWithLUTProxy.reset(new ApplyLUTToImage2DProxy());
+	mSlice->GetMapper()->SetInputConnection(this->getOutputPort()->GetOutputPort());
 }
 
 Image2DProxy::~Image2DProxy()
@@ -50,6 +52,11 @@ Image2DProxyPtr Image2DProxy::New()
 vtkImageSlicePtr Image2DProxy::getSlice()
 {
 	return mSlice;
+}
+
+vtkImageAlgorithmPtr Image2DProxy::getOutputPort()
+{
+	return mImageWithLUTProxy->getOutputPort();
 }
 
 void Image2DProxy::setImage(ImagePtr image)
@@ -80,11 +87,12 @@ void Image2DProxy::setImage(ImagePtr image)
 	{
 		CX_ASSERT(mImage->is2D()); // class only treats 2d images.
 
-		mImageWithLUTProxy->setInputData(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
+		this->transferFunctionsChangedSlot();
 	}
 	else
 	{
 		mImageWithLUTProxy->setInputData(vtkImageDataPtr(), vtkLookupTablePtr());
+		mInputImageData = vtkImageDataPtr();
 	}
 
 	this->vtkImageDataChangedSlot();
@@ -93,7 +101,11 @@ void Image2DProxy::setImage(ImagePtr image)
 
 void Image2DProxy::vtkImageDataChangedSlot()
 {
-	mSlice->GetMapper()->SetInputData(mImageWithLUTProxy->getOutput());
+	// The image data object is replaced e.g. when a video stream reconnects
+	if (mImage && mImage->getBaseVtkImageData() != mInputImageData)
+	{
+		this->transferFunctionsChangedSlot();
+	}
 }
 
 /**called when transform is changed
@@ -113,7 +125,8 @@ void Image2DProxy::transformChangedSlot()
 
 void Image2DProxy::transferFunctionsChangedSlot()
 {
-	mImageWithLUTProxy->setInputData(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
+	mInputImageData = mImage->getBaseVtkImageData();
+	mImageWithLUTProxy->setInputData(mInputImageData, mImage->getLookupTable2D()->getOutputLookupTable());
 }
 
 void Image2DProxy::setTransformOffset(Transform3D rMrr)

@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTime.h"
 #include <QDateTime>
 #include <cstdint>
+#include <chrono>
 
 namespace cx
 {
@@ -34,24 +35,14 @@ QString timestampMilliSecondsFormatNice()
 
 double getMicroSecondsSinceEpoch()
 {
-#if QT_VERSION >= 0x040700
-	return QDateTime::currentDateTime().toMSecsSinceEpoch()*1000; //microseconds
-#else
-	return getMilliSecondsSinceEpoch()*1000;
-#endif
+	return getMilliSecondsSinceEpoch() * 1000;
 }
 
 double getMilliSecondsSinceEpoch()
 {
-#if QT_VERSION >= 0x040700
-	return QDateTime::currentDateTime().toMSecsSinceEpoch(); //milliseconds
-#else
-	QDateTime now = QDateTime::currentDateTime();
-	std::uint64_t now_t64 = now.toTime_t();
-	now_t64 *= 1000;
-	now_t64 += now.time().msec();
-	return now_t64;
-#endif
+	// sub-millisecond resolution, unlike QDateTime
+	std::chrono::duration<double, std::milli> sinceEpoch = std::chrono::system_clock::now().time_since_epoch();
+	return sinceEpoch.count();
 }
 
 QString toMillisecondsFormatNice(double secondsSinceEpoch)

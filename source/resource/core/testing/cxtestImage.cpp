@@ -21,6 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogicManager.h"
 #include "cxFileManagerServiceProxy.h"
 #include "cxNIfTIReader.h"
+#include "cxtestUtilities.h"
 #include "cxEnumConversion.h"
 
 namespace
@@ -157,6 +158,20 @@ TEST_CASE("Image copy: id copied", "[unit][resource][core]")
 	REQUIRE(image->getUid() == imageCopy->getUid());
 
 	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("Image copy: acquisition times copied", "[unit][resource][core]")
+{
+	cx::ImagePtr image = cxtest::Utilities::create3DImage();
+	QDateTime acquired = QDateTime::fromMSecsSinceEpoch(1791966064524);
+	image->setAcquisitionTime(acquired);
+	image->setSoftwareAcquisitionTime(acquired.addMSecs(8));
+	image->setOriginalAcquisitionTime(acquired.addMSecs(-3));
+
+	cx::ImagePtr copy = image->copy();
+	CHECK(copy->getAcquisitionTime() == acquired);
+	CHECK(copy->getAdvancedTimeInfo().mSoftwareAcquisitionTime == acquired.addMSecs(8));
+	CHECK(copy->getAdvancedTimeInfo().mOriginalAcquisitionTime == acquired.addMSecs(-3));
 }
 
 TEST_CASE("Image copy: vtkImage copied", "[unit][resource][core]")

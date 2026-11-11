@@ -65,7 +65,7 @@ void setupWirelessTools(NdiDevice& device, const std::vector<NdiToolConfig>& too
 {
 	for (const NdiToolConfig& tool : tools)
 	{
-		if (!tool.wireless)
+		if (!tool.wireless || device.isStopRequested())
 		{
 			continue;
 		}
@@ -96,12 +96,12 @@ void initializeAndEnablePortHandles(NdiDevice& device, const std::vector<NdiTool
 {
 	std::set<int> failed;
 	bool newHandles = true;
-	for (int round = 0; round < kMaxInitializeRounds && newHandles; ++round)
+	for (int round = 0; round < kMaxInitializeRounds && newHandles && !device.isStopRequested(); ++round)
 	{
 		newHandles = false;
 		for (int portHandle : device.searchPortHandles(NdiPortHandleSearch::NotInitialized))
 		{
-			if (failed.count(portHandle))
+			if (failed.count(portHandle) || device.isStopRequested())
 			{
 				continue;
 			}
@@ -114,7 +114,7 @@ void initializeAndEnablePortHandles(NdiDevice& device, const std::vector<NdiTool
 		}
 		for (int portHandle : device.searchPortHandles(NdiPortHandleSearch::NotEnabled))
 		{
-			if (failed.count(portHandle))
+			if (failed.count(portHandle) || device.isStopRequested())
 			{
 				continue;
 			}
@@ -251,7 +251,15 @@ NdiToolSetupResult setupNdiTools(NdiDevice& device, const std::vector<NdiToolCon
 	}
 	setupWirelessTools(device, tools, result);
 	initializeAndEnablePortHandles(device, tools, result);
-	matchWiredTools(device, tools, result);
+	if (device.isStopRequested())
+	{
+		result = NdiToolSetupResult();
+		result.warnings << "Stopped while setting up the tools.";
+	}
+	else
+	{
+		matchWiredTools(device, tools, result);
+	}
 	return result;
 }
 

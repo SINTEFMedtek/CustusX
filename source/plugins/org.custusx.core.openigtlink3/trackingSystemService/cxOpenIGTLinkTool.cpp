@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxOpenIGTLinkTool.h"
+#include "cxSettings.h"
 
 #include <QDateTime>
 
@@ -32,7 +33,9 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 //	CX_LOG_DEBUG() << "OpenIGTLinkTool constr mInstrumentId: " << mToolFileToolStructure.mInstrumentId << " mInstrumentScannerId: " << mToolFileToolStructure.mInstrumentScannerId;
 //	CX_LOG_DEBUG() << "OpenIGTLinkTool constr mOpenIGTLinkTransformId: " << mConfigFileToolStructure.mOpenIGTLinkTransformId << " mOpenIGTLinkImageId: " << mConfigFileToolStructure.mOpenIGTLinkImageId;
 	connect(&mTpsTimer, &QTimer::timeout, this, &OpenIGTLinkTool::calculateTpsSlot);
-	connect(&mTpsTimer, &QTimer::timeout, this, &OpenIGTLinkTool::calculateVisible);//Use tps timer to calculate visibility
+	connect(&mVisibleTimer, &QTimer::timeout, this, &OpenIGTLinkTool::calculateVisible);
+	double maxErrorRMS_mm = settings()->value("ndiTrackingMaxErrorRMS", 0.0).toDouble();
+	mQuality.setMaxErrorRMS(maxErrorRMS_mm > 0.0 ? maxErrorRMS_mm : PositionQuality::getDefaultMaxErrorRMS(toolFileToolStructure->mTrackerType));
 
 	if(toolFileToolStructure->mIsProbe)
 	{
@@ -49,6 +52,26 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 
 	this->createToolGraphic();
 	this->toolVisibleSlot(true);
+}
+
+QString OpenIGTLinkTool::getOpenIGTLinkImageId() const
+{
+	QString retval = mConfigFileToolStructure.mOpenIGTLinkImageId;
+	if (retval.isEmpty())
+	{
+		retval = ToolImpl::getOpenIGTLinkImageId();
+	}
+	return retval;
+}
+
+QString OpenIGTLinkTool::getOpenIGTLinkTransformId() const
+{
+	QString retval = mConfigFileToolStructure.mOpenIGTLinkTransformId;
+	if (retval.isEmpty())
+	{
+		retval = ToolImpl::getOpenIGTLinkTransformId();
+	}
+	return retval;
 }
 
 bool OpenIGTLinkTool::doIdCorrespondToTool(QString openIGTLinkId)
@@ -162,13 +185,20 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double tim
 	this->checkTimestampMismatch();
 
 	//Only use reference transform if this is to be applied to the other tools
-	if(isReference() && !applyReference())
-		return;
+	if(!isReference() || applyReference())
+	{
+		this->updatePosition(prMs);
+	}
+	this->calculateVisible();
+	if (mVisible && !mVisibleTimer.isActive())
+	{
+		mVisibleTimer.start(kVisibleCheckInterval_ms);
+	}
+}
 
-	//-----------------------------------------------------------------------------------------------
+void OpenIGTLinkTool::updatePosition(Transform3D prMs)
+{
 	// Ref sensor pos is applied to tools in OpenIGTLinkTrackingSystemService::receiveTransform()
-	//-----------------------------------------------------------------------------------------------
-
 	Transform3D prMt = prMs * this->getCalibration_sMt();
 	Transform3D prMt_filtered = prMt;
 
@@ -190,7 +220,7 @@ bool OpenIGTLinkTool::applyReference()
 
 void OpenIGTLinkTool::checkTimestampMismatch()
 {
-	mLastReceivedPositionTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	mLastReceivedPositionTime = QDateTime::currentMSecsSinceEpoch();
 	double diff = mLastReceivedPositionTime - mTimestamp;
 
 	//Use system time if time difference is more than a second
@@ -240,13 +270,29 @@ void OpenIGTLinkTool::calculateVisible()
 {
 	//Compare only timestamps from this computer, and not the received timestamps
 	//(as this computer man not be in sync with the one creating the messages)
-	qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 	double diff = currentTime - mLastReceivedPositionTime;
-//	CX_LOG_DEBUG() << "diff: " << diff;
-	if(diff > 500)//Set visible to false if last position is more than 500 ms old
-		setVisible(false);
-	else
-		setVisible(true);
+	bool visible = diff <= kMaxPositionAge_ms;
+	if (visible != mVisible)
+	{
+		this->setVisible(visible);
+	}
+}
+
+void OpenIGTLinkTool::setMissing()
+{
+	mLastReceivedPositionTime = 0;
+	this->calculateVisible();
+}
+
+void OpenIGTLinkTool::updatePositionQuality(const PositionQualitySample& sample)
+{
+	mQuality.update(sample);
+}
+
+QString OpenIGTLinkTool::getOwnPositionWarning() const
+{
+	return mQuality.getWarning();
 }
 
 void OpenIGTLinkTool::toolVisibleSlot(bool on)
@@ -260,6 +306,12 @@ void OpenIGTLinkTool::toolVisibleSlot(bool on)
 void OpenIGTLinkTool::setVisible(bool vis)
 {
 	mVisible = vis;
+	if (!vis)
+	{
+		mVisibleTimer.stop();
+		mQuality.reset();
+		this->setPositionWarning(QString());
+	}
 	emit toolVisible(vis);
 }
 

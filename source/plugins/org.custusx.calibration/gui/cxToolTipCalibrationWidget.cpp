@@ -151,8 +151,6 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 			text = "Ref. point: "+qstring_cast(tool->getReferencePoints()["1"]);
 			mCalibrateButton->setEnabled(true);
 		}
-		else
-			reportWarning("Selected tool have no known reference point");
 		if(tool)
 		{
 			mCalibrationLabel->setText("Calibration:\n"+qstring_cast(tool->getCalibration_sMt()));

@@ -12,7 +12,9 @@ Polaris devices.
   applications and ndicapi's own CMake files (built by the plugin's CMakeLists.txt instead).
 - ndicapiExport.h is written for CustusX (static build) and replaces ndicapiExport.h.in.
 - Changed for CustusX: ndicapi_serial_unix.cxx also sets 921600 baud on Linux
-  (CustusX#55). Keep this change when updating, unless ndicapi has added it.
+  (CustusX#55), and ndicapi_socket_unix.cxx/ndicapi_socket_apple.cxx pass the socket
+  timeout as a struct timeval, without which the receive timeout was not set (CustusX#65).
+  Keep these changes when updating, unless ndicapi has added them.
 - Update by copying the same files from a newer commit and updating the commit above.
 
 Licenses

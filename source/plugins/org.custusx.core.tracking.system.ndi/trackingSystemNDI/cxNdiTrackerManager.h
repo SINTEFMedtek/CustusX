@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxNdiDevice.h"
 #include "cxNdiFrameRateEstimator.h"
+#include "cxFrameCounterTimestamper.h"
 #include "cxNdiTool.h"
 #include "cxNdiToolSetup.h"
 #include "cxToolFileParser.h"
@@ -56,12 +57,10 @@ public:
 	void setConnectionSettings(const NdiConnectionSettings& connection); ///< Thread-safe. Used by the next connect.
 
 	static NdiToolConfig createToolConfig(ToolFileParser::ToolInternalStructurePtr structure, TRACKING_SYSTEM trackerType);
-	static QString combinePositionWarnings(QString toolWarning, QString referenceWarning);
 	/** Messages for the system status bits that are set in status but not in previousStatus. */
 	static QStringList describeNewSystemStatus(int previousStatus, int status);
 	/** A tool was plugged in or removed: the tools are set up again before tracking starts the next time. */
 	static bool hasNewToolChange(int previousStatus, int status);
-	static double getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType);
 	static bool isPolaris(TRACKING_SYSTEM trackerType);
 	static int getIlluminatorRateToSet(TRACKING_SYSTEM trackerType, int rate_Hz); ///< 0: leave the device's default
 	static const int kMaxConsecutiveReadFailures = 3;
@@ -116,6 +115,7 @@ private:
 	bool mToolsChanged;
 	int mIlluminatorRate_Hz;
 	NdiFrameRateEstimator mFrameRate;
+	FrameCounterTimestamper mFrameTimestamper;
 	int mQuickRepeats; ///< Polls that quickly gave the last frame again, since the last new frame
 	ToolFileParser::TrackerInternalStructure mTrackerStructure;
 	bool mInitialized;

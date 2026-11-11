@@ -128,8 +128,6 @@ USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorder
 	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory_prMt(mRecordingTool, mSession, true);
 	std::map<double, cx::ToolPositionMetadata> trackerMetadata = RecordSession::getToolHistory_metadata(mRecordingTool, mSession, true);
 	std::map<double, cx::ToolPositionMetadata> referenceTrackerMetadata = RecordSession::getToolHistory_metadata(mReference, mSession, true);
-	std::cout << "----------- "
-				 "trackerMetadata : " << trackerMetadata.size() << std::endl;
 
 	CachedImageDataContainerPtr imageData = videoRecorder->getImageData();
 	std::vector<TimeInfo> imageTimestamps = videoRecorder->getTimestamps();
@@ -145,7 +143,8 @@ USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorder
 																		   mRecordingTool,
 																		   videoRecorder->getSource()->getUid(),
 																		   mDoWriteColor,
-																		   m_rMpr);
+																		   m_rMpr,
+																		   mReference);
 	return reconstructData;
 }
 
@@ -170,6 +169,7 @@ void USSavingRecorder::clearRecording()
 	mVideoRecorder.clear();
 	mSession.reset();
 	mRecordingTool.reset();
+	mReference.reset();
 }
 
 

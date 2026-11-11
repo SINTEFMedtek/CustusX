@@ -16,7 +16,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTrackerConfiguration.h"
 #include "cxOpenIGTLinkTool.h"
+#include "cxSettings.h"
+#include "cxOpenIGTLinkStreamerService.h"
+#include "cxOpenIGTLinkStreamer.h"
+#include <QDomDocument>
 #include <QFileInfo>
+#include <QCoreApplication>
+#include <QElapsedTimer>
+#include <QThread>
+#include "igtlioTransformDevice.h"
 
 namespace {
 typedef std::shared_ptr<class TestNetworkHandler> cxtestNetworkHandlerPtr;
@@ -24,20 +32,29 @@ typedef std::shared_ptr<class TestNetworkHandler> cxtestNetworkHandlerPtr;
 class TestNetworkHandler : public cx::NetworkHandler
 {
 public:
-	TestNetworkHandler() : cx::NetworkHandler(nullptr) {}
+	TestNetworkHandler() : cx::NetworkHandler(nullptr)
+	{
+		mTimer->stop(); // no igtlio logic to process
+	}
 
-	double synchronizedTimestamp(double receivedTimestampSec)
+	double synchronizedTimestamp(double sentTimestampSec, double received_ms, QString deviceName = "device")
 	{
-		return NetworkHandler::synchronizedTimestamp(receivedTimestampSec);
+		return NetworkHandler::synchronizedTimestamp(deviceName, sentTimestampSec, received_ms);
 	}
-	bool verifyTimestamp(double &timestampMS)
+	double getTimestampOffset(QString deviceName = "device")
 	{
-		return NetworkHandler::verifyTimestamp(timestampMS);
+		return mClockSynchronizers.count(deviceName) ? mClockSynchronizers[deviceName].getOffset_ms() : 0.0;
 	}
-	double getTimestampOffset()
+	void setSentProbeDefinitions(QString deviceName, int sent)
 	{
-		return mTimestampOffsetMS;
+		mDevices[deviceName].deviceName = deviceName;
+		mDevices[deviceName].sentNumProbeDefinitions = sent;
 	}
+	int getSentProbeDefinitions(QString deviceName)
+	{
+		return mDevices[deviceName].sentNumProbeDefinitions;
+	}
+	using cx::NetworkHandler::readTransformStatus;
 };
 
 /** Pretends to connect to a server, which answers if mServerAvailable */
@@ -80,11 +97,8 @@ typedef std::shared_ptr<FakeServerNetworkHandler> FakeServerNetworkHandlerPtr;
 class OpenIGTLinkTrackingSystemServiceMoc : public cx::OpenIGTLinkTrackingSystemService
 {
 public:
-	cxtestNetworkHandlerPtr mTestNetworkHandler;
-
 	OpenIGTLinkTrackingSystemServiceMoc() : cx::OpenIGTLinkTrackingSystemService(cx::NetworkHandlerPtr()) {}
 	OpenIGTLinkTrackingSystemServiceMoc(cxtestNetworkHandlerPtr testNetworkHandler) :
-		mTestNetworkHandler(testNetworkHandler),
 		cx::OpenIGTLinkTrackingSystemService(testNetworkHandler) {}
 
 	virtual bool isConfigured() const;
@@ -92,7 +106,6 @@ public:
 	virtual bool isTracking() const;
 
 	void internalSetState(cx::Tool::State val) {cx::OpenIGTLinkTrackingSystemService::internalSetState(val);}
-	double getNetworkHandlerTimestampOffset();
 	cx::OpenIGTLinkToolPtr getTool(QString devicename) {return cx::OpenIGTLinkTrackingSystemService::getTool(devicename);}
 	QStringList getTransformIdWarningPrinted() {return mTransformIdWarningPrinted;}
 	bool testPrintTransformIdWarning(QString devicename) {return printTransformIdWarning(devicename);}
@@ -103,6 +116,10 @@ public slots:
 	virtual void receiveTransform(QString devicename, cx::Transform3D transform, double timestampMS)
 	{
 		cx::OpenIGTLinkTrackingSystemService::receiveTransform(devicename, transform, timestampMS);
+	}
+	void receiveTransformWithStatus(QString devicename, cx::Transform3D transform, double timestampMS, cx::TransformStatus status)
+	{
+		cx::OpenIGTLinkTrackingSystemService::receiveTransformWithStatus(devicename, transform, timestampMS, status);
 	}
 
 };
@@ -120,11 +137,6 @@ bool OpenIGTLinkTrackingSystemServiceMoc::isInitialized() const
 bool OpenIGTLinkTrackingSystemServiceMoc::isTracking() const
 {
 	return cx::OpenIGTLinkTrackingSystemService::isTracking();
-}
-
-double OpenIGTLinkTrackingSystemServiceMoc::getNetworkHandlerTimestampOffset()
-{
-	return mTestNetworkHandler->getTimestampOffset();
 }
 
 typedef std::shared_ptr<OpenIGTLinkTrackingSystemServiceMoc> OpenIGTLinkTrackingSystemServiceMocPtr;
@@ -218,6 +230,51 @@ void setCxOpenIGTLinkConfiguration(OpenIGTLinkTrackingSystemServiceMocPtr tracki
 }
 
 const QString kCxOpenIGTLinkTool = "AnserNeedle1";
+
+/** Tracks the Aurora tools of LabAuroraTools from the server: the reference on port_0, a tool on port_2 */
+OpenIGTLinkTrackingSystemServiceMocPtr startAuroraFallbackTracking(FakeServerNetworkHandlerPtr server)
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr retval(new OpenIGTLinkTrackingSystemServiceMoc(server));
+	QStringList configurations = retval->getConfiguration()->getAllConfigurations();
+	int posToolConfigFile = 0;
+	REQUIRE(findConfigFileNumberInList(configurations, QString("LabAuroraTools"), posToolConfigFile));
+	retval->startFallbackTracking(configurations[posToolConfigFile]);
+	REQUIRE(retval->isTracking());
+	REQUIRE(retval->getTool("port_2"));
+	return retval;
+}
+
+cx::TransformStatus createTransformStatus(int portStatus, double errorRMS_mm = 0.1)
+{
+	cx::TransformStatus retval;
+	retval.hasQuality = true;
+	retval.quality.visible = true;
+	retval.quality.portStatus = portStatus;
+	retval.quality.errorRMS_mm = errorRMS_mm;
+	return retval;
+}
+
+void receiveToolTransforms(OpenIGTLinkTrackingSystemServiceMocPtr service, cx::TransformStatus status, int count, cx::TransformStatus referenceStatus = createTransformStatus(0))
+{
+	for (int i = 0; i < count; ++i)
+	{
+		double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+		service->receiveTransformWithStatus("port_0", cx::Transform3D::Identity(), timestampMS, referenceStatus);
+		service->receiveTransformWithStatus("port_2", cx::createTransformTranslate(cx::Vector3D(5, 0, 0)), timestampMS, status);
+	}
+}
+
+bool waitUntilHidden(cx::ToolPtr tool, int timeout_ms)
+{
+	QElapsedTimer timer;
+	timer.start();
+	while (tool->getVisible() && timer.elapsed() < timeout_ms)
+	{
+		QCoreApplication::processEvents();
+		QThread::msleep(10);
+	}
+	return !tool->getVisible();
+}
 
 } // namespace
 
@@ -337,107 +394,53 @@ TEST_CASE("NetworkHandler: the connection is shared, and closed when the last us
 	CHECK_FALSE(server->isConnected());
 }
 
-TEST_CASE("NetworkHandler: Test timestamp verification", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("NetworkHandler: Timestamps follow the sender, with the offset of the fastest message", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double timestamp = latestSystemTime;
-
-	REQUIRE(networkHandler->verifyTimestamp(timestamp));
-	timestamp += 500;
-	REQUIRE(networkHandler->verifyTimestamp(timestamp));
-	timestamp += 1000;
-	REQUIRE_FALSE(networkHandler->verifyTimestamp(timestamp));
-	timestamp -= 3000;
-	REQUIRE_FALSE(networkHandler->verifyTimestamp(timestamp));
-}
-
-TEST_CASE("NetworkHandler: Test timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
-{
-	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-
-	double tolerance = 10;
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double synchValue = 1000;
-	double timestampSec = synchValue;
-
-	double synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-	double timeIncrementSec = 0.005;
-
-	for(int i = 1; i < 40; ++i)
+	double start_ms = 5000000;
+	double latency_ms = 2;
+	for (int i = 0; i < 40; ++i)
 	{
-		timestampSec += timeIncrementSec;
-		synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-		{
-			double targetTime = latestSystemTime + timeIncrementSec*1000*i;
-			INFO("iteration: "+qstring_cast(i)+" "+qstring_cast(synchedTimeMs)+" == "+qstring_cast(targetTime));
-			REQUIRE(cx::similar(synchedTimeMs, targetTime, tolerance));
-		}
+		double sentSec = 1000 + i * 0.005;
+		double received_ms = start_ms + i * 5 + latency_ms + (i % 3);
+		double synchedTimeMs = networkHandler->synchronizedTimestamp(sentSec, received_ms);
+		INFO("iteration: " + qstring_cast(i));
+		CHECK(cx::similar(synchedTimeMs, received_ms - (i % 3), 0.001));
 	}
-
-	//Adding a difference from system time above 1 sec will cause NetworkHandler::verifyTimestamp to change timestamp to system time
-	timestampSec += 1;
-	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	INFO(qstring_cast(synchedTimeMs)+" == "+qstring_cast(latestSystemTime));
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-	timestampSec -= 3;
-	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
+	CHECK(cx::similar(networkHandler->getTimestampOffset(), start_ms + latency_ms - 1000000, 0.001));
 }
 
-TEST_CASE("NetworkHandler: Test timestamp synchronization reset", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("NetworkHandler: Uses the receive time when the sender time jumps back", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-
-	double tolerance = 10;
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double timestampSec = 1000;
-
-	double synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-
-	double offset = latestSystemTime - timestampSec*1000;
-	{
-		INFO(qstring_cast(offset)+"=="+qstring_cast(networkHandler->getTimestampOffset()));
-		REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
-	}
-
-	networkHandler->clearTimestampSynchronization();
-	REQUIRE_FALSE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
-	REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
-
-
-	timestampSec = 3000;
-	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-
-	offset = latestSystemTime - timestampSec*1000;
-	REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
+	double received_ms = 5000000;
+	networkHandler->synchronizedTimestamp(1000, received_ms);
+	received_ms += 5;
+	CHECK(cx::similar(networkHandler->synchronizedTimestamp(1000 - 3, received_ms), received_ms, 0.001));
 }
 
-TEST_CASE("OpenIGTLinkTrackingSystemService: Test timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("NetworkHandler: Each device has its own timestamp offset", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc(networkHandler));
+	double received_ms = 5000000;
+	networkHandler->synchronizedTimestamp(1000, received_ms, "tracking");
+	networkHandler->synchronizedTimestamp(3000, received_ms, "image");
+	CHECK(cx::similar(networkHandler->getTimestampOffset("tracking"), received_ms - 1000000, 0.001));
+	CHECK(cx::similar(networkHandler->getTimestampOffset("image"), received_ms - 3000000, 0.001));
+}
 
-	double tolerance = 10;
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double timestampSec = 1000;
+TEST_CASE("NetworkHandler: A new connection resets the timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	double received_ms = 5000000;
+	server->synchronizedTimestamp(1000, received_ms);
+	CHECK(cx::similar(server->getTimestampOffset(), received_ms - 1000000, 0.001));
 
-	double synchedTimeMs = trackingSystemService->mTestNetworkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
+	server->acquireConnection("tracking", "127.0.0.1", 18944);
+	CHECK(cx::similar(server->getTimestampOffset(), 0, 0.001));
 
-	REQUIRE_FALSE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
-	trackingSystemService->resetTimeSynchronization();
-	REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
+	server->synchronizedTimestamp(3000, received_ms);
+	CHECK(cx::similar(server->getTimestampOffset(), received_ms - 3000000, 0.001));
 }
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: receiveTransform print openigtlinktransformid warning", "[plugins][org.custusx.core.openigtlink3][unit]")
@@ -716,5 +719,235 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool files with OpenIGTLink id
 }
 
 #endif
+
+TEST_CASE("OpenIGTLinkStreamerService: the probe definition is sent again when the streaming starts", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr connection(new FakeServerNetworkHandler());
+	cx::OpenIGTLinkStreamerService service(connection);
+	QDomDocument document;
+	cx::StreamerPtr streamer = service.createStreamer(document.createElement("root"));
+
+	// Images were already received over the connection used by tracking, using up the probe definitions to send
+	connection->setSentProbeDefinitions("BK", 2);
+	streamer->startStreaming(cx::SenderPtr());
+	CHECK(connection->getSentProbeDefinitions("BK") == 0);
+}
+
+TEST_CASE("NetworkHandler: reads the transform status from the metadata", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	igtlioTransformDevicePointer device = igtlioTransformDevicePointer::New();
+	cx::TransformStatus status = TestNetworkHandler::readTransformStatus(device);
+	CHECK(status.valid);
+	CHECK_FALSE(status.hasQuality);
+
+	device->SetMetaDataElement("TransformStatus", IANA_TYPE_US_ASCII, "INVALID");
+	CHECK_FALSE(TestNetworkHandler::readTransformStatus(device).valid);
+
+	device->SetMetaDataElement("TransformStatus", IANA_TYPE_US_ASCII, "OK");
+	device->SetMetaDataElement("PortStatus", IANA_TYPE_US_ASCII, "128");
+	device->SetMetaDataElement("errorRMS_mm", IANA_TYPE_US_ASCII, "0.25");
+	status = TestNetworkHandler::readTransformStatus(device);
+	CHECK(status.valid);
+	CHECK(status.hasQuality);
+	CHECK(status.quality.visible);
+	CHECK(status.quality.portStatus == cx::NdiPortStatus::PartiallyInVolume);
+	CHECK(status.quality.errorRMS_mm == Approx(0.25));
+	CHECK(status.invalidMetadata.isEmpty());
+
+	device->SetMetaDataElement("PortStatus", IANA_TYPE_US_ASCII, "0x40");
+	CHECK(TestNetworkHandler::readTransformStatus(device).quality.portStatus == cx::NdiPortStatus::OutOfVolume);
+	device->SetMetaDataElement("PortStatus", IANA_TYPE_US_ASCII, "064");
+	CHECK(TestNetworkHandler::readTransformStatus(device).quality.portStatus == cx::NdiPortStatus::OutOfVolume);
+	device->SetMetaDataElement("PortStatus", IANA_TYPE_US_ASCII, "-1");
+	CHECK(TestNetworkHandler::readTransformStatus(device).invalidMetadata == "PortStatus=-1");
+}
+
+TEST_CASE("NetworkHandler: metadata values that can't be read are reported", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	igtlioTransformDevicePointer device = igtlioTransformDevicePointer::New();
+	device->SetMetaDataElement("PortStatus", IANA_TYPE_US_ASCII, "out");
+	device->SetMetaDataElement("errorRMS_mm", IANA_TYPE_US_ASCII, "high");
+	cx::TransformStatus status = TestNetworkHandler::readTransformStatus(device);
+	CHECK_FALSE(status.hasQuality);
+	CHECK(status.invalidMetadata == "PortStatus=out errorRMS_mm=high");
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: a transform with TransformStatus INVALID hides the tool at once", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = startAuroraFallbackTracking(server);
+	cx::OpenIGTLinkToolPtr tool = trackingSystemService->getTool("port_2");
+
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0), 1);
+	CHECK(tool->getVisible());
+	cx::Transform3D lastPosition = tool->get_prMt();
+
+	// The server sends the last known matrix of the missing tool
+	cx::TransformStatus invalid;
+	invalid.valid = false;
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+	trackingSystemService->receiveTransformWithStatus("port_2", cx::createTransformTranslate(cx::Vector3D(50, 0, 0)), timestampMS, invalid);
+	CHECK_FALSE(tool->getVisible());
+	CHECK(cx::similar(tool->get_prMt(), lastPosition));
+
+	// Hidden until the next position, also when the visibility is checked again
+	QCoreApplication::processEvents();
+	CHECK_FALSE(tool->getVisible());
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0), 1);
+	CHECK(tool->getVisible());
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: a missing reference also hides the tools positioned relative to it", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = startAuroraFallbackTracking(server);
+	cx::OpenIGTLinkToolPtr reference = trackingSystemService->getTool("port_0");
+	cx::OpenIGTLinkToolPtr tool = trackingSystemService->getTool("port_2");
+	REQUIRE(reference->isReference());
+
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0), 1);
+	CHECK(tool->getVisible());
+
+	cx::TransformStatus invalid;
+	invalid.valid = false;
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+	trackingSystemService->receiveTransformWithStatus("port_0", cx::Transform3D::Identity(), timestampMS, invalid);
+	CHECK_FALSE(reference->getVisible());
+	CHECK_FALSE(tool->getVisible());
+
+	// The tool positions can't be used until the reference is back
+	trackingSystemService->receiveTransformWithStatus("port_2", cx::createTransformTranslate(cx::Vector3D(5, 0, 0)), timestampMS, createTransformStatus(0));
+	CHECK_FALSE(tool->getVisible());
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0), 1);
+	CHECK(tool->getVisible());
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: the warning of the reference is shown for the tools positioned relative to it", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = startAuroraFallbackTracking(server);
+	cx::OpenIGTLinkToolPtr reference = trackingSystemService->getTool("port_0");
+	cx::OpenIGTLinkToolPtr tool = trackingSystemService->getTool("port_2");
+	cx::TransformStatus partiallyOut = createTransformStatus(cx::NdiPortStatus::PartiallyInVolume);
+
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0), cx::PositionQuality::kFramesBeforeWarning, partiallyOut);
+	CHECK(reference->getPositionWarning() == "partially out of the measurement volume");
+	CHECK(tool->getPositionWarning() == "Reference: partially out of the measurement volume");
+
+	receiveToolTransforms(trackingSystemService, cx::TransformStatus(), cx::PositionQuality::kFramesBeforeClearing);
+	CHECK(reference->getPositionWarning().isEmpty());
+	CHECK(tool->getPositionWarning().isEmpty());
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: a reference without new positions hides the tools positioned relative to it", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = startAuroraFallbackTracking(server);
+	cx::OpenIGTLinkToolPtr reference = trackingSystemService->getTool("port_0");
+	cx::OpenIGTLinkToolPtr tool = trackingSystemService->getTool("port_2");
+	QCoreApplication::processEvents(); // events queued by earlier tests would delay the timers
+
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0), 1);
+	REQUIRE(waitUntilHidden(reference, 2000));
+	CHECK_FALSE(tool->getVisible());
+
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+	trackingSystemService->receiveTransformWithStatus("port_2", cx::createTransformTranslate(cx::Vector3D(7, 0, 0)), timestampMS, createTransformStatus(0));
+	CHECK_FALSE(tool->getVisible());
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0), 1);
+	CHECK(tool->getVisible());
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: a tool shown again has its new position when it is shown", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = startAuroraFallbackTracking(server);
+	cx::OpenIGTLinkToolPtr tool = trackingSystemService->getTool("port_2");
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0), 1);
+
+	cx::TransformStatus invalid;
+	invalid.valid = false;
+	trackingSystemService->receiveTransformWithStatus("port_2", cx::Transform3D::Identity(), 0, invalid);
+	REQUIRE_FALSE(tool->getVisible());
+
+	cx::Vector3D positionWhenShown(0, 0, 0);
+	QObject::connect(tool.get(), &cx::Tool::toolVisible, [&](bool)
+	{
+		positionWhenShown = tool->get_prMt().translation();
+	});
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+	trackingSystemService->receiveTransformWithStatus("port_2", cx::createTransformTranslate(cx::Vector3D(9, 0, 0)), timestampMS, createTransformStatus(0));
+	CHECK(cx::similar(positionWhenShown, cx::Vector3D(9, 0, 0)));
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: positions partially out of the volume give a warning, as for NDI tools", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = startAuroraFallbackTracking(server);
+	cx::OpenIGTLinkToolPtr tool = trackingSystemService->getTool("port_2");
+	cx::TransformStatus partiallyOut = createTransformStatus(cx::NdiPortStatus::PartiallyInVolume);
+
+	receiveToolTransforms(trackingSystemService, partiallyOut, cx::PositionQuality::kFramesBeforeWarning - 1);
+	CHECK(tool->getPositionWarning().isEmpty());
+	receiveToolTransforms(trackingSystemService, partiallyOut, 1);
+	CHECK(tool->getPositionWarning() == "partially out of the measurement volume");
+	CHECK(tool->getVisible());
+
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0), cx::PositionQuality::kFramesBeforeClearing - 1);
+	CHECK_FALSE(tool->getPositionWarning().isEmpty());
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0), 1);
+	CHECK(tool->getPositionWarning().isEmpty());
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: the RMS error limit of an Aurora tool is 1 mm", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = startAuroraFallbackTracking(server);
+	cx::OpenIGTLinkToolPtr tool = trackingSystemService->getTool("port_2");
+
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0, 0.75), cx::PositionQuality::kFramesBeforeWarning);
+	CHECK(tool->getPositionWarning().isEmpty());
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0, 1.5), cx::PositionQuality::kFramesBeforeWarning);
+	CHECK(tool->getPositionWarning() == "RMS error 1.50 (limit 1.00)");
+
+	// A hidden tool has no warning
+	cx::TransformStatus invalid;
+	invalid.valid = false;
+	trackingSystemService->receiveTransformWithStatus("port_2", cx::Transform3D::Identity(), 0, invalid);
+	CHECK(tool->getPositionWarning().isEmpty());
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: the RMS error limit can be set, as for NDI tracking", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	QVariant oldLimit = cx::settings()->value("ndiTrackingMaxErrorRMS", 0.0);
+	cx::settings()->setValue("ndiTrackingMaxErrorRMS", 0.2);
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = startAuroraFallbackTracking(server);
+	cx::OpenIGTLinkToolPtr tool = trackingSystemService->getTool("port_2");
+	cx::settings()->setValue("ndiTrackingMaxErrorRMS", oldLimit);
+
+	receiveToolTransforms(trackingSystemService, createTransformStatus(0, 0.3), cx::PositionQuality::kFramesBeforeWarning);
+	CHECK(tool->getPositionWarning() == "RMS error 0.30 (limit 0.20)");
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: a tool without transform status is hidden when its positions stop", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	FakeServerNetworkHandlerPtr server(new FakeServerNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = startAuroraFallbackTracking(server);
+	cx::OpenIGTLinkToolPtr tool = trackingSystemService->getTool("port_2");
+	QCoreApplication::processEvents(); // events queued by earlier tests, e.g. loading a patient, would delay the timers
+
+	// No metadata, e.g. from PlusServer
+	receiveToolTransforms(trackingSystemService, cx::TransformStatus(), 1);
+	CHECK(tool->getVisible());
+	CHECK(cx::similar(tool->get_prMt().translation(), cx::Vector3D(5, 0, 0)));
+	CHECK(tool->getPositionWarning().isEmpty());
+
+	QElapsedTimer timer;
+	timer.start();
+	CHECK(waitUntilHidden(tool, 2000));
+	CHECK(timer.elapsed() >= cx::OpenIGTLinkTool::kMaxPositionAge_ms - 50);
+	CHECK(timer.elapsed() < cx::OpenIGTLinkTool::kMaxPositionAge_ms + 10 * cx::OpenIGTLinkTool::kVisibleCheckInterval_ms);
+}
 
 }//cxtest

@@ -179,9 +179,4 @@ std::vector<TrackingSystemServicePtr> TrackingServiceProxy::getTrackingSystems()
 	return mTrackingService->getTrackingSystems();
 }
 
-void TrackingServiceProxy::resetTimeSynchronization()
-{
-	return mTrackingService->resetTimeSynchronization();
-}
-
 } //cx

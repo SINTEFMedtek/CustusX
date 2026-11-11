@@ -119,6 +119,7 @@ void StateService::fillDefaultSettings()
 
 	this->fillDefault("View2D/useGPU2DRendering", false);
 	this->fillDefault("View2D/useLinearInterpolationIn2DRendering", true);
+	this->fillDefault("View2D/drawImagesInSlicePlaneDirectly", true);
 
 	this->fillDefault("optimizedViews", true);
 	this->fillDefault("smartRender", true);

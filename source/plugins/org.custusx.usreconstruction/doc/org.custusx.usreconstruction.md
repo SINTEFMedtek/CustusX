@@ -14,6 +14,13 @@ Reconstruct 3D US data from acquired 2D sequence.
 
 Select a US Reconstruction algorithm from the list in \ref cx_user_doc_group_usreconstruction.
 
+Flip images L/R
+---------------
+
+Some recordings have images that are mirrored left to right relative to the tracking data, e.g. older acquisitions where the scanner image was flipped. With **Flip images L/R** on, the images are mirrored laterally before they are used, both in the reconstruction and in any image based correction done by the algorithm. The probe sector (origin and clip rect) is mirrored too, so the mask and the frame positions follow the images.
+
+The option belongs to the selected recording: it is not saved, and it is turned off when another recording is selected. Some algorithms (e.g. VIC with image correlation correction) check the image orientation against the tracking data, and write a warning to the log if the images seem to be mirrored.
+
 Position filter
 ---------------
 

@@ -14,6 +14,7 @@ topics, then use the doxygen generated source code documentation to get into det
 * \ref code_style
 * \ref customize_applications
 * \ref dev_tracking_hardware_tests
+* \ref dev_acquisition_timestamps
 
 From the user documentation:
 

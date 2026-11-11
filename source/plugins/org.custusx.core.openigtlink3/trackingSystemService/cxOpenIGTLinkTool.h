@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTransform3D.h"
 #include "cxToolConfigurationParser.h"
+#include "cxPositionQuality.h"
 
 class QStringList;
 
@@ -70,9 +71,17 @@ public:
 	virtual bool isCalibrated() const; ///< true if calibration is different from identity
 	virtual Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
 	virtual void setCalibration_sMt(Transform3D sMt); ///< requests to use the calibration and replaces the tools calibration file
+	virtual QString getOpenIGTLinkImageId() const;
+	virtual QString getOpenIGTLinkTransformId() const;
 
 	//virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	virtual void setVisible(bool vis);
+
+	void setMissing(); ///< Hide the tool at once, until the next position
+	void updatePositionQuality(const PositionQualitySample& sample); ///< Evaluates the position quality with the NDI rules
+	QString getOwnPositionWarning() const; ///< The warning from the tool's own position quality, without the reference's
+	static const int kMaxPositionAge_ms = 500; ///< Hidden when no position has arrived for this long
+	static const int kVisibleCheckInterval_ms = 100;
 
 	bool doIdCorrespondToTool(QString openIGTLinkId);
 	bool isReference();
@@ -88,6 +97,8 @@ private slots:
 private:
 	ProbePtr mProbe;
 	QTimer mTpsTimer;
+	QTimer mVisibleTimer;
+	PositionQuality mQuality;
 	double mTimestamp;
 	bool mVisible;
 	qint64 mLastReceivedPositionTime;
@@ -98,6 +109,7 @@ private:
 	ToolFileParser::ToolInternalStructurePtr mToolFileToolStructure;
 
 	void calculateVisible();
+	void updatePosition(Transform3D prMs);
 	void checkTimestampMismatch();
 	void printWarningAboutTimestampMismatch(double diff);
 };

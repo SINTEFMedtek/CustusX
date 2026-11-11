@@ -227,7 +227,9 @@ std::map<double, cx::ToolPositionMetadata> RecordSession::getToolHistory_metadat
 		}
 	}
 
-	if(retval.empty() && session && verbose)
+	// Only some tracking systems give metadata
+	bool toolHasMetadata = tool && !tool->getMetadataHistory().empty();
+	if(retval.empty() && session && verbose && toolHasMetadata)
 	{
 		CX_LOG_ERROR() << QString("Could not find any tracking meta data for tool [%1] in session [%2]. ")
 						  .arg(tool.get() ? tool->getName() : "NULL")

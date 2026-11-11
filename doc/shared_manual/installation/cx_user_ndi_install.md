@@ -39,15 +39,16 @@ settings.ini in the profile's settings folder (e.g. CustusX_settings/profiles/La
 while CustusX is closed:
 
 * ndiTrackingHostname: the serial port (e.g. /dev/ttyUSB0 or COM3) or the network address of the
-  device. Empty (default): search the serial ports (on Windows COM1 to COM20). Set it for a device
-  on a higher COM port; the COM port number is shown in the Windows Device Manager.
+  device. Empty (default): search the serial ports (on Linux the USB ports /dev/ttyUSB* and
+  /dev/ttyACM*, on Windows COM1 to COM20). Set it for a device on another port, e.g. /dev/ttyS0 or
+  a higher COM port; the COM port number is shown in the Windows Device Manager.
 * ndiTrackingBaudRate: serial baud rate, default 921600. Slower rates are tried if the device or the
   serial adapter can't use it.
 * ndiTrackingIlluminatorRate_Hz: Polaris only, 20, 30 or 60 Hz, default 60. 0 uses the device's
   default (20 Hz). A Polaris that can't use the rate, e.g. a Vicra, tracks at its default rate,
   with a warning in the log.
 * ndiTrackingMaxErrorRMS: warn about positions with a larger RMS error (mm). 0 (default): the
-  default for the device type.
+  default for the device type. Also used for the RMS error sent by an OpenIGTLink server.
 * ndiTrackingDebugLogging: true to log the commands sent to the device and its replies, in
   NdiCommunication.txt in the logging folder. For Polaris, the number of markers of each tool is
   also written to the log ("NDI Tracker debug" lines) whenever it changes.
@@ -76,6 +77,9 @@ the NDI tool configuration from that server instead, without changing the tool c
   toolfile in the tool configuration, or port_N for an Aurora tool on port number N.
 * The positions are made relative to the reference tool, as when tracking with the device itself.
   For a server that already does this, set openIGTLinkFallbackApplyReference=false.
+* A server that sends the tool status with the positions, like the bkinterface streamserver, shows
+  inaccurate positions in orange and hides missing tools at once, as when tracking with the device
+  itself. See \ref org_custusx_core_openigtlink_tool_status.
 * Only one of them tracks at a time. Every Start Tracking tries the NDI device first, and uses the
   server only if the device is still in use.
 

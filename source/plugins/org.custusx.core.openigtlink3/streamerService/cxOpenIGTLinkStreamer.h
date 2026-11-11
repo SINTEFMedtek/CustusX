@@ -46,6 +46,7 @@ public:
 
 signals:
 		void stoppedStreaming();
+		void startedStreaming();
 
 public slots:
     void receivedConnected();

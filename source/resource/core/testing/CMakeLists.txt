@@ -30,6 +30,7 @@ if(BUILD_TESTING)
         cxtestSpaceListenerMock.h
         cxtestSpaceListenerMock.cpp
         cxtestTrackingPositionFilter.cpp
+        cxtestPositionQuality.cpp
         cxtestCoreServices.cpp
         cxtestReporter.cpp
         cxtestImage.cpp
@@ -38,12 +39,14 @@ if(BUILD_TESTING)
         cxtestVisServices.h
         cxtestVisServices.cpp
         cxtestActiveData.cpp
-        cxtestStreamedTimestampSynchronizer.cpp
+        cxtestAcquisitionTimestamps.cpp
+        cxtestSlicedImageProxy.cpp
         cxtestToolPositionRecorder.cpp
         cxtestToolConfigurations.cpp
         cxtestTestDataStructures.h
         cxtestTestDataStructures.cpp
         cxtestDataLocations.cpp
+        cxtestVersion.cpp
         #cxtestDataReaderWriter.cpp
         cxtestTrackingSystemService.cpp
         cxtestFileManagerServiceMock.h

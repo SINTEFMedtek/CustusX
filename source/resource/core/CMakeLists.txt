@@ -152,6 +152,7 @@ cx_add_class(cxResource_SOURCE
   Tool/ProbeXmlConfigParserMock
   Tool/cxCreateProbeDefinitionFromConfiguration
   Tool/cxTrackingPositionFilter
+  Tool/cxPositionQuality
   Tool/cxTrackerConfiguration
   Tool/cxToolNull
   Tool/cxProbeImpl
@@ -209,7 +210,8 @@ cx_add_class(cxResource_SOURCE
   utilities/cxSharedPointerChecker
   utilities/cxNullDeleter.h
   utilities/cxSpaceProviderImpl
-  utilities/cxStreamedTimestampSynchronizer
+  utilities/cxFrameCounterTimestamper
+  utilities/cxSenderClockSynchronizer
   utilities/cxEnumConverter.h
   utilities/cxEnumConversion.h
   utilities/cxSpaceProviderNull
@@ -330,6 +332,15 @@ endif()
 cx_create_export_header("cxResource")
 
 add_msvc_precompiled_header("cxPrecompiledHeader.h" "cxPrecompiledHeader.cpp" cxResource_SOURCE)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/settings/cxVersion.cpp.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/settings/cxVersion.cpp"
+  )
+list(APPEND cxResource_SOURCE
+  settings/cxVersion.h
+  ${CMAKE_CURRENT_BINARY_DIR}/settings/cxVersion.cpp
+  )
 
 add_library(cxResource ${cxResource_SOURCE})
 target_include_directories(cxResource

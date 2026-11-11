@@ -30,6 +30,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioUsSectorDefinitions.h"
 
 #include "cxLogger.h"
+#include "cxTime.h"
 #include "cxProbeSector.h"
 #include "cxProbeDefinition.h"
 #include "qfuturewatcher.h"
@@ -38,17 +39,18 @@ namespace cx
 {
 
 NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
-	mTimer(new QTimer(this)),
-	mGotTimeOffset(false),
-	mTimestampOffsetMS(0)
+	mTimer(new QTimer(this))
 {
 	qRegisterMetaType<Transform3D>("Transform3D");
 	qRegisterMetaType<ImagePtr>("ImagePtr");
+	qRegisterMetaType<TransformStatus>("TransformStatus");
 
 	mLogic = logic;
 
 	this->connectToConnectionEvents();
 	this->connectToDeviceEvents();
+	connect(this, &NetworkHandler::connected, this, &NetworkHandler::clearTimestampSynchronization);
+	connect(this, &NetworkHandler::connected, this, [this]() { mInvalidMetadataReported.clear(); });
 
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(periodicProcess()));
 	mTimer->start(5);
@@ -68,6 +70,11 @@ NetworkHandler::~NetworkHandler()
 igtlioSessionPointer NetworkHandler::requestConnectToServer(std::string serverHost, int serverPort, IGTLIO_SYNCHRONIZATION_TYPE sync, double timeout_s)
 {
 	mSession = mLogic->ConnectToServer(serverHost, serverPort, sync, timeout_s);
+	if (mSession && mSession->GetConnector())
+	{
+		// TCP already detects transfer errors. The CRC of each video frame took about 8% of a CPU core at 40 Hz.
+		mSession->GetConnector()->SetCheckCRC(false);
+	}
 	//This seems to cause the OpenIGTLink crash (#15): Not sure if this use of OpenIGTLink is threadsafe.
 	//Disabled for now
 	// mSession2 = mLogic->ConnectToServer(serverHost, 18945, sync, timeout_s);//Hack for getting video and tracking from two different OpenIGTLink servers
@@ -126,42 +133,21 @@ void NetworkHandler::disconnectFromServer()
 
 void NetworkHandler::clearTimestampSynchronization()
 {
-	mGotTimeOffset = false;
-	mTimestampOffsetMS = 0;
-};
-
-double NetworkHandler::synchronizedTimestamp(double receivedTimestampSec)
-{
-	double receivedTimestampMS = receivedTimestampSec * 1000;
-	if(!mGotTimeOffset)
-	{
-		qint64 systemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-		mTimestampOffsetMS = systemTime - receivedTimestampMS;
-		CX_LOG_DEBUG() << "NetworkHandler: Doing timestamp synchronization - adding fixed offset of " << mTimestampOffsetMS << " ms";
-		mGotTimeOffset = true;
-	}
-	receivedTimestampMS = receivedTimestampMS + mTimestampOffsetMS;
-
-	verifyTimestamp(receivedTimestampMS);
-	return receivedTimestampMS;
+	mClockSynchronizers.clear();
+	mClockProblemsReported.clear();
 }
 
-
-bool NetworkHandler::verifyTimestamp(double &timestampMS)
+double NetworkHandler::synchronizedTimestamp(QString clockId, double sentTimestampSec, double received_ms)
 {
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double diff = timestampMS - latestSystemTime;
-	if(fabs(diff) > 1000)
+	SenderClockSynchronizer& synchronizer = mClockSynchronizers[clockId];
+	double retval = synchronizer.getTimestamp(sentTimestampSec * 1000, received_ms);
+	if (synchronizer.usedReceiveTime() && !mClockProblemsReported.contains(clockId))
 	{
-		// BK stops the time whenever the image is frozen, or a parameter is changed
-		//CX_LOG_WARNING() << "NetworkHandler: Detected difference between system time and timestamp after synchronization. Difference: " << diff
-		//				 << " The reason for this may be messages with different timestamp formats. "
-		//				 << " System time will be used instead of received timestamp.";
-		timestampMS = latestSystemTime;
-		return false;
+		// Reported once: e.g. a frozen ultrasound scanner stops its clock
+		CX_LOG_INFO() << "NetworkHandler: The timestamps of " << clockId << " don't follow the system clock, using the receive time until they do";
+		mClockProblemsReported.insert(clockId);
 	}
-
-	return true;
+	return retval;
 }
 
 void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, unsigned long event , void*)
@@ -173,7 +159,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 	igtlioBaseConverter::HeaderData header = receivedDevice->GetHeader();
 	std::string device_type = receivedDevice->GetDeviceType();
 
-	double timestampMS = synchronizedTimestamp(header.timestamp);
+	double received_ms = getMilliSecondsSinceEpoch();
 
 //	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
 
@@ -181,6 +167,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 	// Use this for all message types for now, instead of equipmentId.
 	// Anser integration may send equipmentId, so this is checked for when we get a transform.
 	QString deviceName(receivedDevice->GetDeviceName().c_str());
+	// Only images and transforms are timestamped, each type and device on its own clock offset
+	QString clockId = QString("%1:%2").arg(device_type.c_str()).arg(deviceName);
 
 	if(device_type == igtlioImageConverter::GetIGTLTypeName())
 	{
@@ -191,7 +179,9 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 //		QString deviceName(header.deviceName.c_str());
 //		QString deviceName(header.equipmentId.c_str());//Use equipmentId
 		ImagePtr cximage = ImagePtr(new Image(deviceName, content.image, deviceName, imUS));
+		double timestampMS = this->synchronizedTimestamp(clockId, header.timestamp, received_ms);
 		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(timestampMS)));
+		cximage->setSoftwareAcquisitionTime(QDateTime::fromMSecsSinceEpoch(qint64(received_ms)));
 		//this->decode_rMd(msg, retval);
 
 		//Use the igtlio meta data from the image message
@@ -230,8 +220,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 				//To fix this for now: Set ClientHeaderVersion to IGTL_HEADER_VERSION_2 in src/PlusOpenIGTLink/PlusIgtlClientInfo.cxx, instead of IGTL_HEADER_VERSION_1
 				if(QString(metaLabel.c_str()) == IGTLIO_KEY_TIMESTAMP)
 				{
-					int originalTime = QString(metaDataValue.c_str()).toInt();
-					cximage->setOriginalAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(originalTime)));
+					qint64 originalTime = qint64(QString(metaDataValue.c_str()).toDouble());
+					cximage->setOriginalAcquisitionTime(QDateTime::fromMSecsSinceEpoch(originalTime));
 				}
 			}
 		}
@@ -281,6 +271,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		//QString streamIdTo(content.streamIdTo.c_str());
 		//QString streamIdFrom(content.streamIdFrom.c_str());
 		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
+		double timestampMS = this->synchronizedTimestamp(clockId, header.timestamp, received_ms);
 
 //		CX_LOG_DEBUG() << "TRANSFORM: "
 //										<< " deviceName: " << deviceName
@@ -292,11 +283,11 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		// and added to the messages from Plus.
 		std::string openigtlinktransformid;
 		bool gotTransformId = receivedDevice->GetMetaDataElement("equipmentId", openigtlinktransformid);
+		QString transformId = gotTransformId ? qstring_cast(openigtlinktransformid) : deviceName;
 
-		if (gotTransformId)
-			emit transform(qstring_cast(openigtlinktransformid), cxtransform, timestampMS);
-		else
-			emit transform(deviceName, cxtransform, timestampMS);
+		TransformStatus status = readTransformStatus(receivedDevice);
+		this->reportInvalidMetadata(transformId, status.invalidMetadata);
+		emit transformWithStatus(transformId, cxtransform, timestampMS, status);
 	}
 	else if(device_type == igtlioStatusConverter::GetIGTLTypeName())
 	{
@@ -460,6 +451,43 @@ void NetworkHandler::connectToDeviceEvents()
 	}
 }
 
+TransformStatus NetworkHandler::readTransformStatus(igtlioDevicePointer device)
+{
+	TransformStatus retval;
+	std::string value;
+	if (device->GetMetaDataElement("TransformStatus", value))
+	{
+		retval.valid = qstring_cast(value).compare("INVALID", Qt::CaseInsensitive) != 0;
+	}
+	retval.quality.visible = retval.valid;
+	bool ok = false;
+	if (device->GetMetaDataElement("PortStatus", value))
+	{
+		QString text = qstring_cast(value);
+		retval.quality.portStatus = text.toInt(&ok, text.startsWith("0x", Qt::CaseInsensitive) ? 16 : 10);
+		ok = ok && retval.quality.portStatus >= 0;
+		retval.hasQuality = retval.hasQuality || ok;
+		retval.invalidMetadata += ok ? "" : QString(" PortStatus=%1").arg(qstring_cast(value));
+	}
+	if (device->GetMetaDataElement("errorRMS_mm", value))
+	{
+		retval.quality.errorRMS_mm = qstring_cast(value).toDouble(&ok);
+		retval.hasQuality = retval.hasQuality || ok;
+		retval.invalidMetadata += ok ? "" : QString(" errorRMS_mm=%1").arg(qstring_cast(value));
+	}
+	retval.invalidMetadata = retval.invalidMetadata.trimmed();
+	return retval;
+}
+
+void NetworkHandler::reportInvalidMetadata(QString devicename, QString invalidMetadata)
+{
+	if (!invalidMetadata.isEmpty() && !mInvalidMetadataReported.contains(devicename))
+	{
+		CX_LOG_WARNING() << "OpenIGTLink: Can't read the metadata of transform " << devicename << ": " << invalidMetadata;
+		mInvalidMetadataReported.insert(devicename);
+	}
+}
+
 ThreadResult NetworkHandler::processImage(ThreadResult result)
 {
 	if(result.probeDefinitionFromStringMessages->haveValidValues())
@@ -504,8 +532,10 @@ bool NetworkHandler::convertZeroesInsideSectorToOnes(ThreadResult &result, int t
 	unsigned components = result.image->getBaseVtkImageData()->GetNumberOfScalarComponents();
 	unsigned dimX = maskDims[0];
 	unsigned dimY = maskDims[1];
-	for (unsigned x = 0; x < dimX; x++)
-		for (unsigned y = 0; y < dimY; y++)
+	// Row by row, the order of the pixels in memory
+	for (unsigned y = 0; y < dimY; y++)
+	{
+		for (unsigned x = 0; x < dimX; x++)
 		{
 			unsigned pos = x + y * dimX;
 			unsigned imagePos = pos*components;
@@ -514,13 +544,16 @@ bool NetworkHandler::convertZeroesInsideSectorToOnes(ThreadResult &result, int t
 			if (maskVal != 0 && imageVal <= threshold)
 			{
 				for(unsigned i=0; i < components; ++i)
+				{
 					if(i < 3) //Only set RGB components, not Alpha
 					{
 						imagePtr[imagePos + i] = newValue;
 						retval = true;
 					}
+				}
 			}
 		}
+	}
 	return retval;
 }
 

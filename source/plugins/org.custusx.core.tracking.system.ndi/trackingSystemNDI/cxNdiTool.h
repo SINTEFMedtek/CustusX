@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxToolFileParser.h"
 #include "cxTool.h"
 #include "cxNdiDevice.h"
-#include "cxNdiPositionQuality.h"
+#include "cxPositionQuality.h"
 
 namespace cx
 {
@@ -69,7 +69,7 @@ public:
     void updateTransform(const Transform3D& transform, double timestamp, bool visible, const NdiToolSample& sample = NdiToolSample());
 
 	QString updateQuality(const NdiToolSample& sample); ///< Add a sample to the position quality, return the tool's own warning
-	void setMarkerCount(int markers); ///< The tool's own number of markers, see NdiPositionQuality
+	void setMarkerCount(int markers); ///< The tool's own number of markers, see PositionQuality
 	void setPositionWarning(QString warning); ///< Emits positionWarning if it changed
 	void setMaxErrorRMS(double maxErrorRMS_mm);
 
@@ -94,7 +94,7 @@ private:
 	std::atomic<bool> mVisible;     ///< Written by the tracker thread, read by the main thread
 	std::atomic<bool> mInitialized; ///< Written by the tracker thread, read by the main thread
 	int mMissedFrames;
-	NdiPositionQuality mQuality; ///< Used by the tracker thread only
+	PositionQuality mQuality; ///< Used by the tracker thread only
 	QString mPositionWarning;   ///< Used by the tracker thread only
 };
 

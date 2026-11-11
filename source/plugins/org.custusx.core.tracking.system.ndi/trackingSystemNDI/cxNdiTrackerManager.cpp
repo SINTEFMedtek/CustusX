@@ -111,12 +111,17 @@ void NdiTrackerManager::initializeSlot(bool on)
 	{
 		mLastSystemStatus = 0;
 		mToolsChanged = false;
-		bool success = this->connectToDevice() && this->setupTools();
+		bool success = this->connectToDevice() && !mDevice->isStopRequested() && this->setupTools();
 		if (success)
 		{
 			this->setIlluminatorRate(mIlluminatorRate_Hz);
 			mInitialized = true;
 			emit initialized(true);
+		}
+		else if (mDevice->isStopRequested())
+		{
+			this->disconnectFromDevice();
+			report("NDI Tracker: Stopped while connecting.");
 		}
 		else
 		{
@@ -156,6 +161,7 @@ void NdiTrackerManager::trackSlot(bool on)
 			mLastFrameNumber = 0;
 			mQuickRepeats = 0;
 			mFrameRate.reset();
+			mFrameTimestamper.reset();
 			mConsecutiveReadFailures = 0;
 			mTimer->start(kRepeatPollInterval_ms);
 			emit tracking(true);
@@ -210,7 +216,11 @@ void NdiTrackerManager::poll()
 		mLastFrameNumber = frame.frameNumber;
 		mFrameRate.addFrame(now);
 		this->reportSystemStatus(frame.systemStatus);
-		this->distributeFrame(frame, now);
+		for (NdiToolSample& sample : frame.samples)
+		{
+			sample.received_ms = now;
+		}
+		this->distributeFrame(frame, mFrameTimestamper.getTimestamp(frame.frameNumber, now));
 	}
 	bool quickRepeat = !newFrame && (now - readStart < kQuickReply_ms);
 	mTimer->setInterval(getPollInterval_ms(newFrame, mQuickRepeats, mFrameRate.getWaitBeforeNextPoll_ms(now)));
@@ -272,9 +282,11 @@ void NdiTrackerManager::distributeFrame(const NdiFrame& frame, double timestamp)
 		}
 		else if (visible)
 		{
-			tool->setPositionWarning(combinePositionWarnings(tool->updateQuality(sample), referenceWarning));
+			tool->setPositionWarning(PositionQuality::combineWarnings(tool->updateQuality(sample), referenceWarning));
 		}
-		tool->updateTransform(prMt, timestamp, visible, sample);
+		// a port handle may not have been updated in the newest frame
+		double sampleTimestamp = (sample.frameNumber != 0) ? mFrameTimestamper.getTimestampOfEarlierFrame(sample.frameNumber) : timestamp;
+		tool->updateTransform(prMt, sampleTimestamp, visible, sample);
 	}
 }
 
@@ -315,22 +327,6 @@ QStringList NdiTrackerManager::describeNewSystemStatus(int previousStatus, int s
 		}
 	}
 	return retval;
-}
-
-QString NdiTrackerManager::combinePositionWarnings(QString toolWarning, QString referenceWarning)
-{
-	QString retval = toolWarning;
-	if (!referenceWarning.isEmpty())
-	{
-		retval = toolWarning.isEmpty() ? "Reference: " + referenceWarning : toolWarning + "; reference: " + referenceWarning;
-	}
-	return retval;
-}
-
-double NdiTrackerManager::getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType)
-{
-	bool aurora = (trackerType == tsAURORA);
-	return aurora ? NdiPositionQuality::kDefaultMaxErrorRMSAurora_mm : NdiPositionQuality::kDefaultMaxErrorRMSPolaris_mm;
 }
 
 int NdiTrackerManager::getIlluminatorRateToSet(TRACKING_SYSTEM trackerType, int rate_Hz)
@@ -388,7 +384,7 @@ bool NdiTrackerManager::connectToDevice()
 	}
 	connection.requestMarkerInfo = isPolaris(mTrackerStructure.mType);
 	mIlluminatorRate_Hz = getIlluminatorRateToSet(mTrackerStructure.mType, connection.illuminatorRate_Hz);
-	this->setMaxErrorRMS(connection.maxErrorRMS_mm > 0.0 ? connection.maxErrorRMS_mm : getDefaultMaxErrorRMS(mTrackerStructure.mType));
+	this->setMaxErrorRMS(connection.maxErrorRMS_mm > 0.0 ? connection.maxErrorRMS_mm : PositionQuality::getDefaultMaxErrorRMS(mTrackerStructure.mType));
 	QString where = connection.hostname.isEmpty() ? QString("(searching serial ports)") : connection.hostname;
 	report("NDI Tracker: Connecting to device " + where + "...");
 	bool success = mDevice->open(connection);
@@ -396,7 +392,7 @@ bool NdiTrackerManager::connectToDevice()
 	{
 		reportSuccess(QString("NDI Tracker: Connected to %1 %2").arg(where).arg(mDevice->getDescription()));
 	}
-	else
+	else if (!mDevice->isStopRequested())
 	{
 		reportError("NDI Tracker: Could not connect to the device: " + mDevice->getLastError()
 					+ ". Check the cable, or set 'ndiTrackingHostname' in the CustusX settings.");
@@ -441,7 +437,7 @@ bool NdiTrackerManager::setupTools()
 		if (isPolaris(mTrackerStructure.mType))
 		{
 			// Warn about a hidden or missing sphere from the start, not only after all were seen once
-			tool->setMarkerCount(NdiPositionQuality::readMarkerCount(tool->getInternalStructure()->mSROMFilename));
+			tool->setMarkerCount(PositionQuality::readMarkerCount(tool->getInternalStructure()->mSROMFilename));
 		}
 		mPortHandleToTool[entry.first] = tool;
 		mPortHandles.push_back(entry.first);

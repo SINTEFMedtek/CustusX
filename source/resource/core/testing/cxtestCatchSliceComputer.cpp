@@ -216,4 +216,30 @@ TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][reso
 	CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0.707107, -0.707107))); // tip down and towards the feet
 	CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
 	std::cout << "TOOLSIDE slicerplan, Case 4 \n" << slicer.getPlane();
+
+}
+
+TEST_CASE("SliceComputer centers a probe view on the middle of the sector, whatever the zoom", "[unit][resource][core]")
+{
+	cx::SliceComputer slicer;
+	slicer.setOrientationType(cx::otOBLIQUE);
+	slicer.setFollowType(cx::ftFOLLOW_TOOL);
+	cx::Vector3D c_tool(5, 40, -50);
+	cx::Transform3D rMt = cx::createTransformTranslate(c_tool) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+	slicer.setToolPosition(rMt);
+	slicer.setPlaneType(cx::ptANYPLANE);
+	slicer.setIsProbe(true);
+	slicer.setProbeSectorCenterDepth(120);
+
+	// The beam points down (-z in r), so the middle of the sector is 120 mm below the probe origin
+	cx::Vector3D sectorCenter(5, 40, -170);
+	for (double viewportHeight : {300.0, 50.0}) // zoomed out and in
+	{
+		slicer.setToolViewOffset(true, viewportHeight, 0.25);
+		CHECK(cx::similar(slicer.getPlane().c, sectorCenter));
+	}
+
+	slicer.setProbeSectorCenterDepth(-1); // unknown sector: the tool view offset is used
+	slicer.setToolViewOffset(true, 300, 0.25);
+	CHECK_FALSE(cx::similar(slicer.getPlane().c, sectorCenter));
 }

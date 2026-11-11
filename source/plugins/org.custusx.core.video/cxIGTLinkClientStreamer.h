@@ -17,7 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QAbstractSocket>
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
-#include "cxStreamedTimestampSynchronizer.h"
+#include "cxSenderClockSynchronizer.h"
+#include "cxForwardDeclarations.h"
 
 class QTcpSocket;
 
@@ -45,7 +46,12 @@ public:
 	virtual void startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 	virtual bool isStreaming();
+	static bool isOnThisComputer(const QString& address); ///< a sender here normally uses the same clock as this computer
+	static constexpr double kMaxLocalOffset_ms = 100; ///< a larger clock offset is not this computer's clock, e.g. a tunnel to another computer
 
+protected:
+	void synchronizeTimestamp(ImagePtr image);
+	bool usesThisComputersClock(double sent_ms) const;
 
 private slots:
 	virtual void streamSlot() {}
@@ -72,7 +78,8 @@ private:
 	bool mHeadingReceived;
 	QString mAddress;
 	int mPort;
-    StreamedTimestampSynchronizer mStreamSynchronizer;
+	bool mSenderOnThisComputer;
+	SenderClockSynchronizer mClockSynchronizer;
     std::shared_ptr<QTcpSocket> mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;
 	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives

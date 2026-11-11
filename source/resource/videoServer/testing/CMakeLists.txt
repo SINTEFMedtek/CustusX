@@ -7,6 +7,7 @@ if(BUILD_TESTING)
 
     set(CX_TEST_SOURCE_FILES
         cxtestSonixProbeFileReader.cpp
+        cxtestImageStreamerOpenCV.cpp
         cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
 
