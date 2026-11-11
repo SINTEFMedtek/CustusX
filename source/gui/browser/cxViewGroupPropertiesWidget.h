@@ -63,6 +63,7 @@ private:
   StringPropertyBasePtr mCameraNotBehindROI;
   BoolPropertyPtr mTableLock;
   BoolPropertyPtr mUniCam;
+  BoolPropertyPtr mScopeRendering;
   DoublePropertyPtr mElevation;
   StringPropertyBasePtr mAutoZoomROI;
   StringPropertyBasePtr mFocusROI;

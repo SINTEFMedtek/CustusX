@@ -68,6 +68,13 @@ void CameraStyleData::setCameraStyle(CAMERA_STYLE_TYPE style)
 	{
 		mUniCam = true;
 	}
+	if (style==cstENDOSCOPE_STYLE)
+	{
+		mCameraFollowTool = true;
+		mFocusFollowTool = true;
+		mScopeRendering = true;
+		mCameraViewAngle = 110.0/180.0*M_PI; // An endoscope has a field of view of about 90-120 degrees
+	}
 }
 
 CAMERA_STYLE_TYPE CameraStyleData::getStyle()
@@ -75,7 +82,9 @@ CAMERA_STYLE_TYPE CameraStyleData::getStyle()
 	for (unsigned int i=0; i<cstCOUNT; ++i)
 	{
 		CAMERA_STYLE_TYPE current = static_cast<CAMERA_STYLE_TYPE>(i);
-		if (CameraStyleData(current)==*this)
+		CameraStyleData candidate(current);
+		candidate.mCameraViewAngle = mCameraViewAngle; // the view angle can be changed without changing the style
+		if (candidate==*this)
 			return current;
 	}
 	return cstCOUNT;
@@ -93,6 +102,7 @@ void CameraStyleData::clear()
 	mTableLock = false;
 	mElevation = 0;
 	mUniCam = false;
+	mScopeRendering = false;
 	mAutoZoomROI = "";
 	mFocusROI = "";
 }
@@ -109,6 +119,7 @@ void CameraStyleData::addXml(QDomNode &dataNode)
 	elem.setAttribute("tableLock", mTableLock);
 	elem.setAttribute("elevation", mElevation);
 	elem.setAttribute("uniCam", mUniCam);
+	elem.setAttribute("scopeRendering", mScopeRendering);
 	elem.setAttribute("autoZoomROI", mAutoZoomROI);
 	elem.setAttribute("focusROI", mFocusROI);
 }
@@ -125,6 +136,7 @@ void CameraStyleData::parseXml(QDomNode dataNode)
 	mTableLock = elem.attribute("tableLock", QString::number(mTableLock)).toInt();
 	mElevation = elem.attribute("elevation", QString::number(mElevation)).toDouble();
 	mUniCam = elem.attribute("uniCam", QString::number(mUniCam)).toInt();
+	mScopeRendering = elem.attribute("scopeRendering", QString::number(mScopeRendering)).toInt();
 	mAutoZoomROI = elem.attribute("autoZoomROI", mAutoZoomROI);
 	mFocusROI = elem.attribute("focusROI", mFocusROI);
 }
@@ -140,6 +152,7 @@ bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs)
 			(lhs.mTableLock==rhs.mTableLock) &&
 			similar(lhs.mElevation, rhs.mElevation) &&
 			(lhs.mUniCam==rhs.mUniCam) &&
+			(lhs.mScopeRendering==rhs.mScopeRendering) &&
 			(lhs.mAutoZoomROI==rhs.mAutoZoomROI) &&
 			(lhs.mFocusROI==rhs.mFocusROI)
 			);
@@ -533,6 +546,20 @@ void ViewGroupData::setOptions(ViewGroupData::Options options)
 {
 	mOptions = options;
 	emit optionsChanged();
+}
+
+void ViewGroupData::setScopeExposure(double exposure)
+{
+	if (!similar(exposure, mScopeExposure))
+	{
+		mScopeExposure = exposure;
+		emit scopeExposureChanged();
+	}
+}
+
+double ViewGroupData::getScopeExposure() const
+{
+	return mScopeExposure;
 }
 
 void ViewGroupData::initializeGlobal2DZoom(SyncedValuePtr val)

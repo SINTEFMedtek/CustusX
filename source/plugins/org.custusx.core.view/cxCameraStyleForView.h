@@ -25,11 +25,14 @@ class QWidget;
 class QMenu;
 class QActionGroup;
 class vtkInteractorStyle;
+class vtkLight;
 
 namespace cx
 {
 typedef std::shared_ptr<class ViewportPreRenderListener> ViewportPreRenderListenerPtr;
 typedef std::shared_ptr<class CoreServices> CoreServicesPtr;
+class FisheyePass;
+class MaterialOverridePass;
 
 typedef std::shared_ptr<class CameraStyleForView> CameraStyleForViewPtr;
 using cx::Transform3D;
@@ -90,12 +93,15 @@ class org_custusx_core_view_EXPORT CameraStyleForView: public QObject
 Q_OBJECT
 public:
 	explicit CameraStyleForView(CoreServicesPtr backend);
+	~CameraStyleForView();
 	void setView(ViewPtr widget);
 
 	/** Select tool style. This replaces the vtkInteractor Style.
 	  */
 	void setCameraStyle(CameraStyleData style);
 	CameraStyleData getCameraStyle();
+	/** Brightness factor for the light in the fly-through style, like the automatic exposure of an endoscope. */
+	void setScopeExposure(double exposure);
 
 private slots:
 	void setModified();
@@ -107,6 +113,8 @@ private:
 	vtkCameraPtr getCamera() const;
 	ToolRep3DPtr getToolRep() const;
 	bool isToolFollowingStyle() const;
+	bool isScopeStyle() const;
+	bool isCameraOnToolStyle() const;
 	void onPreRender();
 	void applyCameraStyle(); ///< receives transforms from the tool which the camera should follow
 
@@ -123,12 +131,21 @@ private:
 	bool mBlockCameraUpdate; ///< for breaking a camera update loop
 	ViewPtr mView;
 	CoreServicesPtr mBackend;
+	vtkSmartPointer<vtkLight> mScopeLight; ///< light at the camera, used in the fly-through style
+	double mScopeExposure = 1.0; ///< factor on the scope light intensity
+	vtkSmartPointer<FisheyePass> mFisheyePass; ///< lens distortion, used in the fly-through style
+	vtkSmartPointer<MaterialOverridePass> mScopeMaterialPass; ///< airway wall material, used in the fly-through style
 
 //	Vector3D mPreviousZoomCameraPos;
 	JitterFilter mZoomJitterFilter;
 
 	Vector3D smoothZoomedCameraPosition(Vector3D pos);
-	void handleLights();
+	void updateScopeRendering();
+	void enableScopeRendering(vtkRendererPtr renderer);
+	void disableScopeRendering(vtkRendererPtr renderer);
+	vtkSmartPointer<vtkLight> createScopeLight() const;
+	void updateScopeLightIntensity();
+	void createScopeRenderPasses();
 	CameraInfo viewEntireAutoZoomROI(CameraInfo info);
 	void updateCamera(CameraInfo info);
 	Vector3D getToolTip_r();

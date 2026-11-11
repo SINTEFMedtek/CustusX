@@ -558,7 +558,8 @@ void MainWindow::createToolBars()
 	mNavigationToolBar->addAction(mActions->getAction("CenterToTooltip"));
 	mNavigationToolBar->addAction(mActions->getAction("ShowPointPicker"));
 
-	mInteractorStyleToolBar = this->registerToolBar("InteractorStyle");
+	mInteractorStyleToolBar = this->registerToolBar("Camera Style");
+	mInteractorStyleToolBar->setObjectName("InteractorStyleToolBar"); // Old name kept, as saved desktops refer to it
 	mInteractorStyleToolBar->addActions(mInteractorStyleActionGroup->actions());
 
 	mDesktopToolBar = this->registerToolBar("Desktop");
