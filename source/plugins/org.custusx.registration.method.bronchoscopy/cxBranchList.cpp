@@ -753,20 +753,18 @@ void BranchList::excludeClosePositionsInCTCenterline(double minPointDistance){
 	for (int i = 0; i < branchVector.size(); i++)
 	{
 		Eigen::MatrixXd positions = branchVector[i]->getPositions();
-		Eigen::MatrixXd orientations = branchVector[i]->getOrientations();
 		Eigen::VectorXd radius = branchVector[i]->getRadius();
 		bool updateRadius = (radius.size() > 0 && radius.size() == positions.cols()); // keep radius aligned with positions
 
+		// Orientations are recalculated by setPositions()
 		for (int j = positions.cols()-2; j > 0; j--){
 			double distance = (positions.col(j) - positions.col(j+1)).norm();
 			if ( distance < minPointDistance )
 			{
 				positions = eraseCol(j,positions);
-				orientations = eraseCol(j,orientations);
 				if (updateRadius)
 				{
-					radius.segment(j, radius.size() - j - 1) = radius.tail(radius.size() - j - 1).eval();
-					radius.conservativeResize(radius.size() - 1);
+					radius = eraseElement(j, radius);
 				}
 			}
 		}
@@ -1173,6 +1171,13 @@ Eigen::MatrixXd eraseCol(int removeIndex, Eigen::MatrixXd positions)
 	positions.block(0 , removeIndex , positions.rows() , positions.cols() - removeIndex - 1) = positions.rightCols(positions.cols() - removeIndex - 1);
 	positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
 	return positions;
+}
+
+Eigen::VectorXd eraseElement(int removeIndex, Eigen::VectorXd values)
+{
+	values.segment(removeIndex, values.size() - removeIndex - 1) = values.tail(values.size() - removeIndex - 1).eval();
+	values.conservativeResize(values.size() - 1);
+	return values;
 }
 
 std::pair<Eigen::MatrixXd::Index, double> dsearch(Eigen::Vector3d p, Eigen::MatrixXd positions)

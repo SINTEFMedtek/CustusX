@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxBranch.h"
+#include "cxBranchList.h"
 #include "cxLog.h"
 #include "cxEnumConversion.h"
 
@@ -259,8 +260,7 @@ void Branch::removeEqualPositions()
 				orientations.conservativeResize(Eigen::NoChange, orientations.cols() - 1);
 			if (resizeRadius)
 			{
-				radius.segment(i, radius.size() - i - 1) = radius.tail(radius.size() - i - 1).eval();
-				radius.conservativeResize(radius.size() - 1);
+				radius = eraseElement(i, radius);
 			}
 		}
 	}

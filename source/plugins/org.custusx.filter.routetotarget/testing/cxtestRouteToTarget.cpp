@@ -198,6 +198,34 @@ TEST_CASE("RouteToTarget: radius along route belongs to the same branch position
 	CHECK(positionsOnBranches == 22);
 }
 
+TEST_CASE("RouteToTarget: with smoothing, the position at the branching point gets the parent's radius", "[unit][org.custusx.filter.routetotarget]")
+{
+	cx::BranchListPtr branchList = createTwoBranchesWithIndexedRadius();
+	cx::RouteToTarget routeToTarget;
+	routeToTarget.setSmoothing(true);
+	routeToTarget.setBranchList(branchList);
+	cx::PointMetricPtr target = createPoint("target", cx::Vector3D(0, 13, 90));
+
+	routeToTarget.findRouteToTarget(target, "");
+	routeToTarget.findExtendedRoute(target);
+
+	std::vector<Eigen::Vector3d> route = routeToTarget.getRoutePositions(true);
+	std::vector<double> radius = routeToTarget.getRadius();
+	REQUIRE(route.size() == radius.size());
+
+	Eigen::Vector3d branchingPoint(0, 0, 90); // last position of the trachea
+	int positionsAtBranchingPoint = 0;
+	for (unsigned i = 0; i < route.size(); ++i)
+	{
+		if (cx::similar(cx::Vector3D(route[i]), cx::Vector3D(branchingPoint), 1e-6))
+		{
+			++positionsAtBranchingPoint;
+			CHECK(radius[i] == Approx(110)); // last trachea radius
+		}
+	}
+	CHECK(positionsAtBranchingPoint >= 1);
+}
+
 TEST_CASE("RouteToTarget: radius and generation numbers are aligned with route when using extra airway points", "[unit][org.custusx.filter.routetotarget]")
 {
 	cx::BranchListPtr branchList = createTwoBranchesWithIndexedRadius();
