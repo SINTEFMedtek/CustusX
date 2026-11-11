@@ -282,7 +282,7 @@ void NdiTrackerManager::distributeFrame(const NdiFrame& frame, double timestamp)
 		}
 		else if (visible)
 		{
-			tool->setPositionWarning(combinePositionWarnings(tool->updateQuality(sample), referenceWarning));
+			tool->setPositionWarning(PositionQuality::combineWarnings(tool->updateQuality(sample), referenceWarning));
 		}
 		// a port handle may not have been updated in the newest frame
 		double sampleTimestamp = (sample.frameNumber != 0) ? mFrameTimestamper.getTimestampOfEarlierFrame(sample.frameNumber) : timestamp;
@@ -327,22 +327,6 @@ QStringList NdiTrackerManager::describeNewSystemStatus(int previousStatus, int s
 		}
 	}
 	return retval;
-}
-
-QString NdiTrackerManager::combinePositionWarnings(QString toolWarning, QString referenceWarning)
-{
-	QString retval = toolWarning;
-	if (!referenceWarning.isEmpty())
-	{
-		retval = toolWarning.isEmpty() ? "Reference: " + referenceWarning : toolWarning + "; reference: " + referenceWarning;
-	}
-	return retval;
-}
-
-double NdiTrackerManager::getDefaultMaxErrorRMS(TRACKING_SYSTEM trackerType)
-{
-	bool aurora = (trackerType == tsAURORA);
-	return aurora ? NdiPositionQuality::kDefaultMaxErrorRMSAurora_mm : NdiPositionQuality::kDefaultMaxErrorRMSPolaris_mm;
 }
 
 int NdiTrackerManager::getIlluminatorRateToSet(TRACKING_SYSTEM trackerType, int rate_Hz)
@@ -400,7 +384,7 @@ bool NdiTrackerManager::connectToDevice()
 	}
 	connection.requestMarkerInfo = isPolaris(mTrackerStructure.mType);
 	mIlluminatorRate_Hz = getIlluminatorRateToSet(mTrackerStructure.mType, connection.illuminatorRate_Hz);
-	this->setMaxErrorRMS(connection.maxErrorRMS_mm > 0.0 ? connection.maxErrorRMS_mm : getDefaultMaxErrorRMS(mTrackerStructure.mType));
+	this->setMaxErrorRMS(connection.maxErrorRMS_mm > 0.0 ? connection.maxErrorRMS_mm : PositionQuality::getDefaultMaxErrorRMS(mTrackerStructure.mType));
 	QString where = connection.hostname.isEmpty() ? QString("(searching serial ports)") : connection.hostname;
 	report("NDI Tracker: Connecting to device " + where + "...");
 	bool success = mDevice->open(connection);
@@ -453,7 +437,7 @@ bool NdiTrackerManager::setupTools()
 		if (isPolaris(mTrackerStructure.mType))
 		{
 			// Warn about a hidden or missing sphere from the start, not only after all were seen once
-			tool->setMarkerCount(NdiPositionQuality::readMarkerCount(tool->getInternalStructure()->mSROMFilename));
+			tool->setMarkerCount(PositionQuality::readMarkerCount(tool->getInternalStructure()->mSROMFilename));
 		}
 		mPortHandleToTool[entry.first] = tool;
 		mPortHandles.push_back(entry.first);

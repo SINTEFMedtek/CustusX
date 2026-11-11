@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <memory>
 #include <QString>
 #include "cxTransform3D.h"
+#include "cxPositionQuality.h"
 
 namespace cx
 {
@@ -56,29 +57,10 @@ struct org_custusx_core_tracking_system_ndi_EXPORT NdiPortLocation
 };
 
 /** Tracking data for one port handle in one frame. */
-/** BX port status bits used by the plugin */
-namespace NdiPortStatus
-{
-const int OutOfVolume = 0x40;
-const int PartiallyInVolume = 0x80;
-}
-
-/** BX tool information bits (Polaris) */
-namespace NdiToolInfo
-{
-const int BadTransformFit = 0x01;
-const int NotEnoughMarkers = 0x02;
-}
-
-struct org_custusx_core_tracking_system_ndi_EXPORT NdiToolSample
+struct org_custusx_core_tracking_system_ndi_EXPORT NdiToolSample : public PositionQualitySample
 {
 	int portHandle = -1;
-	bool visible = false;          ///< false if the transform is missing (out of view) or the port is disabled
 	Transform3D transform = Transform3D::Identity(); ///< camera/field generator to tool sensor, mm
-	double errorRMS_mm = 0.0;
-	int portStatus = 0;  ///< BX port status bits, see NdiPortStatus
-	int toolInfo = 0;    ///< BX tool information bits, see NdiToolInfo. Polaris only.
-	int markersUsed = -1; ///< Markers used to compute the transform, -1 if unknown. Polaris only.
 	unsigned long frameNumber = 0; ///< The frame of this port handle, which may be older than the frame
 	double received_ms = 0.0; ///< When the frame was read, before it was timestamped from the frame number
 };
