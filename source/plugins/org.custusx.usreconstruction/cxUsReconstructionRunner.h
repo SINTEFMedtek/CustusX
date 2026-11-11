@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QStringList>
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
+#include "cxUSReconstructInputData.h"
 
 namespace cx
 {
@@ -59,8 +60,6 @@ public:
 	bool isReconstructingUs() const; ///< True in the US volume step of a run
 	std::vector<DataPtr> getCreatedData() const; ///< The data added to the patient by the last run
 
-	static void setAngioParameters(UsReconstructionServicePtr reconstruction, bool usVolume, bool angio);
-
 signals:
 	void progress(int done, int total);
 	void statusChanged(QString text);
@@ -87,6 +86,7 @@ private:
 	bool mCancel;
 	Outputs mOutputs;
 	std::vector<ExtensionOutputs> mExtensions;
+	USReconstructInputData mRecording; ///< The recording selected at the start, also used by the extensions
 	QPointer<UsReconstructionExtensionService> mCurrentExtension;
 	QStringList mDataBefore;
 	QStringList mCreatedData;

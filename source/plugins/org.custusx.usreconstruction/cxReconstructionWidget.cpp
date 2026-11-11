@@ -26,6 +26,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxServiceTrackerListener.h"
 #include "cxUsReconstructionExtensionService.h"
 #include "cxUsReconstructionRunner.h"
+#include "cxReconstructParams.h"
 #include "cxReconstructionResultsWidget.h"
 
 namespace cx
@@ -100,6 +101,11 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServ
 	}
 
 	this->paramsChangedSlot();
+	mUsReconstructing = this->isUsReconstructing();
+	if (mUsReconstructing)
+	{
+		mTimedAlgorithmProgressBar->attach(mReconstructer->getThreadedReconstruction());
+	}
 	this->updateButtons();
 }
 
@@ -122,6 +128,7 @@ QWidget* ReconstructionWidget::createReconstructTab(ViewServicePtr viewService)
 	layout->addWidget(mOutputsLayout->parentWidget());
 
 	mReconstructButton = new QPushButton("Reconstruct", retval);
+	mReconstructButton->setObjectName("reconstruct");
 	connect(mReconstructButton, &QPushButton::clicked, this, &ReconstructionWidget::reconstruct);
 	layout->addWidget(mReconstructButton);
 
@@ -172,11 +179,24 @@ void ReconstructionWidget::createOutputCheckBoxes(QWidget* parent)
 	mAngioVolumeCheckBox = this->createOutputCheckBox("angioVolume", "Angio volume", "A volume of the color (Doppler) data of the recording", angio);
 	mAngioMeshCheckBox = this->createOutputCheckBox("angioMesh", "Angio mesh", "A mesh of the angio volume, at the angio mesh threshold. Also creates the angio volume", false);
 	this->showAngioData(angio);
-	QList<QCheckBox*> checkBoxes = QList<QCheckBox*>() << mUsVolumeCheckBox << mAngioVolumeCheckBox << mAngioMeshCheckBox;
+	QList<QCheckBox*> checkBoxes = this->getUsCheckBoxes();
 	for (int i = 0; i < checkBoxes.size(); ++i)
 	{
 		connect(checkBoxes[i], &QCheckBox::toggled, this, &ReconstructionWidget::setAngioParameters);
 	}
+	connect(mReconstructer->getParam("Angio data").get(), &Property::changed, this, &ReconstructionWidget::angioDataChanged);
+}
+
+QList<QCheckBox*> ReconstructionWidget::getUsCheckBoxes() const
+{
+	return QList<QCheckBox*>() << mUsVolumeCheckBox << mAngioVolumeCheckBox << mAngioMeshCheckBox;
+}
+
+/** E.g. the US Angio preset turns on Angio data. */
+void ReconstructionWidget::angioDataChanged()
+{
+	this->showAngioData(mReconstructer->getParam("Angio data")->getValueAsVariant().toBool());
+	this->updateButtons();
 }
 
 /** The saved angio checkboxes are only kept if they agree with Angio data. */
@@ -199,7 +219,15 @@ void ReconstructionWidget::showAngioData(bool angio)
 void ReconstructionWidget::setAngioParameters()
 {
 	bool angio = mAngioVolumeCheckBox->isChecked() || mAngioMeshCheckBox->isChecked();
-	UsReconstructionRunner::setAngioParameters(mReconstructer, mUsVolumeCheckBox->isChecked(), angio);
+	applyAngioParameters(mReconstructer, mUsVolumeCheckBox->isChecked(), angio);
+}
+
+void ReconstructionWidget::applyAngioParameters(UsReconstructionServicePtr reconstruction, bool usVolume, bool angio)
+{
+	PropertyPtr preset = reconstruction->getParam("Preset");
+	preset->setValueFromVariant(ReconstructParams::getPreset(preset->getValueAsVariant().toString(), angio));
+	reconstruction->getParam("Angio data")->setValueFromVariant(angio);
+	reconstruction->getParam("Dual Angio")->setValueFromVariant(usVolume);
 }
 
 QCheckBox* ReconstructionWidget::createOutputCheckBox(QString uid, QString name, QString help, bool defaultValue)
@@ -458,16 +486,23 @@ void ReconstructionWidget::reconstruct()
 	this->updateButtons();
 }
 
-void ReconstructionWidget::storeOutputSelections()
+/** The US checkboxes, then those of the extensions. */
+QList<QCheckBox*> ReconstructionWidget::getOutputCheckBoxes() const
 {
-	QList<QCheckBox*> checkBoxes = QList<QCheckBox*>() << mUsVolumeCheckBox << mAngioVolumeCheckBox << mAngioMeshCheckBox;
+	QList<QCheckBox*> retval = this->getUsCheckBoxes();
 	for (unsigned i = 0; i < mExtensions.size(); ++i)
 	{
 		for (unsigned j = 0; j < mExtensions[i].mOutputs.size(); ++j)
 		{
-			checkBoxes << mExtensions[i].mOutputs[j].second;
+			retval << mExtensions[i].mOutputs[j].second;
 		}
 	}
+	return retval;
+}
+
+void ReconstructionWidget::storeOutputSelections()
+{
+	QList<QCheckBox*> checkBoxes = this->getOutputCheckBoxes();
 	for (int i = 0; i < checkBoxes.size(); ++i)
 	{
 		settings()->setValue("reconstruction/create/" + checkBoxes[i]->objectName(), checkBoxes[i]->isChecked());
@@ -476,13 +511,11 @@ void ReconstructionWidget::storeOutputSelections()
 
 bool ReconstructionWidget::isAnyOutputSelected() const
 {
-	bool retval = mUsVolumeCheckBox->isChecked() || mAngioVolumeCheckBox->isChecked() || mAngioMeshCheckBox->isChecked();
-	for (unsigned i = 0; i < mExtensions.size(); ++i)
+	bool retval = false;
+	QList<QCheckBox*> checkBoxes = this->getOutputCheckBoxes();
+	for (int i = 0; i < checkBoxes.size(); ++i)
 	{
-		for (unsigned j = 0; j < mExtensions[i].mOutputs.size(); ++j)
-		{
-			retval = retval || mExtensions[i].mOutputs[j].second->isChecked();
-		}
+		retval = retval || checkBoxes[i]->isChecked();
 	}
 	return retval;
 }
@@ -533,12 +566,14 @@ void ReconstructionWidget::onExtensionRemoved(UsReconstructionExtensionService* 
 		{
 			for (unsigned j = 0; j < mExtensions[i].mOutputs.size(); ++j)
 			{
+				QCheckBox* checkBox = mExtensions[i].mOutputs[j].second;
+				settings()->setValue("reconstruction/create/" + checkBox->objectName(), checkBox->isChecked());
 				mOutputsLayout->removeWidget(mExtensions[i].mOutputs[j].second);
 				mExtensions[i].mOutputs[j].second->hide();
-				mExtensions[i].mOutputs[j].second->deleteLater();
+				delete mExtensions[i].mOutputs[j].second;
 			}
 			mTabs->removeTab(mTabs->indexOf(mExtensions[i].mTab));
-			mExtensions[i].mTab->deleteLater();
+			delete mExtensions[i].mTab;
 			mExtensions.erase(mExtensions.begin() + i);
 			break;
 		}

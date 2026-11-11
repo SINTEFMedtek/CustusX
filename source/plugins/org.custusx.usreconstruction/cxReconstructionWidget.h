@@ -55,6 +55,7 @@ Q_OBJECT
 public:
 	ReconstructionWidget(QWidget* parent, UsReconstructionServicePtr reconstructer, PatientModelServicePtr patientModelService, ViewServicePtr viewService, ctkPluginContext* pluginContext);
 	virtual ~ReconstructionWidget();
+	static void applyAngioParameters(UsReconstructionServicePtr reconstruction, bool usVolume, bool angio); ///< Sets Preset, Angio data and Dual Angio for these outputs
 	UsReconstructionServicePtr reconstructer()
 	{
 		return mReconstructer;
@@ -127,6 +128,9 @@ private:
 	void createOutputCheckBoxes(QWidget* parent);
 	void setAngioParameters();
 	void showAngioData(bool angio);
+	void angioDataChanged();
+	QList<QCheckBox*> getUsCheckBoxes() const;
+	QList<QCheckBox*> getOutputCheckBoxes() const;
 	bool isUsReconstructing() const;
 	QWidget* createSettingsTab();
 	QWidget* createOptionsWidget(QWidget* parent);

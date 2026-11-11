@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUsReconstructionExtensionService.h"
 #include "cxPatientModelService.h"
 #include "cxImage.h"
+#include "cxUSReconstructInputData.h"
 #include "cxVolumeHelpers.h"
 
 namespace cxtest
@@ -34,9 +35,10 @@ public:
 		return std::vector<Output>{Output{"fakeA", "Fake A", ""}, Output{"fakeB", "Fake B", ""}};
 	}
 	virtual QWidget* createSettingsWidget(QWidget* parent) { return new QLabel("Fake settings", parent); }
-	virtual bool start(QStringList outputUids)
+	virtual bool start(QStringList outputUids, const cx::USReconstructInputData& recording)
 	{
 		mStarted << outputUids;
+		mRecording = recording.mFilename;
 		mRunning = true;
 		QTimer::singleShot(0, this, [this, outputUids]()
 		{
@@ -54,6 +56,7 @@ public:
 	virtual bool isRunning() const { return mRunning; }
 
 	QStringList mStarted;
+	QString mRecording; ///< The file name of the recording of the last start
 
 private:
 	cx::PatientModelServicePtr mPatientModel;

@@ -95,6 +95,13 @@ void UsReconstructionServiceNull::startReconstruction()
 	printWarning();
 }
 
+void UsReconstructionServiceNull::startReconstruction(bool angio, bool dualAngio)
+{
+	Q_UNUSED(angio);
+	Q_UNUSED(dualAngio);
+	printWarning();
+}
+
 std::set<TimedAlgorithmPtr> UsReconstructionServiceNull::getThreadedReconstruction()
 {
 	printWarning();

@@ -156,6 +156,11 @@ void UsReconstructionServiceProxy::startReconstruction()
 	mUsReconstructionService->startReconstruction();
 }
 
+void UsReconstructionServiceProxy::startReconstruction(bool angio, bool dualAngio)
+{
+	mUsReconstructionService->startReconstruction(angio, dualAngio);
+}
+
 std::set<TimedAlgorithmPtr> UsReconstructionServiceProxy::getThreadedReconstruction()
 {
 	return mUsReconstructionService->getThreadedReconstruction();

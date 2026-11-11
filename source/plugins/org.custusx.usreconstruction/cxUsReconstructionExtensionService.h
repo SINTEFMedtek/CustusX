@@ -24,11 +24,12 @@ class QWidget;
 
 namespace cx
 {
+struct USReconstructInputData;
 
 /** \brief Adds outputs and a settings tab to the US reconstruction widget.
  *
- * The outputs are reconstructed from the recording selected in the UsReconstructionService,
- * after the US volumes.
+ * The outputs are reconstructed from the recording that was selected in the UsReconstructionService
+ * when the run started, after the US volumes.
  *
  * \ingroup org_custusx_usreconstruction
  */
@@ -49,7 +50,7 @@ public:
 	virtual std::vector<Output> getOutputs() const = 0;
 	virtual QWidget* createSettingsWidget(QWidget* parent) = 0;
 
-	virtual bool start(QStringList outputUids) = 0; ///< False if nothing was started. finished() is emitted when a started run ends.
+	virtual bool start(QStringList outputUids, const USReconstructInputData& recording) = 0; ///< False if nothing was started. finished() is emitted when a started run ends.
 	virtual void cancel() = 0;
 	virtual bool isRunning() const = 0;
 

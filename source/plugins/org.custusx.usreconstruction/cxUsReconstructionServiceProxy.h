@@ -48,6 +48,7 @@ public:
 //	virtual void setOutputRelativePath(QString path);
 //	virtual void setOutputBasePath(QString path);
 	virtual void startReconstruction();
+	virtual void startReconstruction(bool angio, bool dualAngio);
 	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction();
 	virtual ReconstructionMethodService* createAlgorithm();
 

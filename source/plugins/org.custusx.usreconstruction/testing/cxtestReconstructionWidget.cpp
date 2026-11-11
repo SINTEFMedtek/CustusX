@@ -12,7 +12,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QApplication>
 #include <QCheckBox>
+#include <QPushButton>
 #include <QTabWidget>
+#include <QTimer>
 #include <vtkPolyData.h>
 #include "cxtestFakeReconstructionExtension.h"
 #include "cxtestReconstructionManagerFixture.h"
@@ -30,6 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUsReconstructionRunner.h"
 #include "cxUsReconstructionService.h"
 #include "cxViewService.h"
+#include "cxTimedAlgorithm.h"
 
 namespace cxtest
 {
@@ -41,34 +44,51 @@ QVariant getParam(cx::UsReconstructionServicePtr reconstruction, QString uid)
 	return reconstruction->getParam(uid)->getValueAsVariant();
 }
 
-bool runAndWait(cx::UsReconstructionRunner& runner, cx::UsReconstructionRunner::Outputs outputs, std::vector<cx::UsReconstructionRunner::ExtensionOutputs> extensions)
+/** Fails if the run does not finish within the time limit (ms). */
+bool waitForRun(cx::UsReconstructionRunner& runner, int timeLimit = 600000)
 {
 	QObject::connect(&runner, &cx::UsReconstructionRunner::finished, qApp, &QApplication::quit);
-	bool retval = runner.start(outputs, extensions);
-	if (retval && runner.isRunning())
+	QTimer timer;
+	timer.setSingleShot(true);
+	QObject::connect(&timer, &QTimer::timeout, qApp, &QApplication::quit);
+	timer.start(timeLimit);
+	if (runner.isRunning())
 	{
+		qApp->exec();
+	}
+	bool retval = !runner.isRunning();
+	if (!retval)
+	{
+		runner.cancel();
+		timer.start(timeLimit);
 		qApp->exec();
 	}
 	return retval;
 }
+
+bool runAndWait(cx::UsReconstructionRunner& runner, cx::UsReconstructionRunner::Outputs outputs, std::vector<cx::UsReconstructionRunner::ExtensionOutputs> extensions)
+{
+	bool retval = runner.start(outputs, extensions);
+	return retval && waitForRun(runner);
+}
 } // namespace
 
-TEST_CASE("UsReconstructionRunner: sets the angio parameters from the selected outputs", "[unit][usreconstruction]")
+TEST_CASE("ReconstructionWidget: sets the angio parameters from the selected outputs", "[unit][usreconstruction]")
 {
 	ReconstructionManagerTestFixture fixture;
 	cx::UsReconstructionServicePtr reconstruction = fixture.getManager();
 	reconstruction->getParam("Preset")->setValueFromVariant("US B-Mode");
 
-	cx::UsReconstructionRunner::setAngioParameters(reconstruction, true, true);
+	cx::ReconstructionWidget::applyAngioParameters(reconstruction, true, true);
 	CHECK(getParam(reconstruction, "Angio data").toBool());
 	CHECK(getParam(reconstruction, "Dual Angio").toBool());
 	CHECK(getParam(reconstruction, "Preset").toString() == "US Angio");
 
-	cx::UsReconstructionRunner::setAngioParameters(reconstruction, false, true);
+	cx::ReconstructionWidget::applyAngioParameters(reconstruction, false, true);
 	CHECK(getParam(reconstruction, "Angio data").toBool());
 	CHECK_FALSE(getParam(reconstruction, "Dual Angio").toBool());
 
-	cx::UsReconstructionRunner::setAngioParameters(reconstruction, true, false);
+	cx::ReconstructionWidget::applyAngioParameters(reconstruction, true, false);
 	CHECK_FALSE(getParam(reconstruction, "Angio data").toBool());
 	CHECK(getParam(reconstruction, "Preset").toString() == "US B-Mode");
 }
@@ -94,6 +114,7 @@ TEST_CASE("UsReconstructionRunner: runs the extensions and lists the created dat
 	REQUIRE(runAndWait(runner, outputs, extensions));
 	CHECK_FALSE(runner.isRunning());
 	CHECK(extension.mStarted == QStringList() << "fakeB");
+	CHECK(extension.mRecording == realData.getSourceFilename());
 	REQUIRE(runner.getCreatedData().size() == 1);
 	CHECK(runner.getCreatedData()[0]->getUid() == "fake_fakeB");
 }
@@ -107,13 +128,24 @@ TEST_CASE("UsReconstructionRunner: reconstructs the US and angio volumes and the
 	reconstruction->getParam("Algorithm")->setValueFromVariant("pnn");
 	fixture.setPNN_InterpolationSteps(1);
 	cx::PatientModelServicePtr patientModel = cx::PatientModelServiceProxy::create(cx::logicManager()->getPluginContext());
+	reconstruction->getParam("Preset")->setValueFromVariant("US B-Mode");
+	reconstruction->getParam("Angio data")->setValueFromVariant(false);
 	cx::UsReconstructionRunner runner(reconstruction, patientModel);
 	cx::UsReconstructionRunner::Outputs outputs;
 	outputs.mAngioMesh = true;
+	FakeReconstructionExtension extension(patientModel);
+	cx::UsReconstructionRunner::ExtensionOutputs extensionOutputs;
+	extensionOutputs.mExtension = &extension;
+	extensionOutputs.mOutputs << "fakeA";
 
-	REQUIRE(runAndWait(runner, outputs, std::vector<cx::UsReconstructionRunner::ExtensionOutputs>()));
+	REQUIRE(runner.start(outputs, std::vector<cx::UsReconstructionRunner::ExtensionOutputs>(1, extensionOutputs)));
+	CHECK(getParam(reconstruction, "Preset").toString() == "US B-Mode");
+	CHECK_FALSE(getParam(reconstruction, "Angio data").toBool());
+	reconstruction->selectData(cx::USReconstructInputData());
+	REQUIRE(waitForRun(runner));
+	CHECK(extension.mRecording == realData.getSourceFilename());
 	std::vector<cx::DataPtr> created = runner.getCreatedData();
-	REQUIRE(created.size() == 3);
+	REQUIRE(created.size() == 4);
 	int images = 0;
 	cx::MeshPtr mesh;
 	for (unsigned i=0; i<created.size(); ++i)
@@ -121,7 +153,7 @@ TEST_CASE("UsReconstructionRunner: reconstructs the US and angio volumes and the
 		images += std::dynamic_pointer_cast<cx::Image>(created[i]) ? 1 : 0;
 		mesh = std::dynamic_pointer_cast<cx::Mesh>(created[i]) ? std::dynamic_pointer_cast<cx::Mesh>(created[i]) : mesh;
 	}
-	CHECK(images == 2);
+	CHECK(images == 3);
 	REQUIRE(mesh);
 	CHECK(mesh->getVtkPolyData()->GetNumberOfPoints() > 0);
 	CHECK(patientModel->getData<cx::Image>(mesh->getParentSpace())->getImageType() == cx::istANGIO);
@@ -166,6 +198,48 @@ TEST_CASE("ReconstructionWidget: the angio checkboxes set the Angio data paramet
 	CHECK(angioData->getValueAsVariant().toBool());
 	angioVolume->setChecked(false);
 	CHECK_FALSE(angioData->getValueAsVariant().toBool());
+}
+
+TEST_CASE("ReconstructionWidget: the angio checkboxes follow the Angio data parameter, e.g. set by the preset", "[unit][usreconstruction][gui]")
+{
+	ReconstructionManagerTestFixture fixture;
+	cx::PatientModelServicePtr patientModel = cx::PatientModelServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::UsReconstructionServicePtr reconstruction = fixture.getManager();
+	reconstruction->getParam("Preset")->setValueFromVariant("US B-Mode");
+	reconstruction->getParam("Angio data")->setValueFromVariant(false);
+	cx::ReconstructionWidget widget(NULL, reconstruction, patientModel, cx::ViewService::getNullObject(), NULL);
+	QCheckBox* angioVolume = widget.findChild<QCheckBox*>("angioVolume");
+	REQUIRE(angioVolume);
+	CHECK_FALSE(angioVolume->isChecked());
+
+	reconstruction->getParam("Preset")->setValueFromVariant("US Angio");
+	CHECK(getParam(reconstruction, "Angio data").toBool());
+	CHECK(angioVolume->isChecked());
+	reconstruction->getParam("Angio data")->setValueFromVariant(false);
+	CHECK_FALSE(angioVolume->isChecked());
+}
+
+TEST_CASE("ReconstructionWidget: cannot start while a US reconstruction runs when it opens", "[integration][usreconstruction][gui]")
+{
+	ReconstructionManagerTestFixture fixture;
+	ReconstructRealTestData realData;
+	cx::PatientModelServicePtr patientModel = cx::PatientModelServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::UsReconstructionServicePtr reconstruction = fixture.getManager();
+	reconstruction->selectData(realData.getSourceFilename());
+	QObject::connect(reconstruction.get(), &cx::UsReconstructionService::reconstructFinished, qApp, &QApplication::quit);
+	QTimer::singleShot(600000, qApp, &QApplication::quit);
+	reconstruction->startReconstruction();
+	std::set<cx::TimedAlgorithmPtr> threads = reconstruction->getThreadedReconstruction();
+	REQUIRE(threads.size() == 1);
+
+	cx::ReconstructionWidget widget(NULL, reconstruction, patientModel, cx::ViewService::getNullObject(), NULL);
+	QPushButton* button = widget.findChild<QPushButton*>("reconstruct");
+	REQUIRE(button);
+	if (!(*threads.begin())->isFinished())
+	{
+		CHECK_FALSE(button->isEnabled());
+	}
+	qApp->exec();
 }
 
 TEST_CASE("ReconstructionWidget: opening the widget does not change the angio parameters", "[unit][usreconstruction][gui]")

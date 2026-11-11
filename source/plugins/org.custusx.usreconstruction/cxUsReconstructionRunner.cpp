@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxProperty.h"
 #include "cxTimedAlgorithm.h"
+#include "cxUSFrameData.h"
 #include "cxUSReconstructInputData.h"
 #include "cxUsReconstructionExtensionService.h"
 #include "cxUsReconstructionService.h"
@@ -56,6 +57,8 @@ bool UsReconstructionRunner::start(Outputs outputs, std::vector<ExtensionOutputs
 		mCancel = false;
 		mOutputs = outputs;
 		mExtensions = extensions;
+		mRecording = mReconstruction->getSelectedFileData();
+		mRecording.mUsRaw = mRecording.mUsRaw ? mRecording.mUsRaw->copy() : mRecording.mUsRaw;
 		mDataBefore = QStringList();
 		mCreatedData = QStringList();
 		std::map<QString, DataPtr> data = mPatientModel->getDatas();
@@ -91,25 +94,9 @@ bool UsReconstructionRunner::isReconstructingUs() const
 	return mRunning && mUsThread && !mUsThread->isFinished();
 }
 
-void UsReconstructionRunner::setAngioParameters(UsReconstructionServicePtr reconstruction, bool usVolume, bool angio)
-{
-	PropertyPtr preset = reconstruction->getParam("Preset");
-	QString presetName = preset->getValueAsVariant().toString();
-	if (angio && presetName == "US B-Mode")
-	{
-		preset->setValueFromVariant("US Angio");
-	}
-	else if (!angio && presetName == "US Angio")
-	{
-		preset->setValueFromVariant("US B-Mode");
-	}
-	reconstruction->getParam("Angio data")->setValueFromVariant(angio);
-	reconstruction->getParam("Dual Angio")->setValueFromVariant(usVolume);
-}
-
 bool UsReconstructionRunner::hasColorData() const
 {
-	return !mReconstruction->getSelectedFileData().is8bit();
+	return mRecording.mUsRaw && !mRecording.is8bit();
 }
 
 /** Returns false if no US or angio volume is reconstructed. */
@@ -135,18 +122,11 @@ bool UsReconstructionRunner::startUsReconstruction()
 	return bool(mUsThread);
 }
 
-/** The angio parameters are set for this reconstruction only. Returns the thread of the new reconstruction, or null. */
+/** The angio settings are given to this reconstruction only. Returns the thread of the new reconstruction, or null. */
 TimedAlgorithmPtr UsReconstructionRunner::startUsReconstructionThread(bool angio)
 {
-	QVariant preset = mReconstruction->getParam("Preset")->getValueAsVariant();
-	QVariant angioData = mReconstruction->getParam("Angio data")->getValueAsVariant();
-	QVariant dualAngio = mReconstruction->getParam("Dual Angio")->getValueAsVariant();
 	std::set<TimedAlgorithmPtr> before = mReconstruction->getThreadedReconstruction();
-	setAngioParameters(mReconstruction, mOutputs.mUsVolume, angio);
-	mReconstruction->startReconstruction();
-	mReconstruction->getParam("Preset")->setValueFromVariant(preset);
-	mReconstruction->getParam("Angio data")->setValueFromVariant(angioData);
-	mReconstruction->getParam("Dual Angio")->setValueFromVariant(dualAngio);
+	mReconstruction->startReconstruction(angio, mOutputs.mUsVolume);
 
 	TimedAlgorithmPtr retval;
 	std::set<TimedAlgorithmPtr> after = mReconstruction->getThreadedReconstruction();
@@ -238,7 +218,7 @@ void UsReconstructionRunner::startNextExtension()
 			mCurrentExtension = next.mExtension;
 			emit progress(0, 0);
 			this->connectExtension(mCurrentExtension, true);
-			started = mCurrentExtension->start(next.mOutputs);
+			started = mCurrentExtension->start(next.mOutputs, mRecording);
 			if (!started)
 			{
 				this->connectExtension(mCurrentExtension, false);
@@ -279,6 +259,7 @@ void UsReconstructionRunner::extensionFinished()
 
 void UsReconstructionRunner::finish()
 {
+	mRecording = USReconstructInputData();
 	std::map<QString, DataPtr> data = mPatientModel->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{

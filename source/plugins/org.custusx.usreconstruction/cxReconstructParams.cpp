@@ -35,6 +35,20 @@ ReconstructParams::ReconstructParams(PatientModelServicePtr patientModelService,
 	connect(mPatientModelService.get(), &PatientModelService::patientChanged, this, &ReconstructParams::onPatientChanged);
 }
 
+QString ReconstructParams::getPreset(QString preset, bool angio)
+{
+	QString retval = preset;
+	if (angio && preset == "US B-Mode")
+	{
+		retval = "US Angio";
+	}
+	else if (!angio && preset == "US Angio")
+	{
+		retval = "US B-Mode";
+	}
+	return retval;
+}
+
 ReconstructParams::~ReconstructParams()
 {
 	mSettings.save();
