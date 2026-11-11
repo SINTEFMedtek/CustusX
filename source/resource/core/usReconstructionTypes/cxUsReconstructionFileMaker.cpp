@@ -390,15 +390,15 @@ void UsReconstructionFileMaker::report()
 	}
 }
 
-unsigned UsReconstructionFileMaker::writeUSImages(const QString& path, ImageDataContainerPtr images, bool compression, const std::vector<TimedPosition>& pos)
+std::vector<TimedPosition> UsReconstructionFileMaker::writeUSImages(const QString& path, ImageDataContainerPtr images, bool compression, const std::vector<TimedPosition>& frames)
 {
-	if (images->size() != pos.size())
+	if (images->size() != frames.size())
 	{
-		reportError(QString("Mismatch between %1 images and %2 frame positions in %3, only images with a position are saved.")
-					.arg(images->size()).arg(pos.size()).arg(mSessionDescription));
+		reportError(QString("Mismatch between %1 images and %2 frame positions in %3, only frames with both are saved.")
+					.arg(images->size()).arg(frames.size()).arg(mSessionDescription));
 	}
-	unsigned count = std::min<unsigned>(images->size(), pos.size());
-	unsigned written = 0;
+	unsigned count = std::min<unsigned>(images->size(), frames.size());
+	std::vector<TimedPosition> written;
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
 	writer->SetCompression(compression);
 
@@ -407,18 +407,37 @@ unsigned UsReconstructionFileMaker::writeUSImages(const QString& path, ImageData
 		vtkImageDataPtr currentImage = images->get(i);
 		if (currentImage)
 		{
-			QString filename = QString("%1/%2_%3.mhd").arg(path).arg(mSessionDescription).arg(i);
-			this->writeUSImage(writer, filename, currentImage, pos[i].mPos);
-			++written;
+			QString filename = QString("%1/%2_%3.mhd").arg(path).arg(mSessionDescription).arg(written.size());
+			this->writeUSImage(writer, filename, currentImage, frames[i].mPos);
+			written.push_back(frames[i]);
 		}
 	}
 
-	if (written < count)
+	if (written.size() < count)
 	{
-		reportError(QString("Failed to read %1 of %2 images in %3 from the recording cache, the saved recording is incomplete.")
-					.arg(count-written).arg(count).arg(mSessionDescription));
+		reportError(QString("Failed to read %1 of %2 images in %3 from the recording cache, these frames are not saved.")
+					.arg(count-written.size()).arg(count).arg(mSessionDescription));
 	}
 	return written;
+}
+
+std::vector<TimedPosition> UsReconstructionFileMaker::writeUSImagesFromRecording(const QString& path, bool compression)
+{
+	std::vector<TimedPosition> retval;
+	ImageDataContainerPtr imageData;
+	if (mReconstructData.mUsRaw)
+	{
+		imageData = mReconstructData.mUsRaw->getImageContainer();
+	}
+	if (imageData)
+	{
+		retval = this->writeUSImages(path, imageData, compression, mReconstructData.mFrames);
+	}
+	else
+	{
+		reportError(QString("Found no image data to save in %1, the saved recording has no frames.").arg(mSessionDescription));
+	}
+	return retval;
 }
 
 void UsReconstructionFileMaker::writeUSImage(vtkMetaImageWriterPtr writer, const QString& filename, vtkImageDataPtr image, const Transform3D& rMu)
@@ -490,10 +509,11 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	{
 		this->writeReferenceMetadata(path, session, mReconstructData.mReferenceRecordedMetadata);
 	}
+	std::vector<TimedPosition> savedFrames = this->writeUSImagesFromRecording(path, compression);
 	this->writeTrackerTimestamps(path, session, mReconstructData.mPositions);
 	this->writeTrackerTransforms(path, session, mReconstructData.mPositions);
-	this->writeUSTimestamps(path, session, mReconstructData.mFrames);
-	this->writeUSTransforms(path, session, mReconstructData.mFrames);
+	this->writeUSTimestamps(path, session, savedFrames);
+	this->writeUSTransforms(path, session, savedFrames);
 	this->writeProbeConfiguration(path, session, mReconstructData);
 	if (!mReconstructData.mProbeUid.isEmpty())
 	{
@@ -503,23 +523,8 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	this->writeMask(path, session, mReconstructData.getMask());
 	this->writeREADMEFile(path, session);
 
-	ImageDataContainerPtr imageData;
-	if (mReconstructData.mUsRaw)
-	{
-		imageData = mReconstructData.mUsRaw->getImageContainer();
-	}
-	unsigned imageCount = 0;
-	if (imageData)
-	{
-		imageCount = this->writeUSImages(path, imageData, compression, mReconstructData.mFrames);
-	}
-	else
-	{
-		mReport << "failed to find frame data, save failed.";
-	}
-
 	int time = std::max(1, timer.getElapsedms());
-	mReport << QString("Completed save to %1. Spent %2s, %3fps").arg(mSessionDescription).arg(time/1000).arg(imageCount*1000/time);
+	mReport << QString("Completed save to %1. Spent %2s, %3fps").arg(mSessionDescription).arg(time/1000).arg(savedFrames.size()*1000/time);
 
 	this->report();
 	mReport.clear();

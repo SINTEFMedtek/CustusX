@@ -136,7 +136,7 @@ TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Sav
 
 	CHECK(QFileInfo(filename).exists());
 	CHECK(!this->imageFileExists(filename, input.sessionName, 0));
-	CHECK(waitForText(messageListener, "the saved recording is incomplete"));
+	CHECK(waitForText(messageListener, "these frames are not saved"));
 	messageListener.reset();
 	cx::Reporter::shutdown();
 }
@@ -159,6 +159,52 @@ TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Sav
 
 	CHECK(this->imageFileExists(filename, input.sessionName, 0));
 	CHECK(this->imageFileExists(filename, input.sessionName, cacheFiles.size()-1));
+}
+
+TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save and load a recording with a frame missing from the recording cache", "[unit][resource][usReconstructionTypes]")
+{
+	cx::DataLocations::setTestMode();
+	ReconstructionData input = this->createSampleReconstructData();
+	QString cacheFilename = this->write(input);
+	std::vector<QString> cacheFiles;
+	for (unsigned i=0; i<input.imageTimestamps.size(); ++i)
+	{
+		cacheFiles.push_back(QString("%1/%2_%3.mhd").arg(QFileInfo(cacheFilename).absolutePath()).arg(input.sessionName).arg(i));
+	}
+	REQUIRE(QFile::remove(cacheFiles[3]));
+	cx::FileManagerServicePtr nullFileManager(new cx::FileManagerServiceNull());
+	input.imageData.reset(new cx::CachedImageDataContainer(cacheFiles, nullFileManager));
+	input.sessionName = "saved_session";
+
+	QString filename = this->write(input);
+	cx::USReconstructInputData hasBeenRead = this->read(filename, nullFileManager);
+
+	REQUIRE(hasBeenRead.mUsRaw);
+	CHECK(!hasBeenRead.mFilename.isEmpty());
+	REQUIRE(hasBeenRead.mFrames.size() == cacheFiles.size()-1);
+	CHECK(hasBeenRead.mUsRaw->getNumImages() == cacheFiles.size()-1);
+	CHECK(cx::similar(hasBeenRead.mFrames[2].mTime, input.imageTimestamps[2].getAcquisitionTime()));
+	CHECK(cx::similar(hasBeenRead.mFrames[3].mTime, input.imageTimestamps[4].getAcquisitionTime()));
+}
+
+TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save and load a recording with more frame positions than images", "[unit][resource][usReconstructionTypes]")
+{
+	cx::DataLocations::setTestMode();
+	ReconstructionData input = this->createSampleReconstructData();
+	unsigned imageCount = input.imageData->size();
+	input.imageTimestamps.push_back(2*imageCount);
+	input.imageTimestamps.push_back(2*imageCount+2);
+	cx::FileManagerServicePtr nullFileManager(new cx::FileManagerServiceNull());
+
+	QString filename = this->write(input);
+	cx::USReconstructInputData hasBeenRead = this->read(filename, nullFileManager);
+
+	REQUIRE(hasBeenRead.mUsRaw);
+	CHECK(!hasBeenRead.mFilename.isEmpty());
+	REQUIRE(hasBeenRead.mFrames.size() == imageCount);
+	CHECK(hasBeenRead.mUsRaw->getNumImages() == imageCount);
+	CHECK(cx::similar(hasBeenRead.mFrames[0].mTime, input.imageTimestamps[0].getAcquisitionTime()));
+	CHECK(cx::similar(hasBeenRead.mFrames[imageCount-1].mTime, input.imageTimestamps[imageCount-1].getAcquisitionTime()));
 }
 
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save only images that have a frame position", "[unit][resource][usReconstructionTypes]")

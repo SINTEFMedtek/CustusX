@@ -14,11 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QDir>
 #include "cxTypeConversions.h"
-#include <vtkMetaImageReader.h>
 #include <vtkMetaImageWriter.h>
-#include <vtkImageChangeInformation.h>
 #include <vtkImageData.h>
-#include "cxErrorObserver.h"
 #include "cxCustomMetaImage.h"
 #include "cxImage.h"
 #include "cxLogger.h"
@@ -30,19 +27,7 @@ namespace cx {
 
 vtkImageDataPtr MetaImageReader::loadVtkImageData(QString filename)
 {
-	//load the image from file
-	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
-	reader->SetFileName(cstring_cast(filename));
-	reader->ReleaseDataFlagOn();
-
-	if (!ErrorObserver::checkedRead(reader, filename))
-		return vtkImageDataPtr();
-
-	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
-	zeroer->SetInputConnection(reader->GetOutputPort());
-	zeroer->SetOutputOrigin(0, 0, 0);
-	zeroer->Update();
-	return zeroer->GetOutput();
+	return CustomMetaImage::readVtkImageData(filename);
 }
 
 MetaImageReader::MetaImageReader(PatientModelServicePtr patientModelService) :

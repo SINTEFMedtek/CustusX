@@ -97,7 +97,9 @@ private:
 	void writeProbeConfiguration(QString reconstructionFolder, QString session, const USReconstructInputData& data);
 	bool writeMatrix(QString filename, Transform3D matrix, QString type);
 	static USRecordingInfo createRecordingInfo(ToolPtr tool, ToolPtr reference, Transform3D rMpr);
-	unsigned writeUSImages(const QString& path, ImageDataContainerPtr images, bool compression, const std::vector<TimedPosition>& pos);
+	std::vector<TimedPosition> writeUSImagesFromRecording(const QString& path, bool compression);
+	/// Write the images that can be read, numbered without gaps. Return the frames that were written.
+	std::vector<TimedPosition> writeUSImages(const QString& path, ImageDataContainerPtr images, bool compression, const std::vector<TimedPosition>& frames);
 	void writeUSImage(vtkMetaImageWriterPtr writer, const QString& filename, vtkImageDataPtr image, const Transform3D& rMu);
 	void writeMask(QString path, QString session, vtkImageDataPtr mask);
 	void writeREADMEFile(QString reconstructionFolder, QString session);
