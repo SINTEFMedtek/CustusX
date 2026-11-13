@@ -66,6 +66,7 @@ void BranchList::deleteBranch(BranchPtr b)
 void BranchList::deleteAllBranches()
 {
 	mBranches.clear();
+	mIsRadiusAvailable = false;
 }
 
 std::vector<BranchPtr> BranchList::getBranches()
@@ -769,7 +770,9 @@ void BranchList::excludeClosePositionsInCTCenterline(double minPointDistance){
 			}
 		}
 		if (updateRadius)
+		{
 			branchVector[i]->setRadius(radius); // set before positions, so that removeEqualPositions() keeps them aligned
+		}
 		branchVector[i]->setPositions(positions);
 	}
 

@@ -45,6 +45,7 @@ public:
 
 	static QString getRadiusArrayName();
 	static bool addRadiusToCenterline(MeshPtr centerline, ImagePtr segmentationVolume);
+	static std::vector<Eigen::Vector3d> findCenterlineOrientations(vtkPolyDataPtr centerline);
 
 private:
 	void addSpheresAlongCenterlines(double staticRadius = 0);

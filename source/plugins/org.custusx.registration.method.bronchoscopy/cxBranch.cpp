@@ -269,7 +269,9 @@ void Branch::removeEqualPositions()
 	if (resizeOrientations)
 		mOrientations = orientations;
 	if (resizeRadius)
+	{
 		mRadius = radius;
+	}
 }
 
 void Branch::setLap(QString lap)

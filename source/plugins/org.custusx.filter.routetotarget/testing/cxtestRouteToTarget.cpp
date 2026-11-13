@@ -75,18 +75,21 @@ cx::BranchListPtr createTwoBranchesWithIndexedRadius()
 double findRadiusAtBranchPosition(cx::BranchListPtr branchList, Eigen::Vector3d position, bool& found)
 {
 	std::vector<cx::BranchPtr> branches = branchList->getBranches();
-	for (unsigned i = 0; i < branches.size(); ++i)
+	found = false;
+	double retval = 0;
+	for (unsigned i = 0; i < branches.size() && !found; ++i)
 	{
 		Eigen::MatrixXd positions = branches[i]->getPositions();
-		for (int j = 0; j < positions.cols(); ++j)
+		for (int j = 0; j < positions.cols() && !found; ++j)
+		{
 			if (cx::similar(cx::Vector3D(positions.col(j)), cx::Vector3D(position)))
 			{
 				found = true;
-				return branches[i]->getRadius()(j);
+				retval = branches[i]->getRadius()(j);
 			}
+		}
 	}
-	found = false;
-	return 0;
+	return retval;
 }
 } // namespace
 
@@ -193,7 +196,9 @@ TEST_CASE("RouteToTarget: radius along route belongs to the same branch position
 			CHECK(radius[i] == Approx(expectedRadius));
 		}
 		else
+		{
 			CHECK(radius[i] == Approx(0)); // extension from airway to target
+		}
 	}
 	CHECK(positionsOnBranches == 22);
 }

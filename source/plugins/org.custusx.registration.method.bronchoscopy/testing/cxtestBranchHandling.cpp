@@ -113,6 +113,24 @@ TEST_CASE("Test the findParentIndex method", "[unit][bronchoscopy]")
 
 }
 
+TEST_CASE("BranchList: deleting all branches resets radius availability", "[unit][bronchoscopy]")
+{
+	cx::BranchPtr branch(new cx::Branch());
+	Eigen::MatrixXd positions(3, 2);
+	positions << 0, 0,
+				 0, 0,
+				 0, 1;
+	branch->setPositions(positions);
+	cx::BranchListPtr branchList(new cx::BranchList());
+	branchList->addBranch(branch);
+	branchList->setRadius(cx::ImagePtr());
+	REQUIRE(branchList->isRadiusAvailable());
+
+	branchList->deleteAllBranches();
+
+	CHECK_FALSE(branchList->isRadiusAvailable());
+}
+
 TEST_CASE("BranchList: excluding close positions keeps radius aligned with positions", "[unit][bronchoscopy]")
 {
 	int numberOfPositions = 101;
@@ -136,7 +154,9 @@ TEST_CASE("BranchList: excluding close positions keeps radius aligned with posit
 	CHECK(reducedPositions.cols() < numberOfPositions);
 	REQUIRE(reducedRadius.size() == reducedPositions.cols());
 	for (int i = 0; i < reducedPositions.cols(); ++i)
+	{
 		CHECK(reducedRadius(i) == Approx(reducedPositions(2, i)));
+	}
 }
 
 namespace
@@ -465,4 +485,3 @@ TEST_CASE("BranchList: deleteBranch removes only that branch from its parent", "
 }
 
 } //namespace cxtest
-
