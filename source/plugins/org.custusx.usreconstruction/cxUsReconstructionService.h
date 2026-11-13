@@ -75,6 +75,7 @@ public:
 	  * In general, dont use the retval, it is for unit testing.
 	  */
 	virtual void startReconstruction() = 0;
+	virtual void startReconstruction(bool angio, bool dualAngio) = 0; ///< With these angio settings instead of the Angio data, Dual Angio and Preset parameters
 	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction() = 0; ///< Return the currently reconstructing thread object(s).
 	/**
 	  * Create the reconstruct algorithm object.

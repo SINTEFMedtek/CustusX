@@ -22,6 +22,11 @@ set(PLUGIN_SRCS
     cxReconstructPreprocessor.cpp
     cxReconstructPreprocessor.h
     cxReconstructionWidget.cpp
+    cxReconstructionResultsWidget.h
+    cxReconstructionResultsWidget.cpp
+    cxUsReconstructionRunner.h
+    cxUsReconstructionRunner.cpp
+    cxUsReconstructionExtensionService.h
     cxReconstructOutputValueParamsInterfaces.cpp
     cxReconstructOutputValueParamsInterfaces.h
     cxReconstructionMethodService.h
@@ -43,6 +48,9 @@ set(PLUGIN_MOC_SRCS
    cxReconstructionExecuter.h
    cxReconstructionMethodService.h
    cxReconstructionWidget.h
+   cxReconstructionResultsWidget.h
+   cxUsReconstructionRunner.h
+   cxUsReconstructionExtensionService.h
    cxReconstructOutputValueParamsInterfaces.h
 )
 
@@ -67,6 +75,7 @@ set(PLUGIN_target_libraries
     cxResource
     cxResourceWidgets
     cxResourceVisualization
+    cxResourceFilter
     cxPluginUtilities
     )
 

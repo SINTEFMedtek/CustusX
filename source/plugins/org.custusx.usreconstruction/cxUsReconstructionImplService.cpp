@@ -96,13 +96,25 @@ void UsReconstructionImplService::setSettings()
 
 void UsReconstructionImplService::startReconstruction()
 {
+	this->startReconstruction(this->createCoreParameters(), mParams->getCreateBModeWhenAngio()->getValue());
+}
+
+void UsReconstructionImplService::startReconstruction(bool angio, bool dualAngio)
+{
+	ReconstructCore::InputParams par = this->createCoreParameters();
+	par.mAngio = angio;
+	par.mTransferFunctionPreset = ReconstructParams::getPreset(par.mTransferFunctionPreset, angio);
+	this->startReconstruction(par, dualAngio);
+}
+
+void UsReconstructionImplService::startReconstruction(ReconstructCore::InputParams par, bool dualAngio)
+{
 	if(!mOutputVolumeParams.isValid())
 	{
 		reportError("Cannot reconstruct from invalid ultrasound data");
 		return;
 	}
 	ReconstructionMethodService* algo = this->createAlgorithm();
-	ReconstructCore::InputParams par = this->createCoreParameters();
 	USReconstructInputData fileData = mOriginalFileData;
 	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
 
@@ -113,7 +125,7 @@ void UsReconstructionImplService::startReconstruction()
 	connect(executer.get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
 	mExecuters.push_back(executer);
 
-	bool success = executer->startReconstruction(algo, par, fileData, mParams->getCreateBModeWhenAngio()->getValue());
+	bool success = executer->startReconstruction(algo, par, fileData, dualAngio);
 	if(!success)
 		CX_LOG_WARNING() << "US reconstruction failed. Probably an error with input data.";
 }
@@ -128,11 +140,14 @@ std::set<cx::TimedAlgorithmPtr> UsReconstructionImplService::getThreadedReconstr
 
 void UsReconstructionImplService::reconstructFinishedSlot()
 {
-	mOriginalFileData.mUsRaw->purgeAll();
+	if (mOriginalFileData.mUsRaw)
+	{
+		mOriginalFileData.mUsRaw->purgeAll();
+	}
 
 	for (unsigned i=0; i<mExecuters.size(); ++i)
 	{
-		if (mExecuters[i]->getThread()->isFinished())
+		if (!mExecuters[i]->getThread() || mExecuters[i]->getThread()->isFinished())
 		{
 			ReconstructionExecuterPtr executer = mExecuters[i];
 			disconnect(executer.get(), SIGNAL(reconstructAboutToStart()), this, SIGNAL(reconstructAboutToStart()));

@@ -121,6 +121,7 @@ private:
 	OutputVolumeParams mOutputVolumeParams;
 	bool mSuccess;
 	PatientModelServicePtr mPatientModelService;
+	QString mPatientFolder; ///< The active patient when the reconstruction was created
 };
 
 } /* namespace cx */

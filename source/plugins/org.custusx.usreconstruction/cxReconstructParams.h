@@ -42,6 +42,7 @@ public:
 
 	PropertyPtr getParameter(QString uid);
 	QStringList getParameterUids() const;
+	static QString getPreset(QString preset, bool angio); ///< The angio or B-mode preset instead of the other, else the preset
 
 	StringPropertyPtr getOrientationAdapter() { this->createParameters(); return mOrientationAdapter; }
 	BoolPropertyPtr getFlipImages() { this->createParameters(); return mFlipImages; }

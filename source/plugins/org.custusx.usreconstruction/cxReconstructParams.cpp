@@ -35,6 +35,20 @@ ReconstructParams::ReconstructParams(PatientModelServicePtr patientModelService,
 	connect(mPatientModelService.get(), &PatientModelService::patientChanged, this, &ReconstructParams::onPatientChanged);
 }
 
+QString ReconstructParams::getPreset(QString preset, bool angio)
+{
+	QString retval = preset;
+	if (angio && preset == "US B-Mode")
+	{
+		retval = "US Angio";
+	}
+	else if (!angio && preset == "US Angio")
+	{
+		retval = "US B-Mode";
+	}
+	return retval;
+}
+
 ReconstructParams::~ReconstructParams()
 {
 	mSettings.save();
@@ -175,6 +189,12 @@ void ReconstructParams::createParameters()
 		mSettings.getElement());
 	connect(mCreateBModeWhenAngio.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 	this->add(mCreateBModeWhenAngio);
+
+	DoublePropertyPtr angioMeshThreshold = DoubleProperty::initialize("Angio mesh threshold", "",
+		"The angio mesh is the surface where the angio volume has this value (0-255)", 20,
+		DoubleRange(1, 255, 1), 0,
+		mSettings.getElement());
+	this->add(angioMeshThreshold);
 
 	mAlgorithmAdapter = StringProperty::initialize("Algorithm", "", "Choose algorithm to use for reconstruction",
 			QString(), QStringList(), mSettings.getElement());

@@ -81,6 +81,7 @@ public:
 	  * In general, dont use the retval, it is for unit testing.
 	  */
 	virtual void startReconstruction();
+	virtual void startReconstruction(bool angio, bool dualAngio);
 	virtual std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction(); ///< Return the currently reconstructing thread object(s).
 	/**
 	  * Create the reconstruct algorithm object.
@@ -101,6 +102,7 @@ private slots:
 	void patientChangedSlot();
 
 private:
+	void startReconstruction(ReconstructCore::InputParams par, bool dualAngio);
 	void clearAll();
 
 	/** Use the mOriginalFileData structure to rebuild all internal data.
