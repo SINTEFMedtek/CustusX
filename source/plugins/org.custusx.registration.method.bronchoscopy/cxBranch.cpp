@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxBranch.h"
+#include "cxBranchList.h"
 #include "cxLog.h"
 #include "cxEnumConversion.h"
 
@@ -243,9 +244,11 @@ void Branch::removeEqualPositions()
 {
 	Eigen::MatrixXd positions = this->getPositions();
 	Eigen::MatrixXd orientations = this->getOrientations();
+	Eigen::VectorXd radius = this->getRadius();
 	bool resizeOrientations = false;
 	if (positions.cols() == orientations.cols())
 		resizeOrientations = true;
+	bool resizeRadius = (radius.size() > 0 && radius.size() == positions.cols()); // keep radius aligned with positions
 
 	for (int i = positions.cols() - 1; i > 0; i--)
 	{
@@ -255,12 +258,20 @@ void Branch::removeEqualPositions()
 			positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
 			if (resizeOrientations)
 				orientations.conservativeResize(Eigen::NoChange, orientations.cols() - 1);
+			if (resizeRadius)
+			{
+				radius = eraseElement(i, radius);
+			}
 		}
 	}
 
 	mPositions = positions;
 	if (resizeOrientations)
 		mOrientations = orientations;
+	if (resizeRadius)
+	{
+		mRadius = radius;
+	}
 }
 
 void Branch::setLap(QString lap)

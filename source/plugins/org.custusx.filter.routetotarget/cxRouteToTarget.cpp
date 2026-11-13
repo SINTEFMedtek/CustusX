@@ -195,8 +195,30 @@ void RouteToTarget::findRoutePositions(std::vector<Eigen::Vector3d> initialRoute
 
 	std::vector< double > initialRouteRotations(mRoutePositions.size(), cameraRotation);
 	mCameraRotation = initialRouteRotations;
+	// Keep generation numbers and radius aligned with mRoutePositions. No airway radius outside the airway tree.
+	mGenerationNumber = std::vector< int >(mRoutePositions.size(), mProjectedBranchPtr->findGenerationNumber());
+	mRadius = std::vector< double >(mRoutePositions.size(), 0.0);
 
 	searchBranchUp(mProjectedBranchPtr, mProjectedIndex);
+}
+
+/**
+ * Airway radius at route position i of a branch, where positions are ordered from startIndex and up the branch, towards trachea.
+ * With smoothing, the last position is the parent's last position, and gets the parent's radius.
+ */
+double RouteToTarget::findRadiusAlongBranch(BranchPtr branch, int startIndex, int i) const
+{
+	BranchPtr parent = branch->getParentBranch();
+	bool atParentPosition = mSmoothing && parent && i == startIndex;
+	Eigen::VectorXd radius = atParentPosition ? parent->getRadius() : branch->getRadius();
+	int branchIndex = atParentPosition ? radius.size() - 1 : startIndex - i;
+
+	double retval = 0.0;
+	if (branchIndex >= 0 && branchIndex < radius.size())
+	{
+		retval = radius(branchIndex);
+	}
+	return retval;
 }
 
 void RouteToTarget::findRoutePositionsInBloodVessels()
@@ -240,12 +262,7 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 		else
 			mCameraRotation.push_back(cameraRotation);
 		mGenerationNumber.push_back(searchBranchPtr->findGenerationNumber());
-		Eigen::VectorXd radius = searchBranchPtr->getRadius();
-
-		if(radius.size() > i)
-			mRadius.push_back(radius(i));
-		else
-			mRadius.push_back(0.0);
+		mRadius.push_back(this->findRadiusAlongBranch(searchBranchPtr, startIndex, i));
 	}
 
 	mBranchingIndex.push_back(mRoutePositions.size()-1);

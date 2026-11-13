@@ -64,6 +64,7 @@ public:
 	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
 	void setRadius(ImagePtr segmentationVolume);
 	bool isRadiusAvailable();
+	double calculateRadius(Eigen::Vector3d position, Eigen::Vector3d orientation, ImagePtr segmentationVolume);
 	void setBranchCode();
 	void findBranchCodeForChildren(BranchPtr branch);
 
@@ -78,7 +79,6 @@ private:
 	double findDistance(Vector3D p1, Vector3D p2);
 	BranchPtr findClosestBranch(Vector3D targetCoordinate_r);
 	Eigen::MatrixXd findMainConnectedAirwayTree(Eigen::MatrixXd positions_r);
-	double calculateRadius(Eigen::Vector3d position, Eigen::Vector3d orientation, ImagePtr segmentationVolume);
 	double findDistanceToSegmentationEdge(vtkImageDataPtr segmentationVolume, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction);
 
 	bool mIsRadiusAvailable = false;
@@ -88,6 +88,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd > org_custusx_registration_method_bron
 bool checkIfTwoPointCloudsAreClose(Eigen::MatrixXd C1, Eigen::MatrixXd C2, double maxDistance/*mm*/);
 Eigen::MatrixXd sortMatrix(int rowNumber, Eigen::MatrixXd matrix);
 Eigen::MatrixXd org_custusx_registration_method_bronchoscopy_EXPORT eraseCol(int removeIndex, Eigen::MatrixXd positions);
+Eigen::VectorXd org_custusx_registration_method_bronchoscopy_EXPORT eraseElement(int removeIndex, Eigen::VectorXd values);
 std::pair<Eigen::MatrixXd::Index, double> org_custusx_registration_method_bronchoscopy_EXPORT dsearch(Eigen::Vector3d p, Eigen::MatrixXd positions);
 std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd > org_custusx_registration_method_bronchoscopy_EXPORT dsearchn(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 std::vector<Eigen::Vector3d> org_custusx_registration_method_bronchoscopy_EXPORT smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);

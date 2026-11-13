@@ -66,6 +66,7 @@ void BranchList::deleteBranch(BranchPtr b)
 void BranchList::deleteAllBranches()
 {
 	mBranches.clear();
+	mIsRadiusAvailable = false;
 }
 
 std::vector<BranchPtr> BranchList::getBranches()
@@ -753,15 +754,24 @@ void BranchList::excludeClosePositionsInCTCenterline(double minPointDistance){
 	for (int i = 0; i < branchVector.size(); i++)
 	{
 		Eigen::MatrixXd positions = branchVector[i]->getPositions();
-		Eigen::MatrixXd orientations = branchVector[i]->getOrientations();
+		Eigen::VectorXd radius = branchVector[i]->getRadius();
+		bool updateRadius = (radius.size() > 0 && radius.size() == positions.cols()); // keep radius aligned with positions
 
-		for (int i = positions.cols()-2; i > 0; i--){
-			double distance = (positions.col(i) - positions.col(i+1)).norm();
+		// Orientations are recalculated by setPositions()
+		for (int j = positions.cols()-2; j > 0; j--){
+			double distance = (positions.col(j) - positions.col(j+1)).norm();
 			if ( distance < minPointDistance )
 			{
-				positions = eraseCol(i,positions);
-				orientations = eraseCol(i,orientations);
+				positions = eraseCol(j,positions);
+				if (updateRadius)
+				{
+					radius = eraseElement(j, radius);
+				}
 			}
+		}
+		if (updateRadius)
+		{
+			branchVector[i]->setRadius(radius); // set before positions, so that removeEqualPositions() keeps them aligned
 		}
 		branchVector[i]->setPositions(positions);
 	}
@@ -1164,6 +1174,13 @@ Eigen::MatrixXd eraseCol(int removeIndex, Eigen::MatrixXd positions)
 	positions.block(0 , removeIndex , positions.rows() , positions.cols() - removeIndex - 1) = positions.rightCols(positions.cols() - removeIndex - 1);
 	positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
 	return positions;
+}
+
+Eigen::VectorXd eraseElement(int removeIndex, Eigen::VectorXd values)
+{
+	values.segment(removeIndex, values.size() - removeIndex - 1) = values.tail(values.size() - removeIndex - 1).eval();
+	values.conservativeResize(values.size() - 1);
+	return values;
 }
 
 std::pair<Eigen::MatrixXd::Index, double> dsearch(Eigen::Vector3d p, Eigen::MatrixXd positions)

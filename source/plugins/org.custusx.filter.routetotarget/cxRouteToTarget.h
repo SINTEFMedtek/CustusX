@@ -58,6 +58,7 @@ public:
 
 
 private:
+	double findRadiusAlongBranch(BranchPtr branch, int startIndex, int i) const;
 	std::vector<Eigen::Vector3d> insertAndinterpolate(std::vector<Eigen::Vector3d> routePositions, Vector3D newPosition, double interpolationDistance);
 
 	Eigen::MatrixXd mCLpoints;

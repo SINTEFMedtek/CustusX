@@ -43,6 +43,10 @@ public:
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
 	vtkPolyDataPtr getVTKPoints();
 
+	static QString getRadiusArrayName();
+	static bool addRadiusToCenterline(MeshPtr centerline, ImagePtr segmentationVolume);
+	static std::vector<Eigen::Vector3d> findCenterlineOrientations(vtkPolyDataPtr centerline);
+
 private:
 	void addSpheresAlongCenterlines(double staticRadius = 0);
 	void addSphereToImage(double position[3], double radius);

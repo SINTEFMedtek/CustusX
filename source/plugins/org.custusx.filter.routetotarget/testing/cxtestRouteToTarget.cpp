@@ -15,6 +15,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPointMetric.h"
 #include "cxVector3D.h"
 #include "cxtestSpaceProviderMock.h"
+#include "cxBranchList.h"
+#include "cxBranch.h"
 
 namespace cxtest
 {
@@ -35,6 +37,57 @@ std::map<QString, cx::PointMetricPtr> createPoints(std::vector<cx::Vector3D> coo
 	{
 		QString uid = cx::RouteToTargetFilter::getExtraAirwayPointUidPrefix() + QString::number(i + 1);
 		retval[uid] = createPoint(uid, coordinates[i]);
+	}
+	return retval;
+}
+
+// Trachea along -z, with a child branch along +y. Radius is 100+index in trachea and 200+index in child branch.
+cx::BranchListPtr createTwoBranchesWithIndexedRadius()
+{
+	int numberOfPositions = 11;
+	Eigen::MatrixXd tracheaPositions(3, numberOfPositions);
+	Eigen::MatrixXd childPositions(3, numberOfPositions);
+	Eigen::VectorXd tracheaRadius(numberOfPositions);
+	Eigen::VectorXd childRadius(numberOfPositions);
+	for (int i = 0; i < numberOfPositions; ++i)
+	{
+		tracheaPositions.col(i) = Eigen::Vector3d(0, 0, 100 - i);
+		childPositions.col(i) = Eigen::Vector3d(0, i + 1, 90);
+		tracheaRadius(i) = 100 + i;
+		childRadius(i) = 200 + i;
+	}
+
+	cx::BranchPtr trachea(new cx::Branch());
+	trachea->setPositions(tracheaPositions);
+	trachea->setRadius(tracheaRadius);
+	cx::BranchPtr child(new cx::Branch());
+	child->setPositions(childPositions);
+	child->setRadius(childRadius);
+	child->setParentBranch(trachea);
+	trachea->addChildBranch(child);
+
+	cx::BranchListPtr branchList(new cx::BranchList());
+	branchList->addBranch(trachea);
+	branchList->addBranch(child);
+	return branchList;
+}
+
+double findRadiusAtBranchPosition(cx::BranchListPtr branchList, Eigen::Vector3d position, bool& found)
+{
+	std::vector<cx::BranchPtr> branches = branchList->getBranches();
+	found = false;
+	double retval = 0;
+	for (unsigned i = 0; i < branches.size() && !found; ++i)
+	{
+		Eigen::MatrixXd positions = branches[i]->getPositions();
+		for (int j = 0; j < positions.cols() && !found; ++j)
+		{
+			if (cx::similar(cx::Vector3D(positions.col(j)), cx::Vector3D(position)))
+			{
+				found = true;
+				retval = branches[i]->getRadius()(j);
+			}
+		}
 	}
 	return retval;
 }
@@ -115,6 +168,85 @@ TEST_CASE("RouteToTarget: route without extra airway points contains only the ta
 
 	REQUIRE(route.size() == 1);
 	CHECK(cx::similar(route.front(), target));
+}
+
+TEST_CASE("RouteToTarget: radius along route belongs to the same branch position as the route position", "[unit][org.custusx.filter.routetotarget]")
+{
+	cx::BranchListPtr branchList = createTwoBranchesWithIndexedRadius();
+	cx::RouteToTarget routeToTarget;
+	routeToTarget.setSmoothing(false);
+	routeToTarget.setBranchList(branchList);
+	cx::PointMetricPtr target = createPoint("target", cx::Vector3D(0, 13, 90));
+
+	routeToTarget.findRouteToTarget(target, "");
+	routeToTarget.findExtendedRoute(target);
+
+	std::vector<Eigen::Vector3d> route = routeToTarget.getRoutePositions(true);
+	std::vector<double> radius = routeToTarget.getRadius();
+	REQUIRE(route.size() == radius.size());
+
+	int positionsOnBranches = 0;
+	for (unsigned i = 0; i < route.size(); ++i)
+	{
+		bool onBranch = false;
+		double expectedRadius = findRadiusAtBranchPosition(branchList, route[i], onBranch);
+		if (onBranch)
+		{
+			++positionsOnBranches;
+			CHECK(radius[i] == Approx(expectedRadius));
+		}
+		else
+		{
+			CHECK(radius[i] == Approx(0)); // extension from airway to target
+		}
+	}
+	CHECK(positionsOnBranches == 22);
+}
+
+TEST_CASE("RouteToTarget: with smoothing, the position at the branching point gets the parent's radius", "[unit][org.custusx.filter.routetotarget]")
+{
+	cx::BranchListPtr branchList = createTwoBranchesWithIndexedRadius();
+	cx::RouteToTarget routeToTarget;
+	routeToTarget.setSmoothing(true);
+	routeToTarget.setBranchList(branchList);
+	cx::PointMetricPtr target = createPoint("target", cx::Vector3D(0, 13, 90));
+
+	routeToTarget.findRouteToTarget(target, "");
+	routeToTarget.findExtendedRoute(target);
+
+	std::vector<Eigen::Vector3d> route = routeToTarget.getRoutePositions(true);
+	std::vector<double> radius = routeToTarget.getRadius();
+	REQUIRE(route.size() == radius.size());
+
+	Eigen::Vector3d branchingPoint(0, 0, 90); // last position of the trachea
+	int positionsAtBranchingPoint = 0;
+	for (unsigned i = 0; i < route.size(); ++i)
+	{
+		if (cx::similar(cx::Vector3D(route[i]), cx::Vector3D(branchingPoint), 1e-6))
+		{
+			++positionsAtBranchingPoint;
+			CHECK(radius[i] == Approx(110)); // last trachea radius
+		}
+	}
+	CHECK(positionsAtBranchingPoint >= 1);
+}
+
+TEST_CASE("RouteToTarget: radius and generation numbers are aligned with route when using extra airway points", "[unit][org.custusx.filter.routetotarget]")
+{
+	cx::BranchListPtr branchList = createTwoBranchesWithIndexedRadius();
+	cx::RouteToTarget routeToTarget;
+	routeToTarget.setSmoothing(false);
+	routeToTarget.setBranchList(branchList);
+	cx::PointMetricPtr target = createPoint("target", cx::Vector3D(0, 16, 90));
+	std::map<QString, cx::PointMetricPtr> airwayPoints = createPoints({cx::Vector3D(0, 14, 90)});
+
+	routeToTarget.findRouteToTarget(target, "", airwayPoints);
+	routeToTarget.findExtendedRoute(target);
+
+	size_t routeSize = routeToTarget.getRoutePositions(true).size();
+	CHECK(routeToTarget.getRadius().size() == routeSize);
+	CHECK(routeToTarget.getGenerationNumbers().size() == routeSize);
+	CHECK(routeToTarget.getCameraRotation().size() == routeSize);
 }
 
 } // namespace cxtest
