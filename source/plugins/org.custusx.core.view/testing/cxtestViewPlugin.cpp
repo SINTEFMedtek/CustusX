@@ -130,6 +130,34 @@ TEST_CASE("ViewService: set/get camera style", "[integration][plugins][org.custu
 	REQUIRE(selectedAction->data().toString() == enum2string(cx::cstTOOL_STYLE));
 }
 
+TEST_CASE("ViewService: The Endoscopy action selects the endoscope style with scope rendering", "[integration][plugins][org.custusx.core.view]")
+{
+	ViewServiceFixture fixture;
+	fixture.quickRun();
+
+	QActionGroup* actionGroup = fixture.mServices->view()->getInteractorStyleActionGroup();
+	REQUIRE(actionGroup);
+
+	QAction* endoscopeAction = nullptr;
+	for (QAction* action : actionGroup->actions())
+	{
+		if (action->data().toString() == enum2string(cx::cstENDOSCOPE_STYLE))
+		{
+			endoscopeAction = action;
+		}
+	}
+	REQUIRE(endoscopeAction);
+
+	endoscopeAction->trigger();
+
+	cx::ViewGroupDataPtr group = fixture.mServices->view()->getActiveViewGroup();
+	REQUIRE(group);
+	cx::CameraStyleData style = group->getOptions().mCameraStyle;
+	CHECK(style.getStyle() == cx::cstENDOSCOPE_STYLE);
+	CHECK(style.mScopeRendering);
+	CHECK(actionGroup->checkedAction() == endoscopeAction);
+}
+
 TEST_CASE("ViewService: Add new default layout", "[integration][plugins][org.custusx.core.view]")
 {
 	ViewServiceFixture fixture;

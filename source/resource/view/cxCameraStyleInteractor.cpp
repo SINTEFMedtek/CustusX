@@ -56,10 +56,10 @@ QActionGroup* CameraStyleInteractor::getInteractorStyleActionGroup()
 								   enum2string(cstANGLED_TOOL_STYLE),
 								   QIcon(":/icons/camera-at.png"),
 								   "Camera following tool (Placed at an angle of 20 degrees).");
-	this->addInteractorStyleAction("Unicam", mCameraStyleGroup,
-								   enum2string(cstUNICAM_STYLE),
-								   QIcon(":/icons/camera-u.png"),
-								   "Set 3D interaction to a single-button style, useful for touch screens.");
+	this->addInteractorStyleAction("Endoscopy", mCameraStyleGroup,
+								   enum2string(cstENDOSCOPE_STYLE),
+								   QIcon(":/icons/camera-e.png"),
+								   "Camera following tool, rendered like an endoscope: wide view angle, fisheye lens, light at the camera.");
 	return mCameraStyleGroup;
 }
 

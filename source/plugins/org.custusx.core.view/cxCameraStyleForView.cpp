@@ -35,6 +35,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxRegionOfInterestMetric.h"
 #include "cxNavigationAlgorithms.h"
 #include "cxDoubleRange.h"
+#include "cxFisheyePass.h"
+#include "cxMaterialOverridePass.h"
 
 namespace cx
 {
@@ -64,10 +66,26 @@ CameraStyleForView::CameraStyleForView(CoreServicesPtr backend) :
 			this, &CameraStyleForView::activeToolChangedSlot);
 }
 
+/** Views are reused by other view groups: leave the view with the default rendering. */
+CameraStyleForView::~CameraStyleForView()
+{
+	vtkRendererPtr renderer = this->getRenderer();
+	if (renderer)
+	{
+		this->disableScopeRendering(renderer);
+	}
+}
+
 void CameraStyleForView::setView(ViewPtr widget)
 {
 	mViewportListener->stopListen();
 	mPreRenderListener->stopListen();
+
+	vtkRendererPtr oldRenderer = this->getRenderer();
+	if (oldRenderer)
+	{
+		this->disableScopeRendering(oldRenderer);
+	}
 
 	this->disconnectTool();
 	mView = widget;
@@ -75,6 +93,7 @@ void CameraStyleForView::setView(ViewPtr widget)
 
 	mViewportListener->startListen(this->getRenderer());
 	mPreRenderListener->startListen(this->getRenderer());
+	this->updateScopeRendering();
 }
 
 
@@ -92,6 +111,7 @@ void CameraStyleForView::viewportChangedSlot()
 
 void CameraStyleForView::onPreRender()
 {
+	this->updateScopeRendering();
 	this->applyCameraStyle();
 }
 
@@ -307,19 +327,120 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 	return retval;
 }
 
-void CameraStyleForView::handleLights()
+/**
+ * Imitate an endoscope when the camera style has scope rendering on:
+ * Replace the default VTK headlight (directional, no attenuation) with a positional
+ * spotlight at the camera, so that brightness falls off with distance and towards
+ * the edges of the view. Render through a fisheye lens distortion, magnifying the
+ * center of the view as a wide angle endoscope lens does, and give the surfaces a
+ * wet look.
+ * Other styles get the default headlight and rendering back.
+ */
+void CameraStyleForView::updateScopeRendering()
 {
 	vtkRendererPtr renderer = this->getRenderer();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "#lights: " << renderer->GetLights()->GetNumberOfItems();
-	renderer->GetLights()->InitTraversal();
-	vtkLight* light = renderer->GetLights()->GetNextItem();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "light ";
-//	light->PrintSelf(std::cout, vtkIndent(2));
+	if (renderer && this->isScopeStyle())
+	{
+		this->enableScopeRendering(renderer);
+	}
+	else if (renderer)
+	{
+		this->disableScopeRendering(renderer);
+	}
+}
 
-	// experiment: set a light to the left of the camera, pointing at focus
-	light->SetConeAngle(160);
+void CameraStyleForView::enableScopeRendering(vtkRendererPtr renderer)
+{
+	if (!mScopeLight)
+	{
+		mScopeLight = this->createScopeLight();
+		this->updateScopeLightIntensity();
+	}
+
+	if (!renderer->GetLights()->IsItemPresent(mScopeLight))
+	{
+		renderer->AutomaticLightCreationOff();
+		renderer->RemoveAllLights();
+		renderer->AddLight(mScopeLight);
+	}
+
+	if (!mScopeMaterialPass)
+	{
+		this->createScopeRenderPasses();
+	}
+	if (renderer->GetPass() != mScopeMaterialPass)
+	{
+		renderer->SetPass(mScopeMaterialPass);
+	}
+}
+
+void CameraStyleForView::disableScopeRendering(vtkRendererPtr renderer)
+{
+	if (mScopeLight && renderer->GetLights()->IsItemPresent(mScopeLight))
+	{
+		renderer->RemoveLight(mScopeLight);
+		renderer->AutomaticLightCreationOn();
+	}
+	if (mScopeMaterialPass && renderer->GetPass() == mScopeMaterialPass)
+	{
+		mScopeMaterialPass->restoreMaterials();
+		// The renderer only releases the pass that is set
+		mScopeMaterialPass->ReleaseGraphicsResources(renderer->GetRenderWindow());
+		renderer->SetPass(nullptr);
+	}
+}
+
+void CameraStyleForView::createScopeRenderPasses()
+{
+	mFisheyePass = vtkSmartPointer<FisheyePass>::New();
+
+	// Wet mucosa: small, sharp specular highlights. Almost no ambient light inside the airways.
+	mScopeMaterialPass = vtkSmartPointer<MaterialOverridePass>::New();
+	mScopeMaterialPass->setMaterial(0.05, 0.85, 0.6, 60);
+	mScopeMaterialPass->SetDelegatePass(mFisheyePass);
+}
+
+vtkSmartPointer<vtkLight> CameraStyleForView::createScopeLight() const
+{
+	vtkSmartPointer<vtkLight> light = vtkSmartPointer<vtkLight>::New();
 	light->SetLightTypeToCameraLight();
-	light->SetPosition(-0.5,0,1);
+	// Camera light coordinates: the camera is at (0,0,1) looking towards (0,0,0)
+	light->SetPosition(0, 0, 1);
+	light->SetFocalPoint(0, 0, 0);
+	light->SetPositional(true); // required for cone angle and attenuation to have effect
+	light->SetConeAngle(80); // half angle, must be < 90 to give a spotlight. Wider than the view to avoid a hard edge
+	light->SetExponent(1); // falloff towards the cone edge
+	// Brightness is 1/(1+d/r0+(d/r1)^2), with d the distance in mm. The constant term
+	// caps the brightness near the walls. Near the camera the linear term dominates
+	// (a video camera's gamma makes the physical 1/d^2 falloff look roughly like 1/d),
+	// while the quadratic term darkens branch openings far ahead, as in real endoscopy.
+	double r0 = 30.0;
+	double r1 = 30.0;
+	light->SetAttenuationValues(1, 1.0/r0, 1.0/(r1*r1));
+	light->SetColor(1.0, 0.96, 0.92); // slightly warm
+	return light;
+}
+
+void CameraStyleForView::setScopeExposure(double exposure)
+{
+	if (!similar(exposure, mScopeExposure))
+	{
+		mScopeExposure = exposure;
+		if (mScopeLight)
+		{
+			this->updateScopeLightIntensity();
+		}
+		if (mScopeLight && this->getView())
+		{
+			this->getView()->setModified();
+		}
+	}
+}
+
+void CameraStyleForView::updateScopeLightIntensity()
+{
+	const double baseIntensity = 1.5;
+	mScopeLight->SetIntensity(baseIntensity * mScopeExposure);
 }
 
 /**
@@ -357,6 +478,17 @@ bool CameraStyleForView::isToolFollowingStyle() const
 	return (mStyle.mCameraFollowTool || mStyle.mFocusFollowTool);
 }
 
+bool CameraStyleForView::isScopeStyle() const
+{
+	return mStyle.mScopeRendering;
+}
+
+/** The camera sits on the tool, looking along it. */
+bool CameraStyleForView::isCameraOnToolStyle() const
+{
+	return mStyle.mCameraFollowTool && fabs(mStyle.mElevation) < 0.01;
+}
+
 void CameraStyleForView::connectTool()
 {
 	if (!this->isToolFollowingStyle())
@@ -377,7 +509,7 @@ void CameraStyleForView::connectTool()
 	if (rep)
 	{
 		rep->setOffsetPointVisibleAtZeroOffset(false);
-		if (mStyle.mCameraFollowTool && fabs(mStyle.mElevation) < 0.01)
+		if (this->isCameraOnToolStyle())
 			rep->setStayHiddenAfterVisible(true);
 	}
 
@@ -417,6 +549,7 @@ void CameraStyleForView::setCameraStyle(CameraStyleData style)
 		this->setInteractor(vtkInteractorStyleTrackballCameraPtr::New());
 
 	mStyle = style;
+	this->updateScopeRendering();
 
 	this->connectTool();
 }
@@ -448,15 +581,16 @@ void CameraStyleForView::updateCamera(CameraInfo info)
 	if (similar(cam_old, info, tol))
 		return; // break update loop: this event is triggered by camera change.
 
-//	this->handleLights();
-
 	mBlockCameraUpdate = true;
 	camera->SetPosition(info.pos.begin());
 	camera->SetFocalPoint(info.focus.begin());
 	camera->SetViewUp(info.vup.begin());
 	camera->SetViewAngle(info.viewAngle);
+	// In the scope style, the walls of small airways at the edges of a wide view
+	// can be closer than 1mm to the camera plane, and would be clipped away.
+	double nearClip = this->isScopeStyle() ? 0.1 : 1;
 	// use 2m, as the camera sometimes can move far from the object during zoom
-	camera->SetClippingRange(1, std::max<double>(2000, info.distance() * 10));
+	camera->SetClippingRange(nearClip, std::max<double>(2000, info.distance() * 10));
 	mBlockCameraUpdate = false;
 }
 

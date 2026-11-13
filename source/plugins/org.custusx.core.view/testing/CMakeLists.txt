@@ -21,6 +21,7 @@ if(BUILD_TESTING)
     cxtestVisualizationHelper.h
     cxtestVisualizationHelper.cpp
     cxtestViewGroup.cpp
+    cxtestFisheyePass.cpp
     cxtestNavigationAlgorithms.cpp
     cxtestViewService.cpp
     cxtestViewServiceMock.cpp

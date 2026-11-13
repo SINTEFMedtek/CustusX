@@ -57,6 +57,7 @@ struct cxResourceVisualization_EXPORT CameraStyleData
 	bool mTableLock;
 	double mElevation;
 	bool mUniCam;
+	bool mScopeRendering; ///< Look like an endoscope: fisheye lens, light at the camera, wet surfaces
 	QString mCameraNotBehindROI; // never move camera behind this roi
 	QString mFocusROI; // name of ROI to set focus in.
 	QString mAutoZoomROI; // name of ROI to zoom to.
@@ -142,6 +143,11 @@ public:
 	ToolPtr getControllingTool();
 	void setControllingTool(ToolPtr tool);
 
+	/** Brightness factor for the light in the fly-through (scope) camera style, like the
+	 *  automatic exposure of an endoscope. 1 gives the default brightness. Not saved. */
+	void setScopeExposure(double exposure);
+	double getScopeExposure() const;
+
 	// view options for this group.
 	struct Options
 	{
@@ -168,6 +174,7 @@ signals:
 	void initialized();
 	void optionsChanged();
 	void controllingToolChanged();
+	void scopeExposureChanged();
 
 private:
 	typedef std::pair<QString, DataViewProperties> DataAndViewPropertiesPair;
@@ -199,6 +206,7 @@ private:
 	StringListPropertyPtr mSliceDefinitionProperty;
 	DataPtr getData(QString uid) const;
 	ToolPtr mControllingTool; ///< Tool controlling 2D/3D views for this view group. Using this overrides the active tool.
+	double mScopeExposure = 1.0;
 
 };
 
