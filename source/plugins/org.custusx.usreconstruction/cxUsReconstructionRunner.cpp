@@ -37,9 +37,11 @@ UsReconstructionRunner::UsReconstructionRunner(UsReconstructionServicePtr recons
 	mReconstruction(reconstruction),
 	mPatientModel(patientModel),
 	mRunning(false),
-	mCancel(false)
+	mCancel(false),
+	mPatientChanged(false)
 {
 	connect(&mMeshWatcher, &QFutureWatcher<vtkPolyDataPtr>::finished, this, &UsReconstructionRunner::angioMeshFinished);
+	connect(mPatientModel.get(), &PatientModelService::patientChanged, this, &UsReconstructionRunner::patientChanged);
 }
 
 UsReconstructionRunner::~UsReconstructionRunner()
@@ -55,6 +57,7 @@ bool UsReconstructionRunner::start(Outputs outputs, std::vector<ExtensionOutputs
 	{
 		mRunning = true;
 		mCancel = false;
+		mPatientChanged = false;
 		mOutputs = outputs;
 		mExtensions = extensions;
 		mRecording = mReconstruction->getSelectedFileData();
@@ -81,6 +84,18 @@ void UsReconstructionRunner::cancel()
 	if (mCurrentExtension)
 	{
 		mCurrentExtension->cancel();
+	}
+}
+
+/** A run is cancelled, and data is no longer listed as created, as it is not in the new patient. */
+void UsReconstructionRunner::patientChanged()
+{
+	mCreatedData.clear();
+	if (mRunning)
+	{
+		mPatientChanged = true;
+		this->cancel();
+		emit statusChanged("Cancelling after the current step, as another patient was loaded");
 	}
 }
 
@@ -260,16 +275,21 @@ void UsReconstructionRunner::extensionFinished()
 void UsReconstructionRunner::finish()
 {
 	mRecording = USReconstructInputData();
-	std::map<QString, DataPtr> data = mPatientModel->getDatas();
-	for (std::map<QString, DataPtr>::iterator iter = data.begin(); iter != data.end(); ++iter)
+	QString status = "Cancelled, as another patient was loaded";
+	if (!mPatientChanged)
 	{
-		if (!mDataBefore.contains(iter->first))
+		std::map<QString, DataPtr> data = mPatientModel->getDatas();
+		for (std::map<QString, DataPtr>::iterator iter = data.begin(); iter != data.end(); ++iter)
 		{
-			mCreatedData << iter->first;
+			if (!mDataBefore.contains(iter->first))
+			{
+				mCreatedData << iter->first;
+			}
 		}
+		status = mCancel ? "Cancelled" : QString("Created %1 data").arg(mCreatedData.size());
 	}
 	mRunning = false;
-	emit statusChanged(mCancel ? "Cancelled" : QString("Created %1 data").arg(mCreatedData.size()));
+	emit statusChanged(status);
 	emit finished();
 }
 

@@ -58,7 +58,7 @@ public:
 	void cancel();
 	bool isRunning() const;
 	bool isReconstructingUs() const; ///< True in the US volume step of a run
-	std::vector<DataPtr> getCreatedData() const; ///< The data added to the patient by the last run
+	std::vector<DataPtr> getCreatedData() const; ///< The data added to the patient by the last run. Empty if another patient was loaded during the run
 
 signals:
 	void progress(int done, int total);
@@ -69,6 +69,7 @@ private slots:
 	void usReconstructionFinished();
 	void angioMeshFinished();
 	void extensionFinished();
+	void patientChanged();
 
 private:
 	bool startUsReconstruction();
@@ -84,6 +85,7 @@ private:
 	PatientModelServicePtr mPatientModel;
 	bool mRunning;
 	bool mCancel;
+	bool mPatientChanged;
 	Outputs mOutputs;
 	std::vector<ExtensionOutputs> mExtensions;
 	USReconstructInputData mRecording; ///< The recording selected at the start, also used by the extensions

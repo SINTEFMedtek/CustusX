@@ -19,7 +19,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestFakeReconstructionExtension.h"
 #include "cxtestReconstructionManagerFixture.h"
 #include "cxtestReconstructRealData.h"
+#include "cxDataLocations.h"
 #include "cxLogicManager.h"
+#include "cxSessionStorageService.h"
 #include "cxMesh.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxProperty.h"
@@ -117,6 +119,59 @@ TEST_CASE("UsReconstructionRunner: runs the extensions and lists the created dat
 	CHECK(extension.mRecording == realData.getSourceFilename());
 	REQUIRE(runner.getCreatedData().size() == 1);
 	CHECK(runner.getCreatedData()[0]->getUid() == "fake_fakeB");
+}
+
+TEST_CASE("UsReconstructionRunner: loading another patient cancels the run, and its data is not listed as created", "[unit][usreconstruction]")
+{
+	ReconstructionManagerTestFixture fixture;
+	ReconstructRealTestData realData;
+	cx::UsReconstructionServicePtr reconstruction = fixture.getManager();
+	reconstruction->selectData(realData.getSourceFilename());
+	cx::PatientModelServicePtr patientModel = cx::PatientModelServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::UsReconstructionRunner runner(reconstruction, patientModel);
+	FakeReconstructionExtension extension(patientModel);
+	cx::UsReconstructionRunner::Outputs outputs;
+	outputs.mUsVolume = false;
+	cx::UsReconstructionRunner::ExtensionOutputs first;
+	first.mExtension = &extension;
+	first.mOutputs << "fakeA";
+	cx::UsReconstructionRunner::ExtensionOutputs second = first;
+	second.mOutputs = QStringList() << "fakeB";
+	std::vector<cx::UsReconstructionRunner::ExtensionOutputs> extensions = {first, second};
+	QString status;
+	QObject::connect(&runner, &cx::UsReconstructionRunner::statusChanged, [&status](QString text) { status = text; });
+
+	REQUIRE(runner.start(outputs, extensions));
+	patientModel->insertData(cx::ImagePtr(new cx::Image("otherPatientImage", cx::generateVtkImageData(Eigen::Array3i(2, 2, 2), cx::Vector3D(1, 1, 1), 0), "other")));
+	emit patientModel->patientChanged();
+	REQUIRE(waitForRun(runner));
+
+	CHECK(extension.mStarted == QStringList() << "fakeA");
+	CHECK(runner.getCreatedData().empty());
+	CHECK(status == "Cancelled, as another patient was loaded");
+}
+
+TEST_CASE("UsReconstructionRunner: a US volume is not added to a patient loaded while it is reconstructed", "[integration][usreconstruction][not_win32]")
+{
+	ReconstructionManagerTestFixture fixture;
+	ReconstructRealTestData realData;
+	cx::UsReconstructionServicePtr reconstruction = fixture.getManager();
+	reconstruction->selectData(realData.getSourceFilename());
+	reconstruction->getParam("Algorithm")->setValueFromVariant("pnn");
+	fixture.setPNN_InterpolationSteps(1);
+	cx::PatientModelServicePtr patientModel = cx::PatientModelServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::UsReconstructionRunner runner(reconstruction, patientModel);
+	QString status;
+	QObject::connect(&runner, &cx::UsReconstructionRunner::statusChanged, [&status](QString text) { status = text; });
+
+	REQUIRE(runner.start(cx::UsReconstructionRunner::Outputs(), std::vector<cx::UsReconstructionRunner::ExtensionOutputs>()));
+	REQUIRE(runner.isReconstructingUs());
+	cx::logicManager()->getSessionStorageService()->load(cx::DataLocations::getTestDataPath() + "/temp/test_other_patient.cx3");
+	REQUIRE(waitForRun(runner));
+
+	CHECK(patientModel->getDataOfType<cx::Image>().empty());
+	CHECK(runner.getCreatedData().empty());
+	CHECK(status == "Cancelled, as another patient was loaded");
 }
 
 TEST_CASE("UsReconstructionRunner: reconstructs the US and angio volumes and the angio mesh", "[integration][usreconstruction][not_win32]")
@@ -227,7 +282,10 @@ TEST_CASE("ReconstructionWidget: cannot start while a US reconstruction runs whe
 	cx::UsReconstructionServicePtr reconstruction = fixture.getManager();
 	reconstruction->selectData(realData.getSourceFilename());
 	QObject::connect(reconstruction.get(), &cx::UsReconstructionService::reconstructFinished, qApp, &QApplication::quit);
-	QTimer::singleShot(600000, qApp, &QApplication::quit);
+	QTimer timer;
+	timer.setSingleShot(true);
+	QObject::connect(&timer, &QTimer::timeout, qApp, &QApplication::quit);
+	timer.start(600000);
 	reconstruction->startReconstruction();
 	std::set<cx::TimedAlgorithmPtr> threads = reconstruction->getThreadedReconstruction();
 	REQUIRE(threads.size() == 1);

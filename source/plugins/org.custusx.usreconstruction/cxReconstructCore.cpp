@@ -35,7 +35,8 @@ namespace cx
 
 ReconstructCore::ReconstructCore(cx::PatientModelServicePtr patientModelService) :
 	mInput(InputParams()),
-	mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService),
+	mPatientFolder(patientModelService->getActivePatientFolder())
 {
 //	mMaxTimeDiff = 100; // TODO: Change default value for max allowed time difference between tracking and image time tags
 	mSuccess = false;
@@ -100,7 +101,12 @@ void ReconstructCore::threadedPostReconstruct()
 	if (!this->validInputData())
 		return;
 
-	if (mSuccess)
+	bool patientChanged = mPatientModelService->getActivePatientFolder() != mPatientFolder;
+	if (mSuccess && patientChanged)
+	{
+		reportWarning("The US reconstruction is not added, as another patient was loaded while it ran");
+	}
+	else if (mSuccess)
 	{
 		this->writeProcessedPositions();
 		mOutput = this->generateOutputVolume(mRawOutput);
