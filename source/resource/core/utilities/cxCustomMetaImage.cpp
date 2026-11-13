@@ -13,11 +13,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
+#include <vtkMetaImageReader.h>
+#include <vtkImageChangeInformation.h>
+#include <vtkImageData.h>
 #include "cxLogger.h"
 #include "cxData.h"
 
 #include "cxTypeConversions.h"
 #include "cxEnumConversion.h"
+#include "cxErrorObserver.h"
 
 namespace cx
 {
@@ -90,6 +94,24 @@ IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString)
 CustomMetaImage::CustomMetaImage(QString filename) :
     mFilename(filename)
 {}
+
+vtkImageDataPtr CustomMetaImage::readVtkImageData(QString filename)
+{
+	vtkImageDataPtr retval;
+	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
+	reader->SetFileName(cstring_cast(filename));
+	reader->ReleaseDataFlagOn();
+
+	if (ErrorObserver::checkedRead(reader, filename))
+	{
+		vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
+		zeroer->SetInputConnection(reader->GetOutputPort());
+		zeroer->SetOutputOrigin(0, 0, 0);
+		zeroer->Update();
+		retval = zeroer->GetOutput();
+	}
+	return retval;
+}
 
 QString CustomMetaImage::readKey(QString key)
 {

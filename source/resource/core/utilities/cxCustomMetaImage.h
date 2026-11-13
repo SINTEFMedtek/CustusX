@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QString>
 #include "cxTransform3D.h"
 #include "cxDefinitions.h"
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
@@ -38,6 +39,9 @@ class cxResource_EXPORT CustomMetaImage
 public:
   static CustomMetaImagePtr create(QString filename) { return CustomMetaImagePtr(new CustomMetaImage(filename)); }
   explicit CustomMetaImage(QString filename);
+
+	/// Read the image in an .mhd file, with the origin set to zero. Return null on failure.
+	static vtkImageDataPtr readVtkImageData(QString filename);
 
   Transform3D readTransform();
   void setTransform(const Transform3D M);

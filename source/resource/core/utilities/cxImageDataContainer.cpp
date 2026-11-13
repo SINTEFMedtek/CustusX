@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageData.h>
 #include <iostream>
 #include "cxFileManagerService.h"
+#include "cxCustomMetaImage.h"
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
@@ -41,8 +42,14 @@ vtkImageDataPtr CachedImageData::getImage(FileManagerServicePtr filemanager)
 {
 	if (!mImageData)
 	{
-		//mImageData = MetaImageReader().loadVtkImageData(mFilename);
-		mImageData = filemanager->loadVtkImageData(mFilename);
+		if (filemanager && !filemanager->isNull())
+		{
+			mImageData = filemanager->loadVtkImageData(mFilename);
+		}
+		else
+		{
+			mImageData = CustomMetaImage::readVtkImageData(mFilename);
+		}
 	}
 	return mImageData;
 }

@@ -69,6 +69,20 @@ TEST_CASE("LogicManager: shutdown stops the plugins", "[unit][plugins]")
 	CHECK(getHelpPluginState() != ctkPlugin::ACTIVE);
 }
 
+TEST_CASE("PluginFrameworkManager: save the current state of a plugin that loaded", "[unit][plugins]")
+{
+	CHECK(cx::PluginFrameworkManager::getStateToSave(ctkPlugin::ACTIVE, false, "UNINSTALLED") == "ACTIVE");
+	CHECK(cx::PluginFrameworkManager::getStateToSave(ctkPlugin::UNINSTALLED, false, "ACTIVE") == "UNINSTALLED");
+	CHECK(cx::PluginFrameworkManager::getStateToSave(ctkPlugin::RESOLVED, false, "") == "RESOLVED");
+}
+
+TEST_CASE("PluginFrameworkManager: keep the stored state of a plugin that failed to load", "[unit][plugins]")
+{
+	CHECK(cx::PluginFrameworkManager::getStateToSave(ctkPlugin::UNINSTALLED, true, "ACTIVE") == "ACTIVE");
+	CHECK(cx::PluginFrameworkManager::getStateToSave(ctkPlugin::RESOLVED, true, "ACTIVE") == "ACTIVE");
+	CHECK(cx::PluginFrameworkManager::getStateToSave(ctkPlugin::UNINSTALLED, true, "").isEmpty());
+}
+
 TEST_CASE("LogicManager: plugins are started again after shutdown and initialize", "[unit][plugins]")
 {
 	cx::DataLocations::setTestMode();

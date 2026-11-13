@@ -56,6 +56,8 @@ protected:
 	cx::USReconstructInputData createUSReconstructData(ReconstructionData input);
 
 	QString write(ReconstructionData input);
+	QString write(cx::USReconstructInputData toBeWritten, QString sessionName);
+	bool imageFileExists(QString filename, QString sessionName, unsigned index);
 	cx::USReconstructInputData read(QString filename, cx::FileManagerServicePtr filemanagerservice);
 	void assertCorrespondence(ReconstructionData input, cx::USReconstructInputData output);
 	void assertRecordingInfoCorrespondence(ReconstructionData input, cx::USRecordingInfo output);

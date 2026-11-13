@@ -73,6 +73,8 @@ public:
 	QSharedPointer<ctkPlugin> getInstalledPluginFromSymbolicName(QString symbolicName);
 	ctkPlugin::State getStateFromSymbolicName(QString name);
 	void loadState();
+	/// State to store for a plugin. A plugin that failed to load keeps its stored state, so one failed run doesn't disable it.
+	static QString getStateToSave(ctkPlugin::State currentState, bool failedToLoad, const QString& storedState);
 
 signals:
 	void pluginPoolChanged();
@@ -100,8 +102,11 @@ private:
 	QString convertToRelativePath(QString path) const;
 	QString convertToAbsolutePath(QString path) const;
 
+	void setFailedToLoad(const QString& symbolicName, bool failed);
+
 	QStringList mPluginSearchPaths;
 	QStringList mPluginLibFilter;
+	QStringList mPluginsFailedToLoad;
 	bool mPluginsStopped;
 
 	QString mSettingsSearchPaths;
